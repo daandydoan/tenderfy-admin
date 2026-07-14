@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-page="settings" data-title="Settings">
+<div id="app-content">
+  <div class="pad">
+    <div class="pg-head">
+      <div>
+        <div class="tn-title">Settings</div>
+        <div class="pg-sub">Platform configuration, and the roles that separate template building from QA sign-off.</div>
+      </div>
+    </div>
+
+    <div class="sa-sech" style="justify-content:flex-start">Roles &amp; permissions</div>
+    <div class="pg-sub" style="margin-bottom:14px">Building and QA sign-off are deliberately separated so a template can't be approved by its own author.</div>
+    <table class="dtable">
+      <thead><tr><th>Role</th><th>Can build / edit</th><th>Submit for review</th><th>Approve &amp; publish live</th><th>Manage library</th></tr></thead>
+      <tbody>
+        <tr><td class="nm">Super Admin</td><td class="ok">Yes</td><td class="ok">Yes</td><td class="ok">Yes</td><td class="ok">Yes</td></tr>
+        <tr><td class="nm">Template Builder</td><td class="ok">Yes</td><td class="ok">Yes</td><td class="no">No</td><td class="no">No</td></tr>
+        <tr><td class="nm">QA Approver</td><td class="no">No</td><td class="no">No</td><td class="ok">Yes</td><td class="no">No</td></tr>
+        <tr><td class="nm">Library Manager</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="ok">Yes</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sa-sech mt24" style="justify-content:flex-start">Team</div>
+    <table class="dtable">
+      <thead><tr><th>Member</th><th>Role</th><th></th></tr></thead>
+      <tbody>
+        <tr><td><div class="hstack"><span class="ta" style="width:32px;height:32px;border-radius:50%;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">AW</span><span class="nm">Andrew Williams</span></div></td><td>Super Admin</td><td style="text-align:right"><a class="btn btn-outline btn-xs" data-toast="Edit member">Edit</a></td></tr>
+        <tr><td><div class="hstack"><span class="ta" style="width:32px;height:32px;border-radius:50%;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">DN</span><span class="nm">Daniel</span></div></td><td>Template Builder</td><td style="text-align:right"><a class="btn btn-outline btn-xs" data-toast="Edit member">Edit</a></td></tr>
+        <tr><td><div class="hstack"><span class="ta" style="width:32px;height:32px;border-radius:50%;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">AS</span><span class="nm">Ashish</span></div></td><td>QA Approver</td><td style="text-align:right"><a class="btn btn-outline btn-xs" data-toast="Edit member">Edit</a></td></tr>
+      </tbody>
+    </table>
+
+    <div class="sa-sech mt24" style="justify-content:flex-start">Security</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><div class="nm" style="font-weight:600">Two-factor authentication</div><div class="muted" style="font-size:13px">Require a second factor for all super-admin logins.</div></div>
+        <label class="tg"><input type="checkbox" id="tfa"><span class="tg-slider"></span></label>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script>
+function pageInit(){
+  document.getElementById('tfa').addEventListener('change',e=>showToast(e.target.checked?'Two-factor authentication enabled':'Two-factor authentication disabled'));
+}
+</script>
+<style>
+.dtable td.ok{color:var(--st-green-tx);font-weight:600}.dtable td.no{color:var(--light)}
+.tg{position:relative;display:inline-block;width:46px;height:26px;cursor:pointer}
+.tg input{opacity:0;width:0;height:0}
+.tg-slider{position:absolute;inset:0;background:var(--lighter);border-radius:99px;transition:.2s}
+.tg-slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.tg input:checked + .tg-slider{background:var(--teal)}
+.tg input:checked + .tg-slider:before{transform:translateX(20px)}
+</style>
+</body>
+</html>

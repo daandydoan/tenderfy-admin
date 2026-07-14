@@ -1,28 +1,35 @@
 # Tenderfy Admin Portal — Prototype
 
-Static HTML click-through prototype of the Tenderfy **Super Admin** portal, extracted
-from the [subbie-portal prototype](https://github.com/daandydoan/tenderfy-subbie-portal)
-(`superadmin/` section) so the admin side can grow as its own project.
+Static HTML click-through prototype of the Tenderfy **Super Admin** portal. Originally extracted
+from the [subbie-portal prototype](https://github.com/daandydoan/tenderfy-subbie-portal), now
+redesigned around a global component library and a self-serve template builder.
 
-## Screens
+See **[DESIGN.md](DESIGN.md)** for the IA, the answers to the open design questions, and the
+lifecycle/roles model.
 
-| File | Screen |
+## Sections (reorganised IA)
+
+| Page | Section |
 |---|---|
-| `index.html` | Admin dashboard — company overview, revenue chart, latest subscribers |
-| `subcontractors.html` | Subcontractor list |
-| `view-subbie.html` | Subcontractor detail |
+| `index.html` | **Dashboard** — overview stats, revenue chart, quick links |
+| `library.html` · `component-detail.html` | **Library** — global component library (browse, search, categories, statuses) |
+| `templates.html` · `template-builder.html` | **Templates** — list + 3-pane self-serve builder |
+| `tenants.html` · `tenant-detail.html` | **Tenants** — client companies + per-tenant Brand Kit |
+| `qa.html` | **QA** — review queue, Draft→In review→Approved→Live pipeline |
+| `settings.html` | **Settings** — roles & permissions, security |
 
-Sidebar items without a real screen yet (Manage Company, Subscriptions, AI Usage,
-Reports) show a placeholder toast — they are the expansion points.
+`subcontractors.html` / `view-subbie.html` are legacy subbie screens, kept outside the new IA.
 
 ## Structure
 
-- `styles.css` — full shared stylesheet copied from the subbie-portal prototype
-  (admin uses the `capp` / `c-side` / `c-*` shell and `sa-*` components; the rest
-  is available for new screens)
-- `app.js` — trimmed to what the admin pages use: placeholder-action toasts
-  (`data-toast`) and the hidden-scrollbar toggle
-- No build step — open `index.html` or serve the folder statically
+- `styles.css` — shared base stylesheet (unchanged copy from the subbie prototype)
+- `admin.css` — header / sidebar hover / chart / drawer / register-modal styles
+- `components.css` — library, builder, tenants, QA, settings components
+- `shell.js` — single-source chrome (sidebar IA + header) injected on every page
+- `library-data.js`, `tenant-data.js` — shared prototype data (components, tenants + brand kits)
+- `dashboard.js`, `builder.js` — page logic (chart/modal; builder assemble/brand/preview/assign)
+- Each page exposes a `pageInit()` the shell calls after the chrome is built
+- Deep links use `#id=` hash params. No build step.
 
 ## Run locally
 

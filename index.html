@@ -11,55 +11,58 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
 </head>
-<body>
-<div class="capp">
-  <aside class="c-side">
-    <div class="clogo"><img src="logo-symbol.svg" alt="Tenderfy"></div>
-    <a class="cic active" href="index.html" title="Dashboard"><span class="ms fill">desktop_mac</span></a>
-    <a class="cic" data-toast="Manage companies" title="Manage Company"><span class="ms fill">contacts</span></a>
-    <a class="cic" data-toast="Subscription management" title="Manage Subscription"><span class="ms fill">credit_card</span></a>
-    <a class="cic" data-toast="AI usage" title="AI Usage"><span class="ms fill">auto_awesome</span></a>
-    <a class="cic" href="subcontractors.html" title="Subcontractors"><span class="ms fill">groups</span></a>
-    <a class="cic" data-toast="Reports" title="Reports"><span class="ms fill">description</span></a>
-  </aside>
-  <div class="c-main">
-    <div class="c-header">
-      <div class="l"><span class="ms fill" style="font-size:20px">home</span> <span>Dashboard</span></div>
-      <div class="r"><span class="ms fill" data-toast="Settings">settings</span><span class="ms fill" data-toast="Notifications">notifications</span><span class="grp"><span>Andrew Williams</span><span class="cava">AW</span></span></div>
+<body data-page="dashboard" data-title="Dashboard">
+<div id="app-content">
+  <div class="pad">
+    <div class="tn-title" style="margin-bottom:18px">Dashboard</div>
+
+    <div class="stat-row">
+      <div class="stat-tile"><div class="st-ic"><span class="ms">apartment</span></div><div class="st-big">19</div><div class="st-lbl">Tenants on board</div><div class="st-trend"><span class="ms">trending_up</span> +2 this month</div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">rocket_launch</span></div><div class="st-big">14</div><div class="st-lbl">Live templates</div><div class="st-trend"><span class="ms">trending_up</span> 3 shared across tenants</div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--teal-tint);color:var(--teal)"><span class="ms">widgets</span></div><div class="st-big">22</div><div class="st-lbl">Library components</div><div class="st-trend" style="color:var(--gray)"><span class="ms">public</span> All tenants by default</div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">rate_review</span></div><div class="st-big">2</div><div class="st-lbl">Awaiting QA</div><div class="st-trend" style="color:var(--st-amber-tx)"><span class="ms">schedule</span> Oldest: 1 day</div></div>
     </div>
-    <div class="c-content"><div class="pad">
-      <div class="tn-title" style="margin-bottom:18px">Dashboard</div>
-      <div class="row">
-        <div class="grow">
-          <div class="sa-sech" style="justify-content:flex-start">Overview</div>
-          <div class="sa-ov">
-            <div style="display:flex;align-items:baseline;gap:12px"><span class="big">19</span><span class="lbl">Total companies on board</span></div>
-            <div class="divg"></div>
-            <a class="btn btn-primary" id="regopen"><span class="ms" style="font-size:18px">add</span> Register New Company</a>
-          </div>
-          <div class="sa-sech">Revenue <span class="sa-fy" id="fybtn"><span id="fylabel">FY 2026-2027</span> <span class="ms" style="font-size:15px">filter_list</span></span></div>
-          <div class="sa-chart" id="revchart"></div>
+
+    <div class="row">
+      <div class="grow">
+        <div class="sa-sech" style="justify-content:flex-start">Overview</div>
+        <div class="sa-ov">
+          <div style="display:flex;align-items:baseline;gap:12px"><span class="big">19</span><span class="lbl">Total companies on board</span></div>
+          <div class="divg"></div>
+          <a class="btn btn-primary" id="regopen"><span class="ms" style="font-size:18px">add</span> Register New Company</a>
         </div>
-        <div class="rail">
-          <div class="sa-subs">
-            <div class="sh"><h3>Latest Subscribers</h3><a class="btn btn-primary btn-sm" href="subcontractors.html">Show more</a></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">1996</div><div class="ds">Testing unassigned template first time</div></div><span class="tm">4 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">demo testing purpose</div></div><span class="tm">5 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">Dev Self Testing</div><div class="ds">Since YOPmail accounts are public&hellip;</div></div><span class="tm">11 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">Custom sign1</div><div class="ds">Welcome to Tenderfy! We&rsquo;re excited&hellip;</div></div><span class="tm">11 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">46 GERO</div><div class="ds">TEST</div></div><span class="tm">11 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">self singup 1</div></div><span class="tm">11 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">Test INC</div></div><span class="tm">11 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">Test Inc</div></div><span class="tm">11 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">AABB</div></div><span class="tm">11 days ago</span></div>
-            <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">SubPermission</div></div><span class="tm">12 days ago</span></div>
-          </div>
+
+        <div class="sa-sech">Revenue <span class="sa-fy" id="fybtn"><span id="fylabel">FY 2026-2027</span> <span class="ms" style="font-size:15px">filter_list</span></span></div>
+        <div class="sa-chart" id="revchart"></div>
+
+        <div class="sa-sech mt24" style="justify-content:flex-start">Jump back in</div>
+        <div class="comp-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+          <a class="card" href="library.html" style="display:flex;gap:12px;align-items:center;cursor:pointer"><span class="st-ic" style="margin:0"><span class="ms">widgets</span></span><div><div class="nm" style="font-weight:600">Component Library</div><div class="muted" style="font-size:12.5px">Browse & manage</div></div></a>
+          <a class="card" href="template-builder.html" style="display:flex;gap:12px;align-items:center;cursor:pointer"><span class="st-ic" style="margin:0;background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">build</span></span><div><div class="nm" style="font-weight:600">Template Builder</div><div class="muted" style="font-size:12.5px">Assemble & brand</div></div></a>
+          <a class="card" href="qa.html" style="display:flex;gap:12px;align-items:center;cursor:pointer"><span class="st-ic" style="margin:0;background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">fact_check</span></span><div><div class="nm" style="font-weight:600">QA Review</div><div class="muted" style="font-size:12.5px">2 in queue</div></div></a>
         </div>
       </div>
-    </div></div>
+
+      <div class="rail">
+        <div class="sa-subs">
+          <div class="sh"><h3>Latest Subscribers</h3><a class="btn btn-primary btn-sm" href="tenants.html">Show more</a></div>
+          <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">1996</div><div class="ds">Testing unassigned template first time</div></div><span class="tm">4 days ago</span></div>
+          <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">demo testing purpose</div></div><span class="tm">5 days ago</span></div>
+          <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">Dev Self Testing</div><div class="ds">Since YOPmail accounts are public&hellip;</div></div><span class="tm">11 days ago</span></div>
+          <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">Custom sign1</div><div class="ds">Welcome to Tenderfy! We&rsquo;re excited&hellip;</div></div><span class="tm">11 days ago</span></div>
+          <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">46 GERO</div><div class="ds">TEST</div></div><span class="tm">11 days ago</span></div>
+          <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">self singup 1</div></div><span class="tm">11 days ago</span></div>
+          <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">Test INC</div></div><span class="tm">11 days ago</span></div>
+          <div class="sa-sub"><span class="ms ic">work</span><div><div class="nm">SubPermission</div></div><span class="tm">12 days ago</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Register New Company modal -->
 <div class="modal-overlay" id="regmodal">
   <div class="rmodal">
     <div class="rmhead"><h2>Register New Company</h2><span class="ms" data-close>close</span></div>
@@ -70,9 +73,7 @@
           <div class="field"><label>First Name</label><div class="iinput"><input type="text" placeholder="First Name"><span class="ms">face</span></div></div>
           <div class="field"><label>Last Name</label><div class="iinput"><input type="text" placeholder="Last Name"><span class="ms">face</span></div></div>
           <div class="field"><label>Company Name</label><div class="iinput"><input type="text" id="regcompany" placeholder="Company Name"><span class="ms">work</span></div></div>
-          <div class="field"><label>Industry</label><div class="iinput"><select>
-            <option>Agriculture and Agribusiness</option><option>Construction</option><option>Civil</option><option>Engineering</option><option>Infrastructure</option><option>HVAC</option><option>Trades</option>
-          </select><span class="ms">business</span></div></div>
+          <div class="field"><label>Industry</label><div class="iinput"><select><option>Construction</option><option>Civil</option><option>Engineering</option><option>Infrastructure</option><option>HVAC</option><option>Trades</option></select><span class="ms">business</span></div></div>
           <div class="field"><label>Phone Number</label><div class="iinput"><input type="text" placeholder="Phone Number"><span class="ms">call</span></div></div>
           <div class="field"><label>Address</label><div class="iinput"><input type="text" placeholder="Address"><span class="ms">location_on</span></div></div>
           <div class="field"><label>Company Email</label><div class="iinput"><input type="email" placeholder="Company Email"><span class="ms">email</span></div></div>
@@ -86,15 +87,14 @@
         <div class="field"><label>Set Price</label><div class="iinput"><input type="number" placeholder="$ 0.00"></div></div>
         <div class="field"><label>Number of Tenders</label><div class="iinput"><input type="number" placeholder="0"></div></div>
         <div class="field"><label>Number of Resumes</label><div class="iinput"><input type="number" placeholder="0"></div></div>
-        <div class="field"><label>Number of Case Studies</label><div class="iinput"><input type="number" placeholder="0"></div></div>
-        <div class="field"><label>Number of Policies</label><div class="iinput"><input type="number" placeholder="0"></div></div>
-        <div class="field"><label>Number of Other Documents</label><div class="iinput"><input type="number" placeholder="0"></div></div>
         <div class="field"><label>AI Usage</label><div class="iinput"><select><option>None</option><option>Limited</option><option>Unlimited</option></select></div></div>
       </div>
     </div>
     <div class="rmfoot"><a class="btn btn-outline" data-close>Cancel</a><a class="btn btn-primary" id="regsubmit">Register Company</a></div>
   </div>
 </div>
-<script src="app.js"></script>
+
+<script src="shell.js"></script>
+<script src="dashboard.js"></script>
 </body>
 </html>

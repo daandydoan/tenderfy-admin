@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Templates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-page="templates" data-title="Templates">
+<div id="app-content">
+  <div class="pad">
+    <div class="pg-head">
+      <div>
+        <div class="tn-title">Templates</div>
+        <div class="pg-sub">Reusable, versioned templates assembled from library components. Build once, brand per client on assign — no developer in the loop.</div>
+      </div>
+      <div class="pg-acts">
+        <a class="btn btn-outline btn-sm" href="qa.html"><span class="ms" style="font-size:17px">fact_check</span> Review queue</a>
+        <a class="btn btn-primary btn-sm" href="template-builder.html"><span class="ms" style="font-size:18px">add</span> New Template</a>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-tile"><div class="st-ic"><span class="ms">space_dashboard</span></div><div class="st-big" id="s-total">0</div><div class="st-lbl">Templates</div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">rocket_launch</span></div><div class="st-big" id="s-live">0</div><div class="st-lbl">Live</div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">rate_review</span></div><div class="st-big" id="s-review">0</div><div class="st-lbl">In review</div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-grey-bg);color:var(--st-grey-tx)"><span class="ms">edit_note</span></div><div class="st-big" id="s-draft">0</div><div class="st-lbl">Draft</div></div>
+    </div>
+
+    <div class="pg-toolbar">
+      <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search templates…"></span>
+      <div class="cat-chips" id="stfilter">
+        <span class="cat-chip on" data-st="all">All</span>
+        <span class="cat-chip" data-st="live">Live</span>
+        <span class="cat-chip" data-st="approved">Approved</span>
+        <span class="cat-chip" data-st="inreview">In review</span>
+        <span class="cat-chip" data-st="draft">Draft</span>
+      </div>
+    </div>
+
+    <table class="dtable">
+      <thead><tr><th>Template</th><th>Components</th><th>Assigned tenants</th><th>Version</th><th>Status</th><th>Updated</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script src="tenant-data.js"></script>
+<script>
+const TEMPLATES = [
+  {id:'t1', name:'Construction — Standard Tender', desc:'General head-contractor response', comps:9, tenants:['taylor','hansen','acme'], version:3, status:'live',     updated:'2 days ago'},
+  {id:'t2', name:'Civil Infrastructure Response',  desc:'Includes environmental rows',        comps:11,tenants:['cpm-civil','cpm-infra'],    version:2, status:'live',     updated:'1 week ago'},
+  {id:'t3', name:'Engineering Capability Statement',desc:'Short capability / EOI',            comps:6, tenants:['velocity'],                 version:1, status:'approved', updated:'3 days ago'},
+  {id:'t4', name:'HVAC Maintenance Tender',        desc:'Facilities / maintenance scope',     comps:8, tenants:['civic'],                    version:2, status:'inreview', updated:'5 hours ago'},
+  {id:'t5', name:'Trades Prequalification',        desc:'Subcontractor prequal pack',         comps:5, tenants:[],                           version:1, status:'draft',    updated:'Yesterday'},
+  {id:'t6', name:'Government Supplier Panel',       desc:'Compliance-heavy panel submission',  comps:12,tenants:['taylor','cpm-civil'],       version:4, status:'inreview', updated:'1 day ago'},
+];
+function pageInit(){
+  const byId = Object.fromEntries(TENANTS.map(t=>[t.id,t]));
+  let activeSt='all', query='';
+  const badge=(s)=>{const m={live:'Live',approved:'Approved',inreview:'In review',draft:'Draft'};return `<span class="badge b-${s}"><span class="b-dot"></span>${m[s]}</span>`;};
+  const stack=(ids)=>{
+    if(!ids.length) return '<span class="muted" style="font-size:12.5px">Unassigned</span>';
+    const shown=ids.slice(0,3).map(id=>`<span title="${byId[id].name}">${byId[id].initials}</span>`).join('');
+    const more=ids.length>3?`<span class="more">+${ids.length-3}</span>`:'';
+    return `<span class="avatstack">${shown}${more}</span>`;
+  };
+  function render(){
+    const list=TEMPLATES.filter(t=>(activeSt==='all'||t.status===activeSt)&&(!query||t.name.toLowerCase().includes(query)));
+    document.getElementById('rows').innerHTML = list.map(t=>`
+      <tr onclick="location.href='template-builder.html#id=${t.id}'">
+        <td><div class="nm">${t.name}</div><div class="sub">${t.desc}</div></td>
+        <td>${t.comps}</td>
+        <td>${stack(t.tenants)}</td>
+        <td>v${t.version}</td>
+        <td>${badge(t.status)}</td>
+        <td class="muted">${t.updated}</td>
+      </tr>`).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--light);padding:40px">No templates match.</td></tr>`;
+  }
+  render();
+  document.getElementById('s-total').textContent=TEMPLATES.length;
+  document.getElementById('s-live').textContent=TEMPLATES.filter(t=>t.status==='live').length;
+  document.getElementById('s-review').textContent=TEMPLATES.filter(t=>t.status==='inreview').length;
+  document.getElementById('s-draft').textContent=TEMPLATES.filter(t=>t.status==='draft').length;
+  document.getElementById('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();render();});
+  document.querySelectorAll('#stfilter .cat-chip').forEach(c=>c.addEventListener('click',()=>{
+    activeSt=c.dataset.st;document.querySelectorAll('#stfilter .cat-chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');render();
+  }));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Template Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-page="templates" data-title="Template Builder">
+<div id="app-content">
+  <div class="pad">
+    <div class="crumb"><a href="templates.html">Templates</a> <span class="ms">chevron_right</span> <span id="cr-name">New Template</span></div>
+    <div class="pg-head" style="margin-bottom:14px">
+      <div>
+        <input id="tpl-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:340px" value="Untitled Template">
+        <div class="pg-sub">Assemble components → set brand preview → save (versioned) → send to QA → assign to tenants.</div>
+      </div>
+      <div class="pg-acts">
+        <span class="badge b-draft" id="tpl-status"><span class="b-dot"></span>Draft</span>
+        <a class="btn btn-outline btn-sm" id="previewBtn"><span class="ms" style="font-size:17px">visibility</span> Preview</a>
+        <a class="btn btn-outline btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save</a>
+        <a class="btn btn-primary btn-sm" id="reviewBtn"><span class="ms" style="font-size:17px">send</span> Submit for Review</a>
+      </div>
+    </div>
+
+    <div class="tb-wrap">
+      <!-- Palette -->
+      <div class="tb-col palette">
+        <div class="tb-colhead">Library <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0" id="pal-count"></span></div>
+        <div class="tb-colbody">
+          <div class="tb-psearch"><span class="ms" style="font-size:17px">search</span><input id="pq" placeholder="Search components…"></div>
+          <div id="palette"></div>
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <div class="tb-canvas">
+        <div class="tb-sheet">
+          <div class="tb-brandbar" id="brandbar">
+            <div class="bl" id="bb-logo">TF</div>
+            <div><div class="bt" id="bb-name">Brand-neutral preview</div><div style="font-size:11px;opacity:.85" id="bb-sub">Structure only — pick a tenant to preview its brand</div></div>
+            <div class="bhint">Preview brand</div>
+          </div>
+          <div id="canvas"></div>
+          <div class="tb-drop" id="drop">Drag components here, or click one in the library to add it</div>
+        </div>
+      </div>
+
+      <!-- Properties / Brand / Assign -->
+      <div class="tb-col props">
+        <div class="tb-colhead">Template</div>
+        <div style="overflow:auto;flex:1">
+          <div class="props-sec">
+            <div class="lbl" style="margin-top:0">Description</div>
+            <textarea id="tpl-desc" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;resize:vertical" rows="2" placeholder="What is this template for?"></textarea>
+            <div class="lbl">Components</div>
+            <div class="hstack"><span class="ms" style="color:var(--teal)">widgets</span> <strong id="p-count">0</strong> <span class="muted">added</span></div>
+          </div>
+
+          <div class="props-sec">
+            <h4>Brand identity <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">— applied on assign</span></h4>
+            <div class="lbl" style="margin-top:0">Preview as tenant</div>
+            <select id="brandsel" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;background:#fff">
+              <option value="">Brand-neutral (structure)</option>
+            </select>
+            <div class="lbl">Logo</div>
+            <div class="bk-logo" id="bk-logo" data-toast="Upload logo — pulled from tenant brand kit"><span class="ms">image</span> <span id="bk-logo-t">From tenant brand kit</span></div>
+            <div class="lbl">Colours</div>
+            <div class="bk-swatches" id="bk-sw"><span class="bk-sw add" data-toast="Colours come from the tenant brand kit"><span class="ms" style="font-size:16px">add</span></span></div>
+            <div class="lbl">Font</div>
+            <div class="bk-font"><span id="bk-font">Outfit</span><span class="ms muted" data-toast="Fonts come from the tenant brand kit">expand_more</span></div>
+            <div class="muted" style="font-size:12px;margin-top:10px">Brand is stored on each tenant. The template stays reusable — assigning it applies that tenant's kit automatically.</div>
+          </div>
+        </div>
+        <div class="tb-foot">
+          <a class="btn btn-primary btn-block btn-sm" id="assignBtn"><span class="ms" style="font-size:17px">apartment</span> Assign to Tenants</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Preview modal -->
+<div class="modal-overlay" id="previewModal">
+  <div class="preview-modal">
+    <div class="pm-head"><div class="hstack"><strong id="pm-title">Preview</strong> <span class="badge b-draft" id="pm-brand">Brand-neutral</span></div><span class="ms" style="cursor:pointer" data-close-preview>close</span></div>
+    <div class="pm-body"><div class="preview-paper" id="pm-paper"></div></div>
+  </div>
+</div>
+
+<!-- Assign modal -->
+<div class="modal-overlay" id="assignModal">
+  <div class="rmodal" style="max-width:520px;height:auto">
+    <div class="rmhead"><h2>Assign to tenants</h2><span class="ms" data-close-assign>close</span></div>
+    <div style="padding:8px 24px 0"><div class="muted" style="font-size:13px">Each tenant renders this template with <strong>its own brand kit</strong>, automatically.</div></div>
+    <div style="padding:12px 24px"><div class="assign-list" id="assignList"></div></div>
+    <div class="rmfoot"><a class="btn btn-outline" data-close-assign>Cancel</a><a class="btn btn-primary" id="assignConfirm">Assign <span id="assignN"></span></a></div>
+  </div>
+</div>
+
+<script src="shell.js"></script>
+<script src="library-data.js"></script>
+<script src="tenant-data.js"></script>
+<script src="builder.js"></script>
+</body>
+</html>

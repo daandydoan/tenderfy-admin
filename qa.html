@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · QA Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-page="qa" data-title="QA Review">
+<div id="app-content">
+  <div class="pad">
+    <div class="pg-head">
+      <div>
+        <div class="tn-title">QA Review</div>
+        <div class="pg-sub">Every template passes through review before it goes live. Pipeline: <strong>Draft → In review → Approved → Live</strong>. Builders submit; QA approvers sign off.</div>
+      </div>
+      <div class="pg-acts">
+        <span class="badge b-approved" style="padding:8px 12px"><span class="ms" style="font-size:15px;margin-right:5px">verified_user</span> Your role: QA Approver</span>
+      </div>
+    </div>
+
+    <div class="qa-pipe">
+      <div class="qa-stage done"><span class="qn"><span class="ms" style="font-size:17px">edit_note</span></span><div><div class="qs">Draft</div><div class="qc" id="q-draft">0</div></div></div>
+      <span class="ms qa-arrow">chevron_right</span>
+      <div class="qa-stage active"><span class="qn"><span class="ms" style="font-size:17px">rate_review</span></span><div><div class="qs">In review</div><div class="qc" id="q-review">0</div></div></div>
+      <span class="ms qa-arrow">chevron_right</span>
+      <div class="qa-stage"><span class="qn"><span class="ms" style="font-size:17px">task_alt</span></span><div><div class="qs">Approved</div><div class="qc" id="q-approved">0</div></div></div>
+      <span class="ms qa-arrow">chevron_right</span>
+      <div class="qa-stage"><span class="qn"><span class="ms" style="font-size:17px">rocket_launch</span></span><div><div class="qs">Live</div><div class="qc" id="q-live">0</div></div></div>
+    </div>
+
+    <div class="sa-sech" style="justify-content:flex-start">Review queue</div>
+    <div id="queue" class="mt16"></div>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script>
+const QUEUE = [
+  {id:'q1', name:'HVAC Maintenance Tender', v:2, comps:8, tenant:'Civic HVAC', by:'Daniel', ago:'5 hours ago', note:'Added assumptions section per Wade feedback'},
+  {id:'q2', name:'Government Supplier Panel', v:4, comps:12, tenant:'Taylor Builders, CPM Civil', by:'Ashish', ago:'1 day ago', note:'Compliance matrix + insurance currency updated'},
+];
+const APPROVED = [{name:'Engineering Capability Statement', v:1, tenant:'Velocity Engineering'}];
+function pageInit(){
+  document.getElementById('q-draft').textContent='1';
+  document.getElementById('q-review').textContent=QUEUE.length;
+  document.getElementById('q-approved').textContent=APPROVED.length;
+  document.getElementById('q-live').textContent='2';
+
+  const q=document.getElementById('queue');
+  function render(){
+    q.innerHTML = QUEUE.map(t=>`
+      <div class="qa-row" data-id="${t.id}">
+        <span class="qicon"><span class="ms">space_dashboard</span></span>
+        <div class="qmid">
+          <div class="qtitle">${t.name} <span class="badge b-inreview" style="margin-left:6px"><span class="b-dot"></span>In review</span></div>
+          <div class="qmeta"><span>v${t.v}</span><span>${t.comps} components</span><span>Assigned: ${t.tenant}</span><span>Submitted by ${t.by} · ${t.ago}</span></div>
+          <div class="qmeta" style="color:var(--gray)"><span class="ms" style="font-size:15px">notes</span> ${t.note}</div>
+        </div>
+        <div class="qacts">
+          <a class="btn btn-outline btn-xs" href="template-builder.html#id=${t.id}"><span class="ms" style="font-size:15px">visibility</span> Review</a>
+          <a class="btn btn-danger-outline btn-xs" data-rej="${t.id}"><span class="ms" style="font-size:15px">close</span> Reject</a>
+          <a class="btn btn-green btn-xs" data-app="${t.id}"><span class="ms" style="font-size:15px">check</span> Approve</a>
+        </div>
+      </div>`).join('') || `<div class="qa-row" style="justify-content:center;color:var(--light)">Queue is clear — nothing awaiting review.</div>`;
+    q.querySelectorAll('[data-app]').forEach(b=>b.addEventListener('click',()=>act(b.dataset.app,true)));
+    q.querySelectorAll('[data-rej]').forEach(b=>b.addEventListener('click',()=>act(b.dataset.rej,false)));
+  }
+  function act(id,approved){
+    const i=QUEUE.findIndex(x=>x.id===id); if(i<0)return;
+    const t=QUEUE[i];
+    showToast(approved ? `Approved: ${t.name} — ready to go live` : `Sent back to draft: ${t.name}`);
+    QUEUE.splice(i,1);
+    document.getElementById('q-review').textContent=QUEUE.length;
+    if(approved) document.getElementById('q-approved').textContent=(+document.getElementById('q-approved').textContent+1);
+    else document.getElementById('q-draft').textContent=(+document.getElementById('q-draft').textContent+1);
+    render();
+  }
+  render();
+}
+</script>
+</body>
+</html>
