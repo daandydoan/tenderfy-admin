@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tenderfy — Super Admin · Tenants</title>
+<title>Tenderfy — Super Admin · Clients</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,25 +13,25 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 </head>
-<body data-page="tenants" data-title="Tenants">
+<body data-page="tenants" data-title="Clients">
 <div id="app-content">
   <div class="pad">
     <div class="pg-head">
       <div>
-        <div class="tn-title">Tenants</div>
+        <div class="tn-title">Clients</div>
         <div class="pg-sub">Client companies on the platform. Each holds a <strong>Brand Kit</strong> that is auto-applied to any template assigned to it.</div>
       </div>
       <div class="pg-acts">
-        <a class="btn btn-primary btn-sm" data-toast="Register a new tenant"><span class="ms" style="font-size:18px">add</span> New Tenant</a>
+        <a class="btn btn-primary btn-sm" data-toast="Register a new client"><span class="ms" style="font-size:18px">add</span> New Client</a>
       </div>
     </div>
 
     <div class="pg-toolbar">
-      <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search tenants…"></span>
+      <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search clients…"></span>
     </div>
 
     <table class="dtable">
-      <thead><tr><th>Tenant</th><th>Industry</th><th>Brand kit</th><th>Templates</th><th>Font</th><th></th></tr></thead>
+      <thead><tr><th>Client</th><th>Industry</th><th>Brand kit</th><th>Templates</th><th>Font</th><th></th></tr></thead>
       <tbody id="rows"></tbody>
     </table>
   </div>

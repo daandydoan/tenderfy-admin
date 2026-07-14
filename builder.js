@@ -90,8 +90,8 @@ function pageInit(){
       bar.style.background='var(--teal)';
       document.getElementById('bb-logo').textContent='TF';
       document.getElementById('bb-name').textContent='Brand-neutral preview';
-      document.getElementById('bb-sub').textContent='Structure only — pick a tenant to preview its brand';
-      document.getElementById('bk-logo-t').textContent='From tenant brand kit';
+      document.getElementById('bb-sub').textContent='Structure only — pick a client to preview its brand';
+      document.getElementById('bk-logo-t').textContent='From client brand kit';
       document.getElementById('bk-font').textContent='Outfit';
       document.getElementById('bk-sw').innerHTML='<span class="bk-sw add"><span class="ms" style="font-size:16px">add</span></span>';
       return;
@@ -156,8 +156,8 @@ function pageInit(){
   document.querySelectorAll('[data-close-assign]').forEach(x=>x.addEventListener('click',()=>document.getElementById('assignModal').classList.remove('open')));
   document.getElementById('assignModal').addEventListener('click',e=>{if(e.target.id==='assignModal')e.target.classList.remove('open');});
   document.getElementById('assignConfirm').addEventListener('click', ()=>{
-    if(!assigned.size){showToast('Select at least one tenant');return;}
-    showToast(`Assigned to ${assigned.size} tenant${assigned.size>1?'s':''} — each applies its own brand kit`);
+    if(!assigned.size){showToast('Select at least one client');return;}
+    showToast(`Assigned to ${assigned.size} client${assigned.size>1?'s':''} — each applies its own brand kit`);
     document.getElementById('assignModal').classList.remove('open');
   });
 

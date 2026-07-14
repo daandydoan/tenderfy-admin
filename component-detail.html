@@ -50,9 +50,9 @@
           <div class="cd-attr"><span class="k">Used in templates</span><span class="v" id="a-used">—</span></div>
         </div>
         <div class="card">
-          <div class="sa-sech" style="justify-content:flex-start;font-size:15px">Tenant availability</div>
+          <div class="sa-sech" style="justify-content:flex-start;font-size:15px">Client availability</div>
           <div id="avail"></div>
-          <a class="btn btn-outline btn-sm btn-block mt16" data-toast="Manage tenant availability"><span class="ms" style="font-size:16px">tune</span> Manage availability</a>
+          <a class="btn btn-outline btn-sm btn-block mt16" data-toast="Manage client availability"><span class="ms" style="font-size:16px">tune</span> Manage availability</a>
         </div>
         <div class="card">
           <div class="sa-sech" style="justify-content:flex-start;font-size:15px">Version history</div>
@@ -100,11 +100,11 @@ function pageInit(){
   // availability
   const av = document.getElementById('avail');
   if(c.restricted){
-    av.innerHTML = `<div class="hstack" style="color:var(--st-amber-tx);font-weight:600;margin-bottom:8px"><span class="ms">lock</span> Restricted to ${c.restricted} tenants</div>
-      <div class="muted" style="font-size:13px">This component is an exception — hidden from the ${c.status==='deprecated'?'platform':'other'} tenants. Everything else is available to all.</div>`;
+    av.innerHTML = `<div class="hstack" style="color:var(--st-amber-tx);font-weight:600;margin-bottom:8px"><span class="ms">lock</span> Restricted to ${c.restricted} clients</div>
+      <div class="muted" style="font-size:13px">This component is an exception — hidden from the ${c.status==='deprecated'?'platform':'other'} clients. Everything else is available to all.</div>`;
   } else {
-    av.innerHTML = `<div class="hstack" style="color:var(--st-green-tx);font-weight:600;margin-bottom:8px"><span class="ms">public</span> Available to all tenants</div>
-      <div class="muted" style="font-size:13px">Default. Any template in any tenant can use this component.</div>`;
+    av.innerHTML = `<div class="hstack" style="color:var(--st-green-tx);font-weight:600;margin-bottom:8px"><span class="ms">public</span> Available to all clients</div>
+      <div class="muted" style="font-size:13px">Default. Any template for any client can use this component.</div>`;
   }
 }
 </script>

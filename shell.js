@@ -1,5 +1,5 @@
 // Tenderfy Super Admin — shared shell (chrome for every page).
-// Renders the reorganised IA (Dashboard / Library / Templates / Tenants / QA / Settings)
+// Renders the reorganised IA (Dashboard / Library / Templates / Clients / Subcontractors / QA / Settings)
 // plus the header (search, notifications, calendar drawer, user menu) around each page's
 // content. A page supplies only its inner content in #app-content plus data-page / data-title.
 
@@ -19,7 +19,7 @@ const NAV = [
   {key:'dashboard', icon:'desktop_mac',    label:'Dashboard', href:'index.html'},
   {key:'library',   icon:'widgets',        label:'Library',   href:'library.html'},
   {key:'templates', icon:'space_dashboard',label:'Templates', href:'templates.html'},
-  {key:'tenants',   icon:'apartment',      label:'Tenants',   href:'tenants.html'},
+  {key:'tenants',   icon:'apartment',      label:'Clients',   href:'tenants.html'},
   {key:'subcontractors', icon:'groups',   label:'Subcontractors', href:'subcontractors.html'},
   {key:'qa',        icon:'fact_check',     label:'QA',        href:'qa.html'},
   {key:'settings',  icon:'settings',       label:'Settings',  href:'settings.html'},

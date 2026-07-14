@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tenderfy — Super Admin · Tenant</title>
+<title>Tenderfy — Super Admin · Client</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,10 +13,10 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 </head>
-<body data-page="tenants" data-title="Tenants">
+<body data-page="tenants" data-title="Clients">
 <div id="app-content">
   <div class="pad">
-    <div class="crumb"><a href="tenants.html">Tenants</a> <span class="ms">chevron_right</span> <span id="cr-name">Tenant</span></div>
+    <div class="crumb"><a href="tenants.html">Clients</a> <span class="ms">chevron_right</span> <span id="cr-name">Client</span></div>
     <div class="pg-head">
       <div class="hstack" style="gap:14px">
         <span id="t-av" style="width:52px;height:52px;border-radius:12px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700"></span>
@@ -71,7 +71,7 @@ function pageInit(){
   const t=TENANTS.find(x=>x.id===id)||TENANTS[0];
   document.getElementById('cr-name').textContent=t.name;
   document.getElementById('t-name').textContent=t.name;
-  document.getElementById('t-ind').textContent=t.industry+' · Tenant since 2025';
+  document.getElementById('t-ind').textContent=t.industry+' · Client since 2025';
   document.getElementById('t-av').textContent=t.initials;
   document.getElementById('c-pri').style.background=t.brand.primary;
   document.getElementById('c-pri-hex').textContent=t.brand.primary.toUpperCase();

@@ -19,7 +19,7 @@
     <div class="pg-head">
       <div>
         <div class="tn-title">Component Library</div>
-        <div class="pg-sub">One source of truth. Every component is available to <strong>all tenants by default</strong> — restricting is a deliberate exception. Components define structure only; branding is applied in the template builder.</div>
+        <div class="pg-sub">One source of truth. Every component is available to <strong>all clients by default</strong> — restricting is a deliberate exception. Components define structure only; branding is applied in the template builder.</div>
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" data-toast="Manage categories"><span class="ms" style="font-size:17px">category</span> Categories</a>
@@ -31,7 +31,7 @@
       <div class="stat-tile"><div class="st-ic"><span class="ms">widgets</span></div><div class="st-big" id="s-total">0</div><div class="st-lbl">Components</div></div>
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">check_circle</span></div><div class="st-big" id="s-pub">0</div><div class="st-lbl">Published</div></div>
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-grey-bg);color:var(--st-grey-tx)"><span class="ms">edit_note</span></div><div class="st-big" id="s-draft">0</div><div class="st-lbl">Draft</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">lock</span></div><div class="st-big" id="s-restrict">0</div><div class="st-lbl">Tenant-restricted</div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">lock</span></div><div class="st-big" id="s-restrict">0</div><div class="st-lbl">Client-restricted</div></div>
     </div>
 
     <div class="pg-toolbar">
@@ -86,7 +86,7 @@ function pageInit(){
           <div class="nm">${c.name} ${badge(c.status)}</div>
           <div class="cat">${c.category}</div>
           <div class="foot">
-            <span>${c.restricted ? `<span class="comp-restrict"><span class="ms">lock</span> ${c.restricted} tenants</span>` : 'All tenants'}</span>
+            <span>${c.restricted ? `<span class="comp-restrict"><span class="ms">lock</span> ${c.restricted} clients</span>` : 'All clients'}</span>
             <span>v${c.version}</span>
           </div>
         </div>

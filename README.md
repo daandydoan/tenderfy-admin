@@ -14,13 +14,14 @@ lifecycle/roles model.
 | `index.html` | **Dashboard** — overview stats, revenue chart, quick links |
 | `library.html` · `component-detail.html` | **Library** — global component library (browse, search, categories, statuses) |
 | `templates.html` · `template-builder.html` | **Templates** — list + 3-pane self-serve builder |
-| `tenants.html` · `tenant-detail.html` | **Tenants** — client companies + per-tenant Brand Kit |
+| `tenants.html` · `tenant-detail.html` | **Clients** — client companies + per-client Brand Kit |
 | `subcontractors.html` · `view-subbie.html` | **Subcontractors** — the tenants' supply chain: onboarding status, compliance, activity |
 | `qa.html` | **QA** — review queue, Draft→In review→Approved→Live pipeline |
 | `settings.html` | **Settings** — roles & permissions, security |
 
-Subcontractors are a distinct entity from Tenants (client companies): tenants are the
-head contractors; subcontractors are who they invite to quote.
+Subcontractors are a distinct entity from Clients (the customer companies): clients are the
+head contractors; subcontractors are who they invite to quote. The `tenants.html` /
+`tenant-data.js` filenames and internal ids are kept as-is — only the visible label is "Clients".
 
 ## Structure
 

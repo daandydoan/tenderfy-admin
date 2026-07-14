@@ -20,7 +20,7 @@
     <div class="pg-head" style="margin-bottom:14px">
       <div>
         <input id="tpl-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:340px" value="Untitled Template">
-        <div class="pg-sub">Assemble components → set brand preview → save (versioned) → send to QA → assign to tenants.</div>
+        <div class="pg-sub">Assemble components → set brand preview → save (versioned) → send to QA → assign to clients.</div>
       </div>
       <div class="pg-acts">
         <span class="badge b-draft" id="tpl-status"><span class="b-dot"></span>Draft</span>
@@ -45,7 +45,7 @@
         <div class="tb-sheet">
           <div class="tb-brandbar" id="brandbar">
             <div class="bl" id="bb-logo">TF</div>
-            <div><div class="bt" id="bb-name">Brand-neutral preview</div><div style="font-size:11px;opacity:.85" id="bb-sub">Structure only — pick a tenant to preview its brand</div></div>
+            <div><div class="bt" id="bb-name">Brand-neutral preview</div><div style="font-size:11px;opacity:.85" id="bb-sub">Structure only — pick a client to preview its brand</div></div>
             <div class="bhint">Preview brand</div>
           </div>
           <div id="canvas"></div>
@@ -66,21 +66,21 @@
 
           <div class="props-sec">
             <h4>Brand identity <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">— applied on assign</span></h4>
-            <div class="lbl" style="margin-top:0">Preview as tenant</div>
+            <div class="lbl" style="margin-top:0">Preview as client</div>
             <select id="brandsel" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;background:#fff">
               <option value="">Brand-neutral (structure)</option>
             </select>
             <div class="lbl">Logo</div>
-            <div class="bk-logo" id="bk-logo" data-toast="Upload logo — pulled from tenant brand kit"><span class="ms">image</span> <span id="bk-logo-t">From tenant brand kit</span></div>
+            <div class="bk-logo" id="bk-logo" data-toast="Upload logo — pulled from client brand kit"><span class="ms">image</span> <span id="bk-logo-t">From client brand kit</span></div>
             <div class="lbl">Colours</div>
-            <div class="bk-swatches" id="bk-sw"><span class="bk-sw add" data-toast="Colours come from the tenant brand kit"><span class="ms" style="font-size:16px">add</span></span></div>
+            <div class="bk-swatches" id="bk-sw"><span class="bk-sw add" data-toast="Colours come from the client brand kit"><span class="ms" style="font-size:16px">add</span></span></div>
             <div class="lbl">Font</div>
-            <div class="bk-font"><span id="bk-font">Outfit</span><span class="ms muted" data-toast="Fonts come from the tenant brand kit">expand_more</span></div>
-            <div class="muted" style="font-size:12px;margin-top:10px">Brand is stored on each tenant. The template stays reusable — assigning it applies that tenant's kit automatically.</div>
+            <div class="bk-font"><span id="bk-font">Outfit</span><span class="ms muted" data-toast="Fonts come from the client brand kit">expand_more</span></div>
+            <div class="muted" style="font-size:12px;margin-top:10px">Brand is stored on each client. The template stays reusable — assigning it applies that client's kit automatically.</div>
           </div>
         </div>
         <div class="tb-foot">
-          <a class="btn btn-primary btn-block btn-sm" id="assignBtn"><span class="ms" style="font-size:17px">apartment</span> Assign to Tenants</a>
+          <a class="btn btn-primary btn-block btn-sm" id="assignBtn"><span class="ms" style="font-size:17px">apartment</span> Assign to Clients</a>
         </div>
       </div>
     </div>
@@ -98,8 +98,8 @@
 <!-- Assign modal -->
 <div class="modal-overlay" id="assignModal">
   <div class="rmodal" style="max-width:520px;height:auto">
-    <div class="rmhead"><h2>Assign to tenants</h2><span class="ms" data-close-assign>close</span></div>
-    <div style="padding:8px 24px 0"><div class="muted" style="font-size:13px">Each tenant renders this template with <strong>its own brand kit</strong>, automatically.</div></div>
+    <div class="rmhead"><h2>Assign to clients</h2><span class="ms" data-close-assign>close</span></div>
+    <div style="padding:8px 24px 0"><div class="muted" style="font-size:13px">Each client renders this template with <strong>its own brand kit</strong>, automatically.</div></div>
     <div style="padding:12px 24px"><div class="assign-list" id="assignList"></div></div>
     <div class="rmfoot"><a class="btn btn-outline" data-close-assign>Cancel</a><a class="btn btn-primary" id="assignConfirm">Assign <span id="assignN"></span></a></div>
   </div>
