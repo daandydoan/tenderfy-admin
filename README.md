@@ -12,8 +12,9 @@ lifecycle/roles model.
 | Page | Section |
 |---|---|
 | `index.html` | **Dashboard** — overview stats, revenue chart, quick links |
-| `library.html` · `component-detail.html` | **Library** — global component library (browse, search, categories, statuses) |
-| `templates.html` · `template-builder.html` | **Templates** — list + 3-pane self-serve builder |
+| `blocks.html` | **Blocks** — content blocks behind Tenderfy's Block Builder; standard set + custom blocks |
+| `library.html` · `component-detail.html` | **Documents** — reusable document sections by type (Resumes, Case Studies, Policies, Insurances, Certifications, Org Chart, Cover Pages, TOC, Others), assembled from blocks |
+| `templates.html` · `template-builder.html` | **Templates** — assemble documents into a tender architecture; save as **Preset** or assign to clients |
 | `tenants.html` · `tenant-detail.html` | **Clients** — client companies + per-client Brand Kit, plan & credits; **AI Usage** tab |
 | `subcontractors.html` · `view-subbie.html` | **Subcontractors** — the clients' supply chain: onboarding status, compliance, activity |
 | `subscriptions.html` | **Subscriptions** — global plan catalog (reference; editor in production) |

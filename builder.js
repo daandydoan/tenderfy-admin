@@ -152,6 +152,10 @@ function pageInit(){
     }));
   }
   function updateN(){ document.getElementById('assignN').textContent = assigned.size?`(${assigned.size})`:''; }
+  document.getElementById('presetBtn').addEventListener('click', ()=>{
+    if(!blocks.length){showToast('Add documents before saving a preset');return;}
+    showToast('Saved as a reusable tender preset — available to assign to any client');
+  });
   document.getElementById('assignBtn').addEventListener('click', ()=>{ renderAssign(); updateN(); document.getElementById('assignModal').classList.add('open'); });
   document.querySelectorAll('[data-close-assign]').forEach(x=>x.addEventListener('click',()=>document.getElementById('assignModal').classList.remove('open')));
   document.getElementById('assignModal').addEventListener('click',e=>{if(e.target.id==='assignModal')e.target.classList.remove('open');});

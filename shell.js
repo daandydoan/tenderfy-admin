@@ -17,7 +17,8 @@ window.showToast = showToast;
 
 const NAV = [
   {key:'dashboard', icon:'desktop_mac',    label:'Dashboard', href:'index.html'},
-  {key:'library',   icon:'widgets',        label:'Library',   href:'library.html'},
+  {key:'blocks',    icon:'grid_view',      label:'Blocks',    href:'blocks.html'},
+  {key:'library',   icon:'description',    label:'Documents', href:'library.html'},
   {key:'templates', icon:'space_dashboard',label:'Templates', href:'templates.html'},
   {key:'tenants',   icon:'apartment',      label:'Clients',   href:'tenants.html'},
   {key:'subcontractors', icon:'groups',   label:'Subcontractors', href:'subcontractors.html'},

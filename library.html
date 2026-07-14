@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tenderfy — Super Admin · Component Library</title>
+<title>Tenderfy — Super Admin · Documents</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,29 +13,29 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 </head>
-<body data-page="library" data-title="Component Library">
+<body data-page="library" data-title="Documents">
 <div id="app-content">
   <div class="pad">
     <div class="pg-head">
       <div>
-        <div class="tn-title">Component Library</div>
-        <div class="pg-sub">One source of truth. Every component is available to <strong>all clients by default</strong> — restricting is a deliberate exception. Components define structure only; branding is applied in the template builder.</div>
+        <div class="tn-title">Documents</div>
+        <div class="pg-sub">The reusable document sections a tender is made of — Resumes, Case Studies, Policies, Insurances, Certifications and more. Each is assembled from <a href="blocks.html" style="color:var(--teal)">blocks</a>, available to <strong>all clients by default</strong>, and brand-applied when used in a template.</div>
       </div>
       <div class="pg-acts">
-        <a class="btn btn-outline btn-sm" data-toast="Manage categories"><span class="ms" style="font-size:17px">category</span> Categories</a>
-        <a class="btn btn-primary btn-sm" data-toast="Create new component"><span class="ms" style="font-size:18px">add</span> New Component</a>
+        <a class="btn btn-outline btn-sm" data-toast="Manage document types"><span class="ms" style="font-size:17px">category</span> Types</a>
+        <a class="btn btn-primary btn-sm" data-toast="Create new document"><span class="ms" style="font-size:18px">add</span> New Document</a>
       </div>
     </div>
 
     <div class="stat-row">
-      <div class="stat-tile"><div class="st-ic"><span class="ms">widgets</span></div><div class="st-big" id="s-total">0</div><div class="st-lbl">Components</div></div>
+      <div class="stat-tile"><div class="st-ic"><span class="ms">description</span></div><div class="st-big" id="s-total">0</div><div class="st-lbl">Documents</div></div>
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">check_circle</span></div><div class="st-big" id="s-pub">0</div><div class="st-lbl">Published</div></div>
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-grey-bg);color:var(--st-grey-tx)"><span class="ms">edit_note</span></div><div class="st-big" id="s-draft">0</div><div class="st-lbl">Draft</div></div>
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">lock</span></div><div class="st-big" id="s-restrict">0</div><div class="st-lbl">Client-restricted</div></div>
     </div>
 
     <div class="pg-toolbar">
-      <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search components…"></span>
+      <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search documents…"></span>
       <div class="filter-dd" id="statusdd">
         <button class="filter-toggle" data-kebab><span class="ms" style="font-size:16px">filter_list</span> <span id="statuslabel">All statuses</span></button>
         <div class="filter-panel" id="statuspanel">
@@ -49,7 +49,7 @@
 
     <div class="cat-chips mt16" id="cats"></div>
     <div class="comp-grid mt24" id="grid"></div>
-    <div id="empty" style="display:none;text-align:center;color:var(--light);padding:60px 0"><span class="ms" style="font-size:44px">search_off</span><p class="mt16">No components match your filters.</p></div>
+    <div id="empty" style="display:none;text-align:center;color:var(--light);padding:60px 0"><span class="ms" style="font-size:44px">search_off</span><p class="mt16">No documents match your filters.</p></div>
   </div>
 </div>
 <script src="shell.js"></script>
