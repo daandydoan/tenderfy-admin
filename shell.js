@@ -17,9 +17,11 @@ window.showToast = showToast;
 
 const NAV = [
   {key:'dashboard', icon:'desktop_mac',    label:'Dashboard', href:'index.html'},
-  {key:'blocks',    icon:'grid_view',      label:'Blocks',    href:'blocks.html'},
-  {key:'library',   icon:'description',    label:'Documents', href:'library.html'},
-  {key:'templates', icon:'space_dashboard',label:'Templates', href:'templates.html'},
+  {group:'content', icon:'layers',         label:'Content', children:[
+    {key:'blocks',    icon:'grid_view',      label:'Blocks',    href:'blocks.html'},
+    {key:'library',   icon:'description',    label:'Documents', href:'library.html'},
+    {key:'templates', icon:'space_dashboard',label:'Templates', href:'templates.html'},
+  ]},
   {key:'tenants',   icon:'apartment',      label:'Clients',   href:'tenants.html'},
   {key:'subcontractors', icon:'groups',   label:'Subcontractors', href:'subcontractors.html'},
   {key:'subscriptions', icon:'credit_card', label:'Subscriptions', href:'subscriptions.html'},
@@ -34,10 +36,16 @@ function buildShell(){
   const title = document.body.dataset.title || '';
   const src = document.getElementById('app-content');
 
-  const nav = NAV.map(n=>`
-    <a class="cic ${n.key===page?'active':''}" href="${n.href}" title="${n.label}">
-      <span class="ms fill">${n.icon}</span><span class="clbl">${n.label}</span>
-    </a>`).join('');
+  const item = (n)=>`<a class="cic ${n.key===page?'active':''}" href="${n.href}" title="${n.label}"><span class="ms fill">${n.icon}</span><span class="clbl">${n.label}</span></a>`;
+  const nav = NAV.map(n=>{
+    if(!n.children) return item(n);
+    const childActive = n.children.some(c=>c.key===page);
+    const kids = n.children.map(c=>`<a class="cic csub ${c.key===page?'active':''}" href="${c.href}" title="${c.label}"><span class="ms fill">${c.icon}</span><span class="clbl">${c.label}</span></a>`).join('');
+    return `<div class="cgroup open">
+      <a class="cic cgroup-head ${childActive?'active':''}" title="${n.label}"><span class="ms fill">${n.icon}</span><span class="clbl">${n.label}</span><span class="ms cchev">expand_more</span></a>
+      <div class="c-subnav">${kids}</div>
+    </div>`;
+  }).join('');
 
   const notifs = SIGNUPS.map(n=>`
     <div class="nitem"><span class="nic" style="background:var(--teal-tint);color:var(--teal)"><span class="ms">notifications_active</span></span>
@@ -74,6 +82,10 @@ function buildShell(){
 
   wireHeader();
   buildDrawer();
+  // Collapsible sidebar groups (parent header toggles its submenu)
+  document.querySelectorAll('.cgroup-head').forEach(h=>{
+    h.addEventListener('click', (e)=>{ e.preventDefault(); h.closest('.cgroup').classList.toggle('open'); });
+  });
 }
 
 function closePopovers(except){

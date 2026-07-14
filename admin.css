@@ -10,6 +10,18 @@
 .c-side:hover .clbl{display:inline}
 .c-side .cic.active .clbl,.c-side .cic:hover .clbl{color:var(--teal-bright)}
 
+/* ---- Sidebar group: parent with collapsible submenu ---- */
+.c-side .cgroup-head{cursor:pointer}
+.c-side .cchev{display:none;margin-left:auto;font-size:19px;color:#fff;opacity:.75;transition:transform .18s ease}
+.c-side:hover .cgroup-head .cchev{display:inline-block}
+.c-side .cgroup.open .cchev{transform:rotate(180deg)}
+.c-side .c-subnav{display:none;flex-direction:column}
+.c-side:hover .cgroup.open .c-subnav{display:flex}
+.c-side .c-subnav .cic .ms{font-size:20px}
+.c-side:hover .c-subnav .cic{padding-left:56px}
+.c-side .c-subnav .cic .clbl{font-size:13.5px}
+.c-side .c-subnav .cic.active .clbl{color:var(--teal-bright)}
+
 /* ---- Header: notification bell with badge, user menu, calendar drawer ---- */
 .c-header .r .hbtn{position:relative;display:flex;align-items:center}
 .hbadge{position:absolute;top:-7px;right:-9px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#F2A33C;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
