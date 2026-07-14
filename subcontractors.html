@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy â€” Super Admin Â· Subcontractors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="capp">
+  <aside class="c-side">
+    <div class="clogo"><img src="logo-symbol.svg" alt="Tenderfy"></div>
+    <a class="cic" href="index.html" title="Dashboard"><span class="ms fill">desktop_mac</span></a>
+    <a class="cic" data-toast="Manage companies" title="Manage Company"><span class="ms fill">contacts</span></a>
+    <a class="cic" data-toast="Subscription management" title="Subscriptions"><span class="ms fill">credit_card</span></a>
+    <a class="cic" data-toast="AI usage" title="AI Usage"><span class="ms fill">auto_awesome</span></a>
+    <a class="cic active" href="subcontractors.html" title="Subcontractors"><span class="ms fill">groups</span></a>
+    <a class="cic" data-toast="Reports" title="Reports"><span class="ms fill">description</span></a>
+  </aside>
+  <div class="c-main">
+    <div class="c-header">
+      <div class="l"><span class="ms fill" style="font-size:20px">home</span> <span>Subcontractors</span></div>
+      <div class="r"><span class="ms fill" data-toast="Settings">settings</span><span class="ms fill" data-toast="Notifications">notifications</span><span class="grp"><span>Andrew Williams</span><span class="cava">AW</span></span></div>
+    </div>
+    <div class="c-content"><div class="pad">
+      <div class="cs-top">
+        <div><div class="h1">Subcontractors</div><p class="sub" style="margin-top:4px">Subcontractors invited by contractors across Tenderfy &mdash; onboarding status and activity.</p></div>
+        <a class="btn btn-outline" data-toast="Export subcontractor data (CSV)"><span class="ms" style="font-size:18px">download</span> Export</a>
+      </div>
+
+      <div class="vs-stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px">
+        <div class="vs-stat"><div class="v">248</div><div class="l">Total invited</div></div>
+        <div class="vs-stat"><div class="v">176</div><div class="l">Registered</div><div class="sub2">71% conversion</div></div>
+        <div class="vs-stat"><div class="v">52</div><div class="l">Pending invite</div></div>
+        <div class="vs-stat"><span class="live"></span><div class="v">134</div><div class="l">Active</div><div class="sub2">quoted in 30 days</div></div>
+        <div class="vs-stat"><div class="v">20</div><div class="l">Declined / bounced</div></div>
+      </div>
+
+      <div class="cs-search-row">
+        <div class="sa-search"><span class="ms" style="font-size:18px">search</span><input placeholder="Search by subbie, contractor or trade&hellip;"></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <a class="btn btn-outline btn-sm" data-toast="Filter by status">Status <span class="ms" style="font-size:16px">arrow_drop_down</span></a>
+          <a class="btn btn-outline btn-sm" data-toast="Filter by contractor">Contractor <span class="ms" style="font-size:16px">arrow_drop_down</span></a>
+          <span class="sub" id="scCount">248 subcontractors</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0">
+        <div style="overflow-x:auto">
+        <table class="ctable"><thead><tr><th>Subcontractor</th><th>Invited by</th><th>Trade</th><th>Status</th><th class="c">Quotes</th><th>Invited</th><th>Last active</th><th style="text-align:right">Action</th></tr></thead>
+          <tbody id="scBody"></tbody>
+        </table>
+        </div>
+        <div class="ct-foot"><span>Showing 1&ndash;8 of 248</span><span class="pgbtn" data-toast="Previous page"><span class="ms" style="font-size:16px">chevron_left</span></span><span class="pgbtn" data-toast="Next page"><span class="ms" style="font-size:16px">chevron_right</span></span></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+<script src="app.js"></script>
+<script>
+const SUBS = [
+  {name:'Northolt Construction',av:'NC',color:'#38988A',by:'Tenderfy Civil',trade:'Traffic Management',status:'Active',badge:'b-active',quotes:12,inv:'2 Mar 2026',last:'2 days ago',contact:'Kenzie May',email:'kenzie.m@northolt.com.au',abn:'61 904 749 201',region:'Brisbane, QLD',verified:true,acc:7,resp:84,turn:'2.4 days',comp:['current','current','expiring','current']},
+  {name:'Ironbark Traffic',av:'IT',color:'#795548',by:'Tenderfy Civil',trade:'Traffic Management',status:'Active',badge:'b-active',quotes:8,inv:'5 Mar 2026',last:'Today',contact:'Dylan Ross',email:'dylan@ironbarktraffic.com.au',abn:'54 210 998 771',region:'Carole Park, QLD',verified:true,acc:5,resp:91,turn:'1.8 days',comp:['current','current','current','current']},
+  {name:'Metro Civil',av:'MS',color:'#5C6BC0',by:'Buildcorp QLD',trade:'Civil Works',status:'Registered',badge:'b-registered',quotes:2,inv:'8 Mar 2026',last:'6 days ago',contact:'Priya Nair',email:'priya@metrocivil.com.au',abn:'33 771 220 984',region:'Archerfield, QLD',verified:false,acc:0,resp:60,turn:'4.1 days',comp:['current','missing','current','missing']},
+  {name:'Coastline Demolition',av:'CD',color:'#8D6E63',by:'Hansen Projects',trade:'Demolition',status:'Viewed',badge:'b-viewed',quotes:0,inv:'11 Mar 2026',last:'11 Mar 2026',contact:'Aaron West',email:'aaron@coastlinedemo.com.au',abn:'â€”',region:'Warana, QLD',verified:false,acc:0,resp:0,turn:'â€”',comp:['expiring','missing','expired','missing']},
+  {name:'Apex Civil Group',av:'AC',color:'#00838F',by:'Buildcorp QLD',trade:'Civil Works',status:'Active',badge:'b-active',quotes:5,inv:'1 Mar 2026',last:'Yesterday',contact:'Sam Lee',email:'sam@apexcivil.com.au',abn:'12 345 678 901',region:'The Gap, QLD',verified:true,acc:3,resp:78,turn:'2.9 days',comp:['current','current','current','missing']},
+  {name:'Greenline Landscaping',av:'GL',color:'#2E7D32',by:'McMahon Services',trade:'Landscaping',status:'Invited',badge:'b-invited',quotes:0,inv:'14 Mar 2026',last:'&mdash;',contact:'â€”',email:'hello@greenline.com.au',abn:'â€”',region:'Bulimba, QLD',verified:false,acc:0,resp:0,turn:'â€”',comp:['missing','missing','missing','missing']},
+  {name:'Buildcorp Plumbing',av:'BP',color:'#6D4C41',by:'Acme Constructions',trade:'Plumbing',status:'Declined',badge:'b-declined',quotes:0,inv:'3 Mar 2026',last:'4 Mar 2026',contact:'â€”',email:'admin@buildcorpplumbing.com.au',abn:'â€”',region:'Yatala, QLD',verified:false,acc:0,resp:0,turn:'â€”',comp:['missing','missing','missing','missing']},
+  {name:'Meridian Earthworks',av:'ME',color:'#827717',by:'Hansen Projects',trade:'Earthworks',status:'Registered',badge:'b-registered',quotes:1,inv:'9 Mar 2026',last:'3 days ago',contact:'Lena Ford',email:'lena@meridianearth.com.au',abn:'88 640 112 305',region:'Torrington, QLD',verified:false,acc:0,resp:70,turn:'3.1 days',comp:['current','current','missing','current']},
+];
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const COMP_NAMES=['Public Liability','Workers Comp','Trade Licence','White Card'];
+const COMP=Object.assign(Object.create(null),{current:{c:'#34C759',t:'Current',x:''},expiring:{c:'var(--secondary)',t:'Expiring soon',x:'#9A6B15'},expired:{c:'var(--accent)',t:'Expired',x:'var(--accent)'},missing:{c:'var(--lighter)',t:'Not on file',x:'var(--light)'}});
+const PENDING=['Invited','Viewed','Declined'];
+
+function renderRows(){
+  document.getElementById('scBody').innerHTML = SUBS.map((s,i)=>`
+    <tr class="${s.suspended?'suspended':''}">
+      <td><div class="ccell"><span class="ava" style="background:${s.color}">${s.av}</span><span style="font-weight:600">${esc(s.name)}</span>${s.verified?'<span class="ms" title="Verified" style="font-size:15px;color:var(--teal)">verified</span>':''}</div></td>
+      <td class="trade">${esc(s.by)}</td>
+      <td class="trade">${esc(s.trade)}</td>
+      <td><span class="badge ${s.suspended?'b-suspended':s.badge}">${s.suspended?'Suspended':s.status}</span></td>
+      <td class="c" style="text-align:center;font-weight:600">${s.quotes||'&mdash;'}</td>
+      <td class="trade">${s.inv}</td>
+      <td class="trade">${s.last}</td>
+      <td style="text-align:right;white-space:nowrap">${(PENDING.includes(s.status)&&!s.suspended)?`<a class="sc-resend" onclick="saResend(event,${i})">Resend</a>`:''}<a class="rq-view" href="view-subbie.html?i=${i}">View &rarr;</a></td>
+    </tr>`).join('');
+}
+renderRows();
+
+function saResend(e,i){ if(e)e.stopPropagation(); showToast('Invite resent to '+SUBS[i].name); }
+</script>
+</body>
+</html>
