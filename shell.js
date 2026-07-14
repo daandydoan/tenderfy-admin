@@ -20,6 +20,7 @@ const NAV = [
   {key:'library',   icon:'widgets',        label:'Library',   href:'library.html'},
   {key:'templates', icon:'space_dashboard',label:'Templates', href:'templates.html'},
   {key:'tenants',   icon:'apartment',      label:'Tenants',   href:'tenants.html'},
+  {key:'subcontractors', icon:'groups',   label:'Subcontractors', href:'subcontractors.html'},
   {key:'qa',        icon:'fact_check',     label:'QA',        href:'qa.html'},
   {key:'settings',  icon:'settings',       label:'Settings',  href:'settings.html'},
 ];

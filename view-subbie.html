@@ -11,70 +11,57 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
 </head>
-<body>
-<div class="capp">
-  <aside class="c-side">
-    <div class="clogo"><img src="logo-symbol.svg" alt="Tenderfy"></div>
-    <a class="cic" href="index.html" title="Dashboard"><span class="ms fill">desktop_mac</span></a>
-    <a class="cic" data-toast="Manage companies" title="Manage Company"><span class="ms fill">contacts</span></a>
-    <a class="cic" data-toast="Subscription management" title="Manage Subscription"><span class="ms fill">credit_card</span></a>
-    <a class="cic" data-toast="AI usage" title="AI Usage"><span class="ms fill">auto_awesome</span></a>
-    <a class="cic active" href="subcontractors.html" title="Subcontractors"><span class="ms fill">groups</span></a>
-    <a class="cic" data-toast="Reports" title="Reports"><span class="ms fill">description</span></a>
-  </aside>
-  <div class="c-main">
-    <div class="c-header">
-      <div class="l"><span class="ms fill" style="font-size:20px">home</span> <span>Subcontractors</span> <span class="dot">&bull;</span> <span>View Sub-contractor</span></div>
-      <div class="r"><span class="ms fill" data-toast="Settings">settings</span><span class="ms fill" data-toast="Notifications">notifications</span><span class="grp"><span>Andrew Williams</span><span class="cava">AW</span></span></div>
+<body data-page="subcontractors" data-title="View Sub-contractor">
+<div id="app-content">
+  <div class="pad">
+    <div class="crumb"><a href="subcontractors.html">Subcontractors</a> <span class="ms">chevron_right</span> <span id="vCrumb">View Sub-contractor</span></div>
+    <div class="vs-head">
+      <a class="vs-back" href="subcontractors.html"><span class="ms" style="font-size:18px">chevron_left</span></a>
+      <div class="h1" id="vName" style="display:flex;align-items:center;gap:12px"></div>
+      <div style="margin-left:auto;display:flex;gap:12px;align-items:center" id="vActs"></div>
     </div>
-    <div class="c-content"><div class="pad">
-      <div class="vs-head">
-        <a class="vs-back" href="subcontractors.html"><span class="ms" style="font-size:18px">chevron_left</span></a>
-        <div class="h1" id="vName" style="display:flex;align-items:center;gap:12px"></div>
-        <div style="margin-left:auto;display:flex;gap:12px;align-items:center" id="vActs"></div>
-      </div>
-      <p class="sub" id="vSub" style="margin:-6px 0 18px"></p>
+    <p class="sub" id="vSub" style="margin:-6px 0 18px"></p>
 
-      <div class="vs-stats" style="grid-template-columns:repeat(5,1fr)" id="vStats"></div>
+    <div class="vs-stats" style="grid-template-columns:repeat(5,1fr)" id="vStats"></div>
 
-      <div class="row">
-        <div class="grow">
-          <div class="vs-sec">
-            <div class="vs-sech" onclick="this.closest('.vs-sec').classList.toggle('collapsed')"><span class="ms">expand_less</span> DETAILS</div>
-            <div class="vs-secb">
-              <div class="dgrid" id="vDetails"></div>
-            </div>
-          </div>
-          <div class="vs-sec">
-            <div class="vs-sech" onclick="this.closest('.vs-sec').classList.toggle('collapsed')"><span class="ms">expand_less</span> ONBOARDING &amp; ACTIVITY</div>
-            <div class="vs-secb">
-              <div class="sad-tl" id="vTl" style="margin-top:4px"></div>
-            </div>
-          </div>
-          <div class="vs-sec" style="margin-bottom:0">
-            <div class="vs-sech" onclick="this.closest('.vs-sec').classList.toggle('collapsed')"><span class="ms">expand_less</span> INTERNAL NOTES</div>
-            <div class="vs-secb">
-              <div id="vNotes" style="margin-top:4px"></div>
-              <textarea class="sad-note" id="vNoteInput" rows="2" placeholder="Add an internal note (operators only)&hellip;"></textarea>
-              <a class="btn btn-outline btn-sm" style="margin-top:8px" onclick="saAddNote()">Add note</a>
-            </div>
+    <div class="row">
+      <div class="grow">
+        <div class="vs-sec">
+          <div class="vs-sech" onclick="this.closest('.vs-sec').classList.toggle('collapsed')"><span class="ms">expand_less</span> DETAILS</div>
+          <div class="vs-secb">
+            <div class="dgrid" id="vDetails"></div>
           </div>
         </div>
-        <div class="rail">
-          <div class="comp-card" style="padding:14px" id="vRailActs"></div>
-          <div class="comp-card" id="vVerify"></div>
-          <div class="comp-card">
-            <h4>COMPLIANCE</h4>
-            <div id="vComp"></div>
-            <a class="comp-link" id="vCompReq" data-toast="Requested missing documents">Request missing documents &rarr;</a>
+        <div class="vs-sec">
+          <div class="vs-sech" onclick="this.closest('.vs-sec').classList.toggle('collapsed')"><span class="ms">expand_less</span> ONBOARDING &amp; ACTIVITY</div>
+          <div class="vs-secb">
+            <div class="sad-tl" id="vTl" style="margin-top:4px"></div>
+          </div>
+        </div>
+        <div class="vs-sec" style="margin-bottom:0">
+          <div class="vs-sech" onclick="this.closest('.vs-sec').classList.toggle('collapsed')"><span class="ms">expand_less</span> INTERNAL NOTES</div>
+          <div class="vs-secb">
+            <div id="vNotes" style="margin-top:4px"></div>
+            <textarea class="sad-note" id="vNoteInput" rows="2" placeholder="Add an internal note (operators only)&hellip;"></textarea>
+            <a class="btn btn-outline btn-sm" style="margin-top:8px" onclick="saAddNote()">Add note</a>
           </div>
         </div>
       </div>
-    </div></div>
+      <div class="rail">
+        <div class="vs-card" style="padding:14px" id="vRailActs"></div>
+        <div class="vs-card" id="vVerify"></div>
+        <div class="vs-card">
+          <h4>COMPLIANCE</h4>
+          <div id="vComp"></div>
+          <a class="vs-link" id="vCompReq" data-toast="Requested missing documents">Request missing documents &rarr;</a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<script src="app.js"></script>
+<script src="shell.js"></script>
 <script>
 const SUBS = [
   {name:'Northolt Construction',av:'NC',color:'#38988A',by:'Tenderfy Civil',trade:'Traffic Management',status:'Active',badge:'b-active',quotes:12,inv:'2 Mar 2026',last:'2 days ago',contact:'Kenzie May',email:'kenzie.m@northolt.com.au',abn:'61 904 749 201',region:'Brisbane, QLD',verified:true,acc:7,resp:84,turn:'2.4 days',comp:['current','current','expiring','current']},
@@ -91,7 +78,7 @@ const COMP_NAMES=['Public Liability','Workers Comp','Trade Licence','White Card'
 const COMP=Object.assign(Object.create(null),{current:{c:'#34C759',t:'Current',x:'var(--teal)'},expiring:{c:'var(--secondary)',t:'Expiring soon',x:'#B7791F'},expired:{c:'var(--accent)',t:'Expired',x:'var(--accent)'},missing:{c:'var(--lighter)',t:'Not on file',x:'var(--light)'}});
 const PENDING=['Invited','Viewed','Declined'];
 
-let cur=+((new URLSearchParams(location.search)).get('i'));
+let cur=+((new URLSearchParams(location.search || location.hash.slice(1))).get('i'));
 if(!(cur>=0&&cur<SUBS.length)) cur=0;
 
 function timeline(s){
@@ -109,12 +96,12 @@ function timeline(s){
 
 function render(){
   const s=SUBS[cur];
+  document.getElementById('vCrumb').textContent = s.name;
   const badge=`<span class="badge ${s.suspended?'b-suspended':s.badge}">${s.suspended?'Suspended':s.status}</span>`;
   document.getElementById('vName').innerHTML = esc(s.name)+' '+badge
     + (s.verified?'<span class="ms" title="Verified subcontractor" style="font-size:20px;color:var(--teal)">verified</span>':'');
   document.getElementById('vSub').innerHTML = 'Invited by <b>'+esc(s.by)+'</b> &middot; onboarding &amp; network activity across all contractors on Tenderfy.';
 
-  // header actions
   const a=[`<a class="sub" style="cursor:pointer;color:var(--accent);font-weight:600" onclick="saSuspend()">${s.suspended?'Restore':'Suspend'}</a>`,
     `<a class="btn btn-outline" data-toast="Message ${esc(s.name)}"><span class="ms" style="font-size:16px">chat</span> Message</a>`,
     `<a class="btn btn-outline" data-toast="Impersonate ${esc(s.name)} (read-only)">View as</a>`];
@@ -122,7 +109,6 @@ function render(){
   else if(!s.verified) a.push(`<a class="btn btn-primary" onclick="saVerify()"><span class="ms" style="font-size:16px">verified</span> Run verification</a>`);
   document.getElementById('vActs').innerHTML=a.join('');
 
-  // stats
   const wr=s.quotes?Math.round(s.acc/s.quotes*100)+'%':'—';
   document.getElementById('vStats').innerHTML=[
     {v:s.quotes||'—',l:'Quotes submitted'},
@@ -132,7 +118,6 @@ function render(){
     {v:'1',l:'Contractors'}
   ].map(t=>`<div class="vs-stat">${t.live?'<span class="live"></span>':''}<div class="v">${t.v}</div><div class="l">${t.l}</div>${t.s2?`<div class="sub2">${t.s2}</div>`:''}</div>`).join('');
 
-  // details
   const trades = s.trade.split(',').map(t=>`<span class="tchip">${esc(t.trim())}</span>`).join('');
   document.getElementById('vDetails').innerHTML=`
     <div>
@@ -148,34 +133,30 @@ function render(){
       <div class="drow" style="border-bottom:none"><span class="k">Verification</span><span>${s.verified?'<span style="color:var(--teal);font-weight:600">Verified</span>':'<span style="color:#B7791F;font-weight:600">Unverified</span>'}</span></div>
     </div>`;
 
-  // timeline
   document.getElementById('vTl').innerHTML=timeline(s).map(e=>`<div class="sad-ev ${e.done?'':'mut'}"><div class="t">${esc(e.t)}</div><div class="d">${e.d}</div></div>`).join('');
 
-  // rail quick actions
   const ra=[];
   if(PENDING.includes(s.status)&&!s.suspended){ ra.push(`<a class="btn btn-primary btn-block" onclick="saResend()">Resend invite</a>`); ra.push(`<a class="btn btn-outline btn-block" style="margin-top:10px" data-toast="Invite expired for ${esc(s.name)}">Expire invite</a>`); }
   else { ra.push(`<a class="btn btn-primary btn-block" data-toast="Message ${esc(s.name)}">Message subcontractor</a>`); ra.push(`<a class="btn btn-outline btn-block" style="margin-top:10px" data-toast="Impersonate ${esc(s.name)} (read-only)">View as subcontractor</a>`); }
   document.getElementById('vRailActs').innerHTML=ra.join('');
 
-  // verification card
   document.getElementById('vVerify').innerHTML = s.verified
     ? `<h4>VERIFICATION</h4><div class="crow" style="border-bottom:none"><span class="dot2" style="background:#34C759"></span>ABN &amp; identity checked<span class="stat" style="color:var(--teal)">Verified</span></div>`
     : `<h4>VERIFICATION</h4><p class="sub" style="font-size:12px;margin:2px 0 10px">ABN and identity not yet checked for this subcontractor.</p><a class="btn btn-outline btn-block btn-sm" onclick="saVerify()">Run verification</a>`;
 
-  // compliance
   document.getElementById('vComp').innerHTML=s.comp.map((st,j)=>{const c=COMP[st];return `<div class="crow"><span class="dot2" style="background:${c.c}"></span>${COMP_NAMES[j]}<span class="stat" style="color:${c.x}">${c.t}</span></div>`;}).join('');
   document.getElementById('vCompReq').style.display = s.comp.every(x=>x==='current') ? 'none' : '';
 
-  // notes
   s.notes=s.notes||[{m:'System &middot; '+s.inv,t:'Invited by '+s.by+'.'}];
   renderNotes();
 }
 function renderNotes(){ const s=SUBS[cur]; document.getElementById('vNotes').innerHTML=(s.notes||[]).map(n=>`<div class="sad-noteitem"><div class="m">${n.m}</div>${esc(n.t)}</div>`).join(''); }
 function saResend(){ showToast('Invite resent to '+SUBS[cur].name); }
-function saVerify(){ SUBS[cur].verified=true; showToast('Verification passed &mdash; '+SUBS[cur].name+' verified'); render(); }
+function saVerify(){ SUBS[cur].verified=true; showToast('Verification passed — '+SUBS[cur].name+' verified'); render(); }
 function saSuspend(){ const s=SUBS[cur]; s.suspended=!s.suspended; showToast(s.suspended?(s.name+' suspended'):(s.name+' restored')); render(); }
 function saAddNote(){ const el=document.getElementById('vNoteInput'); const v=el.value.trim(); if(!v)return; SUBS[cur].notes.unshift({m:'You &middot; just now',t:v}); el.value=''; renderNotes(); }
-render();
+
+function pageInit(){ render(); }
 </script>
 </body>
 </html>

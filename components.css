@@ -206,3 +206,9 @@
 .hstack{display:flex;align-items:center;gap:8px}
 .mt16{margin-top:16px}.mt24{margin-top:24px}
 .btn-xs{padding:6px 12px;font-size:12.5px;border-radius:8px}
+
+/* ---- Subcontractor detail rail cards (renamed from .comp-card to avoid the
+        collision with the library card that shares this stylesheet) ---- */
+.vs-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 22px}
+.vs-card h4{font-size:12px;letter-spacing:.8px;margin-bottom:10px}
+.vs-link{display:inline-block;color:var(--teal);font-size:12.5px;font-weight:600;margin-top:10px;cursor:pointer}
