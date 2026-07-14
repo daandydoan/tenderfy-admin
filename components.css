@@ -320,3 +320,65 @@
 .bk-strip .bk-item:last-child{border-right:none;padding-right:0}
 .bk-strip .bk-k{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:600}
 .bk-strip .bk-sw2{width:22px;height:22px;border-radius:6px;border:1px solid rgba(0,0,0,.08);display:inline-block;vertical-align:middle}
+
+/* ============================================================================
+   Client detail v2 — identity hero + main/rail split, clear button hierarchy.
+   ============================================================================ */
+.cd2-back{display:inline-flex;align-items:center;gap:3px;color:var(--gray);font-size:13px;font-weight:500;margin-bottom:16px}
+.cd2-back:hover{color:var(--teal)}
+.cd2-back .ms{font-size:18px}
+
+.cd2-hero{display:flex;align-items:center;gap:20px;flex-wrap:wrap;background:#fff;border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin-bottom:22px}
+.cd2-id{display:flex;align-items:center;gap:18px;flex:1;min-width:240px}
+.cd2-avatar{width:68px;height:68px;border-radius:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:700}
+.cd2-name{font-size:23px;font-weight:700;line-height:1.15}
+.cd2-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--gray);font-size:13px;margin-top:7px}
+.cd2-actions{display:flex;align-items:center;gap:10px}
+
+.cd2-morewrap{position:relative}
+.cd2-more{width:40px;height:40px;border:1px solid var(--border);background:#fff;border-radius:10px;color:var(--gray);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cd2-more:hover{border-color:var(--lighter);color:var(--ink)}
+.kebab-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;flex-direction:column;min-width:190px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.15);padding:6px;z-index:30}
+.kebab-menu.open{display:flex}
+.kebab-menu a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;font-size:13.5px;color:var(--ink);cursor:pointer}
+.kebab-menu a:hover{background:var(--page)}
+.kebab-menu a .ms{font-size:18px;color:var(--gray)}
+.kebab-menu a.danger{color:var(--accent)}.kebab-menu a.danger:hover{background:var(--st-pink-bg)}
+.kebab-menu a.danger .ms{color:var(--accent)}
+.kebab-sep{height:1px;background:var(--row);margin:5px 8px}
+
+.cd2-grid{display:grid;grid-template-columns:1fr 322px;gap:20px;align-items:start}
+@media(max-width:900px){.cd2-grid{grid-template-columns:1fr}}
+.cd2-main{display:flex;flex-direction:column;gap:22px;min-width:0}
+.cd2-rail{display:flex;flex-direction:column;gap:20px}
+
+.cd2-cardhead{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.cd2-cardhead h3{font-size:15px;font-weight:700;margin:0}
+.cd2-cardhead .sub{font-size:12.5px;color:var(--light);flex:1}
+.cd2-cardhead .lnk{font-size:12.5px;color:var(--teal);font-weight:600;cursor:pointer}
+.cd2-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cd2-sec-h h2{font-size:17px;font-weight:600;margin:0}
+
+.cd2-brand{display:grid;grid-template-columns:1fr 200px;gap:24px;align-items:start}
+@media(max-width:560px){.cd2-brand{grid-template-columns:1fr}}
+.cd2-brow{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--row);font-size:13.5px}
+.cd2-brow:last-child{border-bottom:none}
+.cd2-brow .sw{width:30px;height:30px;border-radius:8px;border:1px solid rgba(0,0,0,.08);flex-shrink:0}
+.cd2-brow .k{color:var(--gray);width:92px;flex-shrink:0}
+.cd2-brow .v{font-weight:600;margin-left:auto}
+.cd2-brand-prev .pk{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:600;margin-bottom:8px}
+
+/* rail: subscription + details */
+.cd2-plan{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+.cd2-plan .pl{font-size:22px;font-weight:700}
+.cd2-plan .pt{font-size:12px;color:var(--light)}
+.cd2-credit{margin-bottom:16px}
+.cd2-credit:last-child{margin-bottom:0}
+.cd2-credit .cl{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px;color:var(--gray)}
+.cd2-credit .cl .v{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.cd2-credit .note{font-size:11.5px;color:var(--light);margin-top:5px}
+.cd2-detail-row{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--row);font-size:13.5px;align-items:flex-start}
+.cd2-detail-row:last-child{border-bottom:none}
+.cd2-detail-row .ms{font-size:18px;color:var(--teal);flex-shrink:0}
+.cd2-detail-row .dv{font-weight:500;word-break:break-word;min-width:0}
+.cd2-detail-row .dk{display:block;color:var(--light);font-size:11px;text-transform:uppercase;letter-spacing:.3px;font-weight:600;margin-bottom:1px}

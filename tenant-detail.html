@@ -16,68 +16,93 @@
 <body data-page="tenants" data-title="Clients">
 <div id="app-content">
   <div class="pad">
-    <!-- Header (production View Company style) -->
-    <div class="td-head">
-      <a class="td-back" href="tenants.html"><span class="ms" style="font-size:18px">chevron_left</span> Back</a>
-      <div class="td-title"><span class="vc-headbar"></span> View Client</div>
-      <div class="td-acts">
-        <a class="btn btn-danger" data-toast="Delete client">Delete Company</a>
-        <a class="btn btn-neutral" data-toast="Block client">Block</a>
-      </div>
-    </div>
+    <a class="cd2-back" href="tenants.html"><span class="ms">chevron_left</span> Clients</a>
 
-    <!-- Top: Basic Information | Plan Credits + Top-Up Credits -->
-    <div class="vc-grid">
-      <div class="vc-basic">
-        <div class="vc-basic-head"><span>Basic Information</span> <a class="btn btn-amber btn-sm" data-toast="View client profile">View Profile</a></div>
-        <div class="vc-basic-body">
-          <div class="vc-avatar" id="vc-avatar"></div>
-          <div>
-            <div class="vc-name" id="vc-name">—</div>
-            <div class="vc-company" id="vc-company"></div>
-            <div class="vc-contact"><span class="ms">call</span> <span id="vc-phone">—</span></div>
-            <div class="vc-contact"><span class="ms">mail</span> <span id="vc-email">—</span></div>
-            <div class="vc-contact"><span class="ms">apartment</span> <span id="vc-quota">—</span></div>
+    <!-- Identity hero: who this is + the actions, ranked -->
+    <div class="cd2-hero">
+      <div class="cd2-id">
+        <div class="cd2-avatar" id="vc-avatar"></div>
+        <div>
+          <div class="cd2-name" id="vc-name">—</div>
+          <div class="cd2-meta">
+            <span class="badge b-active">Active</span>
+            <span id="vc-company"></span>
+            <span>·</span>
+            <span>Client since 2025</span>
           </div>
         </div>
       </div>
-      <div class="vc-credits">
-        <div class="pc-card">
-          <div class="pc-label">Plan Credits</div>
-          <div class="pc-bigrow"><span class="pc-big" id="pc-big">—</span> <span class="pc-rem">Remaining</span></div>
-          <div class="pc-bar"><i id="pc-fill"></i></div>
-          <div class="pc-used" id="pc-used"></div>
-          <div class="pc-note" id="pc-renews"></div>
-        </div>
-        <div class="pc-card">
-          <div class="pc-bigrow" style="margin-bottom:5px"><span class="pc-label">Top-Up Credits</span></div>
-          <div class="pc-bigrow"><span class="pc-big" id="tu-big">—</span> <span class="pc-rem">Remaining</span> <span class="pc-pill" id="tu-pill" style="display:none">No top-up credits</span></div>
-          <div class="pc-bar grey"><i id="tu-fill"></i></div>
-          <div class="pc-used" id="tu-used"></div>
-          <div class="pc-note">Will be used after plan credits run out</div>
+      <div class="cd2-actions">
+        <a class="btn btn-primary" href="templates.html"><span class="ms" style="font-size:18px">add</span> Assign Template</a>
+        <a class="btn btn-outline" data-toast="Edit brand kit"><span class="ms" style="font-size:17px">palette</span> Brand Kit</a>
+        <div class="cd2-morewrap">
+          <button class="cd2-more" id="moreBtn" data-kebab><span class="ms">more_vert</span></button>
+          <div class="kebab-menu" id="moreMenu">
+            <a data-toast="View client profile"><span class="ms">person</span> View profile</a>
+            <a data-toast="Message client"><span class="ms">chat</span> Message client</a>
+            <div class="kebab-sep"></div>
+            <a data-toast="Block client"><span class="ms">block</span> Block</a>
+            <a class="danger" data-toast="Delete client"><span class="ms">delete</span> Delete company</a>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Brand Kit (redesign) -->
-    <div class="sa-sech" style="justify-content:space-between">
-      <span>Brand Kit <span class="muted" style="font-weight:400;font-size:13px;margin-left:6px">— auto-applied to every assigned template</span></span>
-      <a class="btn btn-outline btn-sm" data-toast="Edit brand kit"><span class="ms" style="font-size:16px">palette</span> Edit</a>
-    </div>
-    <div class="bk-strip" style="margin-top:12px">
-      <div class="bk-item"><span class="bk-k">Logo</span><span id="bk-logo"></span></div>
-      <div class="bk-item"><span class="bk-k">Primary</span><span><span class="bk-sw2" id="bk-pri"></span> <span id="bk-pri-hex" style="font-weight:600;font-size:13px"></span></span></div>
-      <div class="bk-item"><span class="bk-k">Secondary</span><span><span class="bk-sw2" id="bk-sec"></span> <span id="bk-sec-hex" style="font-weight:600;font-size:13px"></span></span></div>
-      <div class="bk-item"><span class="bk-k">Heading font</span><span id="bk-font" style="font-weight:600;font-size:15px"></span></div>
-      <div class="bk-item" style="flex:1;min-width:170px"><span class="bk-k">Live preview</span><div id="bk-live" style="border-radius:8px;overflow:hidden;border:1px solid var(--border)"></div></div>
-    </div>
+    <!-- Body: wide main column + supporting rail -->
+    <div class="cd2-grid">
+      <div class="cd2-main">
+        <!-- Brand Kit -->
+        <div class="card">
+          <div class="cd2-cardhead"><h3>Brand Kit</h3><span class="sub">Auto-applied to every assigned template</span><a class="lnk" data-toast="Edit brand kit">Edit</a></div>
+          <div class="cd2-brand">
+            <div>
+              <div class="cd2-brow"><span class="sw" id="bk-pri"></span><span class="k">Primary</span><span class="v" id="bk-pri-hex"></span></div>
+              <div class="cd2-brow"><span class="sw" id="bk-sec"></span><span class="k">Secondary</span><span class="v" id="bk-sec-hex"></span></div>
+              <div class="cd2-brow"><span class="sw" style="background:#2E3C3B"></span><span class="k">Text</span><span class="v">#2E3C3B</span></div>
+              <div class="cd2-brow"><span class="ms" style="color:var(--gray)">title</span><span class="k">Heading font</span><span class="v" id="bk-font"></span></div>
+              <div class="cd2-brow"><span class="ms" style="color:var(--gray)">notes</span><span class="k">Body font</span><span class="v">Outfit</span></div>
+            </div>
+            <div class="cd2-brand-prev">
+              <div class="pk">Live preview</div>
+              <div id="bk-live" style="border-radius:10px;overflow:hidden;border:1px solid var(--border)"></div>
+            </div>
+          </div>
+        </div>
 
-    <!-- Assigned templates by document type -->
-    <div class="sa-sech mt24" style="justify-content:space-between">
-      <span>Assigned templates</span>
-      <a class="btn btn-primary btn-sm" href="templates.html"><span class="ms" style="font-size:16px">add</span> Assign template</a>
+        <!-- Assigned templates -->
+        <div>
+          <div class="cd2-sec-h"><h2>Assigned templates</h2><span class="muted" id="asg-total" style="font-size:13px"></span></div>
+          <div id="assigned"></div>
+        </div>
+      </div>
+
+      <aside class="cd2-rail">
+        <!-- Subscription & credits -->
+        <div class="card">
+          <div class="cd2-cardhead"><h3>Subscription</h3><a class="lnk" href="subscriptions.html">Manage</a></div>
+          <div class="cd2-plan"><span class="pl" id="cd-plan">—</span><span class="pt">Renews <span id="cd-renews"></span></span></div>
+          <div class="cd2-credit">
+            <div class="cl"><span>Plan credits</span><span class="v" id="cd-pc-v"></span></div>
+            <div class="pc-bar"><i id="cd-pc-m"></i></div>
+            <div class="note">Resets each billing cycle</div>
+          </div>
+          <div class="cd2-credit">
+            <div class="cl"><span>Top-up credits</span><span class="v" id="cd-tu-v"></span></div>
+            <div class="pc-bar grey"><i id="cd-tu-m"></i></div>
+            <div class="note">Used after plan credits run out</div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="card">
+          <div class="cd2-cardhead"><h3>Details</h3></div>
+          <div class="cd2-detail-row"><span class="ms">mail</span><span class="dv"><span class="dk">Email</span><span id="vc-email"></span></span></div>
+          <div class="cd2-detail-row"><span class="ms">call</span><span class="dv"><span class="dk">Phone</span><span id="vc-phone"></span></span></div>
+          <div class="cd2-detail-row"><span class="ms">business</span><span class="dv"><span class="dk">Industry</span><span id="vc-industry"></span></span></div>
+          <div class="cd2-detail-row"><span class="ms">description</span><span class="dv"><span class="dk">Templates used</span><span id="vc-quota"></span></span></div>
+        </div>
+      </aside>
     </div>
-    <div id="assigned" class="mt16"></div>
   </div>
 </div>
 <script src="shell.js"></script>
@@ -88,29 +113,17 @@ function pageInit(){
   const t=TENANTS.find(x=>x.id===id)||TENANTS[0];
   const b=t.brand;
 
-  // Basic information
+  // Hero
+  const av=document.getElementById('vc-avatar'); av.textContent=t.initials; av.style.background=b.primary; av.style.fontFamily=`'${b.font}',sans-serif`;
   document.getElementById('vc-name').textContent=t.name;
   document.getElementById('vc-company').textContent=t.industry;
-  document.getElementById('vc-email').textContent=t.id+'@'+t.name.toLowerCase().replace(/[^a-z]+/g,'')+'.com.au';
-  document.getElementById('vc-phone').textContent='+61 7 '+(3000+t.name.length*13)+' '+(1000+t.templates*97);
-  document.getElementById('vc-quota').textContent=t.templates+' / 30 templates';
-  const av=document.getElementById('vc-avatar'); av.textContent=t.initials; av.style.background=b.primary; av.style.fontFamily=`'${b.font}',sans-serif`;
 
-  // Plan credits
-  const pc=t.planCredits;
-  document.getElementById('pc-big').textContent=pc+'%';
-  document.getElementById('pc-fill').style.width=pc+'%';
-  document.getElementById('pc-used').textContent=(100-pc)+'% used';
-  document.getElementById('pc-renews').textContent='Renews on '+t.renews;
-  // Top-up credits
-  const tu=t.topup;
-  document.getElementById('tu-big').textContent=tu+'%';
-  document.getElementById('tu-fill').style.width=tu+'%';
-  document.getElementById('tu-used').textContent=(100-tu)+'% used';
-  if(tu===0) document.getElementById('tu-pill').style.display='';
+  // Kebab menu
+  const mb=document.getElementById('moreBtn'), mm=document.getElementById('moreMenu');
+  mb.addEventListener('click', ()=>{ if(typeof closePopovers==='function') closePopovers(mm); mm.classList.toggle('open'); });
+  mm.addEventListener('click', ()=>mm.classList.remove('open'));
 
-  // Brand kit strip
-  document.getElementById('bk-logo').innerHTML=`<span style="display:inline-flex;width:40px;height:40px;border-radius:9px;background:${b.primary};color:#fff;align-items:center;justify-content:center;font-weight:700;font-family:'${b.font}',sans-serif">${t.initials}</span>`;
+  // Brand kit
   document.getElementById('bk-pri').style.background=b.primary;
   document.getElementById('bk-pri-hex').textContent=b.primary.toUpperCase();
   document.getElementById('bk-sec').style.background=b.secondary;
@@ -118,8 +131,23 @@ function pageInit(){
   document.getElementById('bk-font').textContent=b.font;
   document.getElementById('bk-font').style.fontFamily=`'${b.font}',sans-serif`;
   document.getElementById('bk-live').innerHTML=`
-    <div style="background:${b.primary};color:#fff;padding:11px 14px"><div style="font-family:'${b.font}',sans-serif;font-weight:700;font-size:13px">${t.name}</div><div style="font-size:10px;opacity:.85">Tender Response</div></div>
-    <div style="padding:11px 14px"><div style="font-weight:700;color:${b.primary};border-bottom:2px solid ${b.secondary};padding-bottom:4px;font-size:12px;font-family:'${b.font}',sans-serif">Executive Summary</div><div style="height:6px;background:#eef0f0;border-radius:4px;margin:8px 0;width:92%"></div><div style="height:6px;background:#eef0f0;border-radius:4px;width:74%"></div></div>`;
+    <div style="background:${b.primary};color:#fff;padding:12px 14px"><div style="font-family:'${b.font}',sans-serif;font-weight:700;font-size:13px">${t.name}</div><div style="font-size:10px;opacity:.85">Tender Response</div></div>
+    <div style="padding:12px 14px"><div style="font-weight:700;color:${b.primary};border-bottom:2px solid ${b.secondary};padding-bottom:4px;font-size:12px;font-family:'${b.font}',sans-serif">Executive Summary</div><div style="height:6px;background:#eef0f0;border-radius:4px;margin:9px 0;width:92%"></div><div style="height:6px;background:#eef0f0;border-radius:4px;width:74%"></div></div>`;
+
+  // Subscription & credits
+  const meterFill=(el,pct)=>{el.style.width=pct+'%';};
+  document.getElementById('cd-plan').textContent=t.plan;
+  document.getElementById('cd-renews').textContent=t.renews;
+  document.getElementById('cd-pc-v').textContent=t.planCredits+'% left';
+  meterFill(document.getElementById('cd-pc-m'),t.planCredits);
+  document.getElementById('cd-tu-v').textContent=t.topup?t.topup+'% left':'None';
+  meterFill(document.getElementById('cd-tu-m'),t.topup);
+
+  // Details
+  document.getElementById('vc-email').textContent=t.id+'@'+t.name.toLowerCase().replace(/[^a-z]+/g,'')+'.com.au';
+  document.getElementById('vc-phone').textContent='+61 7 '+(3000+t.name.length*13)+' '+(1000+t.templates*97);
+  document.getElementById('vc-industry').textContent=t.industry;
+  document.getElementById('vc-quota').textContent=t.templates+' / 30';
 
   // Assigned templates by document type
   const has=t.templates>0;
@@ -129,6 +157,7 @@ function pageInit(){
     {type:'Policies Templates', band:'POLICY', items:has?['WHS Policy','Quality & Environmental']:[]},
     {type:'Other Document Templates', band:'DOCUMENT', items:has?['Capability Statement']:[]},
   ];
+  document.getElementById('asg-total').textContent = (has?DOCS.reduce((n,d)=>n+d.items.length,0):0)+' assigned';
   const line=(w)=>`<i style="width:${w}"></i>`;
   const card=(name,band)=>`
     <div class="atmpl">
@@ -141,7 +170,7 @@ function pageInit(){
   document.getElementById('assigned').innerHTML = DOCS.map(d=>`
     <div class="asec ${d.open&&d.items.length?'':'collapsed'}">
       <div class="asec-head" onclick="this.closest('.asec').classList.toggle('collapsed')">
-        <span class="nm">Assigned ${d.type}</span>
+        <span class="nm">${d.type}</span>
         <span class="cnt">${d.items.length}/30</span>
         <span class="ms chev">expand_more</span>
       </div>
