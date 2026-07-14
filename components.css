@@ -212,3 +212,48 @@
 .vs-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 22px}
 .vs-card h4{font-size:12px;letter-spacing:.8px;margin-bottom:10px}
 .vs-link{display:inline-block;color:var(--teal);font-size:12.5px;font-weight:600;margin-top:10px;cursor:pointer}
+
+/* ---- Production-reference banner (features not rebuilt in the prototype) ---- */
+.prod-banner{display:flex;align-items:center;gap:14px;background:var(--st-amber-bg);border:1px solid #F0DEBB;border-radius:12px;padding:15px 18px;margin-bottom:22px}
+.prod-banner .pb-ic{width:38px;height:38px;border-radius:9px;background:#fff;color:var(--st-amber-tx);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.prod-banner .pb-tx{flex:1;min-width:0}
+.prod-banner .pb-tx .t{font-weight:600;color:var(--st-amber-tx);font-size:13.5px}
+.prod-banner .pb-tx .d{font-size:12.5px;color:#8A6A2A;margin-top:2px}
+.prod-banner .btn{flex-shrink:0}
+
+/* ---- Credit meter ---- */
+.meter{height:8px;border-radius:99px;background:var(--row);overflow:hidden;min-width:90px}
+.meter i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.meter.warn i{background:var(--secondary)}
+.meter.low i{background:var(--accent)}
+.credit-cell{display:flex;align-items:center;gap:10px}
+.credit-cell .pct{font-variant-numeric:tabular-nums;font-weight:600;width:42px;text-align:right}
+.credit-cell .pct.mut{color:var(--light);font-weight:500}
+
+/* ---- Plan catalog cards ---- */
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:16px}
+.plan-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;position:relative}
+.plan-card.pop{border-color:var(--teal);box-shadow:0 8px 24px rgba(56,152,138,.14)}
+.plan-tag{position:absolute;top:-10px;right:14px;background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px}
+.plan-name{font-weight:700;font-size:15px;letter-spacing:.3px;text-transform:uppercase;color:var(--gray)}
+.plan-price{font-size:26px;font-weight:700;margin:6px 0 2px}
+.plan-price span{font-size:13px;color:var(--light);font-weight:500}
+.plan-feat{display:flex;flex-direction:column;gap:7px;margin:14px 0;font-size:13px;border-top:1px solid var(--row);padding-top:14px}
+.plan-feat div{display:flex;gap:8px;align-items:center;color:var(--gray)}
+.plan-feat .ms{font-size:16px;color:var(--teal)}
+.plan-subs{font-size:12px;color:var(--light);border-top:1px solid var(--row);padding-top:12px}
+
+/* ---- Credits card on client detail ---- */
+.credit-card .cc-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;font-size:13px}
+.credit-card .cc-row .v{font-weight:600;font-variant-numeric:tabular-nums}
+.credit-card .cc-block{margin-bottom:16px}
+.credit-card .cc-block:last-child{margin-bottom:0}
+.credit-card .cc-sub{font-size:11.5px;color:var(--light);margin-top:5px}
+
+/* ---- Simple informative-pages list ---- */
+.info-list{display:flex;flex-direction:column}
+.info-row{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid var(--row);cursor:pointer}
+.info-row:last-child{border-bottom:none}
+.info-row .ir-ic{width:34px;height:34px;border-radius:8px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.info-row .ir-t{flex:1}.info-row .ir-t .nm{font-weight:600;font-size:13.5px}.info-row .ir-t .ds{font-size:12px;color:var(--gray)}
+.info-row .ir-wc{font-size:12px;color:var(--light);font-variant-numeric:tabular-nums}

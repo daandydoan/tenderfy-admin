@@ -31,7 +31,33 @@
       </div>
     </div>
 
-    <div class="sa-sech" style="justify-content:flex-start">Brand Kit <span class="muted" style="font-weight:400;font-size:13px;margin-left:8px">— auto-applied to every assigned template</span></div>
+    <div class="sa-sech" style="justify-content:flex-start">Subscription &amp; AI credits</div>
+    <div class="card credit-card" style="margin-top:14px">
+      <div class="row" style="gap:28px;flex-wrap:wrap">
+        <div style="min-width:150px">
+          <div class="cc-sub">Current plan</div>
+          <div style="font-size:22px;font-weight:700" id="cd-plan">—</div>
+          <div class="cc-sub">Renews <span id="cd-renews"></span></div>
+        </div>
+        <div class="grow" style="min-width:200px">
+          <div class="cc-row"><span class="muted">Plan credits</span><span class="v" id="cd-pc-v"></span></div>
+          <div class="meter" id="cd-pc-m"><i></i></div>
+          <div class="cc-sub">Resets each billing cycle</div>
+        </div>
+        <div class="grow" style="min-width:200px">
+          <div class="cc-row"><span class="muted">Top-up credits</span><span class="v" id="cd-tu-v"></span></div>
+          <div class="meter" id="cd-tu-m"><i></i></div>
+          <div class="cc-sub">Used after plan credits run out</div>
+        </div>
+      </div>
+      <div class="prod-banner" style="margin:18px 0 0">
+        <span class="pb-ic"><span class="ms">credit_card</span></span>
+        <div class="pb-tx"><div class="t">Plans &amp; billing are managed centrally</div><div class="d">Change plan, adjust or top up credits from Subscriptions (or the production super admin).</div></div>
+        <a class="btn btn-outline btn-sm" href="subscriptions.html"><span class="ms" style="font-size:16px">tune</span> Subscriptions</a>
+      </div>
+    </div>
+
+    <div class="sa-sech mt24" style="justify-content:flex-start">Brand Kit <span class="muted" style="font-weight:400;font-size:13px;margin-left:8px">— auto-applied to every assigned template</span></div>
     <div class="bk-grid mt16">
       <div class="bk-card">
         <h4>Logo</h4>
@@ -80,6 +106,15 @@ function pageInit(){
   document.getElementById('f-name').textContent=t.brand.font;
   document.getElementById('f-name').style.fontFamily=`'${t.brand.font}',sans-serif`;
   document.getElementById('bk-logo').innerHTML=`<div style="width:64px;height:64px;border-radius:12px;background:${t.brand.primary};color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:'${t.brand.font}',sans-serif">${t.initials}</div>`;
+
+  // Subscription & credits
+  const meterFill=(el,pct)=>{el.querySelector('i').style.width=pct+'%';el.classList.toggle('warn',pct>25&&pct<=50);el.classList.toggle('low',pct>0&&pct<=25);};
+  document.getElementById('cd-plan').textContent=t.plan;
+  document.getElementById('cd-renews').textContent=t.renews;
+  document.getElementById('cd-pc-v').textContent=t.planCredits+'% remaining';
+  meterFill(document.getElementById('cd-pc-m'),t.planCredits);
+  document.getElementById('cd-tu-v').textContent=t.topup?t.topup+'% remaining':'None';
+  meterFill(document.getElementById('cd-tu-m'),t.topup);
   document.getElementById('bk-live').innerHTML=`
     <div style="background:${t.brand.primary};color:#fff;padding:16px 18px">
       <div style="font-family:'${t.brand.font}',sans-serif;font-weight:700;font-size:15px">${t.name}</div>

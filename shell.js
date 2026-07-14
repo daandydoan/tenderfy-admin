@@ -21,6 +21,7 @@ const NAV = [
   {key:'templates', icon:'space_dashboard',label:'Templates', href:'templates.html'},
   {key:'tenants',   icon:'apartment',      label:'Clients',   href:'tenants.html'},
   {key:'subcontractors', icon:'groups',   label:'Subcontractors', href:'subcontractors.html'},
+  {key:'subscriptions', icon:'credit_card', label:'Subscriptions', href:'subscriptions.html'},
   {key:'qa',        icon:'fact_check',     label:'QA',        href:'qa.html'},
   {key:'settings',  icon:'settings',       label:'Settings',  href:'settings.html'},
 ];

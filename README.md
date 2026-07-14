@@ -14,14 +14,24 @@ lifecycle/roles model.
 | `index.html` | **Dashboard** — overview stats, revenue chart, quick links |
 | `library.html` · `component-detail.html` | **Library** — global component library (browse, search, categories, statuses) |
 | `templates.html` · `template-builder.html` | **Templates** — list + 3-pane self-serve builder |
-| `tenants.html` · `tenant-detail.html` | **Clients** — client companies + per-client Brand Kit |
-| `subcontractors.html` · `view-subbie.html` | **Subcontractors** — the tenants' supply chain: onboarding status, compliance, activity |
+| `tenants.html` · `tenant-detail.html` | **Clients** — client companies + per-client Brand Kit, plan & credits; **AI Usage** tab |
+| `subcontractors.html` · `view-subbie.html` | **Subcontractors** — the clients' supply chain: onboarding status, compliance, activity |
+| `subscriptions.html` | **Subscriptions** — global plan catalog (reference; editor in production) |
 | `qa.html` | **QA** — review queue, Draft→In review→Approved→Live pipeline |
-| `settings.html` | **Settings** — roles & permissions, security |
+| `settings.html` | **Settings** — roles & permissions, security, **Informative pages** |
 
 Subcontractors are a distinct entity from Clients (the customer companies): clients are the
 head contractors; subcontractors are who they invite to quote. The `tenants.html` /
 `tenant-data.js` filenames and internal ids are kept as-is — only the visible label is "Clients".
+
+**Placement of the live admin's billing/CMS areas** (from the redesign audit):
+- **AI Usage** is per-client data, so it lives *inside* Clients (a tab + a credits panel on each
+  client's detail) rather than as a top-level section.
+- **Manage Subscription** is the global *plan catalog* (not per-client), so it stays top-level
+  as **Subscriptions**. A client's chosen plan/credits show on their detail page.
+- **Informative Pages** (T&Cs etc.) is platform content, so it sits under **Settings**.
+- Subscriptions and Informative Pages are reference placeholders that deep-link to the live
+  super admin (`stgsuperadmin.tenderfy.org`); their editors aren't rebuilt in the prototype.
 
 ## Structure
 

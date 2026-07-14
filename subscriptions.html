@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Subscriptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-page="subscriptions" data-title="Subscriptions">
+<div id="app-content">
+  <div class="pad">
+    <div class="pg-head">
+      <div>
+        <div class="tn-title">Subscriptions</div>
+        <div class="pg-sub">The subscription <strong>plan catalog</strong> — quotas, AI tokens and pricing that clients subscribe to. This is a global product config, separate from any single client. (A client's <em>current</em> plan &amp; credits live on their <a href="tenants.html" style="color:var(--teal)">client page</a>.)</div>
+      </div>
+      <div class="pg-acts">
+        <a class="btn btn-outline btn-sm" data-toast="Mark a plan as popular"><span class="ms" style="font-size:17px">star</span> Mark Popular</a>
+        <a class="btn btn-primary btn-sm" data-toast="Create a subscription plan"><span class="ms" style="font-size:18px">add</span> Create Subscription</a>
+      </div>
+    </div>
+
+    <div class="prod-banner">
+      <span class="pb-ic"><span class="ms">construction</span></span>
+      <div class="pb-tx"><div class="t">Reference snapshot — full plan editor lives in production</div><div class="d">Below mirrors the live plan catalog. Creating, pricing and editing plans is not rebuilt in this prototype yet.</div></div>
+      <a class="btn btn-outline btn-sm" href="https://stgsuperadmin.tenderfy.org/subscription-management" target="_blank" rel="noopener"><span class="ms" style="font-size:16px">open_in_new</span> Open in production</a>
+    </div>
+
+    <div class="plan-grid" id="plans"></div>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script src="tenant-data.js"></script>
+<script>
+function pageInit(){
+  document.getElementById('plans').innerHTML = PLANS.map(p=>`
+    <div class="plan-card ${p.popular?'pop':''}">
+      ${p.popular?'<span class="plan-tag">Popular</span>':''}
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price">$${p.price} <span>/${p.per}</span></div>
+      <div class="plan-feat">
+        <div><span class="ms">check</span> ${p.quota} Resumes</div>
+        <div><span class="ms">check</span> ${p.quota} Case Studies</div>
+        <div><span class="ms">check</span> ${p.quota} Policies</div>
+        <div><span class="ms">check</span> ${p.quota} Other Documents</div>
+        <div><span class="ms">bolt</span> ${p.tokens} AI Tokens</div>
+      </div>
+      <div class="plan-subs">${p.subs} subscribers</div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>

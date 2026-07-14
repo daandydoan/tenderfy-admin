@@ -19,21 +19,45 @@
     <div class="pg-head">
       <div>
         <div class="tn-title">Clients</div>
-        <div class="pg-sub">Client companies on the platform. Each holds a <strong>Brand Kit</strong> that is auto-applied to any template assigned to it.</div>
+        <div class="pg-sub">Customer companies on the platform. Each holds a <strong>Brand Kit</strong> auto-applied to assigned templates, plus a subscription plan and AI credit balance.</div>
       </div>
       <div class="pg-acts">
         <a class="btn btn-primary btn-sm" data-toast="Register a new client"><span class="ms" style="font-size:18px">add</span> New Client</a>
       </div>
     </div>
 
-    <div class="pg-toolbar">
-      <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search clients…"></span>
+    <div class="cat-chips" id="tabs" style="margin-bottom:20px">
+      <span class="cat-chip on" data-tab="clients"><span class="ms" style="font-size:16px">apartment</span> Clients <span class="n" id="tab-c-n"></span></span>
+      <span class="cat-chip" data-tab="usage"><span class="ms" style="font-size:16px">auto_awesome</span> AI Usage</span>
     </div>
 
-    <table class="dtable">
-      <thead><tr><th>Client</th><th>Industry</th><th>Brand kit</th><th>Templates</th><th>Font</th><th></th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
+    <!-- Clients list -->
+    <div id="view-clients">
+      <div class="pg-toolbar">
+        <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search clients…"></span>
+      </div>
+      <div class="tbl-scroll">
+        <table class="dtable">
+          <thead><tr><th>Client</th><th>Industry</th><th>Plan</th><th>Brand kit</th><th>Templates</th><th></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AI Usage (per-client credits — lives inside the client manager) -->
+    <div id="view-usage" style="display:none">
+      <div class="prod-banner">
+        <span class="pb-ic"><span class="ms">auto_awesome</span></span>
+        <div class="pb-tx"><div class="t">AI usage sits with the client it belongs to</div><div class="d">Per-client plan &amp; top-up credit balances. The live meter and adjustments run in the production super admin.</div></div>
+        <a class="btn btn-outline btn-sm" href="https://stgsuperadmin.tenderfy.org/ai-usage" target="_blank" rel="noopener"><span class="ms" style="font-size:16px">open_in_new</span> Open in production</a>
+      </div>
+      <div class="tbl-scroll">
+        <table class="dtable">
+          <thead><tr><th>Client</th><th>Plan</th><th>Plan credits</th><th>Top-up credits</th><th></th></tr></thead>
+          <tbody id="usageRows"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 <script src="shell.js"></script>
@@ -41,20 +65,39 @@
 <script>
 function pageInit(){
   let query='';
-  function render(){
+  const meter=(pct)=>{const cls=pct===0?'':(pct<=25?'low':(pct<=50?'warn':''));return `<div class="credit-cell"><div class="meter ${cls}"><i style="width:${pct}%"></i></div><span class="pct ${pct===0?'mut':''}">${pct}%</span></div>`;};
+
+  function renderClients(){
     const list=TENANTS.filter(t=>!query||t.name.toLowerCase().includes(query));
     document.getElementById('rows').innerHTML=list.map(t=>`
       <tr onclick="location.href='tenant-detail.html#id=${t.id}'">
         <td><div class="hstack"><span class="ta" style="width:34px;height:34px;border-radius:8px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">${t.initials}</span><span class="nm">${t.name}</span></div></td>
         <td class="muted">${t.industry}</td>
+        <td>${t.plan}</td>
         <td><span class="brand-swatch" style="background:${t.brand.primary}"></span> <span class="brand-swatch" style="background:${t.brand.secondary}"></span></td>
         <td>${t.templates ? t.templates+' assigned' : '<span class="muted">None yet</span>'}</td>
-        <td class="muted">${t.brand.font}</td>
         <td style="text-align:right"><span class="ms muted">chevron_right</span></td>
       </tr>`).join('');
   }
-  render();
-  document.getElementById('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();render();});
+  function renderUsage(){
+    document.getElementById('usageRows').innerHTML=TENANTS.map(t=>`
+      <tr onclick="location.href='tenant-detail.html#id=${t.id}'">
+        <td><div class="hstack"><span class="ta" style="width:30px;height:30px;border-radius:7px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${t.initials}</span><span class="nm">${t.name}</span></div></td>
+        <td class="muted">${t.plan}</td>
+        <td>${meter(t.planCredits)}</td>
+        <td>${t.topup ? meter(t.topup) : '<span class="muted" style="font-size:12.5px">No top-up</span>'}</td>
+        <td style="text-align:right"><span class="ms muted">chevron_right</span></td>
+      </tr>`).join('');
+  }
+  renderClients(); renderUsage();
+  document.getElementById('tab-c-n').textContent=TENANTS.length;
+  document.getElementById('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();renderClients();});
+  document.querySelectorAll('#tabs .cat-chip').forEach(c=>c.addEventListener('click',()=>{
+    document.querySelectorAll('#tabs .cat-chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');
+    const t=c.dataset.tab;
+    document.getElementById('view-clients').style.display = t==='clients'?'':'none';
+    document.getElementById('view-usage').style.display = t==='usage'?'':'none';
+  }));
 }
 </script>
 </body>
