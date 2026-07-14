@@ -359,14 +359,22 @@
 .cd2-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .cd2-sec-h h2{font-size:17px;font-weight:600;margin:0}
 
-.cd2-brand{display:grid;grid-template-columns:1fr 200px;gap:24px;align-items:start}
-@media(max-width:560px){.cd2-brand{grid-template-columns:1fr}}
-.cd2-brow{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--row);font-size:13.5px}
-.cd2-brow:last-child{border-bottom:none}
-.cd2-brow .sw{width:30px;height:30px;border-radius:8px;border:1px solid rgba(0,0,0,.08);flex-shrink:0}
-.cd2-brow .k{color:var(--gray);width:92px;flex-shrink:0}
-.cd2-brow .v{font-weight:600;margin-left:auto}
-.cd2-brand-prev .pk{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:600;margin-bottom:8px}
+.cd2-brand{display:grid;grid-template-columns:1fr 246px;gap:28px;align-items:stretch}
+@media(max-width:620px){.cd2-brand{grid-template-columns:1fr}}
+.cd2-btk{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:600;margin-bottom:11px}
+.cd2-swatches{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.cd2-swatch{flex:1;min-width:82px}
+.cd2-swatch .chip{display:block;height:52px;border-radius:10px;border:1px solid rgba(0,0,0,.08);margin-bottom:9px}
+.cd2-swatch .cn{font-size:12.5px;font-weight:600}
+.cd2-swatch .ch{font-size:11.5px;color:var(--light);font-variant-numeric:tabular-nums;margin-top:1px}
+.cd2-fonts{display:flex;gap:12px}
+.cd2-font{flex:1;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.cd2-font .fn{font-size:16px;font-weight:600;line-height:1.2}
+.cd2-font .fl{font-size:11.5px;color:var(--light);margin-top:3px}
+.cd2-brand-prev{display:flex;flex-direction:column}
+.cd2-brand-prev .pk{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:600;margin-bottom:11px}
+.cd2-brand-prev .bk-live-wrap{flex:1;border-radius:10px;overflow:hidden;border:1px solid var(--border);display:flex;flex-direction:column}
+.cd2-brand-prev .bk-live-wrap>*:last-child{flex:1}
 
 /* rail: subscription + details */
 .cd2-plan{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
