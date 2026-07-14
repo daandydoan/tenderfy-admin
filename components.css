@@ -442,3 +442,16 @@
 .ts-add .ms{font-size:18px}
 .ts-empty{padding:11px 18px;color:var(--light);font-size:12.5px;border-top:1px dashed var(--lighter);text-align:center}
 .ts-over{outline:2px dashed var(--teal);outline-offset:-2px}
+
+/* ============================================================================
+   Reference the Subbies feature: adopt its .tcard elevation across the admin —
+   16px radius + the soft layered shadow used throughout the subbie portal.
+   ============================================================================ */
+:root{--elev:0 16px 16px -8px rgba(12,12,13,.10),0 4px 4px -4px rgba(12,12,13,.05)}
+.card,.stat-tile,.comp-card,.blk-card,.tbl-scroll,.ts-sec,.qa-row,.pc-card,
+.bk-card,.cd2-hero,.plan-card,.sa-chart,.sa-subs,.tb-wrap{
+  border-radius:16px;
+  box-shadow:var(--elev);
+}
+/* clickable cards lift a little more on hover */
+.comp-card:hover,.blk-card:hover{box-shadow:0 20px 26px -10px rgba(12,12,13,.16),0 6px 8px -6px rgba(12,12,13,.07)}

@@ -30,8 +30,8 @@
 .c-side:not(:hover) .c-logout{width:42px;margin:14px auto 0;border-radius:50%}
 .c-logout:hover{background:rgba(255,255,255,.09)}
 
-/* Dark header to pair with the teal rail (as in the client portal) */
-.c-header{background:var(--header)}
+/* Dark header to pair with the teal rail, sized to match the subbie portal */
+.c-header{background:var(--header);height:58px}
 
 /* ---- Sidebar group: parent with collapsible submenu ---- */
 .c-side .cgroup-head{cursor:pointer}
