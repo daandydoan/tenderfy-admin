@@ -57,8 +57,9 @@ function buildShell(){
   capp.className = 'capp';
   capp.innerHTML = `
     <aside class="c-side">
-      <div class="clogo"><img src="logo-symbol.svg" alt="Tenderfy"></div>
-      ${nav}
+      <div class="clogo"><img class="logo-sym" src="logo-symbol.svg" alt="Tenderfy"><img class="logo-word" src="logo-wordmark-white.svg" alt="Tenderfy"></div>
+      <nav class="c-nav">${nav}</nav>
+      <a class="c-logout" data-toast="Log out"><span class="ms">logout</span><span class="clbl">Logout</span></a>
     </aside>
     <div class="c-main">
       <div class="c-header">

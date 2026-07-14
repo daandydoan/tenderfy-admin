@@ -1,14 +1,37 @@
 /* Admin portal components — layered on top of the shared styles.css.
    Interactions referenced from the live staging site (stgsuperadmin.tenderfy.org). */
 
-/* ---- Sidebar: expands on hover to reveal labels (live-site behaviour) ---- */
-.c-side{transition:width .18s ease;width:87px}
-.c-side:hover{width:236px}
-.c-side .cic{width:100%;justify-content:center;gap:0;position:relative}
-.c-side:hover .cic{justify-content:flex-start;padding-left:27px;gap:14px}
-.c-side .clbl{display:none;color:#fff;font-size:14px;font-weight:500;white-space:nowrap}
+/* ---- Sidebar: teal rail, wordmark logo, bottom logout (client-portal style) ---- */
+.c-side{transition:width .18s ease;width:87px;background:var(--nav);gap:0;padding:18px 0 16px;align-items:stretch;overflow-x:hidden}
+.c-side:hover{width:240px}
+
+.c-side .clogo{margin:0 0 22px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0}
+.c-side .clogo img{object-fit:contain}
+.c-side .clogo .logo-sym{display:block;width:32px;height:40px}
+.c-side .clogo .logo-word{display:none;height:30px;width:auto}
+.c-side:hover .clogo{justify-content:flex-start;padding-left:26px}
+.c-side:hover .clogo .logo-sym{display:none}
+.c-side:hover .clogo .logo-word{display:block}
+
+.c-nav{display:flex;flex-direction:column;gap:5px;flex:1;width:100%}
+
+.c-side .cic{width:100%;height:auto;padding:11px 0;justify-content:center;gap:0;position:relative;border-radius:0}
+.c-side .cic .ms{font-size:24px}
+.c-side:hover .cic{justify-content:flex-start;padding-left:26px;gap:15px}
+.c-side .clbl{display:none;color:#fff;font-size:14.5px;font-weight:500;white-space:nowrap}
 .c-side:hover .clbl{display:inline}
-.c-side .cic.active .clbl,.c-side .cic:hover .clbl{color:var(--teal-bright)}
+.c-side .cic:hover{color:var(--teal-bright)}
+.c-side .cic.active,.c-side .cic.active .clbl,.c-side .cic:hover .clbl{color:var(--teal-bright)}
+
+.c-logout{flex-shrink:0;margin:14px 16px 0;height:42px;display:flex;align-items:center;justify-content:center;gap:9px;color:#fff;cursor:pointer;border:1px solid rgba(255,255,255,.32);border-radius:100px}
+.c-logout .ms{font-size:20px}
+.c-logout .clbl{display:none;color:#fff;font-size:14px;font-weight:500}
+.c-side:hover .c-logout .clbl{display:inline}
+.c-side:not(:hover) .c-logout{width:42px;margin:14px auto 0;border-radius:50%}
+.c-logout:hover{background:rgba(255,255,255,.09)}
+
+/* Dark header to pair with the teal rail (as in the client portal) */
+.c-header{background:var(--header)}
 
 /* ---- Sidebar group: parent with collapsible submenu ---- */
 .c-side .cgroup-head{cursor:pointer}
