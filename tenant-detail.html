@@ -16,77 +16,68 @@
 <body data-page="tenants" data-title="Clients">
 <div id="app-content">
   <div class="pad">
-    <div class="crumb"><a href="tenants.html">Clients</a> <span class="ms">chevron_right</span> <span id="cr-name">Client</span></div>
-    <div class="pg-head">
-      <div class="hstack" style="gap:14px">
-        <span id="t-av" style="width:52px;height:52px;border-radius:12px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700"></span>
-        <div>
-          <div class="tn-title" id="t-name">—</div>
-          <div class="pg-sub" id="t-ind"></div>
-        </div>
-      </div>
-      <div class="pg-acts">
-        <a class="btn btn-outline btn-sm" href="templates.html"><span class="ms" style="font-size:17px">add</span> Assign template</a>
-        <a class="btn btn-primary btn-sm" data-toast="Edit brand kit"><span class="ms" style="font-size:17px">palette</span> Edit Brand Kit</a>
+    <!-- Header (production View Company style) -->
+    <div class="td-head">
+      <a class="td-back" href="tenants.html"><span class="ms" style="font-size:18px">chevron_left</span> Back</a>
+      <div class="td-title"><span class="vc-headbar"></span> View Client</div>
+      <div class="td-acts">
+        <a class="btn btn-danger" data-toast="Delete client">Delete Company</a>
+        <a class="btn btn-neutral" data-toast="Block client">Block</a>
       </div>
     </div>
 
-    <div class="sa-sech" style="justify-content:flex-start">Subscription &amp; AI credits</div>
-    <div class="card credit-card" style="margin-top:14px">
-      <div class="row" style="gap:28px;flex-wrap:wrap">
-        <div style="min-width:150px">
-          <div class="cc-sub">Current plan</div>
-          <div style="font-size:22px;font-weight:700" id="cd-plan">—</div>
-          <div class="cc-sub">Renews <span id="cd-renews"></span></div>
-        </div>
-        <div class="grow" style="min-width:200px">
-          <div class="cc-row"><span class="muted">Plan credits</span><span class="v" id="cd-pc-v"></span></div>
-          <div class="meter" id="cd-pc-m"><i></i></div>
-          <div class="cc-sub">Resets each billing cycle</div>
-        </div>
-        <div class="grow" style="min-width:200px">
-          <div class="cc-row"><span class="muted">Top-up credits</span><span class="v" id="cd-tu-v"></span></div>
-          <div class="meter" id="cd-tu-m"><i></i></div>
-          <div class="cc-sub">Used after plan credits run out</div>
+    <!-- Top: Basic Information | Plan Credits + Top-Up Credits -->
+    <div class="vc-grid">
+      <div class="vc-basic">
+        <div class="vc-basic-head"><span>Basic Information</span> <a class="btn btn-amber btn-sm" data-toast="View client profile">View Profile</a></div>
+        <div class="vc-basic-body">
+          <div class="vc-avatar" id="vc-avatar"></div>
+          <div>
+            <div class="vc-name" id="vc-name">—</div>
+            <div class="vc-company" id="vc-company"></div>
+            <div class="vc-contact"><span class="ms">call</span> <span id="vc-phone">—</span></div>
+            <div class="vc-contact"><span class="ms">mail</span> <span id="vc-email">—</span></div>
+            <div class="vc-contact"><span class="ms">apartment</span> <span id="vc-quota">—</span></div>
+          </div>
         </div>
       </div>
-      <div class="prod-banner" style="margin:18px 0 0">
-        <span class="pb-ic"><span class="ms">credit_card</span></span>
-        <div class="pb-tx"><div class="t">Plans &amp; billing are managed centrally</div><div class="d">Change plan, adjust or top up credits from Subscriptions (or the production super admin).</div></div>
-        <a class="btn btn-outline btn-sm" href="subscriptions.html"><span class="ms" style="font-size:16px">tune</span> Subscriptions</a>
+      <div class="vc-credits">
+        <div class="pc-card">
+          <div class="pc-label">Plan Credits</div>
+          <div class="pc-bigrow"><span class="pc-big" id="pc-big">—</span> <span class="pc-rem">Remaining</span></div>
+          <div class="pc-bar"><i id="pc-fill"></i></div>
+          <div class="pc-used" id="pc-used"></div>
+          <div class="pc-note" id="pc-renews"></div>
+        </div>
+        <div class="pc-card">
+          <div class="pc-bigrow" style="margin-bottom:5px"><span class="pc-label">Top-Up Credits</span></div>
+          <div class="pc-bigrow"><span class="pc-big" id="tu-big">—</span> <span class="pc-rem">Remaining</span> <span class="pc-pill" id="tu-pill" style="display:none">No top-up credits</span></div>
+          <div class="pc-bar grey"><i id="tu-fill"></i></div>
+          <div class="pc-used" id="tu-used"></div>
+          <div class="pc-note">Will be used after plan credits run out</div>
+        </div>
       </div>
     </div>
 
-    <div class="sa-sech mt24" style="justify-content:flex-start">Brand Kit <span class="muted" style="font-weight:400;font-size:13px;margin-left:8px">— auto-applied to every assigned template</span></div>
-    <div class="bk-grid mt16">
-      <div class="bk-card">
-        <h4>Logo</h4>
-        <div class="bk-preview-logo" id="bk-logo"></div>
-        <a class="btn btn-outline btn-sm btn-block" data-toast="Upload new logo"><span class="ms" style="font-size:16px">upload</span> Replace logo</a>
-      </div>
-      <div class="bk-card">
-        <h4>Colours</h4>
-        <div class="bk-color-row"><span class="sw" id="c-pri"></span><div><div class="cx" id="c-pri-hex"></div><div class="cl">Primary</div></div></div>
-        <div class="bk-color-row"><span class="sw" id="c-sec"></span><div><div class="cx" id="c-sec-hex"></div><div class="cl">Secondary / accent</div></div></div>
-        <div class="bk-color-row"><span class="sw" style="background:#2E3C3B"></span><div><div class="cx">#2E3C3B</div><div class="cl">Text</div></div></div>
-      </div>
-      <div class="bk-card">
-        <h4>Typography</h4>
-        <div class="bk-font" style="margin-bottom:10px"><span id="f-name" style="font-size:16px;font-weight:600"></span><span class="muted" style="font-size:12px">Headings</span></div>
-        <div class="bk-font"><span style="font-size:15px">Outfit</span><span class="muted" style="font-size:12px">Body</span></div>
-        <div class="muted" style="font-size:12px;margin-top:10px">Uploaded fonts apply to headings across every assigned template.</div>
-      </div>
-      <div class="bk-card">
-        <h4>Live brand preview</h4>
-        <div id="bk-live" style="border-radius:10px;overflow:hidden;border:1px solid var(--border)"></div>
-      </div>
+    <!-- Brand Kit (redesign) -->
+    <div class="sa-sech" style="justify-content:space-between">
+      <span>Brand Kit <span class="muted" style="font-weight:400;font-size:13px;margin-left:6px">— auto-applied to every assigned template</span></span>
+      <a class="btn btn-outline btn-sm" data-toast="Edit brand kit"><span class="ms" style="font-size:16px">palette</span> Edit</a>
+    </div>
+    <div class="bk-strip" style="margin-top:12px">
+      <div class="bk-item"><span class="bk-k">Logo</span><span id="bk-logo"></span></div>
+      <div class="bk-item"><span class="bk-k">Primary</span><span><span class="bk-sw2" id="bk-pri"></span> <span id="bk-pri-hex" style="font-weight:600;font-size:13px"></span></span></div>
+      <div class="bk-item"><span class="bk-k">Secondary</span><span><span class="bk-sw2" id="bk-sec"></span> <span id="bk-sec-hex" style="font-weight:600;font-size:13px"></span></span></div>
+      <div class="bk-item"><span class="bk-k">Heading font</span><span id="bk-font" style="font-weight:600;font-size:15px"></span></div>
+      <div class="bk-item" style="flex:1;min-width:170px"><span class="bk-k">Live preview</span><div id="bk-live" style="border-radius:8px;overflow:hidden;border:1px solid var(--border)"></div></div>
     </div>
 
-    <div class="sa-sech mt24" style="justify-content:flex-start">Assigned templates</div>
-    <table class="dtable mt16">
-      <thead><tr><th>Template</th><th>Version</th><th>Status</th><th>Brand applied</th></tr></thead>
-      <tbody id="asgrows"></tbody>
-    </table>
+    <!-- Assigned templates by document type -->
+    <div class="sa-sech mt24" style="justify-content:space-between">
+      <span>Assigned templates</span>
+      <a class="btn btn-primary btn-sm" href="templates.html"><span class="ms" style="font-size:16px">add</span> Assign template</a>
+    </div>
+    <div id="assigned" class="mt16"></div>
   </div>
 </div>
 <script src="shell.js"></script>
@@ -95,48 +86,67 @@
 function pageInit(){
   const id=new URLSearchParams(location.search || location.hash.slice(1)).get('id')||TENANTS[0].id;
   const t=TENANTS.find(x=>x.id===id)||TENANTS[0];
-  document.getElementById('cr-name').textContent=t.name;
-  document.getElementById('t-name').textContent=t.name;
-  document.getElementById('t-ind').textContent=t.industry+' · Client since 2025';
-  document.getElementById('t-av').textContent=t.initials;
-  document.getElementById('c-pri').style.background=t.brand.primary;
-  document.getElementById('c-pri-hex').textContent=t.brand.primary.toUpperCase();
-  document.getElementById('c-sec').style.background=t.brand.secondary;
-  document.getElementById('c-sec-hex').textContent=t.brand.secondary.toUpperCase();
-  document.getElementById('f-name').textContent=t.brand.font;
-  document.getElementById('f-name').style.fontFamily=`'${t.brand.font}',sans-serif`;
-  document.getElementById('bk-logo').innerHTML=`<div style="width:64px;height:64px;border-radius:12px;background:${t.brand.primary};color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:'${t.brand.font}',sans-serif">${t.initials}</div>`;
+  const b=t.brand;
 
-  // Subscription & credits
-  const meterFill=(el,pct)=>{el.querySelector('i').style.width=pct+'%';el.classList.toggle('warn',pct>25&&pct<=50);el.classList.toggle('low',pct>0&&pct<=25);};
-  document.getElementById('cd-plan').textContent=t.plan;
-  document.getElementById('cd-renews').textContent=t.renews;
-  document.getElementById('cd-pc-v').textContent=t.planCredits+'% remaining';
-  meterFill(document.getElementById('cd-pc-m'),t.planCredits);
-  document.getElementById('cd-tu-v').textContent=t.topup?t.topup+'% remaining':'None';
-  meterFill(document.getElementById('cd-tu-m'),t.topup);
+  // Basic information
+  document.getElementById('vc-name').textContent=t.name;
+  document.getElementById('vc-company').textContent=t.industry;
+  document.getElementById('vc-email').textContent=t.id+'@'+t.name.toLowerCase().replace(/[^a-z]+/g,'')+'.com.au';
+  document.getElementById('vc-phone').textContent='+61 7 '+(3000+t.name.length*13)+' '+(1000+t.templates*97);
+  document.getElementById('vc-quota').textContent=t.templates+' / 30 templates';
+  const av=document.getElementById('vc-avatar'); av.textContent=t.initials; av.style.background=b.primary; av.style.fontFamily=`'${b.font}',sans-serif`;
+
+  // Plan credits
+  const pc=t.planCredits;
+  document.getElementById('pc-big').textContent=pc+'%';
+  document.getElementById('pc-fill').style.width=pc+'%';
+  document.getElementById('pc-used').textContent=(100-pc)+'% used';
+  document.getElementById('pc-renews').textContent='Renews on '+t.renews;
+  // Top-up credits
+  const tu=t.topup;
+  document.getElementById('tu-big').textContent=tu+'%';
+  document.getElementById('tu-fill').style.width=tu+'%';
+  document.getElementById('tu-used').textContent=(100-tu)+'% used';
+  if(tu===0) document.getElementById('tu-pill').style.display='';
+
+  // Brand kit strip
+  document.getElementById('bk-logo').innerHTML=`<span style="display:inline-flex;width:40px;height:40px;border-radius:9px;background:${b.primary};color:#fff;align-items:center;justify-content:center;font-weight:700;font-family:'${b.font}',sans-serif">${t.initials}</span>`;
+  document.getElementById('bk-pri').style.background=b.primary;
+  document.getElementById('bk-pri-hex').textContent=b.primary.toUpperCase();
+  document.getElementById('bk-sec').style.background=b.secondary;
+  document.getElementById('bk-sec-hex').textContent=b.secondary.toUpperCase();
+  document.getElementById('bk-font').textContent=b.font;
+  document.getElementById('bk-font').style.fontFamily=`'${b.font}',sans-serif`;
   document.getElementById('bk-live').innerHTML=`
-    <div style="background:${t.brand.primary};color:#fff;padding:16px 18px">
-      <div style="font-family:'${t.brand.font}',sans-serif;font-weight:700;font-size:15px">${t.name}</div>
-      <div style="font-size:11px;opacity:.85">Tender Response</div>
-    </div>
-    <div style="padding:14px 18px">
-      <div style="font-weight:700;color:${t.brand.primary};border-bottom:2px solid ${t.brand.secondary};padding-bottom:4px;font-size:13px;font-family:'${t.brand.font}',sans-serif">Executive Summary</div>
-      <div style="height:7px;background:#eef0f0;border-radius:4px;margin:9px 0;width:94%"></div>
-      <div style="height:7px;background:#eef0f0;border-radius:4px;margin:9px 0;width:80%"></div>
-    </div>`;
+    <div style="background:${b.primary};color:#fff;padding:11px 14px"><div style="font-family:'${b.font}',sans-serif;font-weight:700;font-size:13px">${t.name}</div><div style="font-size:10px;opacity:.85">Tender Response</div></div>
+    <div style="padding:11px 14px"><div style="font-weight:700;color:${b.primary};border-bottom:2px solid ${b.secondary};padding-bottom:4px;font-size:12px;font-family:'${b.font}',sans-serif">Executive Summary</div><div style="height:6px;background:#eef0f0;border-radius:4px;margin:8px 0;width:92%"></div><div style="height:6px;background:#eef0f0;border-radius:4px;width:74%"></div></div>`;
 
-  const badge=(s)=>{const m={live:'Live',approved:'Approved',inreview:'In review',draft:'Draft'};return `<span class="badge b-${s}"><span class="b-dot"></span>${m[s]}</span>`;};
-  const demo = t.templates ? [
-    {n:'Construction — Standard Tender',v:3,s:'live'},
-    {n:'Government Supplier Panel',v:4,s:'inreview'},
-    {n:'Engineering Capability Statement',v:1,s:'approved'},
-    {n:'Civil Infrastructure Response',v:2,s:'live'},
-  ].slice(0,t.templates) : [];
-  document.getElementById('asgrows').innerHTML = demo.length ? demo.map(d=>`
-    <tr><td class="nm">${d.n}</td><td>v${d.v}</td><td>${badge(d.s)}</td>
-    <td><span class="brand-swatch" style="background:${t.brand.primary}"></span> <span class="brand-swatch" style="background:${t.brand.secondary}"></span> ${t.brand.font}</td></tr>`).join('')
-    : `<tr><td colspan="4" style="text-align:center;color:var(--light);padding:34px">No templates assigned yet — <a href="templates.html" style="color:var(--teal)">assign one</a>.</td></tr>`;
+  // Assigned templates by document type
+  const has=t.templates>0;
+  const DOCS=[
+    {type:'Resume Templates', band:'RESUME', items:has?['CV — Site Manager','CV — Project Engineer']:[]},
+    {type:'Case Studies Templates', band:'PROJECT PROFILE', items:has?['Flagship Project Profile']:[], open:true},
+    {type:'Policies Templates', band:'POLICY', items:has?['WHS Policy','Quality & Environmental']:[]},
+    {type:'Other Document Templates', band:'DOCUMENT', items:has?['Capability Statement']:[]},
+  ];
+  const line=(w)=>`<i style="width:${w}"></i>`;
+  const card=(name,band)=>`
+    <div class="atmpl">
+      <div class="atmpl-name">${name}</div>
+      <div class="atmpl-thumb">
+        <div class="atmpl-band" style="background:${b.primary};border-bottom:3px solid ${b.secondary}"><div class="bt" style="font-family:'${b.font}',sans-serif">${t.name}</div><div class="bs">${band}</div></div>
+        <div class="atmpl-lines">${line('96%')+line('88%')+line('66%')}</div>
+      </div>
+    </div>`;
+  document.getElementById('assigned').innerHTML = DOCS.map(d=>`
+    <div class="asec ${d.open&&d.items.length?'':'collapsed'}">
+      <div class="asec-head" onclick="this.closest('.asec').classList.toggle('collapsed')">
+        <span class="nm">Assigned ${d.type}</span>
+        <span class="cnt">${d.items.length}/30</span>
+        <span class="ms chev">expand_more</span>
+      </div>
+      <div class="asec-body">${d.items.length ? d.items.map(n=>card(n,d.band)).join('') : '<span class="asec-empty">No '+d.type.toLowerCase().replace(' templates','')+' templates assigned yet.</span>'}</div>
+    </div>`).join('');
 }
 </script>
 </body>
