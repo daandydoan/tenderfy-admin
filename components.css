@@ -419,3 +419,26 @@
 .blk-list-row{display:flex;align-items:center;gap:9px}
 .blk-list-row .dot{width:6px;height:6px;border-radius:50%;background:#9FB5B0;flex-shrink:0}
 .blk-list-row .blk-bar{flex:1}
+
+/* ============================================================================
+   Tender Template canvas — the sectioned tender structure the client sees
+   (Cover Pages, Table of Contents, Tender Documentations, Resumes, …).
+   ============================================================================ */
+.ts-sec{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.ts-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px 11px}
+.ts-head .ts-title{font-weight:600;font-size:14.5px}
+.ts-entry{display:flex;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid var(--row)}
+.ts-entry.dragging{opacity:.4}
+.ts-entry .grip{color:var(--lighter);cursor:grab;font-size:20px}
+.ts-entry .grip:hover{color:var(--gray)}
+.ts-entry .ei{width:26px;height:26px;border-radius:6px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ts-entry .ei .ms{font-size:16px}
+.ts-entry .en{flex:1;font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ts-entry .etag{font-size:10px;font-weight:700;color:var(--gray);background:var(--bg-shade);padding:2px 7px;border-radius:4px;letter-spacing:.3px;flex-shrink:0}
+.ts-entry .ekebab{color:var(--gray);cursor:pointer;font-size:19px;flex-shrink:0}
+.ts-entry .ekebab:hover{color:var(--accent)}
+.ts-add{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-top:1px solid var(--row);color:var(--teal);font-weight:500;font-size:13.5px;cursor:pointer}
+.ts-add:hover{background:var(--teal-tint)}
+.ts-add .ms{font-size:18px}
+.ts-empty{padding:11px 18px;color:var(--light);font-size:12.5px;border-top:1px dashed var(--lighter);text-align:center}
+.ts-over{outline:2px dashed var(--teal);outline-offset:-2px}

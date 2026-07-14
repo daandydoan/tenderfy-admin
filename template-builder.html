@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tenderfy — Super Admin · Template Builder</title>
+<title>Tenderfy — Super Admin · Tender Template Builder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,14 +13,14 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 </head>
-<body data-page="templates" data-title="Template Builder">
+<body data-page="templates" data-title="Tender Templates">
 <div id="app-content">
   <div class="pad">
-    <div class="crumb"><a href="templates.html">Templates</a> <span class="ms">chevron_right</span> <span id="cr-name">New Template</span></div>
+    <div class="crumb"><a href="templates.html">Tender Templates</a> <span class="ms">chevron_right</span> <span id="cr-name">New Tender Template</span></div>
     <div class="pg-head" style="margin-bottom:14px">
       <div>
-        <input id="tpl-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:340px" value="Untitled Template">
-        <div class="pg-sub">Assemble documents into a tender architecture → set brand preview → save (versioned) → send to QA → save as a <strong>Preset</strong> or assign to clients.</div>
+        <input id="tpl-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:340px" value="Untitled Tender Template">
+        <div class="pg-sub">Build from a document list, organised into the tender structure the client sees. Preview a brand, then save as a <strong>Preset</strong> or assign to clients — each takes its own branding &amp; typography on assign.</div>
       </div>
       <div class="pg-acts">
         <span class="badge b-draft" id="tpl-status"><span class="b-dot"></span>Draft</span>
@@ -33,9 +33,9 @@
     <div class="tb-wrap">
       <!-- Palette -->
       <div class="tb-col palette">
-        <div class="tb-colhead">Library <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0" id="pal-count"></span></div>
+        <div class="tb-colhead">Documents <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0" id="pal-count"></span></div>
         <div class="tb-colbody">
-          <div class="tb-psearch"><span class="ms" style="font-size:17px">search</span><input id="pq" placeholder="Search components…"></div>
+          <div class="tb-psearch"><span class="ms" style="font-size:17px">search</span><input id="pq" placeholder="Search documents…"></div>
           <div id="palette"></div>
         </div>
       </div>
@@ -45,11 +45,10 @@
         <div class="tb-sheet">
           <div class="tb-brandbar" id="brandbar">
             <div class="bl" id="bb-logo">TF</div>
-            <div><div class="bt" id="bb-name">Brand-neutral preview</div><div style="font-size:11px;opacity:.85" id="bb-sub">Structure only — pick a client to preview its brand</div></div>
+            <div><div class="bt" id="bb-name">Brand-neutral structure</div><div style="font-size:11px;opacity:.85" id="bb-sub">Pick a client to preview its brand &amp; typography</div></div>
             <div class="bhint">Preview brand</div>
           </div>
           <div id="canvas"></div>
-          <div class="tb-drop" id="drop">Drag components here, or click one in the library to add it</div>
         </div>
       </div>
 
@@ -60,8 +59,8 @@
           <div class="props-sec">
             <div class="lbl" style="margin-top:0">Description</div>
             <textarea id="tpl-desc" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;resize:vertical" rows="2" placeholder="What is this template for?"></textarea>
-            <div class="lbl">Components</div>
-            <div class="hstack"><span class="ms" style="color:var(--teal)">widgets</span> <strong id="p-count">0</strong> <span class="muted">added</span></div>
+            <div class="lbl">Documents in tender</div>
+            <div class="hstack"><span class="ms" style="color:var(--teal)">description</span> <strong id="p-count">0</strong> <span class="muted">added</span></div>
           </div>
 
           <div class="props-sec">
