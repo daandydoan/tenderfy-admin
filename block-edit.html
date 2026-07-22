@@ -20,7 +20,7 @@
     <div class="pg-head">
       <div>
         <div class="tn-title" id="pg-title">New Custom Block</div>
-        <div class="pg-sub">Compose a reusable content block. Once saved it appears in the Block Builder for every document.</div>
+        <div class="pg-sub">Compose a reusable content block. Once it's standard it appears in the Block Builder for every client.</div>
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" href="blocks.html">Cancel</a>
@@ -32,12 +32,16 @@
     <div class="ed-grid">
       <div class="ed-main">
         <div class="card">
-          <h3 class="ed-h">Block details</h3>
+          <h3 class="ed-h">Naming</h3>
           <div class="frow">
-            <div class="fld"><label for="b-name">Block name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"></div>
-            <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
+            <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout">
+              <span class="fhint">What the team calls it in the super admin.</span></div>
+            <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box">
+              <span class="fhint">What the client sees in Add Block — plain language, no jargon.</span></div>
           </div>
-          <div class="fld"><label for="b-desc">Description</label><textarea class="fin" id="b-desc" rows="2" placeholder="When should this block be used?"></textarea></div>
+          <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box that draws attention to key text.">
+            <span class="fhint">One line telling the client what they're about to insert.</span></div>
+          <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
         </div>
 
         <div class="card">
@@ -50,13 +54,18 @@
 
       <div class="ed-rail">
         <div class="card">
-          <h3 class="ed-h">Live preview</h3>
-          <div class="blk-preview" id="prev"></div>
+          <h3 class="ed-h">How the client sees it</h3>
+          <div class="blk-card" style="box-shadow:none;cursor:default">
+            <div class="blk-name" id="cv-label">Block</div>
+            <div class="blk-preview" id="prev"></div>
+            <div style="font-size:12px;color:var(--gray);padding-top:10px" id="cv-desc"></div>
+          </div>
+          <div class="fhint" style="margin-top:10px">This is the card shown in the Block Builder's Add Block dialog.</div>
         </div>
         <div class="card">
           <h3 class="ed-h">Availability</h3>
-          <div class="fld"><label for="b-status">Status</label><select class="fin" id="b-status"><option value="custom">Custom block</option><option value="standard">Promote to standard</option></select></div>
-          <div class="fhint">Custom blocks sit alongside the standard set and are available to every document.</div>
+          <div id="avail"></div>
+          <a class="btn btn-outline btn-sm btn-block mt16" id="rollBtn" style="display:none"><span class="ms" style="font-size:16px">published_with_changes</span> Roll out to all clients</a>
         </div>
       </div>
     </div>
@@ -64,11 +73,13 @@
 </div>
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
+<script src="tenant-data.js"></script>
 <script>
-const ELEMS={heading:'Heading',subheading:'Sub-Heading',paragraph:'Paragraph',list:'Bulleted List',quote:'Pull Quote',image:'Image',images2:'Two Images',cols:'Two Columns'};
-const P2ELEMS={heading:['heading'],subheading:['subheading'],divider:['heading','paragraph'],paragraph:['paragraph'],double:['cols'],headpara:['cols'],parahead:['cols'],quote:['quote'],list:['list'],callout:['heading','paragraph'],img1:['image'],img2:['images2'],img3:['images2'],imggrid:['images2','images2'],banner:['image'],imgtext:['image','paragraph'],textimg:['paragraph','image'],imgcap:['image','heading'],feature:['image','paragraph']};
+const ELEMS={heading:'Heading',subheading:'Sub-Heading',paragraph:'Paragraph',list:'Bulleted List',quote:'Pull Quote',image:'Image',images2:'Two Images',table:'Table',signature:'Signature',cols:'Two Columns'};
+const P2ELEMS={heading:['heading'],subheading:['subheading'],divider:['heading','paragraph'],paragraph:['paragraph'],double:['cols'],headpara:['cols'],parahead:['cols'],quote:['quote'],list:['list'],callout:['heading','paragraph'],img1:['image'],img2:['images2'],img3:['images2'],imggrid:['images2','images2'],banner:['image'],imgtext:['image','paragraph'],textimg:['paragraph','image'],imgcap:['image','heading'],feature:['image','paragraph'],table:['table'],signature:['signature']};
 
 function pageInit(){
+  const tById=Object.fromEntries(TENANTS.map(t=>[t.id,t]));
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   const existing=id?BLOCKS.find(b=>b.id===id):null;
   let rows = existing ? (P2ELEMS[existing.p]||['paragraph']).slice() : [];
@@ -78,17 +89,13 @@ function pageInit(){
 
   if(existing){
     document.getElementById('b-name').value=existing.name;
+    document.getElementById('b-label').value=existing.label;
+    document.getElementById('b-desc').value=existing.desc;
     document.getElementById('b-cat').value=existing.cat;
-    document.getElementById('cr-name').textContent=existing.name;
-    document.getElementById('pg-title').textContent='Edit — '+existing.name;
-    document.getElementById('b-status').value=existing.custom?'custom':'standard';
+    document.getElementById('cr-name').textContent=existing.label;
+    document.getElementById('pg-title').textContent='Edit — '+existing.label;
     if(existing.custom) document.getElementById('delBtn').style.display='';
   }
-  document.getElementById('b-name').addEventListener('input',e=>{
-    const v=e.target.value.trim()||'New Custom Block';
-    document.getElementById('cr-name').textContent=v;
-    if(!existing) document.getElementById('pg-title').textContent=v;
-  });
 
   const frag=(k)=>{
     const bar=(w,h)=>`<div class="blk-bar${h?' h':''}" style="width:${w}"></div>`;
@@ -101,11 +108,16 @@ function pageInit(){
       case 'quote':return `<div class="blk-quote">${bar('88%',1)+bar('70%')}</div>`;
       case 'image':return img();
       case 'images2':return `<div class="blk-imgs">${img()+img()}</div>`;
+      case 'table':return blockPreview('table');
+      case 'signature':return blockPreview('signature');
       case 'cols':return `<div class="blk-cols"><div>${bar('90%')+bar('78%')}</div><div>${bar('88%')+bar('70%')}</div></div>`;
       default:return bar('80%');
     }
   };
-
+  function syncCustomerView(){
+    document.getElementById('cv-label').textContent=document.getElementById('b-label').value.trim()||'Untitled block';
+    document.getElementById('cv-desc').textContent=document.getElementById('b-desc').value.trim()||'Add a helper description so clients know what this inserts.';
+  }
   function render(){
     document.getElementById('rows').innerHTML=rows.map((k,i)=>`
       <div class="cmp-row" draggable="true" data-i="${i}">
@@ -121,21 +133,46 @@ function pageInit(){
       r.addEventListener('drop',e=>{e.preventDefault();const f=+e.dataTransfer.getData('i');const t=+r.dataset.i;const [m]=rows.splice(f,1);rows.splice(t,0,m);render();});
     });
   }
+  function renderAvail(){
+    const el=document.getElementById('avail');
+    if(!existing){ el.innerHTML='<div class="fhint">New blocks are created as <strong>standard</strong> — available to every client.</div>'; return; }
+    const n=coverage(existing), all=n===ALL_TENANTS.length;
+    const missing=ALL_TENANTS.filter(t=>!existing.tenants.includes(t)).map(t=>tById[t].name);
+    const statusLbl={'standard':'Standard','tenant-only':'Tenant-only','to-retire':'To retire'};
+    el.innerHTML=`<div class="hstack" style="margin-bottom:10px"><span class="badge b-${existing.status}"><span class="b-dot"></span>${statusLbl[existing.status]}</span><span class="muted" style="font-size:12.5px">${n} of ${ALL_TENANTS.length} clients</span></div>`
+      + (all?'<div class="fhint">Available to every client — one block builder to test.</div>'
+           :`<div class="fhint">Missing for: <strong>${missing.join(', ')}</strong></div>`);
+    document.getElementById('rollBtn').style.display=all?'none':'';
+  }
+  document.getElementById('rollBtn').addEventListener('click',()=>{
+    confirmAction({title:'Roll out to all clients?',body:`“${existing.label}” will be added to every client's Block Builder and marked standard.`,confirm:'Roll out'},()=>{
+      existing.tenants=ALL_TENANTS.slice(); existing.status='standard'; renderAvail(); showToast('Rolled out to all clients: '+existing.label);
+    });
+  });
+
   document.querySelectorAll('#addRow [data-el]').forEach(a=>a.addEventListener('click',()=>{rows.push(a.dataset.el);render();}));
+  ['b-label','b-desc'].forEach(i=>document.getElementById(i).addEventListener('input',syncCustomerView));
+  document.getElementById('b-name').addEventListener('input',e=>{
+    const v=e.target.value.trim()||'New Custom Block';
+    document.getElementById('cr-name').textContent=v;
+    if(!existing) document.getElementById('pg-title').textContent=v;
+  });
 
   document.getElementById('saveBtn').addEventListener('click',()=>{
     const n=document.getElementById('b-name').value.trim();
-    if(!n){showToast('Give the block a name first');return;}
+    const l=document.getElementById('b-label').value.trim();
+    if(!n){showToast('Give the block an internal name first');return;}
+    if(!l){showToast('Add a customer-facing label — clients need to know what they are clicking');return;}
     if(!rows.length){showToast('Add at least one element to the layout');return;}
-    showToast((existing?'Updated':'Created')+' block: '+n);
+    showToast((existing?'Updated':'Created')+' block: '+l);
     setTimeout(()=>location.href='blocks.html',700);
   });
   document.getElementById('delBtn').addEventListener('click',()=>{
-    confirmAction({title:'Delete this block?',body:`“${existing.name}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
-      showToast('Deleted block: '+existing.name); setTimeout(()=>location.href='blocks.html',700);
+    confirmAction({title:'Delete this block?',body:`“${existing.label}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
+      showToast('Deleted block: '+existing.label); setTimeout(()=>location.href='blocks.html',700);
     });
   });
-  render();
+  render(); syncCustomerView(); renderAvail();
 }
 </script>
 </body>

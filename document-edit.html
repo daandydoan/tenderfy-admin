@@ -103,7 +103,7 @@ function pageInit(){
   function renderPalette(){
     const avail=BLOCKS.filter(b=>!pq||(b.name+' '+b.cat).toLowerCase().includes(pq));
     palette.innerHTML=BLOCK_CATS.filter(c=>avail.some(b=>b.cat===c)).map(cat=>`<div class="tb-cat">${cat}</div>${avail.filter(b=>b.cat===cat).map(b=>`
-      <div class="tb-comp" draggable="true" data-id="${b.id}"><span class="ci"><span class="ms">${b.custom?'auto_fix_high':'grid_view'}</span></span><span class="cn">${b.name}</span><span class="ms cadd">add_circle</span></div>`).join('')}`).join('');
+      <div class="tb-comp" draggable="true" data-id="${b.id}" title="${b.desc}"><span class="ci"><span class="ms">${b.custom?'auto_fix_high':'grid_view'}</span></span><span class="cn">${b.label}</span><span class="ms cadd">add_circle</span></div>`).join('')}`).join('');
     document.getElementById('pal-count').textContent=`(${avail.length})`;
     palette.querySelectorAll('.tb-comp').forEach(el=>{
       el.addEventListener('click',()=>addItem(el.dataset.id));
@@ -119,7 +119,7 @@ function pageInit(){
     canvas.innerHTML=items.map((bid,i)=>{const b=bById[bid];return `
       <div class="tb-block" draggable="true" data-i="${i}">
         <span class="ms grip">drag_indicator</span>
-        <div class="bmain"><div class="bn">${b.name}</div><div class="bc">${b.cat}</div>
+        <div class="bmain"><div class="bn">${b.label}</div><div class="bc">${b.cat}</div>
           <div class="blk-preview" style="min-height:0;padding:12px;margin-top:9px;gap:7px">${blockPreview(b.p)}</div></div>
         <span class="ms bx" data-rm="${i}">close</span>
       </div>`;}).join('');
@@ -138,7 +138,7 @@ function pageInit(){
       });
     });
   }
-  function addItem(bid){ items.push(bid); render(); showToast('Added block: '+bById[bid].name); }
+  function addItem(bid){ items.push(bid); render(); showToast('Added block: '+bById[bid].label); }
   [drop,canvas].forEach(z=>{
     z.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('add')){e.preventDefault();drop.classList.add('over');}});
     z.addEventListener('dragleave',()=>drop.classList.remove('over'));

@@ -1,27 +1,44 @@
 // Content blocks behind Tenderfy's Block Builder — the pieces Documents are built from.
 // Shared by the Blocks library, the block editor and the document editor.
+//
+// ⚠ COVERAGE DATA IS PLACEHOLDER pending the block audit (scrum 20 Jul 2026):
+// "we need to pull across all the different variations of blocks we've got in Tenderfy
+//  currently — there needs to be some communication with Shiv... we don't know at the
+//  moment who's got what block." Replace `tenants` on each block with audited values.
+//
+// status: 'standard'    — available to every tenant (the agreed end state)
+//         'tenant-only' — bespoke / partial rollout, needs standardising
+//         'to-retire'   — duplicate or superseded, remove after migration
+const ALL_TENANTS = ['taylor','cpm-civil','cpm-infra','velocity','hansen','acme','northolt','civic'];
+
 const BLOCKS = [
-  {id:'heading',    name:'Heading',             cat:'Title Blocks', p:'heading'},
-  {id:'subheading', name:'Sub-Heading',         cat:'Title Blocks', p:'subheading'},
-  {id:'divider',    name:'Section Divider',     cat:'Title Blocks', p:'divider', custom:true},
-  {id:'paragraph',  name:'Paragraph',           cat:'Text Blocks',  p:'paragraph'},
-  {id:'double',     name:'Double Paragraph',    cat:'Text Blocks',  p:'double'},
-  {id:'headpara',   name:'Heading & Paragraph', cat:'Text Blocks',  p:'headpara'},
-  {id:'parahead',   name:'Paragraph & Heading', cat:'Text Blocks',  p:'parahead'},
-  {id:'quote',      name:'Pull Quote',          cat:'Text Blocks',  p:'quote'},
-  {id:'list',       name:'Bulleted List',       cat:'Text Blocks',  p:'list'},
-  {id:'callout',    name:'Branded Callout',     cat:'Text Blocks',  p:'callout', custom:true},
-  {id:'img1',       name:'Single Image',        cat:'Images',       p:'img1'},
-  {id:'img2',       name:'Double Images',       cat:'Images',       p:'img2'},
-  {id:'img3',       name:'Triple Images',       cat:'Images',       p:'img3'},
-  {id:'imggrid',    name:'Image Grid',          cat:'Images',       p:'imggrid'},
-  {id:'banner',     name:'Logo Banner',         cat:'Images',       p:'banner', custom:true},
-  {id:'imgtext',    name:'Image & Text',        cat:'Image & Text', p:'imgtext'},
-  {id:'textimg',    name:'Text & Image',        cat:'Image & Text', p:'textimg'},
-  {id:'imgcap',     name:'Image + Caption',     cat:'Image & Text', p:'imgcap'},
-  {id:'feature',    name:'Two-Column Feature',  cat:'Image & Text', p:'feature', custom:true},
+  {id:'heading',    name:'Heading',             label:'Heading',            desc:'A single section heading.',                          cat:'Title Blocks', p:'heading',    status:'standard',    tenants:ALL_TENANTS},
+  {id:'subheading', name:'Sub-Heading',         label:'Sub-heading',        desc:'A smaller heading with a supporting line.',          cat:'Title Blocks', p:'subheading', status:'standard',    tenants:ALL_TENANTS},
+  {id:'divider',    name:'Section Divider',     label:'Section divider',    desc:'A titled rule that separates sections.',             cat:'Title Blocks', p:'divider',    status:'tenant-only', tenants:['cpm-civil','cpm-infra'], custom:true},
+  {id:'paragraph',  name:'Paragraph',           label:'Paragraph',          desc:'A block of body text.',                              cat:'Text Blocks',  p:'paragraph',  status:'standard',    tenants:ALL_TENANTS},
+  {id:'double',     name:'Double Paragraph',    label:'Two columns of text',desc:'Body text in two side-by-side columns.',             cat:'Text Blocks',  p:'double',     status:'standard',    tenants:ALL_TENANTS},
+  {id:'headpara',   name:'Heading & Paragraph', label:'Heading beside text',desc:'A heading on the left with body text on the right.', cat:'Text Blocks',  p:'headpara',   status:'standard',    tenants:ALL_TENANTS},
+  {id:'parahead',   name:'Paragraph & Heading', label:'Text beside heading',desc:'Body text on the left with a heading on the right.', cat:'Text Blocks',  p:'parahead',   status:'standard',    tenants:ALL_TENANTS},
+  {id:'quote',      name:'Pull Quote',          label:'Quote',              desc:'A highlighted quote or testimonial.',                cat:'Text Blocks',  p:'quote',      status:'standard',    tenants:ALL_TENANTS},
+  {id:'list',       name:'Bulleted List',       label:'Bulleted list',      desc:'A list of short points.',                            cat:'Text Blocks',  p:'list',       status:'standard',    tenants:ALL_TENANTS},
+  {id:'callout',    name:'Branded Callout',     label:'Highlight box',      desc:'A coloured box that draws attention to key text.',   cat:'Text Blocks',  p:'callout',    status:'tenant-only', tenants:['taylor','cpm-civil'], custom:true},
+  {id:'img1',       name:'Single Image',        label:'One image',          desc:'A single full-width image.',                         cat:'Images',       p:'img1',       status:'standard',    tenants:ALL_TENANTS},
+  {id:'img2',       name:'Double Images',       label:'Two images',         desc:'Two images side by side.',                           cat:'Images',       p:'img2',       status:'standard',    tenants:ALL_TENANTS},
+  {id:'img3',       name:'Triple Images',       label:'Three images',       desc:'Three images in a row.',                             cat:'Images',       p:'img3',       status:'standard',    tenants:ALL_TENANTS},
+  {id:'imggrid',    name:'Image Grid',          label:'Image grid',         desc:'A four-image grid.',                                 cat:'Images',       p:'imggrid',    status:'standard',    tenants:ALL_TENANTS},
+  {id:'banner',     name:'Logo Banner',         label:'Logo banner',        desc:'A full-width banner carrying the company logo.',     cat:'Images',       p:'banner',     status:'to-retire',   tenants:['acme'], custom:true},
+  {id:'imgtext',    name:'Image & Text',        label:'Image with text',    desc:'An image on the left, text on the right.',           cat:'Image & Text', p:'imgtext',    status:'standard',    tenants:ALL_TENANTS},
+  {id:'textimg',    name:'Text & Image',        label:'Text with image',    desc:'Text on the left, an image on the right.',           cat:'Image & Text', p:'textimg',    status:'standard',    tenants:ALL_TENANTS},
+  {id:'imgcap',     name:'Image + Caption',     label:'Image with caption', desc:'An image with a caption underneath.',                cat:'Image & Text', p:'imgcap',     status:'standard',    tenants:ALL_TENANTS},
+  {id:'feature',    name:'Two-Column Feature',  label:'Feature panel',      desc:'An image beside a headline and supporting text.',    cat:'Image & Text', p:'feature',    status:'tenant-only', tenants:['taylor','hansen','civic'], custom:true},
+  // Named explicitly in the 20 Jul scrum as bespoke-per-tenant and missing from the standard set.
+  {id:'table',      name:'Table',               label:'Table',              desc:'Rows and columns for rates, schedules or comparisons.',cat:'Tables & Sign-off', p:'table',     status:'tenant-only', tenants:['cpm-civil','cpm-infra','taylor']},
+  {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',          cat:'Tables & Sign-off', p:'signature', status:'tenant-only', tenants:['cpm-civil','hansen']},
 ];
-const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text'];
+const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text','Tables & Sign-off'];
+
+const isStandard = b => b.status === 'standard';
+const coverage = b => b.tenants ? b.tenants.length : 0;
 
 // Schematic preview for a block layout key.
 function blockPreview(p){
@@ -48,7 +65,12 @@ function blockPreview(p){
     case 'textimg':   return `<div class="blk-row"><div class="blk-txt">${bar('92%')+bar('84%')+bar('66%')}</div>${img()}</div>`;
     case 'imgcap':    return `${img()}${bar('50%')}`;
     case 'feature':   return `<div class="blk-row">${img()}<div class="blk-txt">${bar('70%',1)+bar('92%')+bar('80%')}</div></div>`;
+    case 'table':     return `<div class="blk-table">${['h','','',''].map(r=>`<div class="tr ${r}"><span></span><span></span><span></span></div>`).join('')}</div>`;
+    case 'signature': return `${bar('55%')}<div style="height:1px;background:#9FB5B0;margin:14px 0 7px"></div>${bar('40%',1)}${bar('30%')}`;
     default:          return bar('80%');
   }
 }
-if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.blockPreview=blockPreview; }
+if(typeof window!=='undefined'){
+  window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.ALL_TENANTS=ALL_TENANTS;
+  window.blockPreview=blockPreview; window.isStandard=isStandard; window.coverage=coverage;
+}

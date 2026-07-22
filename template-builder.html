@@ -69,19 +69,15 @@
             <select id="brandsel" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;background:#fff">
               <option value="">Brand-neutral (structure)</option>
             </select>
-            <div class="lbl">Logo</div>
-            <div class="bk-logo" id="bk-logo" data-toast="Upload logo — pulled from client brand kit"><span class="ms">image</span> <span id="bk-logo-t">From client brand kit</span></div>
-            <div class="lbl">Colours</div>
-            <div class="bk-swatches" id="bk-sw"><span class="bk-sw add" data-toast="Colours come from the client brand kit"><span class="ms" style="font-size:16px">add</span></span></div>
-            <div class="lbl">Font</div>
-            <div class="bk-font"><span id="bk-font">Outfit</span><span class="ms muted" data-toast="Fonts come from the client brand kit">expand_more</span></div>
-            <div class="muted" style="font-size:12px;margin-top:10px">Brand is stored on each client. The template stays reusable — assigning it applies that client's kit automatically.</div>
+            <div class="lbl">What the brand drives</div>
+            <div id="tokenMap"></div>
+            <div class="muted" style="font-size:12px;margin-top:10px">Brand is stored on each client. The template stays reusable — assigning it applies that client's kit to exactly these places.</div>
           </div>
         </div>
         <div class="tb-foot">
-          <div class="muted" style="font-size:11.5px;margin-bottom:2px">Deploy this architecture as a reusable preset, or straight to clients.</div>
-          <a class="btn btn-outline btn-block btn-sm" id="presetBtn"><span class="ms" style="font-size:17px">bookmark_add</span> Save as Preset</a>
-          <a class="btn btn-primary btn-block btn-sm" id="assignBtn"><span class="ms" style="font-size:17px">apartment</span> Assign to Clients</a>
+          <div class="muted" style="font-size:11.5px;margin-bottom:2px">Save as a reusable preset clients start from — they can still reshape it themselves in Build Tender.</div>
+          <a class="btn btn-primary btn-block btn-sm" id="presetBtn"><span class="ms" style="font-size:17px">bookmark_add</span> Save as Preset</a>
+          <a class="btn btn-outline btn-block btn-sm" id="assignBtn"><span class="ms" style="font-size:17px">apartment</span> Assign to Clients</a>
         </div>
       </div>
     </div>
@@ -102,6 +98,16 @@
     <div class="rmhead"><h2>Assign to clients</h2><span class="ms" data-close-assign>close</span></div>
     <div style="padding:8px 24px 0"><div class="muted" style="font-size:13px">Each client renders this template with <strong>its own brand kit</strong>, automatically.</div></div>
     <div style="padding:12px 24px"><div class="assign-list" id="assignList"></div></div>
+    <div style="padding:0 24px 4px">
+      <div class="qa-pipe" style="margin:0;padding:12px 14px;border-radius:12px">
+        <div class="qa-stage done"><span class="qn"><span class="ms" style="font-size:15px">check</span></span><div><div class="qs">Assigned</div></div></div>
+        <span class="ms qa-arrow">chevron_right</span>
+        <div class="qa-stage active"><span class="qn"><span class="ms" style="font-size:15px">rate_review</span></span><div><div class="qs">QA review</div></div></div>
+        <span class="ms qa-arrow">chevron_right</span>
+        <div class="qa-stage"><span class="qn"><span class="ms" style="font-size:15px">rocket_launch</span></span><div><div class="qs">Live for client</div></div></div>
+      </div>
+      <div class="muted" style="font-size:12px;margin-top:8px">Assigning doesn't publish — it goes to QA to be confirmed as finalised before the client sees it.</div>
+    </div>
     <div class="rmfoot"><a class="btn btn-outline" data-close-assign>Cancel</a><a class="btn btn-primary" id="assignConfirm">Assign <span id="assignN"></span></a></div>
   </div>
 </div>

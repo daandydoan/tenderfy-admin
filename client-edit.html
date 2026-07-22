@@ -59,14 +59,23 @@
       <div class="ed-rail">
         <div class="card">
           <h3 class="ed-h">Brand Kit</h3>
+          <div class="fld"><label>Logo</label><div class="bk-logo" data-toast="Upload client logo"><span class="ms">upload</span> Upload logo</div>
+            <span class="fhint">Cover page lockup and the running header on every page.</span></div>
           <div class="fld"><label for="c-pri">Primary colour</label>
-            <div class="color-row"><input type="color" id="c-pri" value="#1F5C3D"><input class="fin" id="c-pri-hex" placeholder="#1F5C3D"></div></div>
-          <div class="fld"><label for="c-sec">Secondary colour</label>
-            <div class="color-row"><input type="color" id="c-sec" value="#C9A227"><input class="fin" id="c-sec-hex" placeholder="#C9A227"></div></div>
+            <div class="color-row"><input type="color" id="c-pri" value="#1F5C3D"><input class="fin" id="c-pri-hex" placeholder="#1F5C3D"></div>
+            <span class="fhint">Cover panel, section headings, table header fill.</span></div>
+          <div class="fld"><label for="c-sec">Secondary / accent</label>
+            <div class="color-row"><input type="color" id="c-sec" value="#C9A227"><input class="fin" id="c-sec-hex" placeholder="#C9A227"></div>
+            <span class="fhint">Heading rules, dividers, callout borders, bullets.</span></div>
+          <div class="fld"><label for="c-bg">Background</label>
+            <div class="color-row"><input type="color" id="c-bg" value="#F4F7F5"><input class="fin" id="c-bg-hex" placeholder="#F4F7F5"></div>
+            <span class="fhint">Cover panel wash and highlight-box fills.</span></div>
           <div class="fld"><label for="c-font">Heading font</label><select class="fin" id="c-font">
             <option>Outfit</option><option>Inter</option><option>Poppins</option><option>Roboto</option><option>Lora</option><option>Montserrat</option>
-          </select></div>
-          <div class="fld"><label>Logo</label><div class="bk-logo" data-toast="Upload client logo"><span class="ms">upload</span> Upload logo</div></div>
+          </select><span class="fhint">All headings, section titles and the cover title.</span></div>
+          <div class="fld"><label for="c-bodyfont">Body font</label><select class="fin" id="c-bodyfont">
+            <option>Outfit</option><option>Inter</option><option>Roboto</option><option>Lora</option>
+          </select><span class="fhint">Body copy, table text, captions and footers.</span></div>
         </div>
         <div class="card">
           <h3 class="ed-h">Live preview</h3>
@@ -93,36 +102,41 @@ function pageInit(){
     document.getElementById('c-renew').value=t.renews;
     document.getElementById('c-pri').value=t.brand.primary;
     document.getElementById('c-sec').value=t.brand.secondary;
+    document.getElementById('c-bg').value=t.brand.background;
     document.getElementById('c-font').value=t.brand.font;
+    document.getElementById('c-bodyfont').value=t.brand.bodyFont;
     document.getElementById('cr-name').textContent=t.name;
     document.getElementById('pg-title').textContent='Edit — '+t.name;
     document.getElementById('delBtn').style.display='';
   }
-  const pri=document.getElementById('c-pri'), sec=document.getElementById('c-sec');
+  const pri=document.getElementById('c-pri'), sec=document.getElementById('c-sec'), bg=document.getElementById('c-bg');
   document.getElementById('c-pri-hex').value=pri.value.toUpperCase();
   document.getElementById('c-sec-hex').value=sec.value.toUpperCase();
+  document.getElementById('c-bg-hex').value=bg.value.toUpperCase();
 
   function preview(){
     const name=document.getElementById('c-name').value.trim()||'Client name';
-    const p=pri.value, s=sec.value, f=document.getElementById('c-font').value;
+    const p=pri.value, s=sec.value, b=bg.value;
+    const f=document.getElementById('c-font').value, bf=document.getElementById('c-bodyfont').value;
     const initials=name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     document.getElementById('prev').innerHTML=`
       <div style="background:${p};color:#fff;padding:13px 15px;display:flex;align-items:center;gap:10px">
         <span style="width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;font-family:'${f}',sans-serif">${initials}</span>
-        <div><div style="font-family:'${f}',sans-serif;font-weight:700;font-size:13px">${name}</div><div style="font-size:10px;opacity:.85">Tender Response</div></div>
+        <div><div style="font-family:'${f}',sans-serif;font-weight:700;font-size:13px">${name}</div><div style="font-size:10px;opacity:.85;font-family:'${bf}',sans-serif">Tender Response</div></div>
       </div>
-      <div style="padding:13px 15px">
+      <div style="padding:13px 15px;background:${b}">
         <div style="font-weight:700;color:${p};border-bottom:2px solid ${s};padding-bottom:4px;font-size:12px;font-family:'${f}',sans-serif">Executive Summary</div>
-        <div style="height:6px;background:#eef0f0;border-radius:4px;margin:9px 0;width:93%"></div>
-        <div style="height:6px;background:#eef0f0;border-radius:4px;width:76%"></div>
+        <div style="height:6px;background:#e4e8e7;border-radius:4px;margin:9px 0;width:93%"></div>
+        <div style="height:6px;background:#e4e8e7;border-radius:4px;width:76%"></div>
+        <div style="margin-top:11px;border:1px solid ${s};border-radius:5px;padding:7px 9px;font-size:9.5px;color:${p};font-family:'${bf}',sans-serif">Highlight box — accent border, background wash</div>
       </div>`;
   }
-  ['c-name','c-font'].forEach(i=>document.getElementById(i).addEventListener('input',preview));
-  document.getElementById('c-font').addEventListener('change',preview);
-  pri.addEventListener('input',()=>{document.getElementById('c-pri-hex').value=pri.value.toUpperCase();preview();});
-  sec.addEventListener('input',()=>{document.getElementById('c-sec-hex').value=sec.value.toUpperCase();preview();});
-  document.getElementById('c-pri-hex').addEventListener('input',e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value)){pri.value=e.target.value;preview();}});
-  document.getElementById('c-sec-hex').addEventListener('input',e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value)){sec.value=e.target.value;preview();}});
+  document.getElementById('c-name').addEventListener('input',preview);
+  ['c-font','c-bodyfont'].forEach(i=>document.getElementById(i).addEventListener('change',preview));
+  [['c-pri',pri],['c-sec',sec],['c-bg',bg]].forEach(([k,el])=>{
+    el.addEventListener('input',()=>{document.getElementById(k+'-hex').value=el.value.toUpperCase();preview();});
+    document.getElementById(k+'-hex').addEventListener('input',e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value)){el.value=e.target.value;preview();}});
+  });
   document.getElementById('c-name').addEventListener('input',e=>{
     const v=e.target.value.trim()||'New Client';
     document.getElementById('cr-name').textContent=v;

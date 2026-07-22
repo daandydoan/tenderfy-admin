@@ -98,6 +98,18 @@ function pageInit(){
   const brandsel=document.getElementById('brandsel');
   brandsel.innerHTML='<option value="">Brand-neutral (structure)</option>'+TENANTS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
   brandsel.addEventListener('change', ()=>{ brandTenant=brandsel.value; applyBrand(); });
+  function renderTokenMap(t){
+    document.getElementById('tokenMap').innerHTML = BRAND_TOKENS.map(tok=>{
+      const has=!!t, v=t ? (tok.key==='logo' ? t.initials : t.brand[tok.key]) : null;
+      const chip = !has ? `<span class="tok-chip" style="background:var(--row)"></span>`
+        : tok.type==='color' ? `<span class="tok-chip" style="background:${v}"></span>`
+        : tok.type==='font' ? `<span class="tok-chip" style="font-family:'${v}',sans-serif">Aa</span>`
+        : `<span class="tok-chip" style="background:${t.brand.primary};color:#fff">${t.initials}</span>`;
+      return `<div class="tok-row" style="padding:9px 0">${chip}<div class="tok-main">
+        <div class="tk" style="font-size:12.5px">${tok.label} ${has?`<span class="tv">${tok.type==='color'?v.toUpperCase():(tok.type==='font'?v:'Logo')}</span>`:'<span class="tv">from client</span>'}</div>
+        <div class="ta" style="font-size:11.5px">${tok.applies}</div></div></div>`;
+    }).join('');
+  }
   function applyBrand(){
     const bar=document.getElementById('brandbar');
     if(!brandTenant){
@@ -105,25 +117,21 @@ function pageInit(){
       document.getElementById('bb-logo').textContent='TF';
       document.getElementById('bb-name').textContent='Brand-neutral structure';
       document.getElementById('bb-sub').textContent='Pick a client to preview its brand & typography';
-      document.getElementById('bk-logo-t').textContent='From client brand kit';
-      document.getElementById('bk-font').textContent='Outfit';
-      document.getElementById('bk-sw').innerHTML='<span class="bk-sw add"><span class="ms" style="font-size:16px">add</span></span>';
+      renderTokenMap(null);
       return;
     }
     const t=tById[brandTenant], b=t.brand;
     bar.style.background=b.primary;
     document.getElementById('bb-logo').textContent=t.initials;
     document.getElementById('bb-name').textContent=t.name;
-    document.getElementById('bb-sub').textContent=`Brand kit · ${b.font}`;
-    document.getElementById('bk-logo-t').textContent=t.name+' logo';
-    document.getElementById('bk-font').textContent=b.font;
-    document.getElementById('bk-sw').innerHTML=`<span class="bk-sw" style="background:${b.primary}"></span><span class="bk-sw" style="background:${b.secondary}"></span><span class="bk-sw add"><span class="ms" style="font-size:16px">add</span></span>`;
+    document.getElementById('bb-sub').textContent=`Brand kit · ${b.font} / ${b.bodyFont}`;
+    renderTokenMap(t);
   }
 
   // ---- Preview modal (sectioned, branded) ----
   document.getElementById('previewBtn').addEventListener('click', ()=>{
     if(!total()){ showToast('Add documents to preview'); return; }
-    const b= brandTenant ? tById[brandTenant].brand : {primary:'#38988A',secondary:'#FFBC4A',font:'Outfit'};
+    const b= brandTenant ? tById[brandTenant].brand : {primary:'#38988A',secondary:'#FFBC4A',background:'#F7F9F8',font:'Outfit',bodyFont:'Outfit'};
     const bname= brandTenant ? tById[brandTenant].name : 'Brand-neutral';
     document.getElementById('pm-title').textContent=document.getElementById('tpl-name').value;
     document.getElementById('pm-brand').textContent=bname;
@@ -139,7 +147,7 @@ function pageInit(){
       </div>`).join('');
     document.getElementById('pm-paper').innerHTML=`
       <div style="background:${b.primary};color:#fff;padding:30px 34px"><div style="font-family:'${b.font}',sans-serif;font-size:22px;font-weight:700">${document.getElementById('tpl-name').value}</div><div style="opacity:.85;font-size:12px;margin-top:4px">${bname} · Tender Response</div></div>
-      <div style="padding:26px 34px">${body}</div>`;
+      <div style="padding:26px 34px;background:${b.background};font-family:'${b.bodyFont}',sans-serif">${body}</div>`;
     document.getElementById('previewModal').classList.add('open');
   });
   document.querySelectorAll('[data-close-preview]').forEach(x=>x.addEventListener('click',()=>document.getElementById('previewModal').classList.remove('open')));
@@ -173,7 +181,7 @@ function pageInit(){
   document.getElementById('assignModal').addEventListener('click',e=>{if(e.target.id==='assignModal')e.target.classList.remove('open');});
   document.getElementById('assignConfirm').addEventListener('click', ()=>{
     if(!assigned.size){showToast('Select at least one client');return;}
-    showToast(`Assigned to ${assigned.size} client${assigned.size>1?'s':''} — each takes its own brand & typography`);
+    showToast(`Assigned to ${assigned.size} client${assigned.size>1?'s':''} — sent to QA to confirm as finalised before going live`);
     document.getElementById('assignModal').classList.remove('open');
   });
 

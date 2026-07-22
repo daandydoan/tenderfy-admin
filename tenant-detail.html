@@ -53,21 +53,9 @@
       <div class="cd2-main">
         <!-- Brand Kit -->
         <div class="card">
-          <div class="cd2-cardhead"><h3>Brand Kit</h3><span class="sub">Auto-applied to every assigned template</span><a class="lnk" id="brandEditLnk">Edit</a></div>
+          <div class="cd2-cardhead"><h3>Brand Kit</h3><span class="sub">What each token drives in an assigned template</span><a class="lnk" id="brandEditLnk">Edit</a></div>
           <div class="cd2-brand">
-            <div>
-              <div class="cd2-btk">Colours</div>
-              <div class="cd2-swatches">
-                <div class="cd2-swatch"><span class="chip" id="bk-pri"></span><div class="cn">Primary</div><div class="ch" id="bk-pri-hex"></div></div>
-                <div class="cd2-swatch"><span class="chip" id="bk-sec"></span><div class="cn">Secondary</div><div class="ch" id="bk-sec-hex"></div></div>
-                <div class="cd2-swatch"><span class="chip" style="background:#2E3C3B"></span><div class="cn">Text</div><div class="ch">#2E3C3B</div></div>
-              </div>
-              <div class="cd2-btk">Typography</div>
-              <div class="cd2-fonts">
-                <div class="cd2-font"><div class="fn" id="bk-font">—</div><div class="fl">Headings</div></div>
-                <div class="cd2-font"><div class="fn">Outfit</div><div class="fl">Body</div></div>
-              </div>
-            </div>
+            <div id="tokens"></div>
             <div class="cd2-brand-prev">
               <div class="pk">Live preview</div>
               <div class="bk-live-wrap" id="bk-live"></div>
@@ -140,16 +128,21 @@ function pageInit(){
     });
   });
 
-  // Brand kit
-  document.getElementById('bk-pri').style.background=b.primary;
-  document.getElementById('bk-pri-hex').textContent=b.primary.toUpperCase();
-  document.getElementById('bk-sec').style.background=b.secondary;
-  document.getElementById('bk-sec-hex').textContent=b.secondary.toUpperCase();
-  document.getElementById('bk-font').textContent=b.font;
-  document.getElementById('bk-font').style.fontFamily=`'${b.font}',sans-serif`;
+  // Brand kit — token → where it applies
+  document.getElementById('tokens').innerHTML = BRAND_TOKENS.map(tok=>{
+    const v = tok.key==='logo' ? t.initials : b[tok.key];
+    const chip = tok.type==='color'
+      ? `<span class="tok-chip" style="background:${v};border-color:rgba(0,0,0,.12)"></span>`
+      : tok.type==='font'
+        ? `<span class="tok-chip" style="font-family:'${v}',sans-serif">Aa</span>`
+        : `<span class="tok-chip" style="background:${b.primary};color:#fff">${t.initials}</span>`;
+    return `<div class="tok-row">${chip}
+      <div class="tok-main"><div class="tk">${tok.label} <span class="tv">${tok.type==='color'?v.toUpperCase():(tok.type==='font'?v:'Uploaded')}</span></div>
+      <div class="ta">${tok.applies}</div></div></div>`;
+  }).join('');
   document.getElementById('bk-live').innerHTML=`
-    <div style="background:${b.primary};color:#fff;padding:12px 14px"><div style="font-family:'${b.font}',sans-serif;font-weight:700;font-size:13px">${t.name}</div><div style="font-size:10px;opacity:.85">Tender Response</div></div>
-    <div style="padding:12px 14px"><div style="font-weight:700;color:${b.primary};border-bottom:2px solid ${b.secondary};padding-bottom:4px;font-size:12px;font-family:'${b.font}',sans-serif">Executive Summary</div><div style="height:6px;background:#eef0f0;border-radius:4px;margin:9px 0;width:92%"></div><div style="height:6px;background:#eef0f0;border-radius:4px;width:74%"></div></div>`;
+    <div style="background:${b.primary};color:#fff;padding:12px 14px"><div style="font-family:'${b.font}',sans-serif;font-weight:700;font-size:13px">${t.name}</div><div style="font-size:10px;opacity:.85;font-family:'${b.bodyFont}',sans-serif">Tender Response</div></div>
+    <div style="padding:12px 14px;background:${b.background}"><div style="font-weight:700;color:${b.primary};border-bottom:2px solid ${b.secondary};padding-bottom:4px;font-size:12px;font-family:'${b.font}',sans-serif">Executive Summary</div><div style="height:6px;background:#e4e8e7;border-radius:4px;margin:9px 0;width:92%"></div><div style="height:6px;background:#e4e8e7;border-radius:4px;width:74%"></div><div style="margin-top:10px;border:1px solid ${b.secondary};border-radius:5px;padding:6px 8px;font-size:9.5px;color:${b.primary};font-family:'${b.bodyFont}',sans-serif">Highlight box</div></div>`;
 
   // Subscription & credits
   const meterFill=(el,pct)=>{el.style.width=pct+'%';};

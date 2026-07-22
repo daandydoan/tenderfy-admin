@@ -495,3 +495,39 @@ textarea.fin{resize:vertical}
 .cfm p{color:var(--gray);font-size:13.5px;margin:0 0 22px}
 .cfm-acts{display:flex;gap:10px;justify-content:center}
 .cfm-acts .btn{min-width:110px;justify-content:center}
+
+/* ============================================================================
+   Block audit / standardisation (scrum 20 Jul actions) + brand token mapping.
+   ============================================================================ */
+.blk-table{width:100%;border:1px solid var(--lighter);border-radius:4px;overflow:hidden}
+.blk-table .tr{display:flex}
+.blk-table .tr span{flex:1;height:13px;border-right:1px solid var(--lighter);border-bottom:1px solid var(--lighter)}
+.blk-table .tr span:last-child{border-right:none}
+.blk-table .tr.h span{background:#CBD7D3}
+.blk-table .tr:last-child span{border-bottom:none}
+
+/* status pills */
+.b-standard{background:var(--st-green-bg);color:var(--st-green-tx)}
+.b-tenant-only{background:var(--st-amber-bg);color:var(--st-amber-tx)}
+.b-to-retire{background:var(--st-pink-bg);color:var(--st-pink-tx)}
+.b-standard .b-dot{background:#22A565}
+.b-tenant-only .b-dot{background:#C77700}
+.b-to-retire .b-dot{background:var(--st-pink-tx)}
+
+/* coverage matrix */
+.cov-tick{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:15px}
+.cov-tick.yes{background:var(--st-green-bg);color:#1C7247}
+.cov-tick.no{background:var(--row);color:var(--lighter)}
+.cov-count{font-variant-numeric:tabular-nums;font-weight:600}
+.cov-count.part{color:var(--st-amber-tx)}
+.dtable th.rot{font-size:10.5px;letter-spacing:.02em;text-align:center;padding:12px 6px}
+.dtable td.covcell{text-align:center;padding:10px 6px}
+
+/* brand token map */
+.tok-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--row)}
+.tok-row:last-child{border-bottom:none}
+.tok-chip{width:34px;height:34px;border-radius:9px;border:1px solid rgba(0,0,0,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gray);background:var(--page)}
+.tok-main{flex:1;min-width:0}
+.tok-main .tk{font-weight:600;font-size:13.5px;display:flex;align-items:center;gap:8px}
+.tok-main .tv{font-size:11.5px;color:var(--light);font-variant-numeric:tabular-nums}
+.tok-main .ta{font-size:12px;color:var(--gray);margin-top:3px;line-height:1.4}
