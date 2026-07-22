@@ -22,7 +22,7 @@
         <div class="pg-sub">The content building-blocks behind Tenderfy's <strong>Block Builder</strong> — what clients drop in and rearrange to fill a document's content. Manage the standard set and add <strong>custom blocks</strong> here once, and they're available everywhere documents are built.</div>
       </div>
       <div class="pg-acts">
-        <a class="btn btn-primary btn-sm" id="createBtn"><span class="ms" style="font-size:18px">add</span> Create Custom Block</a>
+        <a class="btn btn-primary btn-sm" href="block-edit.html"><span class="ms" style="font-size:18px">add</span> Create Custom Block</a>
       </div>
     </div>
 
@@ -38,58 +38,10 @@
   </div>
 </div>
 <script src="shell.js"></script>
+<script src="blocks-data.js"></script>
 <script>
-const BLOCKS = [
-  {name:'Heading',             cat:'Title Blocks',  p:'heading'},
-  {name:'Sub-Heading',         cat:'Title Blocks',  p:'subheading'},
-  {name:'Section Divider',     cat:'Title Blocks',  p:'divider', custom:true},
-  {name:'Paragraph',           cat:'Text Blocks',   p:'paragraph'},
-  {name:'Double Paragraph',    cat:'Text Blocks',   p:'double'},
-  {name:'Heading & Paragraph', cat:'Text Blocks',   p:'headpara'},
-  {name:'Paragraph & Heading', cat:'Text Blocks',   p:'parahead'},
-  {name:'Pull Quote',          cat:'Text Blocks',   p:'quote'},
-  {name:'Bulleted List',       cat:'Text Blocks',   p:'list'},
-  {name:'Branded Callout',     cat:'Text Blocks',   p:'callout', custom:true},
-  {name:'Single Image',        cat:'Images',        p:'img1'},
-  {name:'Double Images',       cat:'Images',        p:'img2'},
-  {name:'Triple Images',       cat:'Images',        p:'img3'},
-  {name:'Image Grid',          cat:'Images',        p:'imggrid'},
-  {name:'Logo Banner',         cat:'Images',        p:'banner', custom:true},
-  {name:'Image & Text',        cat:'Image & Text',  p:'imgtext'},
-  {name:'Text & Image',        cat:'Image & Text',  p:'textimg'},
-  {name:'Image + Caption',     cat:'Image & Text',  p:'imgcap'},
-  {name:'Two-Column Feature',  cat:'Image & Text',  p:'feature', custom:true},
-];
-
 function pageInit(){
-  const bar=(w,h)=>`<div class="blk-bar${h?' h':''}" style="width:${w}"></div>`;
-  const img=()=>`<div class="blk-img"><span class="ms">image</span></div>`;
-  const col=(...b)=>`<div>${b.join('')}</div>`;
-  const preview=(p)=>{
-    switch(p){
-      case 'heading':   return bar('60%',1);
-      case 'subheading':return bar('72%',1)+bar('46%');
-      case 'divider':   return bar('40%',1)+`<div style="height:2px;background:var(--teal);opacity:.4;margin:4px 0"></div>`+bar('55%');
-      case 'paragraph': return bar('94%')+bar('90%')+bar('92%')+bar('68%');
-      case 'double':    return `<div class="blk-cols">${col(bar('90%'),bar('80%'),bar('86%'))}${col(bar('88%'),bar('84%'),bar('70%'))}</div>`;
-      case 'headpara':  return `<div class="blk-cols">${col(bar('80%',1),bar('60%'))}${col(bar('92%'),bar('86%'),bar('74%'))}</div>`;
-      case 'parahead':  return `<div class="blk-cols">${col(bar('92%'),bar('86%'),bar('74%'))}${col(bar('80%',1),bar('60%'))}</div>`;
-      case 'quote':     return `<div class="blk-quote">${bar('88%',1)+bar('72%')}</div>`;
-      case 'list':      return ['82%','74%','68%'].map(w=>`<div class="blk-list-row"><span class="dot"></span>${bar(w)}</div>`).join('');
-      case 'callout':   return `<div style="background:var(--teal-tint);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px">${bar('70%',1)+bar('88%')+bar('60%')}</div>`;
-      case 'img1':      return img();
-      case 'img2':      return `<div class="blk-imgs">${img()+img()}</div>`;
-      case 'img3':      return `<div class="blk-imgs">${img()+img()+img()}</div>`;
-      case 'imggrid':   return `<div class="blk-imgs">${img()+img()}</div><div class="blk-imgs">${img()+img()}</div>`;
-      case 'banner':    return `<div class="blk-img" style="min-height:64px;background:var(--nav)"><span class="ms">badge</span></div>`;
-      case 'imgtext':   return `<div class="blk-row">${img()}<div class="blk-txt">${bar('92%')+bar('84%')+bar('66%')}</div></div>`;
-      case 'textimg':   return `<div class="blk-row"><div class="blk-txt">${bar('92%')+bar('84%')+bar('66%')}</div>${img()}</div>`;
-      case 'imgcap':    return `${img()}${bar('50%')}`;
-      case 'feature':   return `<div class="blk-row">${img()}<div class="blk-txt">${bar('70%',1)+bar('92%')+bar('80%')}</div></div>`;
-      default:          return bar('80%');
-    }
-  };
-  const cats=['All Blocks', ...Array.from(new Set(BLOCKS.map(b=>b.cat)))];
+  const cats=['All Blocks', ...BLOCK_CATS];
   let active='All Blocks';
 
   function renderTabs(){
@@ -99,17 +51,15 @@ function pageInit(){
   function renderGrid(){
     const list=BLOCKS.filter(b=>active==='All Blocks'||b.cat===active);
     document.getElementById('grid').innerHTML = list.map(b=>`
-      <div class="blk-card" data-toast="${b.custom?'Edit custom block':'Manage block'} — ${b.name}">
+      <a class="blk-card" href="block-edit.html#id=${b.id}">
         <div class="blk-name">${b.name} ${b.custom?'<span class="blk-custom">Custom</span>':''}</div>
-        <div class="blk-preview">${preview(b.p)}</div>
-      </div>`).join('');
+        <div class="blk-preview">${blockPreview(b.p)}</div>
+      </a>`).join('');
   }
   renderTabs(); renderGrid();
   document.getElementById('s-total').textContent=BLOCKS.length;
   document.getElementById('s-std').textContent=BLOCKS.filter(b=>!b.custom).length;
   document.getElementById('s-custom').textContent=BLOCKS.filter(b=>b.custom).length;
-  document.getElementById('createBtn').addEventListener('click',()=>showToast('Create Custom Block — opens the block editor (prototype)'));
 }
-</script>
-</body>
+</script></body>
 </html>

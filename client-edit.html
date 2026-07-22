@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Edit Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-page="tenants" data-title="Clients">
+<div id="app-content">
+  <div class="pad">
+    <div class="crumb"><a href="tenants.html">Clients</a> <span class="ms">chevron_right</span> <span id="cr-name">New Client</span></div>
+    <div class="pg-head">
+      <div>
+        <div class="tn-title" id="pg-title">New Client</div>
+        <div class="pg-sub">Register the company and define its <strong>Brand Kit</strong> — every tender template assigned to this client takes on these colours and typography automatically.</div>
+      </div>
+      <div class="pg-acts">
+        <a class="btn btn-outline btn-sm" href="tenants.html">Cancel</a>
+        <a class="btn btn-danger btn-sm" id="delBtn" style="display:none"><span class="ms" style="font-size:17px">delete</span> Delete</a>
+        <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Client</a>
+      </div>
+    </div>
+
+    <div class="ed-grid">
+      <div class="ed-main">
+        <div class="card">
+          <h3 class="ed-h">Company details</h3>
+          <div class="frow">
+            <div class="fld"><label for="c-name">Company name</label><input class="fin" id="c-name" placeholder="e.g. Taylor Builders"></div>
+            <div class="fld"><label for="c-ind">Industry</label><select class="fin" id="c-ind">
+              <option>Construction</option><option>Civil</option><option>Engineering</option><option>Infrastructure</option><option>HVAC</option><option>Trades</option><option>Facilities Management</option>
+            </select></div>
+          </div>
+          <div class="frow">
+            <div class="fld"><label for="c-email">Contact email</label><input class="fin" id="c-email" type="email" placeholder="name@company.com.au"></div>
+            <div class="fld"><label for="c-phone">Phone</label><input class="fin" id="c-phone" placeholder="+61 7 0000 0000"></div>
+          </div>
+          <div class="fld"><label for="c-abn">Business number (ABN)</label><input class="fin" id="c-abn" placeholder="00 000 000 000"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="ed-h">Subscription</h3>
+          <div class="frow">
+            <div class="fld"><label for="c-plan">Plan</label><select class="fin" id="c-plan"></select></div>
+            <div class="fld"><label for="c-renew">Renews on</label><input class="fin" id="c-renew" placeholder="e.g. 10 Aug 2026"></div>
+          </div>
+          <div class="fhint">Plans are defined in <a href="subscriptions.html" style="color:var(--teal)">Subscriptions</a>.</div>
+        </div>
+      </div>
+
+      <div class="ed-rail">
+        <div class="card">
+          <h3 class="ed-h">Brand Kit</h3>
+          <div class="fld"><label for="c-pri">Primary colour</label>
+            <div class="color-row"><input type="color" id="c-pri" value="#1F5C3D"><input class="fin" id="c-pri-hex" placeholder="#1F5C3D"></div></div>
+          <div class="fld"><label for="c-sec">Secondary colour</label>
+            <div class="color-row"><input type="color" id="c-sec" value="#C9A227"><input class="fin" id="c-sec-hex" placeholder="#C9A227"></div></div>
+          <div class="fld"><label for="c-font">Heading font</label><select class="fin" id="c-font">
+            <option>Outfit</option><option>Inter</option><option>Poppins</option><option>Roboto</option><option>Lora</option><option>Montserrat</option>
+          </select></div>
+          <div class="fld"><label>Logo</label><div class="bk-logo" data-toast="Upload client logo"><span class="ms">upload</span> Upload logo</div></div>
+        </div>
+        <div class="card">
+          <h3 class="ed-h">Live preview</h3>
+          <div id="prev" style="border-radius:10px;overflow:hidden;border:1px solid var(--border)"></div>
+          <div class="fhint" style="margin-top:10px">How an assigned tender template will render for this client.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script src="tenant-data.js"></script>
+<script>
+function pageInit(){
+  document.getElementById('c-plan').innerHTML=PLANS.map(p=>`<option>${p.name}</option>`).join('');
+  const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
+  const t=id?TENANTS.find(x=>x.id===id):null;
+
+  if(t){
+    document.getElementById('c-name').value=t.name;
+    document.getElementById('c-ind').value=t.industry;
+    document.getElementById('c-email').value=t.id+'@'+t.name.toLowerCase().replace(/[^a-z]+/g,'')+'.com.au';
+    document.getElementById('c-plan').value=t.plan;
+    document.getElementById('c-renew').value=t.renews;
+    document.getElementById('c-pri').value=t.brand.primary;
+    document.getElementById('c-sec').value=t.brand.secondary;
+    document.getElementById('c-font').value=t.brand.font;
+    document.getElementById('cr-name').textContent=t.name;
+    document.getElementById('pg-title').textContent='Edit — '+t.name;
+    document.getElementById('delBtn').style.display='';
+  }
+  const pri=document.getElementById('c-pri'), sec=document.getElementById('c-sec');
+  document.getElementById('c-pri-hex').value=pri.value.toUpperCase();
+  document.getElementById('c-sec-hex').value=sec.value.toUpperCase();
+
+  function preview(){
+    const name=document.getElementById('c-name').value.trim()||'Client name';
+    const p=pri.value, s=sec.value, f=document.getElementById('c-font').value;
+    const initials=name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('prev').innerHTML=`
+      <div style="background:${p};color:#fff;padding:13px 15px;display:flex;align-items:center;gap:10px">
+        <span style="width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;font-family:'${f}',sans-serif">${initials}</span>
+        <div><div style="font-family:'${f}',sans-serif;font-weight:700;font-size:13px">${name}</div><div style="font-size:10px;opacity:.85">Tender Response</div></div>
+      </div>
+      <div style="padding:13px 15px">
+        <div style="font-weight:700;color:${p};border-bottom:2px solid ${s};padding-bottom:4px;font-size:12px;font-family:'${f}',sans-serif">Executive Summary</div>
+        <div style="height:6px;background:#eef0f0;border-radius:4px;margin:9px 0;width:93%"></div>
+        <div style="height:6px;background:#eef0f0;border-radius:4px;width:76%"></div>
+      </div>`;
+  }
+  ['c-name','c-font'].forEach(i=>document.getElementById(i).addEventListener('input',preview));
+  document.getElementById('c-font').addEventListener('change',preview);
+  pri.addEventListener('input',()=>{document.getElementById('c-pri-hex').value=pri.value.toUpperCase();preview();});
+  sec.addEventListener('input',()=>{document.getElementById('c-sec-hex').value=sec.value.toUpperCase();preview();});
+  document.getElementById('c-pri-hex').addEventListener('input',e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value)){pri.value=e.target.value;preview();}});
+  document.getElementById('c-sec-hex').addEventListener('input',e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value)){sec.value=e.target.value;preview();}});
+  document.getElementById('c-name').addEventListener('input',e=>{
+    const v=e.target.value.trim()||'New Client';
+    document.getElementById('cr-name').textContent=v;
+    if(!t) document.getElementById('pg-title').textContent=v;
+  });
+
+  document.getElementById('saveBtn').addEventListener('click',()=>{
+    const n=document.getElementById('c-name').value.trim();
+    if(!n){showToast('Enter a company name first');return;}
+    showToast((t?'Updated':'Created')+' client: '+n+' — brand kit saved');
+    setTimeout(()=>location.href=t?('tenant-detail.html#id='+t.id):'tenants.html',700);
+  });
+  document.getElementById('delBtn').addEventListener('click',()=>{
+    confirmAction({title:'Delete this client?',body:`“${t.name}” and its brand kit will be removed. Assigned tender templates stay in the library.`,confirm:'Delete client',danger:true},()=>{
+      showToast('Deleted client: '+t.name); setTimeout(()=>location.href='tenants.html',700);
+    });
+  });
+  preview();
+}
+</script>
+</body>
+</html>

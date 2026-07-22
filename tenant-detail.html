@@ -34,15 +34,15 @@
       </div>
       <div class="cd2-actions">
         <a class="btn btn-primary" href="templates.html"><span class="ms" style="font-size:18px">add</span> Assign Template</a>
-        <a class="btn btn-outline" data-toast="Edit brand kit"><span class="ms" style="font-size:17px">palette</span> Brand Kit</a>
+        <a class="btn btn-outline" id="brandBtn"><span class="ms" style="font-size:17px">palette</span> Brand Kit</a>
         <div class="cd2-morewrap">
           <button class="cd2-more" id="moreBtn" data-kebab><span class="ms">more_vert</span></button>
           <div class="kebab-menu" id="moreMenu">
-            <a data-toast="View client profile"><span class="ms">person</span> View profile</a>
+            <a id="editBtn"><span class="ms">edit</span> Edit client</a>
             <a data-toast="Message client"><span class="ms">chat</span> Message client</a>
             <div class="kebab-sep"></div>
             <a data-toast="Block client"><span class="ms">block</span> Block</a>
-            <a class="danger" data-toast="Delete client"><span class="ms">delete</span> Delete company</a>
+            <a class="danger" id="delBtn"><span class="ms">delete</span> Delete company</a>
           </div>
         </div>
       </div>
@@ -53,7 +53,7 @@
       <div class="cd2-main">
         <!-- Brand Kit -->
         <div class="card">
-          <div class="cd2-cardhead"><h3>Brand Kit</h3><span class="sub">Auto-applied to every assigned template</span><a class="lnk" data-toast="Edit brand kit">Edit</a></div>
+          <div class="cd2-cardhead"><h3>Brand Kit</h3><span class="sub">Auto-applied to every assigned template</span><a class="lnk" id="brandEditLnk">Edit</a></div>
           <div class="cd2-brand">
             <div>
               <div class="cd2-btk">Colours</div>
@@ -128,6 +128,17 @@ function pageInit(){
   const mb=document.getElementById('moreBtn'), mm=document.getElementById('moreMenu');
   mb.addEventListener('click', ()=>{ if(typeof closePopovers==='function') closePopovers(mm); mm.classList.toggle('open'); });
   mm.addEventListener('click', ()=>mm.classList.remove('open'));
+
+  // CRUD entry points
+  const editHref='client-edit.html#id='+t.id;
+  document.getElementById('brandBtn').setAttribute('href',editHref);
+  document.getElementById('editBtn').setAttribute('href',editHref);
+  document.getElementById('brandEditLnk').setAttribute('href',editHref);
+  document.getElementById('delBtn').addEventListener('click',()=>{
+    confirmAction({title:'Delete this client?',body:`“${t.name}” and its brand kit will be removed. Assigned tender templates stay in the library.`,confirm:'Delete client',danger:true},()=>{
+      showToast('Deleted client: '+t.name); setTimeout(()=>location.href='tenants.html',700);
+    });
+  });
 
   // Brand kit
   document.getElementById('bk-pri').style.background=b.primary;

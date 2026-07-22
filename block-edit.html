@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Edit Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-page="blocks" data-title="Blocks">
+<div id="app-content">
+  <div class="pad">
+    <div class="crumb"><a href="blocks.html">Blocks</a> <span class="ms">chevron_right</span> <span id="cr-name">New Custom Block</span></div>
+    <div class="pg-head">
+      <div>
+        <div class="tn-title" id="pg-title">New Custom Block</div>
+        <div class="pg-sub">Compose a reusable content block. Once saved it appears in the Block Builder for every document.</div>
+      </div>
+      <div class="pg-acts">
+        <a class="btn btn-outline btn-sm" href="blocks.html">Cancel</a>
+        <a class="btn btn-danger btn-sm" id="delBtn" style="display:none"><span class="ms" style="font-size:17px">delete</span> Delete</a>
+        <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Block</a>
+      </div>
+    </div>
+
+    <div class="ed-grid">
+      <div class="ed-main">
+        <div class="card">
+          <h3 class="ed-h">Block details</h3>
+          <div class="frow">
+            <div class="fld"><label for="b-name">Block name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"></div>
+            <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
+          </div>
+          <div class="fld"><label for="b-desc">Description</label><textarea class="fin" id="b-desc" rows="2" placeholder="When should this block be used?"></textarea></div>
+        </div>
+
+        <div class="card">
+          <h3 class="ed-h">Layout</h3>
+          <div id="rows"></div>
+          <div class="fhint" id="empty-hint" style="margin-bottom:10px">No elements yet — add one below.</div>
+          <div class="cmp-add" id="addRow"></div>
+        </div>
+      </div>
+
+      <div class="ed-rail">
+        <div class="card">
+          <h3 class="ed-h">Live preview</h3>
+          <div class="blk-preview" id="prev"></div>
+        </div>
+        <div class="card">
+          <h3 class="ed-h">Availability</h3>
+          <div class="fld"><label for="b-status">Status</label><select class="fin" id="b-status"><option value="custom">Custom block</option><option value="standard">Promote to standard</option></select></div>
+          <div class="fhint">Custom blocks sit alongside the standard set and are available to every document.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script src="blocks-data.js"></script>
+<script>
+const ELEMS={heading:'Heading',subheading:'Sub-Heading',paragraph:'Paragraph',list:'Bulleted List',quote:'Pull Quote',image:'Image',images2:'Two Images',cols:'Two Columns'};
+const P2ELEMS={heading:['heading'],subheading:['subheading'],divider:['heading','paragraph'],paragraph:['paragraph'],double:['cols'],headpara:['cols'],parahead:['cols'],quote:['quote'],list:['list'],callout:['heading','paragraph'],img1:['image'],img2:['images2'],img3:['images2'],imggrid:['images2','images2'],banner:['image'],imgtext:['image','paragraph'],textimg:['paragraph','image'],imgcap:['image','heading'],feature:['image','paragraph']};
+
+function pageInit(){
+  const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
+  const existing=id?BLOCKS.find(b=>b.id===id):null;
+  let rows = existing ? (P2ELEMS[existing.p]||['paragraph']).slice() : [];
+
+  document.getElementById('b-cat').innerHTML=BLOCK_CATS.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('addRow').innerHTML=Object.entries(ELEMS).map(([k,v])=>`<a class="btn btn-outline btn-xs" data-el="${k}"><span class="ms" style="font-size:15px">add</span> ${v}</a>`).join('');
+
+  if(existing){
+    document.getElementById('b-name').value=existing.name;
+    document.getElementById('b-cat').value=existing.cat;
+    document.getElementById('cr-name').textContent=existing.name;
+    document.getElementById('pg-title').textContent='Edit — '+existing.name;
+    document.getElementById('b-status').value=existing.custom?'custom':'standard';
+    if(existing.custom) document.getElementById('delBtn').style.display='';
+  }
+  document.getElementById('b-name').addEventListener('input',e=>{
+    const v=e.target.value.trim()||'New Custom Block';
+    document.getElementById('cr-name').textContent=v;
+    if(!existing) document.getElementById('pg-title').textContent=v;
+  });
+
+  const frag=(k)=>{
+    const bar=(w,h)=>`<div class="blk-bar${h?' h':''}" style="width:${w}"></div>`;
+    const img=()=>`<div class="blk-img"><span class="ms">image</span></div>`;
+    switch(k){
+      case 'heading':return bar('60%',1);
+      case 'subheading':return bar('72%',1)+bar('46%');
+      case 'paragraph':return bar('94%')+bar('88%')+bar('68%');
+      case 'list':return ['82%','74%','66%'].map(w=>`<div class="blk-list-row"><span class="dot"></span>${bar(w)}</div>`).join('');
+      case 'quote':return `<div class="blk-quote">${bar('88%',1)+bar('70%')}</div>`;
+      case 'image':return img();
+      case 'images2':return `<div class="blk-imgs">${img()+img()}</div>`;
+      case 'cols':return `<div class="blk-cols"><div>${bar('90%')+bar('78%')}</div><div>${bar('88%')+bar('70%')}</div></div>`;
+      default:return bar('80%');
+    }
+  };
+
+  function render(){
+    document.getElementById('rows').innerHTML=rows.map((k,i)=>`
+      <div class="cmp-row" draggable="true" data-i="${i}">
+        <span class="ms grip">drag_indicator</span><span class="cn">${ELEMS[k]}</span>
+        <span class="ms rm" data-rm="${i}">close</span>
+      </div>`).join('');
+    document.getElementById('empty-hint').style.display=rows.length?'none':'';
+    document.getElementById('prev').innerHTML=rows.length?rows.map(frag).join(''):'<div class="fhint" style="text-align:center">Preview appears as you add elements</div>';
+    document.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',()=>{rows.splice(+x.dataset.rm,1);render();}));
+    document.querySelectorAll('.cmp-row').forEach(r=>{
+      r.addEventListener('dragstart',e=>e.dataTransfer.setData('i',r.dataset.i));
+      r.addEventListener('dragover',e=>e.preventDefault());
+      r.addEventListener('drop',e=>{e.preventDefault();const f=+e.dataTransfer.getData('i');const t=+r.dataset.i;const [m]=rows.splice(f,1);rows.splice(t,0,m);render();});
+    });
+  }
+  document.querySelectorAll('#addRow [data-el]').forEach(a=>a.addEventListener('click',()=>{rows.push(a.dataset.el);render();}));
+
+  document.getElementById('saveBtn').addEventListener('click',()=>{
+    const n=document.getElementById('b-name').value.trim();
+    if(!n){showToast('Give the block a name first');return;}
+    if(!rows.length){showToast('Add at least one element to the layout');return;}
+    showToast((existing?'Updated':'Created')+' block: '+n);
+    setTimeout(()=>location.href='blocks.html',700);
+  });
+  document.getElementById('delBtn').addEventListener('click',()=>{
+    confirmAction({title:'Delete this block?',body:`“${existing.name}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
+      showToast('Deleted block: '+existing.name); setTimeout(()=>location.href='blocks.html',700);
+    });
+  });
+  render();
+}
+</script>
+</body>
+</html>

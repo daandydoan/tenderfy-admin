@@ -24,7 +24,7 @@
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" data-toast="Duplicate component"><span class="ms" style="font-size:17px">content_copy</span> Duplicate</a>
-        <a class="btn btn-outline btn-sm" data-toast="Edit structure"><span class="ms" style="font-size:17px">edit</span> Edit Structure</a>
+        <a class="btn btn-outline btn-sm" id="editBtn"><span class="ms" style="font-size:17px">edit</span> Edit Structure</a>
         <a class="btn btn-primary btn-sm" id="pubbtn" data-toast="Publish component">Publish</a>
       </div>
     </div>
@@ -81,6 +81,7 @@ function pageInit(){
   document.getElementById('a-upd').textContent = c.updated;
   document.getElementById('a-used').textContent = (2 + (c.name.length % 7)) + ' templates';
   document.getElementById('vh-cur').textContent = 'v'+c.version;
+  document.getElementById('editBtn').setAttribute('href','document-edit.html#id='+c.id);
   if(c.status==='published'){ const b=document.getElementById('pubbtn'); b.textContent='Deprecate'; b.className='btn btn-danger-outline btn-sm'; b.setAttribute('data-toast','Deprecate component'); }
   if(c.status==='deprecated'){ const b=document.getElementById('pubbtn'); b.textContent='Restore'; b.setAttribute('data-toast','Restore component'); }
 

@@ -455,3 +455,43 @@
 }
 /* clickable cards lift a little more on hover */
 .comp-card:hover,.blk-card:hover{box-shadow:0 20px 26px -10px rgba(12,12,13,.16),0 6px 8px -6px rgba(12,12,13,.07)}
+
+/* ============================================================================
+   CRUD editors — shared form controls + confirm dialog.
+   ============================================================================ */
+.ed-grid{display:grid;grid-template-columns:1fr 330px;gap:20px;align-items:start}
+@media(max-width:900px){.ed-grid{grid-template-columns:1fr}}
+.ed-main{display:flex;flex-direction:column;gap:20px;min-width:0}
+.ed-rail{display:flex;flex-direction:column;gap:20px}
+.ed-h{font-size:15px;font-weight:700;margin:0 0 16px}
+
+.fld{display:flex;flex-direction:column;gap:6px;margin-bottom:15px}
+.fld:last-child{margin-bottom:0}
+.fld label{font-size:12px;font-weight:600;color:var(--gray)}
+.fin{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:13.5px;background:#fff;color:var(--ink);outline:none;width:100%}
+.fin:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
+textarea.fin{resize:vertical}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.frow{grid-template-columns:1fr}}
+.fhint{font-size:11.5px;color:var(--light)}
+.color-row{display:flex;align-items:center;gap:10px}
+.color-row input[type=color]{width:46px;height:38px;border:1px solid var(--border);border-radius:9px;background:#fff;padding:2px;cursor:pointer;flex-shrink:0}
+
+/* layout composer rows (block editor) */
+.cmp-row{display:flex;align-items:center;gap:11px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;margin-bottom:9px}
+.cmp-row .grip{color:var(--lighter);cursor:grab;font-size:19px}
+.cmp-row .cn{flex:1;font-size:13.5px;font-weight:500}
+.cmp-row .rm{color:var(--light);cursor:pointer;font-size:18px}
+.cmp-row .rm:hover{color:var(--accent)}
+.cmp-add{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.cmp-add .btn{flex:none}
+
+/* confirm dialog */
+.cfm{background:#fff;border-radius:16px;padding:28px;max-width:400px;width:100%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.3)}
+.cfm-ic{width:52px;height:52px;border-radius:50%;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.cfm-ic .ms{font-size:26px}
+.cfm-ic.danger{background:var(--st-pink-bg);color:var(--accent)}
+.cfm h3{font-size:17px;font-weight:700;margin:0 0 8px}
+.cfm p{color:var(--gray);font-size:13.5px;margin:0 0 22px}
+.cfm-acts{display:flex;gap:10px;justify-content:center}
+.cfm-acts .btn{min-width:110px;justify-content:center}

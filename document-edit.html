@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Edit Document</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-page="library" data-title="Documents">
+<div id="app-content">
+  <div class="pad">
+    <div class="crumb"><a href="library.html">Documents</a> <span class="ms">chevron_right</span> <span id="cr-name">New Document</span></div>
+    <div class="pg-head" style="margin-bottom:14px">
+      <div>
+        <input id="d-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:320px" value="Untitled Document">
+        <div class="pg-sub">Build the document from <a href="blocks.html" style="color:var(--teal)">blocks</a>. Structure only — each client's branding &amp; typography is applied when a tender template is assigned.</div>
+      </div>
+      <div class="pg-acts">
+        <span class="badge b-draft" id="d-badge"><span class="b-dot"></span>Draft</span>
+        <a class="btn btn-outline btn-sm" href="library.html">Cancel</a>
+        <a class="btn btn-danger btn-sm" id="delBtn" style="display:none"><span class="ms" style="font-size:17px">delete</span> Delete</a>
+        <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Document</a>
+      </div>
+    </div>
+
+    <div class="tb-wrap">
+      <!-- Block palette -->
+      <div class="tb-col palette">
+        <div class="tb-colhead">Blocks <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0" id="pal-count"></span></div>
+        <div class="tb-colbody">
+          <div class="tb-psearch"><span class="ms" style="font-size:17px">search</span><input id="pq" placeholder="Search blocks…"></div>
+          <div id="palette"></div>
+        </div>
+      </div>
+
+      <!-- Document canvas -->
+      <div class="tb-canvas">
+        <div class="tb-sheet">
+          <div id="canvas"></div>
+          <div class="tb-drop" id="drop">Click or drag a block from the left to start building this document</div>
+        </div>
+      </div>
+
+      <!-- Properties -->
+      <div class="tb-col props">
+        <div class="tb-colhead">Document</div>
+        <div style="overflow:auto;flex:1">
+          <div class="props-sec">
+            <div class="fld"><label for="d-type">Document type</label><select class="fin" id="d-type"></select></div>
+            <div class="fld"><label for="d-status">Status</label><select class="fin" id="d-status"><option value="draft">Draft</option><option value="published">Published</option><option value="deprecated">Deprecated</option></select></div>
+            <div class="fld"><label for="d-desc">Description</label><textarea class="fin" id="d-desc" rows="2" placeholder="What is this document for?"></textarea></div>
+          </div>
+          <div class="props-sec">
+            <h4>Availability</h4>
+            <div class="fld"><label for="d-avail">Clients</label><select class="fin" id="d-avail"><option value="all">All clients (default)</option><option value="restricted">Restricted to selected clients</option></select></div>
+            <div class="fhint">Global by default — restricting is a deliberate exception.</div>
+          </div>
+          <div class="props-sec">
+            <h4>Composition</h4>
+            <div class="hstack"><span class="ms" style="color:var(--teal)">grid_view</span> <strong id="p-count">0</strong> <span class="muted">blocks</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script src="blocks-data.js"></script>
+<script src="library-data.js"></script>
+<script>
+function pageInit(){
+  const bById=Object.fromEntries(BLOCKS.map(b=>[b.id,b]));
+  const TYPES=[...new Set(COMPONENTS.map(c=>c.category))];
+  document.getElementById('d-type').innerHTML=TYPES.map(t=>`<option>${t}</option>`).join('');
+
+  const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
+  const doc=id?COMPONENTS.find(c=>c.id===id):null;
+  let items = doc ? ['heading','paragraph','imgtext','list','img2'] : [];
+
+  if(doc){
+    document.getElementById('d-name').value=doc.name;
+    document.getElementById('cr-name').textContent=doc.name;
+    document.getElementById('d-type').value=doc.category;
+    document.getElementById('d-status').value=doc.status;
+    document.getElementById('d-desc').value=doc.desc;
+    document.getElementById('d-avail').value=doc.restricted?'restricted':'all';
+    document.getElementById('delBtn').style.display='';
+    setBadge(doc.status);
+  }
+  document.getElementById('d-name').addEventListener('input',e=>document.getElementById('cr-name').textContent=e.target.value||'New Document');
+  document.getElementById('d-status').addEventListener('change',e=>setBadge(e.target.value));
+  function setBadge(s){ const b=document.getElementById('d-badge'); b.className='badge b-'+s; b.innerHTML=`<span class="b-dot"></span>${s[0].toUpperCase()+s.slice(1)}`; }
+
+  // palette
+  const palette=document.getElementById('palette'); let pq='';
+  function renderPalette(){
+    const avail=BLOCKS.filter(b=>!pq||(b.name+' '+b.cat).toLowerCase().includes(pq));
+    palette.innerHTML=BLOCK_CATS.filter(c=>avail.some(b=>b.cat===c)).map(cat=>`<div class="tb-cat">${cat}</div>${avail.filter(b=>b.cat===cat).map(b=>`
+      <div class="tb-comp" draggable="true" data-id="${b.id}"><span class="ci"><span class="ms">${b.custom?'auto_fix_high':'grid_view'}</span></span><span class="cn">${b.name}</span><span class="ms cadd">add_circle</span></div>`).join('')}`).join('');
+    document.getElementById('pal-count').textContent=`(${avail.length})`;
+    palette.querySelectorAll('.tb-comp').forEach(el=>{
+      el.addEventListener('click',()=>addItem(el.dataset.id));
+      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('add',el.dataset.id);el.classList.add('dragging');});
+      el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    });
+  }
+  document.getElementById('pq').addEventListener('input',e=>{pq=e.target.value.toLowerCase().trim();renderPalette();});
+
+  // canvas
+  const canvas=document.getElementById('canvas'), drop=document.getElementById('drop');
+  function render(){
+    canvas.innerHTML=items.map((bid,i)=>{const b=bById[bid];return `
+      <div class="tb-block" draggable="true" data-i="${i}">
+        <span class="ms grip">drag_indicator</span>
+        <div class="bmain"><div class="bn">${b.name}</div><div class="bc">${b.cat}</div>
+          <div class="blk-preview" style="min-height:0;padding:12px;margin-top:9px;gap:7px">${blockPreview(b.p)}</div></div>
+        <span class="ms bx" data-rm="${i}">close</span>
+      </div>`;}).join('');
+    document.getElementById('p-count').textContent=items.length;
+    drop.style.display=items.length?'none':'block';
+    canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',()=>{items.splice(+x.dataset.rm,1);render();}));
+    canvas.querySelectorAll('.tb-block').forEach(el=>{
+      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');});
+      el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+      el.addEventListener('dragover',e=>e.preventDefault());
+      el.addEventListener('drop',e=>{
+        e.preventDefault();e.stopPropagation();
+        const mv=e.dataTransfer.getData('move'), add=e.dataTransfer.getData('add'), to=+el.dataset.i;
+        if(add){items.splice(to,0,add);} else if(mv!==''){const [m]=items.splice(+mv,1);items.splice(to,0,m);}
+        render();
+      });
+    });
+  }
+  function addItem(bid){ items.push(bid); render(); showToast('Added block: '+bById[bid].name); }
+  [drop,canvas].forEach(z=>{
+    z.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('add')){e.preventDefault();drop.classList.add('over');}});
+    z.addEventListener('dragleave',()=>drop.classList.remove('over'));
+    z.addEventListener('drop',e=>{drop.classList.remove('over');const add=e.dataTransfer.getData('add');if(add&&!e.target.closest('.tb-block')){e.preventDefault();addItem(add);}});
+  });
+
+  document.getElementById('saveBtn').addEventListener('click',()=>{
+    const n=document.getElementById('d-name').value.trim();
+    if(!n||n==='Untitled Document'){showToast('Give the document a name first');return;}
+    if(!items.length){showToast('Add at least one block');return;}
+    showToast((doc?'Updated':'Created')+' document: '+n+' · '+items.length+' blocks');
+    setTimeout(()=>location.href='library.html',700);
+  });
+  document.getElementById('delBtn').addEventListener('click',()=>{
+    confirmAction({title:'Delete this document?',body:`“${doc.name}” will be removed from the library. Tender templates already using it will need a replacement.`,confirm:'Delete document',danger:true},()=>{
+      showToast('Deleted document: '+doc.name); setTimeout(()=>location.href='library.html',700);
+    });
+  });
+
+  renderPalette(); render();
+}
+</script>
+</body>
+</html>
