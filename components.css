@@ -506,24 +506,7 @@ textarea.fin{resize:vertical}
 .blk-table .tr.h span{background:#CBD7D3}
 .blk-table .tr:last-child span{border-bottom:none}
 
-/* status pills */
-.b-standard{background:var(--st-green-bg);color:var(--st-green-tx)}
-.b-tenant-only{background:var(--st-amber-bg);color:var(--st-amber-tx)}
-.b-to-retire{background:var(--st-pink-bg);color:var(--st-pink-tx)}
-.b-standard .b-dot{background:#22A565}
-.b-tenant-only .b-dot{background:#C77700}
-.b-to-retire .b-dot{background:var(--st-pink-tx)}
-
-/* coverage matrix */
-.cov-tick{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:15px}
-.cov-tick.yes{background:var(--st-green-bg);color:#1C7247}
-.cov-tick.no{background:var(--row);color:var(--lighter)}
-.cov-count{font-variant-numeric:tabular-nums;font-weight:600}
-.cov-count.part{color:var(--st-amber-tx)}
-.dtable th.rot{font-size:10.5px;letter-spacing:.02em;text-align:center;padding:12px 6px}
-.dtable td.covcell{text-align:center;padding:10px 6px}
-
-/* brand token map */
+/* brand token map (client detail) */
 .tok-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--row)}
 .tok-row:last-child{border-bottom:none}
 .tok-chip{width:34px;height:34px;border-radius:9px;border:1px solid rgba(0,0,0,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gray);background:var(--page)}

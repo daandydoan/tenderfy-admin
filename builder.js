@@ -98,17 +98,16 @@ function pageInit(){
   const brandsel=document.getElementById('brandsel');
   brandsel.innerHTML='<option value="">Brand-neutral (structure)</option>'+TENANTS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
   brandsel.addEventListener('change', ()=>{ brandTenant=brandsel.value; applyBrand(); });
-  function renderTokenMap(t){
-    document.getElementById('tokenMap').innerHTML = BRAND_TOKENS.map(tok=>{
-      const has=!!t, v=t ? (tok.key==='logo' ? t.initials : t.brand[tok.key]) : null;
-      const chip = !has ? `<span class="tok-chip" style="background:var(--row)"></span>`
-        : tok.type==='color' ? `<span class="tok-chip" style="background:${v}"></span>`
-        : tok.type==='font' ? `<span class="tok-chip" style="font-family:'${v}',sans-serif">Aa</span>`
-        : `<span class="tok-chip" style="background:${t.brand.primary};color:#fff">${t.initials}</span>`;
-      return `<div class="tok-row" style="padding:9px 0">${chip}<div class="tok-main">
-        <div class="tk" style="font-size:12.5px">${tok.label} ${has?`<span class="tv">${tok.type==='color'?v.toUpperCase():(tok.type==='font'?v:'Logo')}</span>`:'<span class="tv">from client</span>'}</div>
-        <div class="ta" style="font-size:11.5px">${tok.applies}</div></div></div>`;
-    }).join('');
+  function renderBrandSummary(t){
+    const el=document.getElementById('tokenMap');
+    if(!t){ el.innerHTML='<div class="muted" style="font-size:12px">Pick a client above to preview its brand.</div>'; return; }
+    const b=t.brand;
+    el.innerHTML=`<div class="bk-swatches" style="margin:2px 0 8px">
+        <span class="bk-sw" style="background:${b.primary}" title="Primary"></span>
+        <span class="bk-sw" style="background:${b.secondary}" title="Secondary"></span>
+        <span class="bk-sw" style="background:${b.background}" title="Background"></span>
+      </div>
+      <div class="muted" style="font-size:12px">${b.font} / ${b.bodyFont} · headings, accents, background &amp; logo.</div>`;
   }
   function applyBrand(){
     const bar=document.getElementById('brandbar');
@@ -117,7 +116,7 @@ function pageInit(){
       document.getElementById('bb-logo').textContent='TF';
       document.getElementById('bb-name').textContent='Brand-neutral structure';
       document.getElementById('bb-sub').textContent='Pick a client to preview its brand & typography';
-      renderTokenMap(null);
+      renderBrandSummary(null);
       return;
     }
     const t=tById[brandTenant], b=t.brand;
@@ -125,7 +124,7 @@ function pageInit(){
     document.getElementById('bb-logo').textContent=t.initials;
     document.getElementById('bb-name').textContent=t.name;
     document.getElementById('bb-sub').textContent=`Brand kit · ${b.font} / ${b.bodyFont}`;
-    renderTokenMap(t);
+    renderBrandSummary(t);
   }
 
   // ---- Preview modal (sectioned, branded) ----

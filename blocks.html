@@ -19,62 +19,31 @@
     <div class="pg-head">
       <div>
         <div class="tn-title">Blocks</div>
-        <div class="pg-sub">The content building-blocks behind Tenderfy's <strong>Block Builder</strong>. The goal is <strong>one block builder for every client</strong> — check Inventory &amp; coverage for blocks that are still bespoke.</div>
+        <div class="pg-sub">The content building-blocks behind Tenderfy's <strong>Block Builder</strong>. The goal is one shared set for every client — anything tagged <strong>Bespoke</strong> still needs standardising.</div>
       </div>
       <div class="pg-acts">
-        <a class="btn btn-outline btn-sm" id="rolloutAll"><span class="ms" style="font-size:17px">published_with_changes</span> Standardise gaps</a>
+        <a class="btn btn-outline btn-sm" id="stdBtn" style="display:none"></a>
         <a class="btn btn-primary btn-sm" href="block-edit.html"><span class="ms" style="font-size:18px">add</span> Create Custom Block</a>
       </div>
     </div>
 
-    <div class="prod-banner">
-      <span class="pb-ic"><span class="ms">inventory</span></span>
-      <div class="pb-tx"><div class="t">Coverage data is provisional — pending the block audit</div><div class="d">Per-client coverage is placeholder until the full inventory is pulled together with Shiv. <strong>Table</strong> and <strong>Signature</strong> are already known to be bespoke rather than standard.</div></div>
-    </div>
-
-    <div class="stat-row">
-      <div class="stat-tile"><div class="st-ic"><span class="ms">grid_view</span></div><div class="st-big" id="s-total">0</div><div class="st-lbl">Blocks</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">verified</span></div><div class="st-big" id="s-std">0</div><div class="st-lbl">Standard (all clients)</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:#FBEBD2;color:#8E611A"><span class="ms">warning</span></div><div class="st-big" id="s-gap">0</div><div class="st-lbl">Not standard yet</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-pink-bg);color:var(--st-pink-tx)"><span class="ms">delete_sweep</span></div><div class="st-big" id="s-ret">0</div><div class="st-lbl">To retire</div></div>
-    </div>
-
-    <div class="cat-chips" id="views" style="margin-bottom:20px">
-      <span class="cat-chip on" data-view="library"><span class="ms" style="font-size:16px">grid_view</span> Library</span>
-      <span class="cat-chip" data-view="inventory"><span class="ms" style="font-size:16px">table_chart</span> Inventory &amp; coverage</span>
-    </div>
-
-    <div id="view-library">
-      <div class="blk-tabs" id="tabs"></div>
-      <div class="blk-grid" id="grid"></div>
-    </div>
-
-    <div id="view-inventory" style="display:none">
-      <div class="tbl-scroll">
-        <table class="dtable">
-          <thead><tr id="invHead"></tr></thead>
-          <tbody id="invRows"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="blk-tabs" id="tabs"></div>
+    <div class="blk-grid" id="grid"></div>
   </div>
 </div>
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
-<script src="tenant-data.js"></script>
 <script>
 function pageInit(){
-  const tById=Object.fromEntries(TENANTS.map(t=>[t.id,t]));
   const cats=['All Blocks', ...BLOCK_CATS];
   let active='All Blocks';
-  const statusLbl={'standard':'Standard','tenant-only':'Tenant-only','to-retire':'To retire'};
-  const badge=s=>`<span class="badge b-${s}"><span class="b-dot"></span>${statusLbl[s]}</span>`;
 
-  function stats(){
-    document.getElementById('s-total').textContent=BLOCKS.length;
-    document.getElementById('s-std').textContent=BLOCKS.filter(b=>b.status==='standard').length;
-    document.getElementById('s-gap').textContent=BLOCKS.filter(b=>b.status==='tenant-only').length;
-    document.getElementById('s-ret').textContent=BLOCKS.filter(b=>b.status==='to-retire').length;
+  function bespokeCount(){ return BLOCKS.filter(b=>b.bespoke).length; }
+  function renderStdBtn(){
+    const n=bespokeCount(), btn=document.getElementById('stdBtn');
+    if(!n){ btn.style.display='none'; return; }
+    btn.style.display='';
+    btn.innerHTML=`<span class="ms" style="font-size:17px">published_with_changes</span> Standardise ${n} bespoke`;
   }
   function renderTabs(){
     document.getElementById('tabs').innerHTML=cats.map(c=>`<span class="blk-tab ${c===active?'on':''}" data-cat="${c}">${c}</span>`).join('');
@@ -82,55 +51,22 @@ function pageInit(){
   }
   function renderGrid(){
     const list=BLOCKS.filter(b=>active==='All Blocks'||b.cat===active);
-    document.getElementById('grid').innerHTML=list.map(b=>{
-      const n=coverage(b), all=n===ALL_TENANTS.length;
-      return `<a class="blk-card" href="block-edit.html#id=${b.id}">
-        <div class="blk-name">${b.label} ${b.custom?'<span class="blk-custom">Custom</span>':''}</div>
+    document.getElementById('grid').innerHTML=list.map(b=>`
+      <a class="blk-card" href="block-edit.html#id=${b.id}">
+        <div class="blk-name">${b.label} ${b.bespoke?'<span class="blk-custom">Bespoke</span>':''}</div>
         <div class="blk-preview">${blockPreview(b.p)}</div>
-        <div style="padding-top:12px;display:flex;flex-direction:column;gap:7px">
-          <div style="font-size:12px;color:var(--gray)">${b.desc}</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--light)">${badge(b.status)}<span>${all?'All clients':`${n} of ${ALL_TENANTS.length}`}</span></div>
-        </div>
-      </a>`;}).join('');
+        <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>
+      </a>`).join('');
   }
-  function renderInv(){
-    document.getElementById('invHead').innerHTML =
-      '<th>Block</th><th>Category</th><th>Status</th><th>Coverage</th>' +
-      ALL_TENANTS.map(id=>`<th class="rot" title="${tById[id].name}">${tById[id].initials}</th>`).join('') + '<th></th>';
-    document.getElementById('invRows').innerHTML=BLOCKS.map(b=>{
-      const n=coverage(b), all=n===ALL_TENANTS.length;
-      return `<tr>
-        <td><div class="nm">${b.label}</div><div class="sub">${b.name}</div></td>
-        <td class="muted">${b.cat}</td>
-        <td>${badge(b.status)}</td>
-        <td><span class="cov-count ${all?'':'part'}">${n}/${ALL_TENANTS.length}</span></td>
-        ${ALL_TENANTS.map(id=>`<td class="covcell"><span class="cov-tick ${b.tenants.includes(id)?'yes':'no'}"><span class="ms" style="font-size:15px">${b.tenants.includes(id)?'check':'remove'}</span></span></td>`).join('')}
-        <td style="text-align:right">${all?'<span class="muted" style="font-size:12px">—</span>':`<a class="btn btn-outline btn-xs" data-roll="${b.id}">Roll out</a>`}</td>
-      </tr>`;}).join('');
-    document.querySelectorAll('[data-roll]').forEach(a=>a.addEventListener('click',()=>{
-      const b=BLOCKS.find(x=>x.id===a.dataset.roll);
-      confirmAction({title:'Roll out to all clients?',body:`“${b.label}” will be added to every client's Block Builder and marked standard — so one block builder can be tested across the whole customer base.`,confirm:'Roll out'},()=>{
-        b.tenants=ALL_TENANTS.slice(); b.status='standard';
-        stats(); renderInv(); renderGrid(); showToast('Rolled out to all clients: '+b.label);
-      });
-    }));
-  }
-  document.querySelectorAll('#views .cat-chip').forEach(c=>c.addEventListener('click',()=>{
-    document.querySelectorAll('#views .cat-chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');
-    const v=c.dataset.view;
-    document.getElementById('view-library').style.display=v==='library'?'':'none';
-    document.getElementById('view-inventory').style.display=v==='inventory'?'':'none';
-  }));
-  document.getElementById('rolloutAll').addEventListener('click',()=>{
-    const gaps=BLOCKS.filter(b=>b.status==='tenant-only');
-    if(!gaps.length){showToast('Every block is already standard');return;}
-    confirmAction({title:`Standardise ${gaps.length} blocks?`,body:`${gaps.map(g=>g.label).join(', ')} will be made available to all ${ALL_TENANTS.length} clients. Blocks marked “to retire” are left alone.`,confirm:'Standardise all'},()=>{
-      gaps.forEach(b=>{b.tenants=ALL_TENANTS.slice();b.status='standard';});
-      stats(); renderGrid(); renderInv(); showToast(`Standardised ${gaps.length} blocks across all clients`);
+  document.getElementById('stdBtn').addEventListener('click',()=>{
+    const gaps=BLOCKS.filter(b=>b.bespoke);
+    if(!gaps.length) return;
+    confirmAction({title:`Standardise ${gaps.length} blocks?`,body:`${gaps.map(g=>g.label).join(', ')} will be made available to every client, so one block builder covers the whole customer base.`,confirm:'Standardise'},()=>{
+      gaps.forEach(b=>b.bespoke=false); renderGrid(); renderStdBtn(); showToast(`Standardised ${gaps.length} blocks across all clients`);
     });
   });
 
-  stats(); renderTabs(); renderGrid(); renderInv();
+  renderTabs(); renderGrid(); renderStdBtn();
 }
 </script>
 </body>

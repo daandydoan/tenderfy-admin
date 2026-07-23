@@ -65,7 +65,6 @@
         <div class="card">
           <h3 class="ed-h">Availability</h3>
           <div id="avail"></div>
-          <a class="btn btn-outline btn-sm btn-block mt16" id="rollBtn" style="display:none"><span class="ms" style="font-size:16px">published_with_changes</span> Roll out to all clients</a>
         </div>
       </div>
     </div>
@@ -73,13 +72,11 @@
 </div>
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
-<script src="tenant-data.js"></script>
 <script>
 const ELEMS={heading:'Heading',subheading:'Sub-Heading',paragraph:'Paragraph',list:'Bulleted List',quote:'Pull Quote',image:'Image',images2:'Two Images',table:'Table',signature:'Signature',cols:'Two Columns'};
 const P2ELEMS={heading:['heading'],subheading:['subheading'],divider:['heading','paragraph'],paragraph:['paragraph'],double:['cols'],headpara:['cols'],parahead:['cols'],quote:['quote'],list:['list'],callout:['heading','paragraph'],img1:['image'],img2:['images2'],img3:['images2'],imggrid:['images2','images2'],banner:['image'],imgtext:['image','paragraph'],textimg:['paragraph','image'],imgcap:['image','heading'],feature:['image','paragraph'],table:['table'],signature:['signature']};
 
 function pageInit(){
-  const tById=Object.fromEntries(TENANTS.map(t=>[t.id,t]));
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   const existing=id?BLOCKS.find(b=>b.id===id):null;
   let rows = existing ? (P2ELEMS[existing.p]||['paragraph']).slice() : [];
@@ -94,7 +91,7 @@ function pageInit(){
     document.getElementById('b-cat').value=existing.cat;
     document.getElementById('cr-name').textContent=existing.label;
     document.getElementById('pg-title').textContent='Edit — '+existing.label;
-    if(existing.custom) document.getElementById('delBtn').style.display='';
+    if(existing.bespoke) document.getElementById('delBtn').style.display='';
   }
 
   const frag=(k)=>{
@@ -135,20 +132,14 @@ function pageInit(){
   }
   function renderAvail(){
     const el=document.getElementById('avail');
-    if(!existing){ el.innerHTML='<div class="fhint">New blocks are created as <strong>standard</strong> — available to every client.</div>'; return; }
-    const n=coverage(existing), all=n===ALL_TENANTS.length;
-    const missing=ALL_TENANTS.filter(t=>!existing.tenants.includes(t)).map(t=>tById[t].name);
-    const statusLbl={'standard':'Standard','tenant-only':'Tenant-only','to-retire':'To retire'};
-    el.innerHTML=`<div class="hstack" style="margin-bottom:10px"><span class="badge b-${existing.status}"><span class="b-dot"></span>${statusLbl[existing.status]}</span><span class="muted" style="font-size:12.5px">${n} of ${ALL_TENANTS.length} clients</span></div>`
-      + (all?'<div class="fhint">Available to every client — one block builder to test.</div>'
-           :`<div class="fhint">Missing for: <strong>${missing.join(', ')}</strong></div>`);
-    document.getElementById('rollBtn').style.display=all?'none':'';
+    if(!existing||!existing.bespoke){
+      el.innerHTML='<div class="hstack"><span class="badge b-published"><span class="b-dot"></span>Standard</span><span class="muted" style="font-size:12.5px">Available to every client.</span></div>';
+      return;
+    }
+    el.innerHTML='<div class="hstack" style="margin-bottom:12px"><span class="blk-custom">Bespoke</span><span class="muted" style="font-size:12.5px">Not standard across all clients yet.</span></div>'
+      +'<a class="btn btn-outline btn-sm" id="mkStd"><span class="ms" style="font-size:16px">published_with_changes</span> Make standard</a>';
+    document.getElementById('mkStd').addEventListener('click',()=>{ existing.bespoke=false; renderAvail(); showToast('Marked standard: '+existing.label); });
   }
-  document.getElementById('rollBtn').addEventListener('click',()=>{
-    confirmAction({title:'Roll out to all clients?',body:`“${existing.label}” will be added to every client's Block Builder and marked standard.`,confirm:'Roll out'},()=>{
-      existing.tenants=ALL_TENANTS.slice(); existing.status='standard'; renderAvail(); showToast('Rolled out to all clients: '+existing.label);
-    });
-  });
 
   document.querySelectorAll('#addRow [data-el]').forEach(a=>a.addEventListener('click',()=>{rows.push(a.dataset.el);render();}));
   ['b-label','b-desc'].forEach(i=>document.getElementById(i).addEventListener('input',syncCustomerView));

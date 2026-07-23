@@ -69,9 +69,9 @@
             <select id="brandsel" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;background:#fff">
               <option value="">Brand-neutral (structure)</option>
             </select>
-            <div class="lbl">What the brand drives</div>
+            <div class="lbl">Brand — applied on assign</div>
             <div id="tokenMap"></div>
-            <div class="muted" style="font-size:12px;margin-top:10px">Brand is stored on each client. The template stays reusable — assigning it applies that client's kit to exactly these places.</div>
+            <div class="muted" style="font-size:12px;margin-top:8px">Stored on each client; the template stays reusable.</div>
           </div>
         </div>
         <div class="tb-foot">
@@ -98,16 +98,7 @@
     <div class="rmhead"><h2>Assign to clients</h2><span class="ms" data-close-assign>close</span></div>
     <div style="padding:8px 24px 0"><div class="muted" style="font-size:13px">Each client renders this template with <strong>its own brand kit</strong>, automatically.</div></div>
     <div style="padding:12px 24px"><div class="assign-list" id="assignList"></div></div>
-    <div style="padding:0 24px 4px">
-      <div class="qa-pipe" style="margin:0;padding:12px 14px;border-radius:12px">
-        <div class="qa-stage done"><span class="qn"><span class="ms" style="font-size:15px">check</span></span><div><div class="qs">Assigned</div></div></div>
-        <span class="ms qa-arrow">chevron_right</span>
-        <div class="qa-stage active"><span class="qn"><span class="ms" style="font-size:15px">rate_review</span></span><div><div class="qs">QA review</div></div></div>
-        <span class="ms qa-arrow">chevron_right</span>
-        <div class="qa-stage"><span class="qn"><span class="ms" style="font-size:15px">rocket_launch</span></span><div><div class="qs">Live for client</div></div></div>
-      </div>
-      <div class="muted" style="font-size:12px;margin-top:8px">Assigning doesn't publish — it goes to QA to be confirmed as finalised before the client sees it.</div>
-    </div>
+    <div style="padding:0 24px 6px"><div class="muted" style="font-size:12.5px"><span class="ms" style="font-size:15px;vertical-align:-3px;color:var(--st-amber-tx)">rate_review</span> Assigning sends it to QA to be confirmed as finalised — it goes live for the client after that.</div></div>
     <div class="rmfoot"><a class="btn btn-outline" data-close-assign>Cancel</a><a class="btn btn-primary" id="assignConfirm">Assign <span id="assignN"></span></a></div>
   </div>
 </div>
