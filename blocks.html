@@ -19,7 +19,7 @@
     <div class="pg-head">
       <div>
         <div class="tn-title">Blocks</div>
-        <div class="pg-sub">The content building-blocks behind Tenderfy's <strong>Block Builder</strong>. The goal is one shared set for every client — anything tagged <strong>Bespoke</strong> still needs standardising.</div>
+        <div class="pg-sub">The content building-blocks behind Tenderfy's <strong>Block Builder</strong>. The goal is one shared set for every client — anything tagged <strong>Bespoke</strong> still needs standardising.<br><span style="font-size:12px;color:var(--st-amber-tx)">From the 28 Jul audit: 8 tenancies run defaults; CPM, EIWA &amp; Pirrota carry the bespoke blocks below.</span></div>
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" id="stdBtn" style="display:none"></a>
@@ -56,6 +56,7 @@ function pageInit(){
         <div class="blk-name">${b.label} ${b.bespoke?'<span class="blk-custom">Bespoke</span>':''}</div>
         <div class="blk-preview">${blockPreview(b.p)}</div>
         <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>
+        ${b.bespoke&&b.seen?`<div style="font-size:11px;color:var(--st-amber-tx);padding-top:5px">Seen in: ${b.seen}</div>`:''}
       </a>`).join('');
   }
   document.getElementById('stdBtn').addEventListener('click',()=>{

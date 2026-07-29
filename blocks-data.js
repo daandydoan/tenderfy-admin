@@ -1,20 +1,24 @@
 // Content blocks behind Tenderfy's Block Builder — the pieces Documents are built from.
 // Shared by the Blocks library, the block editor and the document editor.
 //
-// Goal (scrum 20 Jul): ONE block builder for every client. Blocks are "standard"
-// (available to all) unless flagged `bespoke` — those need standardising, pending
-// the block audit with Shiv. `label` is what the client sees in Add Block.
+// Goal: ONE block set for every client. Blocks are "standard" (available to all)
+// unless flagged `bespoke` — those need standardising. `label` is what the client
+// sees in Add Block; `seen` records which tenancies currently carry a bespoke block.
+//
+// Bespoke set below comes from the 28 Jul 2026 component audit (with Shivam):
+// 8 tenancies run defaults; CPM, EIWA and Pirrota carry Table, Signature and
+// (EIWA only) Catalogue. Everything else is already uniform across the platform.
 const BLOCKS = [
   {id:'heading',    name:'Heading',             label:'Heading',            desc:'A single section heading.',                            cat:'Title Blocks', p:'heading'},
   {id:'subheading', name:'Sub-Heading',         label:'Sub-heading',        desc:'A smaller heading with a supporting line.',            cat:'Title Blocks', p:'subheading'},
-  {id:'divider',    name:'Section Divider',     label:'Section divider',    desc:'A titled rule that separates sections.',               cat:'Title Blocks', p:'divider', bespoke:true},
+  {id:'divider',    name:'Section Divider',     label:'Section divider',    desc:'A titled rule that separates sections.',               cat:'Title Blocks', p:'divider'},
   {id:'paragraph',  name:'Paragraph',           label:'Paragraph',          desc:'A block of body text.',                                cat:'Text Blocks',  p:'paragraph'},
   {id:'double',     name:'Double Paragraph',    label:'Two columns of text',desc:'Body text in two side-by-side columns.',               cat:'Text Blocks',  p:'double'},
   {id:'headpara',   name:'Heading & Paragraph', label:'Heading beside text',desc:'A heading on the left with body text on the right.',   cat:'Text Blocks',  p:'headpara'},
   {id:'parahead',   name:'Paragraph & Heading', label:'Text beside heading',desc:'Body text on the left with a heading on the right.',   cat:'Text Blocks',  p:'parahead'},
   {id:'quote',      name:'Pull Quote',          label:'Quote',              desc:'A highlighted quote or testimonial.',                  cat:'Text Blocks',  p:'quote'},
   {id:'list',       name:'Bulleted List',       label:'Bulleted list',      desc:'A list of short points.',                              cat:'Text Blocks',  p:'list'},
-  {id:'callout',    name:'Branded Callout',     label:'Highlight box',      desc:'A coloured box that draws attention to key text.',     cat:'Text Blocks',  p:'callout', bespoke:true},
+  {id:'callout',    name:'Branded Callout',     label:'Highlight box',      desc:'A coloured box that draws attention to key text.',     cat:'Text Blocks',  p:'callout'},
   {id:'img1',       name:'Single Image',        label:'One image',          desc:'A single full-width image.',                           cat:'Images',       p:'img1'},
   {id:'img2',       name:'Double Images',       label:'Two images',         desc:'Two images side by side.',                             cat:'Images',       p:'img2'},
   {id:'img3',       name:'Triple Images',       label:'Three images',       desc:'Three images in a row.',                               cat:'Images',       p:'img3'},
@@ -22,10 +26,11 @@ const BLOCKS = [
   {id:'imgtext',    name:'Image & Text',        label:'Image with text',    desc:'An image on the left, text on the right.',             cat:'Image & Text', p:'imgtext'},
   {id:'textimg',    name:'Text & Image',        label:'Text with image',    desc:'Text on the left, an image on the right.',             cat:'Image & Text', p:'textimg'},
   {id:'imgcap',     name:'Image + Caption',     label:'Image with caption', desc:'An image with a caption underneath.',                  cat:'Image & Text', p:'imgcap'},
-  {id:'feature',    name:'Two-Column Feature',  label:'Feature panel',      desc:'An image beside a headline and supporting text.',      cat:'Image & Text', p:'feature', bespoke:true},
-  // Named in the 20 Jul scrum as bespoke-per-tenant and missing from the standard set.
-  {id:'table',      name:'Table',               label:'Table',              desc:'Rows and columns for rates, schedules or comparisons.',cat:'Tables & Sign-off', p:'table',     bespoke:true},
-  {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',            cat:'Tables & Sign-off', p:'signature', bespoke:true},
+  {id:'feature',    name:'Two-Column Feature',  label:'Feature panel',      desc:'An image beside a headline and supporting text.',      cat:'Image & Text', p:'feature'},
+  // Bespoke — from the 28 Jul audit; only some tenancies have these today.
+  {id:'table',      name:'Table',               label:'Table',              desc:'Rows and columns for rates, schedules or comparisons.',cat:'Tables & Sign-off', p:'table',     bespoke:true, seen:'CPM, EIWA, Pirrota'},
+  {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',            cat:'Tables & Sign-off', p:'signature', bespoke:true, seen:'CPM, EIWA, Pirrota'},
+  {id:'catalogue',  name:'Catalogue',           label:'Catalogue',          desc:'A list of items with an image, title and details.',    cat:'Image & Text',      p:'catalogue', bespoke:true, seen:'EIWA'},
 ];
 const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text','Tables & Sign-off'];
 
@@ -55,6 +60,7 @@ function blockPreview(p){
     case 'feature':   return `<div class="blk-row">${img()}<div class="blk-txt">${bar('70%',1)+bar('92%')+bar('80%')}</div></div>`;
     case 'table':     return `<div class="blk-table">${['h','','',''].map(r=>`<div class="tr ${r}"><span></span><span></span><span></span></div>`).join('')}</div>`;
     case 'signature': return `${bar('55%')}<div style="height:1px;background:#9FB5B0;margin:14px 0 7px"></div>${bar('40%',1)}${bar('30%')}`;
+    case 'catalogue': return `<div class="blk-row" style="min-height:0">${img()}<div class="blk-txt">${bar('80%',1)+bar('62%')}</div></div><div class="blk-row" style="min-height:0;margin-top:8px">${img()}<div class="blk-txt">${bar('80%',1)+bar('62%')}</div></div>`;
     default:          return bar('80%');
   }
 }
