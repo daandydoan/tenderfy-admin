@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Admin — Add Block (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* Plain grey backdrop — the popup sits on top; no page behind it for now. */
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+       background:#5c6560;font-family:'Outfit',system-ui,sans-serif;padding:24px}
+
+  .bs-dialog{background:#fff;border-radius:14px;width:100%;max-width:1000px;height:min(86vh,760px);
+             display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+
+  .bs-head{background:#46554f;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:16px 22px;flex-shrink:0}
+  .bs-head h2{font-size:18px;font-weight:600;margin:0}
+  .bs-head .x{cursor:pointer;font-size:22px;opacity:.9}
+  .bs-head .x:hover{opacity:1}
+
+  .bs-body{flex:1;display:flex;min-height:0}
+
+  /* Categories on the LEFT (instead of tabs on top) */
+  .bs-cats{width:216px;flex-shrink:0;border-right:1px solid var(--border);padding:14px 10px;overflow:auto;background:#fcfdfd}
+  .bs-cat{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;font-size:13.5px;color:var(--gray);cursor:pointer;font-weight:500;margin-bottom:2px}
+  .bs-cat .ms{font-size:19px}
+  .bs-cat .n{margin-left:auto;font-size:11.5px;color:var(--light);font-weight:600}
+  .bs-cat:hover{background:var(--page)}
+  .bs-cat.on{background:var(--teal-tint);color:var(--teal);font-weight:600}
+  .bs-cat.on .n{color:var(--teal)}
+
+  .bs-main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .bs-toolbar{padding:14px 20px 0;display:flex;align-items:center;gap:12px}
+  .bs-search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:100px;padding:8px 14px;flex:1;color:var(--light)}
+  .bs-search input{border:none;background:transparent;font-family:inherit;font-size:13.5px;flex:1;outline:none;color:var(--ink)}
+
+  .bs-grid{flex:1;overflow:auto;padding:16px 20px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px 18px;align-content:start}
+  @media(max-width:720px){.bs-grid{grid-template-columns:repeat(2,1fr)}}
+  .bs-item{cursor:pointer}
+  .bs-item .nm{color:var(--teal);font-weight:600;font-size:13.5px;margin-bottom:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bs-prev{border:1px solid var(--border);border-radius:8px;height:132px;padding:18px;display:flex;flex-direction:column;justify-content:center;gap:9px;background:#fff;overflow:hidden;transition:border-color .12s ease,box-shadow .12s ease}
+  /* keep every schematic within the fixed-height box so all cards match */
+  .bs-prev .blk-img{min-height:30px}
+  .bs-prev .blk-imgs{min-height:30px}
+  .bs-prev .blk-row{min-height:42px}
+  /* pricing schematic rows: label on the left, amount on the right */
+  .bs-prev .pr{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .bs-prev .pr .amt{width:36px;flex-shrink:0}
+  .bs-item:hover .bs-prev{border-color:var(--lighter)}
+  .bs-item.sel .bs-prev{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-tint)}
+  .bs-empty{grid-column:1/-1;text-align:center;color:var(--light);padding:40px 0}
+
+  .bs-foot{border-top:1px solid var(--border);padding:14px 22px;display:flex;justify-content:flex-end;gap:12px;flex-shrink:0}
+  .bs-foot .btn.disabled{opacity:.5;pointer-events:none}
+
+  /* tiny toast for the mock */
+  .bs-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#2E3C3B;color:#fff;padding:10px 18px;border-radius:100px;font-size:13px;opacity:0;transition:opacity .2s ease;pointer-events:none;z-index:10}
+  .bs-toast.show{opacity:1}
+</style>
+</head>
+<body>
+  <div class="bs-dialog" role="dialog" aria-label="Add Block">
+    <div class="bs-head">
+      <h2>Add Block</h2>
+      <span class="ms x" id="closeX">close</span>
+    </div>
+    <div class="bs-body">
+      <div class="bs-cats" id="cats"></div>
+      <div class="bs-main">
+        <div class="bs-toolbar">
+          <span class="bs-search"><span class="ms" style="font-size:18px">search</span><input id="q" placeholder="Search blocks…"></span>
+        </div>
+        <div class="bs-grid" id="grid"></div>
+      </div>
+    </div>
+    <div class="bs-foot">
+      <a class="btn btn-outline" id="cancelBtn">Cancel</a>
+      <a class="btn btn-primary disabled" id="insertBtn">Insert Block</a>
+    </div>
+  </div>
+  <div class="bs-toast" id="toast"></div>
+
+<script src="blocks-data.js"></script>
+<script>
+  // Pricing blocks (Cost Breakdown pair, from the 30 Jul meeting) — added to this mock.
+  BLOCKS.push(
+    {id:'itemprice',  name:'Item Pricing',  cat:'Table & Data', p:'itemprice'},
+    {id:'totalprice', name:'Total Pricing', cat:'Table & Data', p:'totalprice'}
+  );
+  // Reclassify: Signature -> Text Blocks; rename "Tables & Sign-off" -> "Table & Data".
+  BLOCKS.forEach(b=>{ if(b.id==='signature') b.cat='Text Blocks'; else if(b.cat==='Tables & Sign-off') b.cat='Table & Data'; });
+  // Local preview that handles the pricing schematics, else falls back to the shared one.
+  function preview(p){
+    if(p==='itemprice'){
+      return '<div class="blk-bar h" style="width:44%"></div>'
+        + [0,1,2].map(()=>'<div class="pr"><span class="blk-bar" style="flex:1;max-width:58%"></span><span class="blk-bar amt"></span></div>').join('');
+    }
+    if(p==='totalprice'){
+      return '<div class="pr"><span class="blk-bar" style="width:34%"></span><span class="blk-bar amt"></span></div>'
+        + '<div class="pr"><span class="blk-bar" style="width:26%"></span><span class="blk-bar amt"></span></div>'
+        + '<div style="height:1px;background:#9FB5B0;margin:3px 0"></div>'
+        + '<div class="pr"><span class="blk-bar h" style="width:42%"></span><span class="blk-bar amt h"></span></div>';
+    }
+    return blockPreview(p);
+  }
+
+  const CAT_ICON = {'All Blocks':'grid_view','Title Blocks':'title','Text Blocks':'notes','Images':'image','Image & Text':'article','Table & Data':'table_chart'};
+  const cats = ['All Blocks','Title Blocks','Text Blocks','Images','Image & Text','Table & Data'];
+  let active = 'All Blocks', query = '', selected = null;
+
+  function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1800); }
+
+  function renderCats(){
+    document.getElementById('cats').innerHTML = cats.map(c=>{
+      const n = c==='All Blocks' ? BLOCKS.length : BLOCKS.filter(b=>b.cat===c).length;
+      return `<div class="bs-cat ${c===active?'on':''}" data-cat="${c}"><span class="ms">${CAT_ICON[c]||'widgets'}</span> ${c} <span class="n">${n}</span></div>`;
+    }).join('');
+    document.querySelectorAll('#cats .bs-cat').forEach(el=>el.addEventListener('click',()=>{active=el.dataset.cat;selected=null;syncInsert();renderCats();renderGrid();}));
+  }
+  function renderGrid(){
+    const list = BLOCKS.filter(b=>(active==='All Blocks'||b.cat===active) && (!query||b.name.toLowerCase().includes(query)));
+    const g = document.getElementById('grid');
+    g.innerHTML = list.length ? list.map(b=>`
+      <div class="bs-item ${selected===b.id?'sel':''}" data-id="${b.id}">
+        <div class="nm">${b.name}</div>
+        <div class="bs-prev">${preview(b.p)}</div>
+      </div>`).join('') : '<div class="bs-empty">No blocks match your search.</div>';
+    g.querySelectorAll('.bs-item').forEach(el=>el.addEventListener('click',()=>{
+      selected = selected===el.dataset.id ? null : el.dataset.id;
+      renderGrid(); syncInsert();
+    }));
+  }
+  function syncInsert(){ document.getElementById('insertBtn').classList.toggle('disabled', !selected); }
+
+  document.getElementById('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();renderGrid();});
+  document.getElementById('insertBtn').addEventListener('click',()=>{ if(!selected) return; const b=BLOCKS.find(x=>x.id===selected); toast('Inserted: '+b.name); });
+  document.getElementById('cancelBtn').addEventListener('click',()=>toast('Cancelled'));
+  document.getElementById('closeX').addEventListener('click',()=>toast('Closed'));
+
+  renderCats(); renderGrid(); syncInsert();
+</script>
+</body>
+</html>
