@@ -19,6 +19,9 @@ const BLOCKS = [
   {id:'quote',      name:'Pull Quote',          label:'Quote',              desc:'A highlighted quote or testimonial.',                  cat:'Text Blocks',  p:'quote'},
   {id:'list',       name:'Bulleted List',       label:'Bulleted list',      desc:'A list of short points.',                              cat:'Text Blocks',  p:'list'},
   {id:'callout',    name:'Branded Callout',     label:'Highlight box',      desc:'A coloured box that draws attention to key text.',     cat:'Text Blocks',  p:'callout'},
+  {id:'doc-details',name:'Document Details Grid',label:'Details grid',       desc:'A section title beside a grid of label / value detail rows.',   cat:'Text Blocks', p:'docdetails'},
+  {id:'doc-para',   name:'Document Paragraph',   label:'Document paragraph', desc:'A section title beside a paragraph.',                           cat:'Text Blocks', p:'docpara'},
+  {id:'doc-dblpara',name:'Document Double Paragraph',label:'Document double paragraph',desc:'A section title beside two paragraphs.',                 cat:'Text Blocks', p:'docdblpara'},
   {id:'img1',       name:'Single Image',        label:'One image',          desc:'A single full-width image.',                           cat:'Images',       p:'img1'},
   {id:'img2',       name:'Double Images',       label:'Two images',         desc:'Two images side by side.',                             cat:'Images',       p:'img2'},
   {id:'img3',       name:'Triple Images',       label:'Three images',       desc:'Three images in a row.',                               cat:'Images',       p:'img3'},
@@ -61,6 +64,9 @@ function blockPreview(p){
     case 'table':     return `<div class="blk-table">${['h','','',''].map(r=>`<div class="tr ${r}"><span></span><span></span><span></span></div>`).join('')}</div>`;
     case 'signature': return `${bar('55%')}<div style="height:1px;background:#9FB5B0;margin:14px 0 7px"></div>${bar('40%',1)}${bar('30%')}`;
     case 'catalogue': return `<div class="blk-row" style="min-height:0">${img()}<div class="blk-txt">${bar('80%',1)+bar('62%')}</div></div><div class="blk-row" style="min-height:0;margin-top:8px">${img()}<div class="blk-txt">${bar('80%',1)+bar('62%')}</div></div>`;
+    case 'docdetails':{ const cell='<div class="doc-cell"><span class="blk-bar h" style="width:75%"></span><span class="blk-bar" style="width:100%"></span><span class="blk-bar" style="width:82%"></span></div>'; return `<div class="doc-row"><div class="doc-title"></div><div class="doc-grid">${cell+cell+cell+cell}</div></div>`; }
+    case 'docpara':   return `<div class="doc-row"><div class="doc-title"></div><div class="doc-body">${bar('46%',1)+bar('92%')+bar('84%')+bar('64%')}</div></div>`;
+    case 'docdblpara':{ const col='<div class="doc-col"><span class="blk-bar h" style="width:72%"></span><span class="blk-bar" style="width:100%"></span><span class="blk-bar" style="width:90%"></span><span class="blk-bar" style="width:72%"></span></div>'; return `<div class="doc-row"><div class="doc-title"></div><div class="doc-cols">${col+col}</div></div>`; }
     default:          return bar('80%');
   }
 }
