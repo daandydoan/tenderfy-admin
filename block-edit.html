@@ -14,14 +14,40 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
-  /* Primitives palette — the default building set shown when creating a block */
-  .prim-pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin-top:4px}
-  .prim-chip{display:flex;align-items:center;gap:7px;border:1px solid var(--border);background:#fff;border-radius:9px;padding:9px 11px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--ink);transition:all .12s}
-  .prim-chip:hover{border-color:var(--teal);background:var(--teal-tint);color:var(--teal)}
-  .prim-chip .ms{font-size:16px;color:var(--teal)}
-  .prim-tag{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:14px 0 2px}
-  /* Live composed preview — real content, brand-neutral */
-  .prev-doc{border:1px solid var(--border);border-radius:9px;padding:16px;background:#fff;display:flex;flex-direction:column;gap:13px;min-height:120px;max-height:420px;overflow:auto}
+  /* ---- Visual builder canvas (Elementor / Webflow style) ---- */
+  .vb-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;min-height:560px;max-height:76vh;overflow:auto}
+  .vb-bar{display:flex;align-items:center;gap:9px;max-width:660px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
+  .vb-bar .dev{margin-left:auto;display:flex;gap:3px}
+  .vb-bar .dev .ms{font-size:17px;color:var(--light);background:#fff;border:1px solid var(--border);border-radius:6px;padding:4px;cursor:pointer}
+  .vb-bar .dev .ms.on{color:var(--teal);border-color:var(--teal)}
+  .vb-page{max-width:660px;margin:0 auto;background:#fff;border-radius:10px;box-shadow:0 10px 34px rgba(20,45,38,.13);padding:30px 36px;min-height:430px;display:flex;flex-direction:column}
+  .vb-page.narrow{max-width:390px}
+  .vb-el{position:relative;padding:11px 12px;border-radius:8px;border:1.5px solid transparent}
+  .vb-el:hover{border-color:var(--teal)}
+  .vb-el.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
+  .vb-el.ins-before::before{content:'';position:absolute;top:-4px;left:6px;right:6px;height:3px;background:var(--teal);border-radius:2px}
+  .vb-name{position:absolute;top:-11px;left:10px;background:var(--teal);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;transition:.1s;display:flex;align-items:center;gap:4px;z-index:2;white-space:nowrap}
+  .vb-el:hover .vb-name,.vb-el.selected .vb-name{opacity:1}
+  .vb-tools{position:absolute;top:-13px;right:8px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:3}
+  .vb-el:hover .vb-tools,.vb-el.selected .vb-tools{opacity:1}
+  .vb-tools .tb{width:24px;height:24px;border-radius:6px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.3)}
+  .vb-tools .tb:hover{filter:brightness(1.09)}
+  .vb-tools .tb.grab{cursor:grab}
+  .vb-tools .tb.del{background:#d5493f}
+  .vb-tools .tb .ms{font-size:15px}
+  .vb-empty{border:1.5px dashed #b3beba;border-radius:10px;padding:52px 20px;text-align:center;color:var(--gray);margin:auto;width:100%}
+  .vb-empty .ms{font-size:32px;color:var(--light);display:block;margin-bottom:10px}
+  .vb-tail{max-width:660px;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:13px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
+  .vb-tail.active{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
+  .vb-tail .ms{font-size:17px}
+  /* ---- Widget palette ---- */
+  .vb-pal{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .vb-widget{display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid var(--border);border-radius:9px;padding:12px 8px;cursor:grab;background:#fff;text-align:center;font-size:11.5px;font-weight:500;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
+  .vb-widget:hover{border-color:var(--teal);background:var(--teal-tint);color:var(--teal);transform:translateY(-1px)}
+  .vb-widget:active{cursor:grabbing}
+  .vb-widget .ms{font-size:21px;color:var(--teal)}
+  .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
+  .pal-tag:first-child{margin-top:0}
 </style>
 </head>
 <body data-page="blocks" data-title="Blocks">
@@ -31,7 +57,7 @@
     <div class="pg-head">
       <div>
         <div class="tn-title" id="pg-title">New Custom Block</div>
-        <div class="pg-sub">Compose a reusable block from primitives — the standard building elements. No new code needed; a block is just primitives arranged. Once it's standard it appears in the Block Builder for every client.</div>
+        <div class="pg-sub">Drag primitives onto the canvas to compose a block — no new code, just an arrangement. Once it's standard it appears in the Block Builder for every client, rendered in their brand.</div>
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" href="blocks.html">Cancel</a>
@@ -42,35 +68,36 @@
 
     <div class="ed-grid">
       <div class="ed-main">
-        <div class="card">
-          <h3 class="ed-h">Naming</h3>
-          <div class="frow">
-            <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout">
-              <span class="fhint">What the team calls it in the super admin.</span></div>
-            <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box">
-              <span class="fhint">What the client sees in Add Block — plain language, no jargon.</span></div>
+        <div class="vb-canvas" id="cvWrap">
+          <div class="vb-bar">
+            <span class="ms" style="font-size:16px;color:var(--teal)">web</span>
+            <span id="bar-name">Untitled block</span>
+            <span class="muted" id="bar-count" style="font-weight:400"></span>
+            <span class="dev">
+              <span class="ms on" data-dev="wide" title="Full width">desktop_windows</span>
+              <span class="ms" data-dev="narrow" title="Narrow">smartphone</span>
+            </span>
           </div>
-          <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box that draws attention to key text.">
-            <span class="fhint">One line telling the client what they're about to insert.</span></div>
-          <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
-        </div>
-
-        <div class="card">
-          <h3 class="ed-h">Layout</h3>
-          <div id="rows"></div>
-          <div class="fhint" id="empty-hint" style="margin-bottom:12px">No primitives yet — add one from the set below.</div>
-          <div class="prim-tag" style="margin-bottom:8px">Add a primitive — the standard building set</div>
-          <div class="prim-pal" id="addRow"></div>
+          <div class="vb-page" id="page"></div>
+          <div class="vb-tail" id="tail"><span class="ms">add</span> Drag an element here, or click one in the Elements panel</div>
         </div>
       </div>
 
       <div class="ed-rail">
         <div class="card">
-          <h3 class="ed-h">How the client sees it</h3>
-          <div class="blk-name" id="cv-label" style="color:var(--teal);font-weight:600;font-size:14px;margin-bottom:10px">Block</div>
-          <div class="prev-doc" id="prev"></div>
-          <div style="font-size:12px;color:var(--gray);padding-top:10px" id="cv-desc"></div>
-          <div class="fhint" style="margin-top:8px">Real preview — the same primitives, rendered with each client's brand tokens at document time.</div>
+          <h3 class="ed-h">Elements</h3>
+          <div class="vb-pal" id="palette"></div>
+          <div class="fhint" style="margin-top:10px">Drag onto the canvas, or click to append.</div>
+        </div>
+        <div class="card">
+          <h3 class="ed-h">Block details</h3>
+          <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout">
+            <span class="fhint">What the team calls it in the super admin.</span></div>
+          <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box">
+            <span class="fhint">What the client sees in Add Block — plain language.</span></div>
+          <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text.">
+            <span class="fhint">One line telling the client what this inserts.</span></div>
+          <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
         </div>
         <div class="card">
           <h3 class="ed-h">Availability</h3>
@@ -94,16 +121,27 @@ function pageInit(){
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   const existing=id?BLOCKS.find(b=>b.id===id):null;
   let rows = existing ? (P2PRIM[existing.p]||['paragraph']).slice() : [];
+  let sel = -1;
+  let drag = null; // {type:'new'|'move', id, from}
+
+  const page=document.getElementById('page');
+  const wrap=document.getElementById('cvWrap');
+  const tail=document.getElementById('tail');
 
   document.getElementById('b-cat').innerHTML=BLOCK_CATS.map(c=>`<option>${c}</option>`).join('');
 
-  // Palette grouped by primitive tag (Text / Media / Data / Sign-off / Layout).
+  // ---- Widget palette (grouped by primitive tag) ----
   const byTag={};
   PRIMITIVES.forEach(p=>{ (byTag[p.tag]=byTag[p.tag]||[]).push(p); });
-  document.getElementById('addRow').innerHTML=Object.entries(byTag).map(([tag,ps])=>
-    `<div class="prim-tag" style="grid-column:1/-1">${tag}</div>`+
-    ps.map(p=>`<div class="prim-chip" data-el="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'add'}</span>${p.name}</div>`).join('')
+  document.getElementById('palette').innerHTML=Object.entries(byTag).map(([tag,ps])=>
+    `<div class="pal-tag">${tag}</div>`+
+    ps.map(p=>`<div class="vb-widget" draggable="true" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('')
   ).join('');
+  document.querySelectorAll('.vb-widget').forEach(w=>{
+    w.addEventListener('dragstart',e=>{drag={type:'new',id:w.dataset.id};e.dataTransfer.effectAllowed='copy';e.dataTransfer.setData('text','n');});
+    w.addEventListener('dragend',()=>{drag=null;clearInd();});
+    w.addEventListener('click',()=>{rows.push(w.dataset.id);sel=rows.length-1;render();});
+  });
 
   if(existing){
     document.getElementById('b-name').value=existing.name;
@@ -115,27 +153,75 @@ function pageInit(){
     if(existing.bespoke) document.getElementById('delBtn').style.display='';
   }
 
-  function syncCustomerView(){
-    document.getElementById('cv-label').textContent=document.getElementById('b-label').value.trim()||'Untitled block';
-    document.getElementById('cv-desc').textContent=document.getElementById('b-desc').value.trim()||'Add a helper description so clients know what this inserts.';
-  }
+  // ---- Canvas render ----
   function render(){
-    document.getElementById('rows').innerHTML=rows.map((k,i)=>`
-      <div class="cmp-row" draggable="true" data-i="${i}">
-        <span class="ms grip">drag_indicator</span><span class="ms" style="font-size:16px;color:var(--teal)">${PRIM_ICON[k]||'widgets'}</span><span class="cn">${ELEMS[k]||k}</span>
-        <span class="ms rm" data-rm="${i}">close</span>
-      </div>`).join('');
-    document.getElementById('empty-hint').style.display=rows.length?'none':'';
-    document.getElementById('prev').innerHTML=rows.length
-      ? rows.map(k=>`<div>${renderPrimitive(k)}</div>`).join('')
-      : '<div class="fhint" style="text-align:center;margin:auto;color:var(--light)">Preview appears as you add primitives</div>';
-    document.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',()=>{rows.splice(+x.dataset.rm,1);render();}));
-    document.querySelectorAll('.cmp-row').forEach(r=>{
-      r.addEventListener('dragstart',e=>e.dataTransfer.setData('i',r.dataset.i));
-      r.addEventListener('dragover',e=>e.preventDefault());
-      r.addEventListener('drop',e=>{e.preventDefault();const f=+e.dataTransfer.getData('i');const t=+r.dataset.i;const [m]=rows.splice(f,1);rows.splice(t,0,m);render();});
+    if(!rows.length){
+      page.innerHTML='<div class="vb-empty"><span class="ms">dashboard_customize</span>Empty block — drag an element from the panel to start building</div>';
+    } else {
+      page.innerHTML=rows.map((k,i)=>`
+        <div class="vb-el${i===sel?' selected':''}" data-i="${i}">
+          <div class="vb-name"><span class="ms" style="font-size:12px">${PRIM_ICON[k]||'widgets'}</span>${ELEMS[k]||k}</div>
+          <div class="vb-tools">
+            <span class="tb grab" data-handle title="Drag to move"><span class="ms">drag_indicator</span></span>
+            <span class="tb" data-dup title="Duplicate"><span class="ms">content_copy</span></span>
+            <span class="tb del" data-del title="Delete"><span class="ms">delete</span></span>
+          </div>
+          <div class="vb-body">${renderPrimitive(k)}</div>
+        </div>`).join('');
+    }
+    document.getElementById('bar-count').textContent=rows.length?`· ${rows.length} element${rows.length>1?'s':''}`:'';
+    wireEls();
+  }
+
+  function wireEls(){
+    page.querySelectorAll('.vb-el').forEach(el=>{
+      const i=+el.dataset.i;
+      el.addEventListener('click',e=>{ if(e.target.closest('[data-del],[data-dup]')) return; sel=i; render(); });
+      el.querySelector('[data-del]').addEventListener('click',()=>{ rows.splice(i,1); if(sel>=rows.length) sel=rows.length-1; render(); });
+      el.querySelector('[data-dup]').addEventListener('click',()=>{ rows.splice(i+1,0,rows[i]); sel=i+1; render(); });
+      // Drag to reorder — only from the grab handle.
+      const h=el.querySelector('[data-handle]');
+      h.addEventListener('mousedown',()=>{el.draggable=true;});
+      el.addEventListener('mouseup',()=>{el.draggable=false;});
+      el.addEventListener('dragstart',e=>{drag={type:'move',from:i};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','m');el.style.opacity='.4';});
+      el.addEventListener('dragend',()=>{el.draggable=false;el.style.opacity='';clearInd();});
     });
   }
+
+  function clearInd(){ page.querySelectorAll('.ins-before').forEach(e=>e.classList.remove('ins-before')); tail.classList.remove('active'); }
+  function indexFromY(y){
+    const els=[...page.querySelectorAll('.vb-el')];
+    for(let i=0;i<els.length;i++){ const r=els[i].getBoundingClientRect(); if(y < r.top + r.height/2) return i; }
+    return els.length;
+  }
+  function markInd(idx){
+    clearInd();
+    const els=[...page.querySelectorAll('.vb-el')];
+    if(idx<els.length) els[idx].classList.add('ins-before'); else tail.classList.add('active');
+  }
+  wrap.addEventListener('dragover',e=>{ if(!drag) return; e.preventDefault(); e.dataTransfer.dropEffect=drag.type==='new'?'copy':'move'; markInd(indexFromY(e.clientY)); });
+  wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) clearInd(); });
+  wrap.addEventListener('drop',e=>{
+    if(!drag) return; e.preventDefault();
+    let idx=indexFromY(e.clientY); clearInd();
+    if(drag.type==='new'){ rows.splice(idx,0,drag.id); sel=idx; }
+    else { const from=drag.from; let to=idx; const [m]=rows.splice(from,1); if(from<to) to--; rows.splice(to,0,m); sel=to; }
+    drag=null; render();
+  });
+
+  // ---- Naming / device / availability ----
+  function syncBar(){ document.getElementById('bar-name').textContent=document.getElementById('b-label').value.trim()||'Untitled block'; }
+  document.querySelectorAll('.vb-bar .dev .ms').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('.vb-bar .dev .ms').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    page.classList.toggle('narrow', b.dataset.dev==='narrow');
+  }));
+  document.getElementById('b-label').addEventListener('input',syncBar);
+  document.getElementById('b-name').addEventListener('input',e=>{
+    const v=e.target.value.trim()||'New Custom Block';
+    document.getElementById('cr-name').textContent=v;
+    if(!existing) document.getElementById('pg-title').textContent=v;
+  });
+
   function renderAvail(){
     const el=document.getElementById('avail');
     if(!existing||!existing.bespoke){
@@ -147,20 +233,12 @@ function pageInit(){
     document.getElementById('mkStd').addEventListener('click',()=>{ existing.bespoke=false; renderAvail(); showToast('Marked standard: '+existing.label); });
   }
 
-  document.querySelectorAll('#addRow [data-el]').forEach(a=>a.addEventListener('click',()=>{rows.push(a.dataset.el);render();}));
-  ['b-label','b-desc'].forEach(i=>document.getElementById(i).addEventListener('input',syncCustomerView));
-  document.getElementById('b-name').addEventListener('input',e=>{
-    const v=e.target.value.trim()||'New Custom Block';
-    document.getElementById('cr-name').textContent=v;
-    if(!existing) document.getElementById('pg-title').textContent=v;
-  });
-
   document.getElementById('saveBtn').addEventListener('click',()=>{
     const n=document.getElementById('b-name').value.trim();
     const l=document.getElementById('b-label').value.trim();
     if(!n){showToast('Give the block an internal name first');return;}
     if(!l){showToast('Add a customer-facing label — clients need to know what they are clicking');return;}
-    if(!rows.length){showToast('Add at least one primitive to the layout');return;}
+    if(!rows.length){showToast('Add at least one element to the canvas');return;}
     showToast((existing?'Updated':'Created')+' block: '+l);
     setTimeout(()=>location.href='blocks.html',700);
   });
@@ -169,7 +247,8 @@ function pageInit(){
       showToast('Deleted block: '+existing.label); setTimeout(()=>location.href='blocks.html',700);
     });
   });
-  render(); syncCustomerView(); renderAvail();
+
+  render(); syncBar(); renderAvail();
 }
 </script>
 </body>
