@@ -20,16 +20,31 @@
   .vb-bar .dev{margin-left:auto;display:flex;gap:3px}
   .vb-bar .dev .ms{font-size:17px;color:var(--light);background:#fff;border:1px solid var(--border);border-radius:6px;padding:4px;cursor:pointer}
   .vb-bar .dev .ms.on{color:var(--teal);border-color:var(--teal)}
-  .vb-page{max-width:660px;margin:0 auto;background:#fff;border-radius:10px;box-shadow:0 10px 34px rgba(20,45,38,.13);padding:30px 36px;min-height:430px;display:flex;flex-direction:column}
+  .vb-page{max-width:660px;margin:0 auto;background:#fff;border-radius:10px;box-shadow:0 10px 34px rgba(20,45,38,.13);padding:26px 30px;min-height:430px;display:flex;flex-direction:column;gap:2px}
   .vb-page.narrow{max-width:390px}
+  /* rows = sections, cols = columns, el = widget */
+  .vb-row{position:relative;display:flex;gap:16px;padding:8px;border-radius:9px;margin:2px 0}
+  .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.35)}
+  .vb-row.row-ins-before::before{content:'';position:absolute;top:-4px;left:0;right:0;height:3px;background:var(--teal);border-radius:2px}
+  .vb-rowtools{position:absolute;top:-12px;left:50%;transform:translateX(-50%);display:flex;gap:3px;opacity:0;transition:.1s;z-index:4}
+  .vb-row:hover>.vb-rowtools{opacity:1}
+  .vb-rowtools .rb{width:23px;height:23px;border-radius:6px;background:#3a4a52;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.25)}
+  .vb-rowtools .rb.grab{cursor:grab}
+  .vb-rowtools .rb.del{background:#d5493f}
+  .vb-rowtools .rb .ms{font-size:14px}
+  .vb-col{flex:1;min-width:0;display:flex;flex-direction:column;min-height:56px;border-radius:8px;position:relative}
+  .vb-col.over{background:var(--teal-tint);box-shadow:inset 0 0 0 1.5px var(--teal)}
+  .vb-col.ins-end::after{content:'';position:absolute;left:6px;right:6px;bottom:3px;height:3px;background:var(--teal);border-radius:2px}
+  .vb-colph{border:1.5px dashed #c2ccc9;border-radius:8px;padding:18px 10px;text-align:center;color:var(--light);font-size:11.5px;margin:auto;width:100%;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .vb-colph .ms{font-size:18px}
   .vb-el{position:relative;padding:11px 12px;border-radius:8px;border:1.5px solid transparent}
   .vb-el:hover{border-color:var(--teal)}
-  .vb-el.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
+  .vb-el.dragging{opacity:.4}
   .vb-el.ins-before::before{content:'';position:absolute;top:-4px;left:6px;right:6px;height:3px;background:var(--teal);border-radius:2px}
   .vb-name{position:absolute;top:-11px;left:10px;background:var(--teal);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;transition:.1s;display:flex;align-items:center;gap:4px;z-index:2;white-space:nowrap}
-  .vb-el:hover .vb-name,.vb-el.selected .vb-name{opacity:1}
+  .vb-el:hover .vb-name{opacity:1}
   .vb-tools{position:absolute;top:-13px;right:8px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:3}
-  .vb-el:hover .vb-tools,.vb-el.selected .vb-tools{opacity:1}
+  .vb-el:hover .vb-tools{opacity:1}
   .vb-tools .tb{width:24px;height:24px;border-radius:6px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.3)}
   .vb-tools .tb:hover{filter:brightness(1.09)}
   .vb-tools .tb.grab{cursor:grab}
@@ -46,6 +61,7 @@
   .vb-widget:hover{border-color:var(--teal);background:var(--teal-tint);color:var(--teal);transform:translateY(-1px)}
   .vb-widget:active{cursor:grabbing}
   .vb-widget .ms{font-size:21px;color:var(--teal)}
+  .vb-widget.struct{background:#f4f7f6}
   .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
   .pal-tag:first-child{margin-top:0}
 </style>
@@ -57,7 +73,7 @@
     <div class="pg-head">
       <div>
         <div class="tn-title" id="pg-title">New Custom Block</div>
-        <div class="pg-sub">Drag primitives onto the canvas to compose a block — no new code, just an arrangement. Once it's standard it appears in the Block Builder for every client, rendered in their brand.</div>
+        <div class="pg-sub">Drag primitives onto the canvas to compose a block. Add a 2- or 3-column structure to place elements side by side — enough to build every standard block. No new code, just an arrangement, rendered in each client's brand.</div>
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" href="blocks.html">Cancel</a>
@@ -79,7 +95,7 @@
             </span>
           </div>
           <div class="vb-page" id="page"></div>
-          <div class="vb-tail" id="tail"><span class="ms">add</span> Drag an element here, or click one in the Elements panel</div>
+          <div class="vb-tail" id="tail"><span class="ms">add</span> Drag an element or structure here</div>
         </div>
       </div>
 
@@ -87,7 +103,7 @@
         <div class="card">
           <h3 class="ed-h">Elements</h3>
           <div class="vb-pal" id="palette"></div>
-          <div class="fhint" style="margin-top:10px">Drag onto the canvas, or click to append.</div>
+          <div class="fhint" style="margin-top:10px">Drag onto the canvas, or click to append. Drop a <strong>structure</strong> for side-by-side columns.</div>
         </div>
         <div class="card">
           <h3 class="ed-h">Block details</h3>
@@ -111,18 +127,45 @@
 <script src="blocks-data.js"></script>
 <script src="primitives.js"></script>
 <script>
-// Palette = the primitives (coded once, in primitives.js). A block is just these arranged.
+// Palette = the primitives (coded once, in primitives.js). A block is just these arranged
+// in rows and columns — the same structure that builds the standard blocks.
 const PRIM_ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height'};
-// Map an existing block's layout key to the primitives it's composed of (prefill on edit).
-const P2PRIM={heading:['heading'],subheading:['subheading'],divider:['heading','divider','paragraph'],paragraph:['paragraph'],double:['paragraph','paragraph'],headpara:['subheading','paragraph'],parahead:['paragraph','subheading'],quote:['quote'],list:['list'],callout:['heading','paragraph'],docdetails:['subheading','keyvalue'],docpara:['subheading','paragraph'],docdblpara:['subheading','paragraph','paragraph'],img1:['image'],img2:['image','image'],img3:['image','image','image'],imggrid:['image','image','image','image'],imgtext:['image','paragraph'],textimg:['paragraph','image'],imgcap:['image','subheading'],feature:['image','heading','paragraph'],table:['table'],signature:['signature'],catalogue:['image','subheading','paragraph']};
+// Map an existing block's layout key to its row/column composition (prefill on edit).
+// This is how each simpler standard block is expressed as primitives in a structure.
+const P2DOC={
+  heading:[{cols:[['heading']]}],
+  subheading:[{cols:[['subheading']]}],
+  divider:[{cols:[['heading','divider','paragraph']]}],
+  paragraph:[{cols:[['paragraph']]}],
+  double:[{cols:[['paragraph'],['paragraph']]}],
+  headpara:[{cols:[['subheading'],['paragraph']]}],
+  parahead:[{cols:[['paragraph'],['subheading']]}],
+  quote:[{cols:[['quote']]}],
+  list:[{cols:[['list']]}],
+  callout:[{cols:[['heading','paragraph']]}],
+  docdetails:[{cols:[['subheading'],['keyvalue']]}],
+  docpara:[{cols:[['subheading'],['paragraph']]}],
+  docdblpara:[{cols:[['subheading'],['paragraph'],['paragraph']]}],
+  img1:[{cols:[['image']]}],
+  img2:[{cols:[['image'],['image']]}],
+  img3:[{cols:[['image'],['image'],['image']]}],
+  imggrid:[{cols:[['image'],['image']]},{cols:[['image'],['image']]}],
+  imgtext:[{cols:[['image'],['paragraph']]}],
+  textimg:[{cols:[['paragraph'],['image']]}],
+  imgcap:[{cols:[['image','subheading']]}],
+  feature:[{cols:[['image'],['heading','paragraph']]}],
+  table:[{cols:[['table']]}],
+  signature:[{cols:[['signature']]}],
+  catalogue:[{cols:[['image'],['subheading','paragraph']]}],
+};
 
 function pageInit(){
   const ELEMS=Object.fromEntries(PRIMITIVES.map(p=>[p.id,p.name]));
+  const clone=x=>JSON.parse(JSON.stringify(x));
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   const existing=id?BLOCKS.find(b=>b.id===id):null;
-  let rows = existing ? (P2PRIM[existing.p]||['paragraph']).slice() : [];
-  let sel = -1;
-  let drag = null; // {type:'new'|'move', id, from}
+  let doc = existing ? clone(P2DOC[existing.p]||[{cols:[['paragraph']]}]) : [];
+  let drag = null; // {kind:'new-prim'|'new-row'|'move-prim'|'move-row', ...}
 
   const page=document.getElementById('page');
   const wrap=document.getElementById('cvWrap');
@@ -130,17 +173,28 @@ function pageInit(){
 
   document.getElementById('b-cat').innerHTML=BLOCK_CATS.map(c=>`<option>${c}</option>`).join('');
 
-  // ---- Widget palette (grouped by primitive tag) ----
+  // ---- Widget palette: Structure + primitives grouped by tag ----
   const byTag={};
   PRIMITIVES.forEach(p=>{ (byTag[p.tag]=byTag[p.tag]||[]).push(p); });
-  document.getElementById('palette').innerHTML=Object.entries(byTag).map(([tag,ps])=>
+  let pal=`<div class="pal-tag">Structure</div>`
+    +`<div class="vb-widget struct" draggable="true" data-row="2" title="A row with two columns"><span class="ms">view_column</span>2 Columns</div>`
+    +`<div class="vb-widget struct" draggable="true" data-row="3" title="A row with three columns"><span class="ms">view_week</span>3 Columns</div>`;
+  pal+=Object.entries(byTag).map(([tag,ps])=>
     `<div class="pal-tag">${tag}</div>`+
     ps.map(p=>`<div class="vb-widget" draggable="true" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('')
   ).join('');
+  document.getElementById('palette').innerHTML=pal;
   document.querySelectorAll('.vb-widget').forEach(w=>{
-    w.addEventListener('dragstart',e=>{drag={type:'new',id:w.dataset.id};e.dataTransfer.effectAllowed='copy';e.dataTransfer.setData('text','n');});
+    w.addEventListener('dragstart',e=>{
+      drag = w.dataset.row ? {kind:'new-row',cols:+w.dataset.row} : {kind:'new-prim',id:w.dataset.id};
+      if(e.dataTransfer){ e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text','n'); }
+    });
     w.addEventListener('dragend',()=>{drag=null;clearInd();});
-    w.addEventListener('click',()=>{rows.push(w.dataset.id);sel=rows.length-1;render();});
+    w.addEventListener('click',()=>{
+      if(w.dataset.row) doc.push({cols:Array.from({length:+w.dataset.row},()=>[])});
+      else doc.push({cols:[[w.dataset.id]]});
+      render();
+    });
   });
 
   if(existing){
@@ -153,60 +207,123 @@ function pageInit(){
     if(existing.bespoke) document.getElementById('delBtn').style.display='';
   }
 
-  // ---- Canvas render ----
+  // ---- Render ----
+  function elHtml(pid,r,c,k){
+    return `<div class="vb-el" data-r="${r}" data-c="${c}" data-k="${k}">
+      <div class="vb-name"><span class="ms" style="font-size:12px">${PRIM_ICON[pid]||'widgets'}</span>${ELEMS[pid]||pid}</div>
+      <div class="vb-tools">
+        <span class="tb grab" data-handle title="Drag to move"><span class="ms">drag_indicator</span></span>
+        <span class="tb" data-dup title="Duplicate"><span class="ms">content_copy</span></span>
+        <span class="tb del" data-del title="Delete"><span class="ms">delete</span></span>
+      </div>
+      <div class="vb-body">${renderPrimitive(pid)}</div>
+    </div>`;
+  }
   function render(){
-    if(!rows.length){
-      page.innerHTML='<div class="vb-empty"><span class="ms">dashboard_customize</span>Empty block — drag an element from the panel to start building</div>';
+    if(!doc.length){
+      page.innerHTML='<div class="vb-empty"><span class="ms">dashboard_customize</span>Empty block — drag an element or a column structure from the panel to start building</div>';
     } else {
-      page.innerHTML=rows.map((k,i)=>`
-        <div class="vb-el${i===sel?' selected':''}" data-i="${i}">
-          <div class="vb-name"><span class="ms" style="font-size:12px">${PRIM_ICON[k]||'widgets'}</span>${ELEMS[k]||k}</div>
-          <div class="vb-tools">
-            <span class="tb grab" data-handle title="Drag to move"><span class="ms">drag_indicator</span></span>
-            <span class="tb" data-dup title="Duplicate"><span class="ms">content_copy</span></span>
-            <span class="tb del" data-del title="Delete"><span class="ms">delete</span></span>
+      page.innerHTML=doc.map((row,r)=>`
+        <div class="vb-row" data-r="${r}">
+          <div class="vb-rowtools">
+            <span class="rb grab" data-rhandle title="Move row"><span class="ms">drag_indicator</span></span>
+            <span class="rb" data-addcol title="Add column"><span class="ms">add</span></span>
+            <span class="rb" data-delcol title="Remove column"><span class="ms">remove</span></span>
+            <span class="rb del" data-delrow title="Delete row"><span class="ms">delete</span></span>
           </div>
-          <div class="vb-body">${renderPrimitive(k)}</div>
+          ${row.cols.map((col,c)=>`<div class="vb-col" data-r="${r}" data-c="${c}">
+              ${col.length?col.map((pid,k)=>elHtml(pid,r,c,k)).join(''):'<div class="vb-colph"><span class="ms">add</span>Drop element</div>'}
+            </div>`).join('')}
         </div>`).join('');
     }
-    document.getElementById('bar-count').textContent=rows.length?`· ${rows.length} element${rows.length>1?'s':''}`:'';
-    wireEls();
+    const n=doc.reduce((s,row)=>s+row.cols.reduce((a,col)=>a+col.length,0),0);
+    document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
+    wire();
   }
 
-  function wireEls(){
+  function wire(){
     page.querySelectorAll('.vb-el').forEach(el=>{
-      const i=+el.dataset.i;
-      el.addEventListener('click',e=>{ if(e.target.closest('[data-del],[data-dup]')) return; sel=i; render(); });
-      el.querySelector('[data-del]').addEventListener('click',()=>{ rows.splice(i,1); if(sel>=rows.length) sel=rows.length-1; render(); });
-      el.querySelector('[data-dup]').addEventListener('click',()=>{ rows.splice(i+1,0,rows[i]); sel=i+1; render(); });
-      // Drag to reorder — only from the grab handle.
+      const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k;
+      el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();doc[r].cols[c].splice(k,1);cleanup();render();});
+      el.querySelector('[data-dup]').addEventListener('click',e=>{e.stopPropagation();doc[r].cols[c].splice(k+1,0,doc[r].cols[c][k]);render();});
       const h=el.querySelector('[data-handle]');
       h.addEventListener('mousedown',()=>{el.draggable=true;});
       el.addEventListener('mouseup',()=>{el.draggable=false;});
-      el.addEventListener('dragstart',e=>{drag={type:'move',from:i};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','m');el.style.opacity='.4';});
-      el.addEventListener('dragend',()=>{el.draggable=false;el.style.opacity='';clearInd();});
+      el.addEventListener('dragstart',e=>{drag={kind:'move-prim',r,c,k};if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','m');}el.classList.add('dragging');});
+      el.addEventListener('dragend',()=>{el.draggable=false;el.classList.remove('dragging');clearInd();drag=null;});
+    });
+    page.querySelectorAll('.vb-row').forEach(rowEl=>{
+      const r=+rowEl.dataset.r;
+      rowEl.querySelector('[data-addcol]').addEventListener('click',e=>{e.stopPropagation();if(doc[r].cols.length<3){doc[r].cols.push([]);render();}else showToast('A row can have up to 3 columns');});
+      rowEl.querySelector('[data-delcol]').addEventListener('click',e=>{e.stopPropagation();if(doc[r].cols.length>1){const last=doc[r].cols.pop();if(last.length)doc[r].cols[doc[r].cols.length-1].push(...last);render();}else showToast('A row needs at least one column');});
+      rowEl.querySelector('[data-delrow]').addEventListener('click',e=>{e.stopPropagation();doc.splice(r,1);render();});
+      const rh=rowEl.querySelector('[data-rhandle]');
+      rh.addEventListener('mousedown',()=>{rowEl.draggable=true;});
+      rowEl.addEventListener('mouseup',()=>{rowEl.draggable=false;});
+      rowEl.addEventListener('dragstart',e=>{if(!rowEl.draggable)return;e.stopPropagation();drag={kind:'move-row',r};if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','r');}});
+      rowEl.addEventListener('dragend',()=>{rowEl.draggable=false;clearInd();drag=null;});
     });
   }
 
-  function clearInd(){ page.querySelectorAll('.ins-before').forEach(e=>e.classList.remove('ins-before')); tail.classList.remove('active'); }
-  function indexFromY(y){
-    const els=[...page.querySelectorAll('.vb-el')];
-    for(let i=0;i<els.length;i++){ const r=els[i].getBoundingClientRect(); if(y < r.top + r.height/2) return i; }
+  // Remove leftover empty single-column rows (multi-column rows persist for filling).
+  function cleanup(){ doc = doc.filter(row => !(row.cols.length===1 && row.cols[0].length===0)); }
+  function pluck(d){ const pid=doc[d.r].cols[d.c][d.k]; doc[d.r].cols[d.c].splice(d.k,1); return pid; }
+
+  function clearInd(){
+    page.querySelectorAll('.ins-before').forEach(e=>e.classList.remove('ins-before'));
+    page.querySelectorAll('.vb-col.over,.vb-col.ins-end').forEach(e=>e.classList.remove('over','ins-end'));
+    page.querySelectorAll('.row-ins-before').forEach(e=>e.classList.remove('row-ins-before'));
+    tail.classList.remove('active');
+  }
+  function rowIndexFromY(y){
+    const rows=[...page.querySelectorAll(':scope > .vb-row')];
+    for(let i=0;i<rows.length;i++){ const b=rows[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; }
+    return rows.length;
+  }
+  function colIndexFromY(col,y){
+    const els=[...col.querySelectorAll(':scope > .vb-el')];
+    for(let i=0;i<els.length;i++){ const b=els[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; }
     return els.length;
   }
-  function markInd(idx){
+
+  wrap.addEventListener('dragover',e=>{
+    if(!drag) return; e.preventDefault();
+    const overCol = e.target.closest && e.target.closest('.vb-col');
+    const rowMode = drag.kind==='new-row' || drag.kind==='move-row' || !overCol;
+    if(e.dataTransfer) e.dataTransfer.dropEffect = drag.kind==='new-prim'?'copy':'move';
     clearInd();
-    const els=[...page.querySelectorAll('.vb-el')];
-    if(idx<els.length) els[idx].classList.add('ins-before'); else tail.classList.add('active');
-  }
-  wrap.addEventListener('dragover',e=>{ if(!drag) return; e.preventDefault(); e.dataTransfer.dropEffect=drag.type==='new'?'copy':'move'; markInd(indexFromY(e.clientY)); });
+    if(rowMode){
+      const ri=rowIndexFromY(e.clientY);
+      const rows=[...page.querySelectorAll(':scope > .vb-row')];
+      if(ri<rows.length) rows[ri].classList.add('row-ins-before'); else tail.classList.add('active');
+    } else {
+      overCol.classList.add('over');
+      const ki=colIndexFromY(overCol,e.clientY);
+      const els=[...overCol.querySelectorAll(':scope > .vb-el')];
+      if(ki<els.length) els[ki].classList.add('ins-before'); else overCol.classList.add('ins-end');
+    }
+  });
   wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) clearInd(); });
   wrap.addEventListener('drop',e=>{
     if(!drag) return; e.preventDefault();
-    let idx=indexFromY(e.clientY); clearInd();
-    if(drag.type==='new'){ rows.splice(idx,0,drag.id); sel=idx; }
-    else { const from=drag.from; let to=idx; const [m]=rows.splice(from,1); if(from<to) to--; rows.splice(to,0,m); sel=to; }
-    drag=null; render();
+    const overCol = e.target.closest && e.target.closest('.vb-col');
+    const rowMode = drag.kind==='new-row' || drag.kind==='move-row' || !overCol;
+    if(rowMode){
+      const ri=rowIndexFromY(e.clientY);
+      if(drag.kind==='new-row'){ doc.splice(ri,0,{cols:Array.from({length:drag.cols},()=>[])}); }
+      else if(drag.kind==='move-row'){ let to=ri; const [m]=doc.splice(drag.r,1); if(drag.r<to)to--; doc.splice(to,0,m); }
+      else { const pid = drag.kind==='new-prim'?drag.id:pluck(drag); doc.splice(ri,0,{cols:[[pid]]}); }
+    } else {
+      const r=+overCol.dataset.r, c=+overCol.dataset.c;
+      let ki=colIndexFromY(overCol,e.clientY);
+      if(drag.kind==='new-prim'){ doc[r].cols[c].splice(ki,0,drag.id); }
+      else { // move-prim
+        if(drag.r===r && drag.c===c && drag.k<ki) ki--;
+        const pid=pluck(drag);
+        doc[r].cols[c].splice(ki,0,pid);
+      }
+    }
+    cleanup(); clearInd(); drag=null; render();
   });
 
   // ---- Naming / device / availability ----
@@ -234,11 +351,12 @@ function pageInit(){
   }
 
   document.getElementById('saveBtn').addEventListener('click',()=>{
-    const n=document.getElementById('b-name').value.trim();
+    const nm=document.getElementById('b-name').value.trim();
     const l=document.getElementById('b-label').value.trim();
-    if(!n){showToast('Give the block an internal name first');return;}
+    const total=doc.reduce((s,row)=>s+row.cols.reduce((a,col)=>a+col.length,0),0);
+    if(!nm){showToast('Give the block an internal name first');return;}
     if(!l){showToast('Add a customer-facing label — clients need to know what they are clicking');return;}
-    if(!rows.length){showToast('Add at least one element to the canvas');return;}
+    if(!total){showToast('Add at least one element to the canvas');return;}
     showToast((existing?'Updated':'Created')+' block: '+l);
     setTimeout(()=>location.href='blocks.html',700);
   });
