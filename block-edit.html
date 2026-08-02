@@ -24,8 +24,8 @@
   /* ---- Visual builder canvas (Elementor / Webflow style) ---- */
   .vb-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;min-height:520px;max-height:76vh;overflow:auto}
   .vb-bar{display:flex;align-items:center;gap:9px;width:620px;max-width:100%;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
-  /* A4 page (210:297) — the block previews as it will sit on a real document page */
-  .vb-page{width:620px;max-width:100%;aspect-ratio:210/297;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px 56px;display:flex;flex-direction:column;gap:2px}
+  /* A4-width page — height grows with the elements, like a real document page */
+  .vb-page{width:620px;max-width:100%;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px 56px;display:flex;flex-direction:column;gap:2px}
   .vb-row{position:relative;display:flex;gap:16px;padding:8px;border-radius:9px;margin:2px 0}
   .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.35)}
   .vb-row.row-ins-before::before{content:'';position:absolute;top:-4px;left:0;right:0;height:3px;background:var(--teal);border-radius:2px}
@@ -82,7 +82,7 @@
   .code-ta{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.65;border:1px solid var(--border);border-radius:12px;padding:16px;resize:none;background:#0f1720;color:#d7e2df;tab-size:2;outline:none;white-space:pre;overflow:auto}
   .code-ta:focus{border-color:var(--teal)}
   .code-prev{flex:1;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto}
-  .code-prev-page{width:100%;max-width:460px;aspect-ratio:210/297;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:40px 44px;overflow:auto}
+  .code-prev-page{width:100%;max-width:460px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:40px 44px}
 </style>
 </head>
 <body data-page="blocks" data-title="Blocks">
