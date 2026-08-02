@@ -83,15 +83,8 @@
   .code-ta:focus{border-color:var(--teal)}
   .code-prev{flex:1;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto}
   .code-prev-page{width:100%;max-width:460px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:40px 44px}
-  /* ---- Per-client brand tabs (default style + each client's style) ---- */
-  .brand-tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:10px}
-  .brand-tab{display:flex;align-items:center;gap:7px;padding:9px 13px;font-size:12.5px;font-weight:600;color:var(--gray);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
-  .brand-tab:hover{color:var(--ink)}
-  .brand-tab.on{color:var(--teal);border-bottom-color:var(--teal)}
-  .brand-tab .ms{font-size:15px;color:var(--light)}
-  .brand-tab.on .ms{color:var(--teal)}
-  .brand-tab .sw{width:15px;height:15px;border-radius:4px;border:1px solid rgba(0,0,0,.1);display:inline-flex;overflow:hidden;flex-shrink:0}
-  .brand-tab .sw i{width:50%;height:100%}
+  /* ---- Per-client style selector (default style + each client's style) ---- */
+  .brand-bar{display:flex;align-items:center;gap:9px;margin-bottom:10px;font-size:12.5px;color:var(--gray)}
   .brand-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--gray);margin-bottom:12px;min-height:20px}
   .brand-meta .chip{display:inline-flex;align-items:center;gap:5px}
   .brand-meta .dot{width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.1)}
@@ -120,8 +113,12 @@
           <button data-mode="code"><span class="ms">code</span> Custom code</button>
         </div>
 
-        <!-- Per-client style tabs: default + one per client -->
-        <div class="brand-tabs" id="brandTabs"></div>
+        <!-- Per-client style: default + one per client -->
+        <div class="brand-bar">
+          <span class="ms" style="font-size:17px;color:var(--teal)">palette</span>
+          <span>Preview style</span>
+          <select id="brandSel" class="fin fin-sm"></select>
+        </div>
         <div class="brand-meta" id="brandMeta"></div>
 
         <!-- VISUAL MODE -->
@@ -339,19 +336,12 @@ function pageInit(){
     render();
   }
 
-  // ---- Per-client brand tabs: default style + each client's style ----
-  function buildBrandTabs(){
-    const el=document.getElementById('brandTabs');
-    el.innerHTML=BRANDS.map((b,i)=>{
-      const on = b.brand===brand;
-      const mark = b.brand
-        ? `<span class="sw"><i style="background:${b.brand.primary}"></i><i style="background:${b.brand.secondary}"></i></span>`
-        : `<span class="ms">palette</span>`;
-      return `<span class="brand-tab${on?' on':''}" data-bi="${i}">${mark}${b.name}</span>`;
-    }).join('');
-    el.querySelectorAll('.brand-tab').forEach(t=>t.addEventListener('click',()=>{
-      brand=BRANDS[+t.dataset.bi].brand; buildBrandTabs(); applyBrand(); renderMeta(); render(); renderCode();
-    }));
+  // ---- Per-client style selector: default style + each client's style ----
+  function buildBrandSelect(){
+    const el=document.getElementById('brandSel');
+    el.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.brand?b.name:'Default (brand-neutral)'}</option>`).join('');
+    el.value=String(Math.max(0,BRANDS.findIndex(b=>b.brand===brand)));
+    el.addEventListener('change',()=>{ brand=BRANDS[+el.value].brand; applyBrand(); renderMeta(); render(); renderCode(); });
   }
   function renderMeta(){
     const m=document.getElementById('brandMeta');
@@ -521,7 +511,7 @@ function pageInit(){
     });
   });
 
-  buildBrandTabs(); applyBrand(); renderMeta(); render(); syncBar(); renderAvail();
+  buildBrandSelect(); applyBrand(); renderMeta(); render(); syncBar(); renderAvail();
 }
 </script>
 </body>
