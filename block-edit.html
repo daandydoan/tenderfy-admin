@@ -16,6 +16,7 @@
 <style>
   /* ---- 3-column editor: scrollable Elements | fixed canvas | scrollable inspector ---- */
   .ed3{display:grid;grid-template-columns:250px minmax(0,1fr) 308px;gap:16px;align-items:stretch;height:calc(100vh - 158px);min-height:500px}
+  .ed3.code-mode{grid-template-columns:250px minmax(0,1fr)}
   .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
   .ed3-col .card{margin-bottom:14px}
   .ed3-mid{height:100%;min-width:0;display:flex;flex-direction:column}
@@ -27,13 +28,12 @@
   .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px;margin-right:6px}
   .hdr-brand .ms{font-size:17px;color:var(--teal)}
   .hdr-brand .fin-sm{min-width:172px}
-  /* ---- Mode toggle (Visual builder / Custom code) ---- */
+  /* ---- Mode toggle ---- */
   .vb-modes{display:flex;background:#eef2f1;border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:14px;gap:2px}
   .vb-modes button{flex:1;border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);padding:7px 10px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
   .vb-modes button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.09)}
   .vb-modes button .ms{font-size:16px}
   .vb-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  /* Selection pill — shows what the inspector is editing */
   .sel-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--gray);background:#eef2f1;border:1px solid var(--border);border-radius:100px;padding:5px 6px 5px 11px}
   .sel-pill.on{color:var(--teal);background:var(--teal-tint);border-color:#bfe0d9}
   .sel-pill .ms{font-size:15px}
@@ -43,28 +43,29 @@
   /* ---- Visual builder canvas ---- */
   .vb-canvas{flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
   .vb-bar{display:flex;align-items:center;gap:9px;width:620px;max-width:100%;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
-  /* A4-width page — height grows with the elements, like a real document page */
-  .vb-page{width:620px;max-width:100%;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px;display:flex;flex-direction:column;gap:2px}
-  .vb-row{position:relative;display:flex;gap:16px;padding:8px;border-radius:9px;margin:2px 0}
-  .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.35)}
-  .vb-row.row-ins-before::before{content:'';position:absolute;top:-4px;left:0;right:0;height:3px;background:var(--teal);border-radius:2px}
+  /* A4-width page (fixed document surface); the block content sits inside it */
+  .vb-page{width:620px;max-width:100%;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px;display:flex;flex-direction:column}
+  .vb-block{display:flex;flex-direction:column;min-width:0}
+  .vb-row{position:relative;display:flex;gap:14px;padding:3px;border-radius:8px}
+  .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.3)}
+  .vb-row.row-ins-before::before{content:'';position:absolute;top:-3px;left:0;right:0;height:3px;background:var(--teal);border-radius:2px}
   .vb-rowtools{position:absolute;top:-12px;left:50%;transform:translateX(-50%);display:flex;gap:3px;opacity:0;transition:.1s;z-index:4}
   .vb-row:hover>.vb-rowtools{opacity:1}
   .vb-rowtools .rb{width:23px;height:23px;border-radius:6px;background:#3a4a52;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.25)}
   .vb-rowtools .rb.grab{cursor:grab}
   .vb-rowtools .rb.del{background:#d5493f}
   .vb-rowtools .rb .ms{font-size:14px}
-  .vb-col{flex:1;min-width:0;display:flex;flex-direction:column;min-height:56px;border-radius:8px;position:relative}
+  .vb-col{flex:1;min-width:0;display:flex;flex-direction:column;border-radius:8px;position:relative}
   .vb-col.over{background:var(--teal-tint);box-shadow:inset 0 0 0 1.5px var(--teal)}
-  .vb-col.ins-end::after{content:'';position:absolute;left:6px;right:6px;bottom:3px;height:3px;background:var(--teal);border-radius:2px}
-  .vb-colph{border:1.5px dashed #c2ccc9;border-radius:8px;padding:18px 10px;text-align:center;color:var(--light);font-size:11.5px;margin:auto;width:100%;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .vb-col.ins-end::after{content:'';position:absolute;left:6px;right:6px;bottom:0;height:3px;background:var(--teal);border-radius:2px}
+  .vb-colph{border:1.5px dashed #c2ccc9;border-radius:8px;padding:16px 10px;text-align:center;color:var(--light);font-size:11.5px;margin:auto;width:100%;display:flex;flex-direction:column;align-items:center;gap:3px}
   .vb-colph .ms{font-size:18px}
-  .vb-el{position:relative;padding:11px 12px;border-radius:8px;border:1.5px solid transparent;cursor:pointer}
+  .vb-el{position:relative;padding:4px 8px;border-radius:7px;border:1.5px solid transparent;cursor:pointer}
   .vb-el:hover{border-color:var(--teal)}
   .vb-el.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
   .vb-el.dragging{opacity:.4}
-  .vb-el.ins-before::before{content:'';position:absolute;top:-4px;left:6px;right:6px;height:3px;background:var(--teal);border-radius:2px}
-  .vb-name{position:absolute;top:-11px;left:10px;background:var(--teal);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;transition:.1s;display:flex;align-items:center;gap:4px;z-index:2;white-space:nowrap}
+  .vb-el.ins-before::before{content:'';position:absolute;top:-3px;left:6px;right:6px;height:3px;background:var(--teal);border-radius:2px}
+  .vb-name{position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;transition:.1s;display:flex;align-items:center;gap:4px;z-index:2;white-space:nowrap}
   .vb-el:hover .vb-name,.vb-el.selected .vb-name{opacity:1}
   .vb-tools{position:absolute;top:-13px;right:8px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:3}
   .vb-el:hover .vb-tools,.vb-el.selected .vb-tools{opacity:1}
@@ -80,7 +81,7 @@
   .vb-qbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;border-radius:100px;padding:7px 13px;font-size:12px;font-weight:500;color:var(--ink);cursor:pointer}
   .vb-qbtn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .vb-qbtn .ms{font-size:15px;color:var(--teal)}
-  .vb-tail{width:620px;max-width:100%;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:13px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
+  .vb-tail{width:620px;max-width:100%;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:11px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
   .vb-tail.active{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .vb-tail .ms{font-size:17px}
   /* ---- Widget palette ---- */
@@ -92,10 +93,7 @@
   .vb-widget.struct{background:#f4f7f6}
   .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
   .pal-tag:first-child{margin-top:0}
-  /* ---- Custom code mode ---- */
-  .code-note{display:flex;gap:9px;align-items:flex-start;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:10px;padding:11px 13px;font-size:12.5px;color:#1f5a50;margin-bottom:12px;line-height:1.5}
-  .code-note .ms{font-size:18px;color:var(--teal);flex-shrink:0}
-  .code-note code{background:#fff;border:1px solid #cfe4df;border-radius:4px;padding:1px 5px;font-size:11.5px}
+  /* ---- Custom code mode (simplified) ---- */
   .code-split{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .code-pane{display:flex;flex-direction:column;min-width:0}
   .code-pane .ph{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:6px}
@@ -103,22 +101,23 @@
   .code-ta:focus{border-color:var(--teal)}
   .code-prev{flex:1;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto}
   .code-prev-page{width:100%;max-width:460px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:40px 44px}
-  /* ---- Style inspector (properties panel) ---- */
+  /* ---- Style inspector ---- */
   #styleTarget{font-size:12px;color:var(--teal);font-weight:600;margin:-4px 0 12px;display:flex;align-items:center;gap:6px}
   #styleTarget .ms{font-size:15px}
   .insp-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--light);font-weight:700;margin:16px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border)}
-  .insp-h:first-of-type{margin-top:0}
+  .insp-sec:first-child .insp-h{margin-top:0}
   .insp-row{display:grid;grid-template-columns:56px 1fr;align-items:center;gap:10px;margin-bottom:9px}
   .insp-row>label{font-size:12px;color:var(--gray)}
   .insp-ctl{display:flex;align-items:center;gap:7px;min-width:0}
   .insp-range{flex:1;min-width:0;accent-color:var(--teal);height:4px}
   .insp-num{width:50px;padding:6px 7px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink);text-align:center}
+  .insp-num:disabled{background:#f2f5f4;color:var(--light)}
   .insp-unit{font-size:10.5px;color:var(--light);flex-shrink:0}
   .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
   .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
   .seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
-  .seg button{border:none;background:#fff;padding:6px 8px;cursor:pointer;color:var(--gray);display:flex;border-left:1px solid var(--border)}
+  .seg button{border:none;background:#fff;padding:6px 10px;cursor:pointer;color:var(--gray);display:flex;align-items:center;font-family:inherit;font-size:12px;font-weight:600;border-left:1px solid var(--border)}
   .seg button:first-child{border-left:none}
   .seg button.on{background:var(--teal-tint);color:var(--teal)}
   .seg button .ms{font-size:16px}
@@ -126,6 +125,9 @@
   #saveModal .cfm{text-align:left;max-width:440px}
   #saveModal .cfm h3{margin-bottom:2px}
   #saveModal .cfm .sub{color:var(--gray);font-size:12.5px;margin-bottom:14px}
+  .fld-err{display:none;color:#d5493f;font-size:11.5px;margin-top:4px}
+  .fld-err.show{display:block}
+  .fin.err{border-color:#d5493f;background:#fdf3f2}
 </style>
 </head>
 <body data-page="blocks" data-title="Blocks">
@@ -138,7 +140,7 @@
       </div>
       <div class="pg-acts">
         <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span>
-        <a class="btn btn-outline btn-sm" href="blocks.html">Cancel</a>
+        <a class="btn btn-outline btn-sm" id="cancelBtn" href="blocks.html">Cancel</a>
         <a class="btn btn-danger btn-sm" id="delBtn" style="display:none"><span class="ms" style="font-size:17px">delete</span> Delete</a>
         <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Block</a>
       </div>
@@ -179,10 +181,6 @@
           </div>
         </div>
         <div id="codePanel" style="display:none">
-          <div class="code-note">
-            <span class="ms">info</span>
-            <div>Use brand tokens (<code>var(--brand-primary)</code>, <code>var(--brand-secondary)</code>) so the block restyles per client.</div>
-          </div>
           <div class="code-split">
             <div class="code-pane">
               <div class="ph"><span class="ms" style="font-size:15px">code</span> HTML</div>
@@ -196,34 +194,48 @@
         </div>
       </div>
 
-      <!-- RIGHT: style inspector (scrolls) -->
-      <div class="ed3-col">
+      <!-- RIGHT: contextual style inspector (scrolls) -->
+      <div class="ed3-col" id="rightCol">
         <div class="card" id="styleCard">
           <h3 class="ed-h">Style</h3>
           <div id="styleTarget"></div>
 
-          <div class="insp-h">Block dimension</div>
-          <div class="insp-row"><label>Padding</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-pad" min="0" max="120"><input type="number" class="insp-num" id="s-padN"><span class="insp-unit">px</span></div></div>
-          <div class="insp-row"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
-          <div class="insp-row"><label>Fill</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bg"><input type="text" class="insp-hex" id="s-bgH"></div></div>
+          <div class="insp-sec" data-sec="layout">
+            <div class="insp-h">Layout</div>
+            <div class="insp-row" data-field="width"><label>Width</label><div class="insp-ctl">
+              <div class="seg" id="s-wmode"><button data-w="fill">Fill</button><button data-w="fixed">Fixed</button></div>
+              <input type="number" class="insp-num" id="s-wpx"><span class="insp-unit">px</span>
+            </div></div>
+          </div>
 
-          <div class="insp-h">Typography</div>
-          <div class="insp-row"><label>Font</label><select class="insp-sel" id="s-font"></select></div>
-          <div class="insp-row"><label>Weight</label><select class="insp-sel" id="s-weight">
-            <option value="">Inherit</option><option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select></div>
-          <div class="insp-row"><label>Size</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-size"><span class="insp-unit">px</span><input type="number" class="insp-num" id="s-lh"><span class="insp-unit">line</span></div></div>
-          <div class="insp-row"><label>Colour</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-color"><input type="text" class="insp-hex" id="s-colorH"></div></div>
-          <div class="insp-row"><label>Align</label><div class="seg" id="s-align">
-            <button data-al="left" title="Left"><span class="ms">format_align_left</span></button>
-            <button data-al="center" title="Centre"><span class="ms">format_align_center</span></button>
-            <button data-al="right" title="Right"><span class="ms">format_align_right</span></button>
-            <button data-al="justify" title="Justify"><span class="ms">format_align_justify</span></button>
-          </div></div>
+          <div class="insp-sec" data-sec="dim">
+            <div class="insp-h">Dimension</div>
+            <div class="insp-row" data-field="pad"><label>Padding</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-pad" min="0" max="120"><input type="number" class="insp-num" id="s-padN"><span class="insp-unit">px</span></div></div>
+            <div class="insp-row" data-field="sp"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
+            <div class="insp-row" data-field="bg"><label>Fill</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bg"><input type="text" class="insp-hex" id="s-bgH" placeholder="None (inherit)"></div></div>
+          </div>
 
-          <div class="insp-h">Border</div>
-          <div class="insp-row"><label>Radius</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-rad" min="0" max="40"><input type="number" class="insp-num" id="s-radN"><span class="insp-unit">px</span></div></div>
-          <div class="insp-row"><label>Width</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-bw"><span class="insp-unit">px</span><select class="insp-sel" id="s-bstyle" style="flex:1"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div></div>
-          <div class="insp-row"><label>Colour</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bcolor"><input type="text" class="insp-hex" id="s-bcolorH"></div></div>
+          <div class="insp-sec" data-sec="typo">
+            <div class="insp-h">Typography</div>
+            <div class="insp-row" data-field="font"><label>Font</label><select class="insp-sel" id="s-font"></select></div>
+            <div class="insp-row" data-field="weight"><label>Weight</label><select class="insp-sel" id="s-weight"><option value="">Inherit from brand</option><option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select></div>
+            <div class="insp-row" data-field="sizelh"><label>Size</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-size" placeholder="brand"><span class="insp-unit">px</span><input type="number" class="insp-num" id="s-lh" placeholder="brand"><span class="insp-unit">line</span></div></div>
+            <div class="insp-row" data-field="color"><label>Colour</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-color"><input type="text" class="insp-hex" id="s-colorH" placeholder="Inherit from brand"></div></div>
+            <div class="insp-row" data-field="align"><label>Align</label><div class="seg" id="s-align">
+              <button data-al="left" title="Left"><span class="ms">format_align_left</span></button>
+              <button data-al="center" title="Centre"><span class="ms">format_align_center</span></button>
+              <button data-al="right" title="Right"><span class="ms">format_align_right</span></button>
+              <button data-al="justify" title="Justify"><span class="ms">format_align_justify</span></button>
+            </div></div>
+            <div class="fhint" style="margin:2px 0 0">Blank fields inherit the client’s brand &amp; styling.</div>
+          </div>
+
+          <div class="insp-sec" data-sec="border">
+            <div class="insp-h">Border</div>
+            <div class="insp-row" data-field="rad"><label>Radius</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-rad" min="0" max="40"><input type="number" class="insp-num" id="s-radN"><span class="insp-unit">px</span></div></div>
+            <div class="insp-row" data-field="bwstyle"><label>Width</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-bw"><span class="insp-unit">px</span><select class="insp-sel" id="s-bstyle" style="flex:1"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div></div>
+            <div class="insp-row" data-field="bcolor"><label>Colour</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bcolor"><input type="text" class="insp-hex" id="s-bcolorH" placeholder="Inherit from brand"></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -235,8 +247,8 @@
   <div class="cfm">
     <h3>Save block</h3>
     <div class="sub">Name it so it reads clearly in the Block Builder.</div>
-    <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"></div>
-    <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"></div>
+    <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"><span class="fld-err" id="b-name-err"></span></div>
+    <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"><span class="fld-err" id="b-label-err"></span></div>
     <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text."></div>
     <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
     <div class="cfm-acts">
@@ -293,14 +305,23 @@ const CODE_STARTER=`<div style="display:flex;gap:24px">
   </div>
 </div>`;
 
+// Which inspector fields make sense for a given element kind.
+function kindOf(id){
+  if(id==='image') return 'image';
+  if(id==='divider') return 'divider';
+  if(id==='spacer') return 'spacer';
+  if(id==='table') return 'table';
+  return 'text'; // heading/subheading/paragraph/list/quote/keyvalue/signature
+}
+
 function pageInit(){
   const ELEMS=Object.fromEntries(PRIMITIVES.map(p=>[p.id,p.name]));
   const clone=x=>JSON.parse(JSON.stringify(x));
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   const existing=id?BLOCKS.find(b=>b.id===id):null;
 
-  // Elements are objects {id, st} so each can carry its own style overrides.
-  const elDef=()=>({pad:0,sp:0,bg:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,bw:0,bstyle:'solid',bcolor:'#38988a'});
+  // Elements are objects {id, st}; st starts empty (inherit) — reasonable defaults until edited.
+  const elDef=()=>({pad:0,bg:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,bw:0,bstyle:'solid',bcolor:'#38988a'});
   const mkEl=pid=>({id:pid, st:elDef()});
   const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
@@ -310,8 +331,8 @@ function pageInit(){
   let brand = null;
   let sel = null; // {r,c,k} selected element, or null = whole block
   const BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand}))];
-  // Block-level (page) style; per-element styles live on each element's .st.
-  const blockStyle={pad:52, sp:2, bg:'#ffffff', font:'Outfit', weight:'400', size:14, lh:22, color:'#3A4442', align:'left', rad:4, bw:0, bstyle:'solid', bcolor:'#E2E8E6'};
+  // Block content style (applied to the block wrapper INSIDE the page, not the page itself).
+  const blockStyle={wmode:'fill', wpx:520, pad:0, sp:8, bg:'', rad:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6'};
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
 
   const page=document.getElementById('page');
@@ -376,7 +397,7 @@ function pageInit(){
         }</div></div>`;
       page.querySelectorAll('[data-tpl]').forEach(b=>b.addEventListener('click',()=>loadTemplate(b.dataset.tpl)));
     } else {
-      page.innerHTML=doc.map((row,r)=>`
+      page.innerHTML=`<div class="vb-block" id="blockWrap">`+doc.map((row,r)=>`
         <div class="vb-row" data-r="${r}">
           <div class="vb-rowtools">
             <span class="rb grab" data-rhandle title="Move row"><span class="ms">drag_indicator</span></span>
@@ -387,12 +408,13 @@ function pageInit(){
           ${row.cols.map((col,c)=>`<div class="vb-col" data-r="${r}" data-c="${c}">
               ${col.length?col.map((el,k)=>elHtml(el,r,c,k)).join(''):'<div class="vb-colph"><span class="ms">add</span>Drop element</div>'}
             </div>`).join('')}
-        </div>`).join('');
+        </div>`).join('')+`</div>`;
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
     wire();
     applyAllElStyles();
+    applyBlockStyle();
     applySelection();
     syncInspector();
   }
@@ -402,12 +424,26 @@ function pageInit(){
     sel=null; render();
   }
 
+  const hasContent=()=> doc.reduce((s,row)=>s+row.cols.reduce((a,c)=>a+c.length,0),0)>0 || (mode==='code' && !!codeArea.value.trim());
+
   // ---- Per-client style selector ----
+  let brandIdx=0;
   function buildBrandSelect(){
     const el=document.getElementById('brandSel');
     el.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.brand?b.name:'Default (brand-neutral)'}</option>`).join('');
-    el.value=String(Math.max(0,BRANDS.findIndex(b=>b.brand===brand)));
-    el.addEventListener('change',()=>{ brand=BRANDS[+el.value].brand; applyBrand(); render(); renderCode(); });
+    el.value=String(brandIdx);
+    el.addEventListener('change',()=>{
+      const newIdx=+el.value; el.value=String(brandIdx); // hold until confirmed
+      if(newIdx===brandIdx) return;
+      const to=BRANDS[newIdx];
+      const proceed=()=>{ brandIdx=newIdx; el.value=String(newIdx); brand=to.brand; applyBrand(); render(); renderCode(); };
+      if(hasContent()) confirmAction({
+        title:'Change preview style?',
+        body:`Previewing in ${to.brand?to.name+'’s brand':'the brand-neutral default'} re-renders the block. Style tweaks you’ve made are shown as-is and can’t be automatically reverted.`,
+        confirm:'Change style'
+      }, proceed);
+      else proceed();
+    });
   }
   function applyBrand(){
     [page, codePrev].forEach(elm=>{
@@ -417,15 +453,18 @@ function pageInit(){
     });
   }
 
-  // ---- Style inspector (targets whole block or the selected element) ----
+  // ---- Style: block content wrapper (not the page) + selected element ----
   function applyBlockStyle(){
+    const w=document.getElementById('blockWrap'); if(!w) return;
     const bs=blockStyle;
-    [page, codePrev].forEach(el=>{ if(!el)return;
-      el.style.padding=bs.pad+'px'; el.style.gap=bs.sp+'px'; el.style.background=bs.bg;
-      el.style.fontFamily=`'${bs.font}',sans-serif`; el.style.fontWeight=bs.weight; el.style.fontSize=bs.size+'px';
-      el.style.lineHeight=bs.lh+'px'; el.style.color=bs.color; el.style.textAlign=bs.align;
-      el.style.borderRadius=bs.rad+'px'; el.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+bs.bcolor):'none';
-    });
+    w.style.width = bs.wmode==='fixed' ? bs.wpx+'px' : '100%';
+    w.style.maxWidth='100%';
+    w.style.marginLeft = bs.wmode==='fixed' ? 'auto':''; w.style.marginRight = bs.wmode==='fixed' ? 'auto':'';
+    w.style.padding = bs.pad?bs.pad+'px':'';
+    w.style.gap = bs.sp+'px';
+    w.style.background = bs.bg||'';
+    w.style.borderRadius = bs.rad?bs.rad+'px':'';
+    w.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+bs.bcolor):'none';
   }
   function applyElStyle(node, st){
     if(!node) return;
@@ -445,6 +484,26 @@ function pageInit(){
   function elNode(r,c,k){ return page.querySelector(`.vb-el[data-r="${r}"][data-c="${c}"][data-k="${k}"] .vb-body`); }
   function applyAllElStyles(){ doc.forEach((row,r)=>row.cols.forEach((col,c)=>col.forEach((el,k)=>applyElStyle(elNode(r,c,k), el.st)))); }
   function applyActive(){ if(sel){ applyElStyle(elNode(sel.r,sel.c,sel.k), target()); } else { applyBlockStyle(); } }
+
+  // Which fields to show for the current target.
+  function fieldsFor(){
+    if(!sel) return new Set(['width','pad','sp','bg','rad','bwstyle','bcolor']);
+    switch(kindOf(doc[sel.r].cols[sel.c][sel.k].id)){
+      case 'image':   return new Set(['pad','bg','rad','bwstyle','bcolor']);
+      case 'table':   return new Set(['sizelh','color','pad','bg','rad','bwstyle','bcolor']);
+      case 'divider': return new Set(['pad','bg']);
+      case 'spacer':  return new Set(['pad']);
+      default:        return new Set(['font','weight','sizelh','color','align','pad','bg','rad','bwstyle','bcolor']); // text
+    }
+  }
+  function renderInspector(){
+    const allowed=fieldsFor();
+    document.querySelectorAll('#styleCard .insp-sec').forEach(sec=>{
+      let any=false;
+      sec.querySelectorAll('.insp-row').forEach(row=>{ const show=allowed.has(row.dataset.field); row.style.display=show?'':'none'; if(show)any=true; });
+      sec.style.display=any?'':'none';
+    });
+  }
 
   function bindRange(rangeId,numId,key){
     const r=document.getElementById(rangeId), n=document.getElementById(numId);
@@ -468,13 +527,18 @@ function pageInit(){
     document.getElementById('s-color').value=t.color||'#333333'; document.getElementById('s-colorH').value=t.color||'';
     document.getElementById('s-bcolor').value=t.bcolor||'#38988a'; document.getElementById('s-bcolorH').value=t.bcolor||'';
     document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.al===(t.align||'')));
+    // width (block only)
+    document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x.dataset.w===blockStyle.wmode));
+    document.getElementById('s-wpx').value=blockStyle.wpx; document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed';
+    // context + section visibility
     const st=document.getElementById('styleTarget');
     st.innerHTML = sel
       ? `<span class="ms">check_circle</span> Editing: ${ELEMS[doc[sel.r].cols[sel.c][sel.k].id]||'element'}`
       : `<span class="ms" style="color:var(--light)">dashboard</span> Editing: whole block`;
+    renderInspector();
   }
   function initStyle(){
-    document.getElementById('s-font').innerHTML='<option value="">Inherit</option>'+['Outfit','Inter','Poppins','Lora','Roboto'].map(f=>`<option>${f}</option>`).join('');
+    document.getElementById('s-font').innerHTML='<option value="">Inherit from brand</option>'+['Outfit','Inter','Poppins','Lora','Roboto'].map(f=>`<option>${f}</option>`).join('');
     bindRange('s-pad','s-padN','pad'); bindRange('s-sp','s-spN','sp'); bindRange('s-rad','s-radN','rad');
     bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
     bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
@@ -482,6 +546,11 @@ function pageInit(){
     document.getElementById('s-align').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
       target().align=b.dataset.al; document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyActive();
     }));
+    document.querySelectorAll('#s-wmode button').forEach(b=>b.addEventListener('click',()=>{
+      blockStyle.wmode=b.dataset.w; document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x===b));
+      document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed'; applyActive();
+    }));
+    document.getElementById('s-wpx').addEventListener('input',e=>{ blockStyle.wpx=+e.target.value||0; applyActive(); });
     syncInspector();
   }
 
@@ -537,7 +606,7 @@ function pageInit(){
     tail.classList.remove('active');
   }
   function rowIndexFromY(y){
-    const rows=[...page.querySelectorAll(':scope > .vb-row')];
+    const rows=[...page.querySelectorAll('.vb-row')];
     for(let i=0;i<rows.length;i++){ const b=rows[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; }
     return rows.length;
   }
@@ -555,7 +624,7 @@ function pageInit(){
     clearInd();
     if(rowMode){
       const ri=rowIndexFromY(e.clientY);
-      const rows=[...page.querySelectorAll(':scope > .vb-row')];
+      const rows=[...page.querySelectorAll('.vb-row')];
       if(ri<rows.length) rows[ri].classList.add('row-ins-before'); else tail.classList.add('active');
     } else {
       overCol.classList.add('over');
@@ -609,9 +678,13 @@ function pageInit(){
     document.getElementById('codePanel').style.display  = m==='code'?'':'none';
     document.getElementById('elementsCard').style.display = m==='visual'?'':'none';
     document.getElementById('codeCard').style.display     = m==='code'?'':'none';
+    // Code mode has no style inspector; drop the right column and go 2-up.
+    document.getElementById('rightCol').style.display = m==='code'?'none':'';
+    document.querySelector('.ed3').classList.toggle('code-mode', m==='code');
     if(m==='code'){
       if(!codeArea.value.trim()){ codeArea.value = doc.length?docToHtml():CODE_STARTER; }
       renderCode();
+      if(doc.length) showToast('Editing custom code — the visual layout stays intact until you save');
     }
   }
   document.querySelectorAll('.vb-modes button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
@@ -623,12 +696,23 @@ function pageInit(){
     if(!existing) document.getElementById('pg-title').textContent=e.target.value.trim()||'New Custom Block';
   });
 
-  // ---- Save flow: details live in a popup opened from Save Block ----
+  // ---- Cancel: warn about discarding unsaved work ----
+  document.getElementById('cancelBtn').addEventListener('click',e=>{
+    if(!hasContent()) return; // nothing to lose — let the link navigate
+    e.preventDefault();
+    confirmAction({title:'Discard changes?',body:'This block hasn’t been saved. Leaving now discards your layout and style changes.',confirm:'Discard',danger:true},()=>{ location.href='blocks.html'; });
+  });
+
+  // ---- Save flow: details in a popup opened from Save Block ----
   const saveModal=document.getElementById('saveModal');
+  function fldErr(idn,msg){ document.getElementById(idn).classList.add('err'); const e=document.getElementById(idn+'-err'); e.textContent=msg; e.classList.add('show'); }
+  function fldClear(idn){ document.getElementById(idn).classList.remove('err'); document.getElementById(idn+'-err').classList.remove('show'); }
+  ['b-name','b-label'].forEach(idn=>document.getElementById(idn).addEventListener('input',()=>fldClear(idn)));
   function openSave(){
     const total=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     if(mode==='code'){ if(!codeArea.value.trim()){showToast('Add some code, or switch to the visual builder');return;} }
     else if(!total){ showToast('Add at least one element to the canvas'); return; }
+    fldClear('b-name'); fldClear('b-label');
     saveModal.classList.add('open');
     document.getElementById('b-name').focus();
   }
@@ -639,8 +723,10 @@ function pageInit(){
   document.getElementById('svConfirm').addEventListener('click',()=>{
     const nm=document.getElementById('b-name').value.trim();
     const l=document.getElementById('b-label').value.trim();
-    if(!nm){showToast('Give the block an internal name first');return;}
-    if(!l){showToast('Add a customer-facing label');return;}
+    let ok=true, first=null;
+    if(!nm){ fldErr('b-name','Give the block an internal name.'); ok=false; first=first||'b-name'; } else fldClear('b-name');
+    if(!l){ fldErr('b-label','Add a customer-facing label so clients know what they’re inserting.'); ok=false; first=first||'b-label'; } else fldClear('b-label');
+    if(!ok){ document.getElementById(first).focus(); return; }
     showToast((existing?'Updated':'Created')+(mode==='code'?' custom-coded':'')+' block: '+l);
     setTimeout(()=>location.href='blocks.html',700);
   });
@@ -651,7 +737,7 @@ function pageInit(){
     });
   });
 
-  buildBrandSelect(); applyBrand(); applyBlockStyle(); initStyle(); render(); syncBar();
+  buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar();
 }
 </script>
 </body>
