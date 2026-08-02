@@ -24,11 +24,7 @@
   /* ---- Visual builder canvas (Elementor / Webflow style) ---- */
   .vb-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;min-height:520px;max-height:76vh;overflow:auto}
   .vb-bar{display:flex;align-items:center;gap:9px;max-width:660px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
-  .vb-bar .dev{margin-left:auto;display:flex;gap:3px}
-  .vb-bar .dev .ms{font-size:17px;color:var(--light);background:#fff;border:1px solid var(--border);border-radius:6px;padding:4px;cursor:pointer}
-  .vb-bar .dev .ms.on{color:var(--teal);border-color:var(--teal)}
   .vb-page{max-width:660px;margin:0 auto;background:#fff;border-radius:10px;box-shadow:0 10px 34px rgba(20,45,38,.13);padding:26px 30px;min-height:410px;display:flex;flex-direction:column;gap:2px}
-  .vb-page.narrow{max-width:390px}
   .vb-row{position:relative;display:flex;gap:16px;padding:8px;border-radius:9px;margin:2px 0}
   .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.35)}
   .vb-row.row-ins-before::before{content:'';position:absolute;top:-4px;left:0;right:0;height:3px;background:var(--teal);border-radius:2px}
@@ -124,10 +120,6 @@
               <span class="ms" style="font-size:16px;color:var(--teal)">web</span>
               <span id="bar-name">Untitled block</span>
               <span class="muted" id="bar-count" style="font-weight:400"></span>
-              <span class="dev">
-                <span class="ms on" data-dev="wide" title="Full width">desktop_windows</span>
-                <span class="ms" data-dev="narrow" title="Narrow">smartphone</span>
-              </span>
             </div>
             <div class="vb-page" id="page"></div>
             <div class="vb-tail" id="tail"><span class="ms">add</span> Drag an element or structure here</div>
@@ -448,12 +440,8 @@ function pageInit(){
   document.querySelectorAll('.vb-modes button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   document.getElementById('tpl').addEventListener('change',e=>loadTemplate(e.target.value));
 
-  // ---- Naming / device / availability ----
+  // ---- Naming / availability ----
   function syncBar(){ document.getElementById('bar-name').textContent=document.getElementById('b-label').value.trim()||'Untitled block'; }
-  document.querySelectorAll('.vb-bar .dev .ms').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('.vb-bar .dev .ms').forEach(x=>x.classList.remove('on')); b.classList.add('on');
-    page.classList.toggle('narrow', b.dataset.dev==='narrow');
-  }));
   document.getElementById('b-label').addEventListener('input',syncBar);
   document.getElementById('b-name').addEventListener('input',e=>{
     const v=e.target.value.trim()||'New Custom Block';
