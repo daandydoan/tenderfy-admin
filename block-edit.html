@@ -14,18 +14,28 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
+  /* ---- 3-column editor: scrollable Elements | fixed canvas | scrollable inspector ---- */
+  .ed3{display:grid;grid-template-columns:250px minmax(0,1fr) 308px;gap:16px;align-items:stretch;height:calc(100vh - 188px);min-height:500px}
+  .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
+  .ed3-col .card{margin-bottom:14px}
+  .ed3-mid{height:100%;min-width:0;display:flex;flex-direction:column}
+  #visualPanel{display:flex;flex-direction:column;height:100%;min-height:0}
+  #codePanel{display:flex;flex-direction:column;height:100%;min-height:0}
+  .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px;margin-right:6px}
+  .hdr-brand .ms{font-size:17px;color:var(--teal)}
+  .hdr-brand .fin-sm{min-width:172px}
   /* ---- Mode toggle (Visual builder / Custom code) ---- */
-  .vb-modes{display:inline-flex;background:#eef2f1;border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:14px;gap:2px}
-  .vb-modes button{border:none;background:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--gray);padding:7px 15px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:6px}
+  .vb-modes{display:flex;background:#eef2f1;border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:14px;gap:2px}
+  .vb-modes button{flex:1;border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);padding:7px 10px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
   .vb-modes button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.09)}
   .vb-modes button .ms{font-size:16px}
   .vb-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12.5px;color:var(--gray);flex-wrap:wrap}
   .fin-sm{padding:7px 10px;font-size:12.5px;width:auto;min-width:190px}
-  /* ---- Visual builder canvas (Elementor / Webflow style) ---- */
-  .vb-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;min-height:520px;max-height:76vh;overflow:auto}
+  /* ---- Visual builder canvas ---- */
+  .vb-canvas{flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
   .vb-bar{display:flex;align-items:center;gap:9px;width:620px;max-width:100%;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
   /* A4-width page — height grows with the elements, like a real document page */
-  .vb-page{width:620px;max-width:100%;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px 56px;display:flex;flex-direction:column;gap:2px}
+  .vb-page{width:620px;max-width:100%;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px;display:flex;flex-direction:column;gap:2px}
   .vb-row{position:relative;display:flex;gap:16px;padding:8px;border-radius:9px;margin:2px 0}
   .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.35)}
   .vb-row.row-ins-before::before{content:'';position:absolute;top:-4px;left:0;right:0;height:3px;background:var(--teal);border-radius:2px}
@@ -76,18 +86,30 @@
   .code-note{display:flex;gap:9px;align-items:flex-start;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:10px;padding:11px 13px;font-size:12.5px;color:#1f5a50;margin-bottom:12px;line-height:1.5}
   .code-note .ms{font-size:18px;color:var(--teal);flex-shrink:0}
   .code-note code{background:#fff;border:1px solid #cfe4df;border-radius:4px;padding:1px 5px;font-size:11.5px}
-  .code-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:520px}
+  .code-split{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .code-pane{display:flex;flex-direction:column;min-width:0}
   .code-pane .ph{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:6px}
   .code-ta{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.65;border:1px solid var(--border);border-radius:12px;padding:16px;resize:none;background:#0f1720;color:#d7e2df;tab-size:2;outline:none;white-space:pre;overflow:auto}
   .code-ta:focus{border-color:var(--teal)}
   .code-prev{flex:1;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto}
   .code-prev-page{width:100%;max-width:460px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:40px 44px}
-  /* ---- Per-client style selector (default style + each client's style) ---- */
-  .brand-bar{display:flex;align-items:center;gap:9px;margin-bottom:10px;font-size:12.5px;color:var(--gray)}
-  .brand-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--gray);margin-bottom:12px;min-height:20px}
-  .brand-meta .chip{display:inline-flex;align-items:center;gap:5px}
-  .brand-meta .dot{width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.1)}
+  /* ---- Style inspector (properties panel) ---- */
+  .insp-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--light);font-weight:700;margin:16px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+  .insp-h:first-of-type{margin-top:0}
+  .insp-row{display:grid;grid-template-columns:56px 1fr;align-items:center;gap:10px;margin-bottom:9px}
+  .insp-row>label{font-size:12px;color:var(--gray)}
+  .insp-ctl{display:flex;align-items:center;gap:7px;min-width:0}
+  .insp-range{flex:1;min-width:0;accent-color:var(--teal);height:4px}
+  .insp-num{width:50px;padding:6px 7px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink);text-align:center}
+  .insp-unit{font-size:10.5px;color:var(--light);flex-shrink:0}
+  .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
+  .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
+  .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
+  .seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .seg button{border:none;background:#fff;padding:6px 8px;cursor:pointer;color:var(--gray);display:flex;border-left:1px solid var(--border)}
+  .seg button:first-child{border-left:none}
+  .seg button.on{background:var(--teal-tint);color:var(--teal)}
+  .seg button .ms{font-size:16px}
 </style>
 </head>
 <body data-page="blocks" data-title="Blocks">
@@ -100,28 +122,33 @@
         <div class="pg-sub">Build visually or in code. Rendered per client's brand.</div>
       </div>
       <div class="pg-acts">
+        <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span>
         <a class="btn btn-outline btn-sm" href="blocks.html">Cancel</a>
         <a class="btn btn-danger btn-sm" id="delBtn" style="display:none"><span class="ms" style="font-size:17px">delete</span> Delete</a>
         <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Block</a>
       </div>
     </div>
 
-    <div class="ed-grid">
-      <div class="ed-main">
+    <div class="ed3">
+      <!-- LEFT: mode toggle + elements / code tips (scrolls) -->
+      <div class="ed3-col">
         <div class="vb-modes">
-          <button data-mode="visual" class="on"><span class="ms">dashboard_customize</span> Visual builder</button>
-          <button data-mode="code"><span class="ms">code</span> Custom code</button>
+          <button data-mode="visual" class="on"><span class="ms">dashboard_customize</span> Visual</button>
+          <button data-mode="code"><span class="ms">code</span> Code</button>
         </div>
-
-        <!-- Per-client style: default + one per client -->
-        <div class="brand-bar">
-          <span class="ms" style="font-size:17px;color:var(--teal)">palette</span>
-          <span>Preview style</span>
-          <select id="brandSel" class="fin fin-sm"></select>
+        <div class="card" id="elementsCard">
+          <h3 class="ed-h">Elements</h3>
+          <div class="vb-pal" id="palette"></div>
         </div>
-        <div class="brand-meta" id="brandMeta"></div>
+        <div class="card" id="codeCard" style="display:none">
+          <h3 class="ed-h">Custom code</h3>
+          <a class="btn btn-outline btn-sm" id="genBtn" style="width:100%;justify-content:center;margin-bottom:14px"><span class="ms" style="font-size:16px">bolt</span> Generate from visual layout</a>
+          <div class="fhint" style="line-height:1.7"><code style="font-size:11px">var(--brand-primary)</code> · headings<br><code style="font-size:11px">var(--brand-secondary)</code> · accents<br><code style="font-size:11px">var(--brand-bg)</code> · panels</div>
+        </div>
+      </div>
 
-        <!-- VISUAL MODE -->
+      <!-- MIDDLE: canvas (fixed) -->
+      <div class="ed3-mid">
         <div id="visualPanel">
           <div class="vb-toolbar">
             <span>Start from</span>
@@ -137,8 +164,6 @@
             <div class="vb-tail" id="tail"><span class="ms">add</span> Drop here</div>
           </div>
         </div>
-
-        <!-- CODE MODE -->
         <div id="codePanel" style="display:none">
           <div class="code-note">
             <span class="ms">info</span>
@@ -157,16 +182,8 @@
         </div>
       </div>
 
-      <div class="ed-rail">
-        <div class="card" id="elementsCard">
-          <h3 class="ed-h">Elements</h3>
-          <div class="vb-pal" id="palette"></div>
-        </div>
-        <div class="card" id="codeCard" style="display:none">
-          <h3 class="ed-h">Custom code</h3>
-          <a class="btn btn-outline btn-sm" id="genBtn" style="width:100%;justify-content:center;margin-bottom:14px"><span class="ms" style="font-size:16px">bolt</span> Generate from visual layout</a>
-          <div class="fhint" style="line-height:1.7"><code style="font-size:11px">var(--brand-primary)</code> · headings<br><code style="font-size:11px">var(--brand-secondary)</code> · accents<br><code style="font-size:11px">var(--brand-bg)</code> · panels</div>
-        </div>
+      <!-- RIGHT: block details + style inspector + availability (scrolls) -->
+      <div class="ed3-col">
         <div class="card">
           <h3 class="ed-h">Block details</h3>
           <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"></div>
@@ -174,6 +191,34 @@
           <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text."></div>
           <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
         </div>
+
+        <div class="card" id="styleCard">
+          <h3 class="ed-h">Style</h3>
+
+          <div class="insp-h">Block dimension</div>
+          <div class="insp-row"><label>Padding</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-pad" min="0" max="120"><input type="number" class="insp-num" id="s-padN"><span class="insp-unit">px</span></div></div>
+          <div class="insp-row"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
+          <div class="insp-row"><label>Fill</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bg"><input type="text" class="insp-hex" id="s-bgH"></div></div>
+
+          <div class="insp-h">Typography</div>
+          <div class="insp-row"><label>Font</label><select class="insp-sel" id="s-font"></select></div>
+          <div class="insp-row"><label>Weight</label><select class="insp-sel" id="s-weight">
+            <option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select></div>
+          <div class="insp-row"><label>Size</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-size"><span class="insp-unit">px</span><input type="number" class="insp-num" id="s-lh"><span class="insp-unit">line</span></div></div>
+          <div class="insp-row"><label>Colour</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-color"><input type="text" class="insp-hex" id="s-colorH"></div></div>
+          <div class="insp-row"><label>Align</label><div class="seg" id="s-align">
+            <button data-al="left" title="Left"><span class="ms">format_align_left</span></button>
+            <button data-al="center" title="Centre"><span class="ms">format_align_center</span></button>
+            <button data-al="right" title="Right"><span class="ms">format_align_right</span></button>
+            <button data-al="justify" title="Justify"><span class="ms">format_align_justify</span></button>
+          </div></div>
+
+          <div class="insp-h">Border</div>
+          <div class="insp-row"><label>Radius</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-rad" min="0" max="40"><input type="number" class="insp-num" id="s-radN"><span class="insp-unit">px</span></div></div>
+          <div class="insp-row"><label>Width</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-bw"><span class="insp-unit">px</span><select class="insp-sel" id="s-bstyle" style="flex:1"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div></div>
+          <div class="insp-row"><label>Colour</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bcolor"><input type="text" class="insp-hex" id="s-bcolorH"></div></div>
+        </div>
+
         <div class="card">
           <h3 class="ed-h">Availability</h3>
           <div id="avail"></div>
@@ -187,10 +232,7 @@
 <script src="tenant-data.js"></script>
 <script src="primitives.js"></script>
 <script>
-// Palette = the primitives (coded once, in primitives.js). A block is just these arranged
-// in rows and columns — the same structure that builds the standard blocks.
 const PRIM_ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height'};
-// Map an existing block's layout key to its row/column composition (prefill on edit).
 const P2DOC={
   heading:[{cols:[['heading']]}],
   subheading:[{cols:[['subheading']]}],
@@ -217,7 +259,6 @@ const P2DOC={
   signature:[{cols:[['signature']]}],
   catalogue:[{cols:[['image'],['subheading','paragraph']]}],
 };
-// Friendly starting points offered in the "Start from" picker and the empty state.
 const TEMPLATES=[
   {key:'',          label:'Blank canvas',        icon:'crop_free'},
   {key:'heading',   label:'Heading',             icon:'title'},
@@ -244,10 +285,11 @@ function pageInit(){
   const existing=id?BLOCKS.find(b=>b.id===id):null;
   let doc = existing ? clone(P2DOC[existing.p]||[{cols:[['paragraph']]}]) : [];
   let mode = 'visual';
-  let drag = null; // {kind:'new-prim'|'new-row'|'move-prim'|'move-row', ...}
-  let brand = null; // active preview brand tokens (null = default / brand-neutral)
-  // Default style + one entry per client, driving the brand tabs.
+  let drag = null;
+  let brand = null;
   const BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand}))];
+  // Block-level style state (driven by the inspector, applied to the preview page).
+  const s={pad:52, sp:2, bg:'#ffffff', font:'Outfit', weight:'400', size:14, lh:22, color:'#3A4442', align:'left', rad:4, bw:0, bstyle:'solid', bcolor:'#E2E8E6'};
 
   const page=document.getElementById('page');
   const wrap=document.getElementById('cvWrap');
@@ -258,7 +300,7 @@ function pageInit(){
   document.getElementById('b-cat').innerHTML=BLOCK_CATS.map(c=>`<option>${c}</option>`).join('');
   document.getElementById('tpl').innerHTML=TEMPLATES.map(t=>`<option value="${t.key}">${t.label}</option>`).join('');
 
-  // ---- Widget palette: Structure + primitives grouped by tag ----
+  // ---- Widget palette ----
   const byTag={};
   PRIMITIVES.forEach(p=>{ (byTag[p.tag]=byTag[p.tag]||[]).push(p); });
   let pal=`<div class="pal-tag">Structure</div>`
@@ -325,7 +367,7 @@ function pageInit(){
             </div>`).join('')}
         </div>`).join('');
     }
-    const n=doc.reduce((s,row)=>s+row.cols.reduce((a,col)=>a+col.length,0),0);
+    const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
     wire();
   }
@@ -336,21 +378,12 @@ function pageInit(){
     render();
   }
 
-  // ---- Per-client style selector: default style + each client's style ----
+  // ---- Per-client style selector ----
   function buildBrandSelect(){
     const el=document.getElementById('brandSel');
     el.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.brand?b.name:'Default (brand-neutral)'}</option>`).join('');
     el.value=String(Math.max(0,BRANDS.findIndex(b=>b.brand===brand)));
-    el.addEventListener('change',()=>{ brand=BRANDS[+el.value].brand; applyBrand(); renderMeta(); render(); renderCode(); });
-  }
-  function renderMeta(){
-    const m=document.getElementById('brandMeta');
-    const entry=BRANDS.find(x=>x.brand===brand);
-    if(!brand){ m.innerHTML='<span class="chip"><span class="ms" style="font-size:14px;color:var(--light)">info</span> Brand-neutral default — every client inherits this unless their brand overrides it.</span>'; return; }
-    m.innerHTML=`<span class="chip"><span class="dot" style="background:${brand.primary}"></span>${brand.primary}</span>`
-      +`<span class="chip"><span class="dot" style="background:${brand.secondary}"></span>${brand.secondary}</span>`
-      +`<span class="chip"><span class="ms" style="font-size:14px;color:var(--light)">text_fields</span>${brand.font} / ${brand.bodyFont}</span>`
-      +`<span class="chip" style="margin-left:auto;color:var(--teal);font-weight:600"><span class="ms" style="font-size:15px">check_circle</span>In ${entry.name}'s block set</span>`;
+    el.addEventListener('change',()=>{ brand=BRANDS[+el.value].brand; applyBrand(); render(); renderCode(); });
   }
   // Expose brand as CSS vars so custom-code blocks using var(--brand-*) restyle too.
   function applyBrand(){
@@ -359,6 +392,52 @@ function pageInit(){
       if(brand){ elm.style.setProperty('--brand-primary',brand.primary); elm.style.setProperty('--brand-secondary',brand.secondary); elm.style.setProperty('--brand-bg',brand.background); }
       else { elm.style.removeProperty('--brand-primary'); elm.style.removeProperty('--brand-secondary'); elm.style.removeProperty('--brand-bg'); }
     });
+  }
+
+  // ---- Style inspector ----
+  function applyStyle(){
+    [page, codePrev].forEach(el=>{
+      if(!el) return;
+      el.style.padding=s.pad+'px';
+      el.style.gap=s.sp+'px';
+      el.style.background=s.bg;
+      el.style.fontFamily=`'${s.font}',sans-serif`;
+      el.style.fontWeight=s.weight;
+      el.style.fontSize=s.size+'px';
+      el.style.lineHeight=s.lh+'px';
+      el.style.color=s.color;
+      el.style.textAlign=s.align;
+      el.style.borderRadius=s.rad+'px';
+      el.style.border = s.bw>0 ? (s.bw+'px '+s.bstyle+' '+s.bcolor) : 'none';
+    });
+  }
+  function bindRange(rangeId,numId,key){
+    const r=document.getElementById(rangeId), n=document.getElementById(numId);
+    const set=v=>{ v=Math.max(+r.min||0,Math.min(+r.max||9999,Math.round(+v||0))); s[key]=v; r.value=v; n.value=v; applyStyle(); };
+    r.addEventListener('input',()=>set(r.value)); n.addEventListener('input',()=>set(n.value)); set(s[key]);
+  }
+  function bindNum(numId,key){ const n=document.getElementById(numId); n.value=s[key]; n.addEventListener('input',()=>{ s[key]=+n.value||0; applyStyle(); }); }
+  function bindSel(id,key){ const el=document.getElementById(id); el.value=s[key]; el.addEventListener('change',()=>{ s[key]=el.value; applyStyle(); }); }
+  function bindColor(colId,hexId,key){
+    const c=document.getElementById(colId), h=document.getElementById(hexId);
+    c.value=s[key]; h.value=s[key];
+    c.addEventListener('input',()=>{ s[key]=c.value; h.value=c.value; applyStyle(); });
+    h.addEventListener('change',()=>{ if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(h.value.trim())){ s[key]=h.value.trim(); c.value=s[key]; applyStyle(); } });
+  }
+  function initStyle(){
+    document.getElementById('s-font').innerHTML=['Outfit','Inter','Poppins','Lora','Roboto'].map(f=>`<option>${f}</option>`).join('');
+    bindRange('s-pad','s-padN','pad');
+    bindRange('s-sp','s-spN','sp');
+    bindRange('s-rad','s-radN','rad');
+    bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
+    bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
+    bindColor('s-bg','s-bgH','bg'); bindColor('s-color','s-colorH','color'); bindColor('s-bcolor','s-bcolorH','bcolor');
+    const seg=document.getElementById('s-align');
+    seg.querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('on',b.dataset.al===s.align);
+      b.addEventListener('click',()=>{ s.align=b.dataset.al; seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyStyle(); });
+    });
+    applyStyle();
   }
 
   function wire(){
@@ -501,7 +580,7 @@ function pageInit(){
     if(!nm){showToast('Give the block an internal name first');return;}
     if(!l){showToast('Add a customer-facing label — clients need to know what they are clicking');return;}
     if(mode==='code'){ if(!codeArea.value.trim()){showToast('Add some code, or switch to the visual builder');return;} }
-    else { const total=doc.reduce((s,row)=>s+row.cols.reduce((a,col)=>a+col.length,0),0); if(!total){showToast('Add at least one element to the canvas');return;} }
+    else { const total=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0); if(!total){showToast('Add at least one element to the canvas');return;} }
     showToast((existing?'Updated':'Created')+(mode==='code'?' custom-coded':'')+' block: '+l);
     setTimeout(()=>location.href='blocks.html',700);
   });
@@ -511,7 +590,7 @@ function pageInit(){
     });
   });
 
-  buildBrandSelect(); applyBrand(); renderMeta(); render(); syncBar(); renderAvail();
+  buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar(); renderAvail();
 }
 </script>
 </body>
