@@ -83,6 +83,18 @@
   .code-ta:focus{border-color:var(--teal)}
   .code-prev{flex:1;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto}
   .code-prev-page{width:100%;max-width:460px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:40px 44px}
+  /* ---- Per-client brand tabs (default style + each client's style) ---- */
+  .brand-tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:10px}
+  .brand-tab{display:flex;align-items:center;gap:7px;padding:9px 13px;font-size:12.5px;font-weight:600;color:var(--gray);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .brand-tab:hover{color:var(--ink)}
+  .brand-tab.on{color:var(--teal);border-bottom-color:var(--teal)}
+  .brand-tab .ms{font-size:15px;color:var(--light)}
+  .brand-tab.on .ms{color:var(--teal)}
+  .brand-tab .sw{width:15px;height:15px;border-radius:4px;border:1px solid rgba(0,0,0,.1);display:inline-flex;overflow:hidden;flex-shrink:0}
+  .brand-tab .sw i{width:50%;height:100%}
+  .brand-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--gray);margin-bottom:12px;min-height:20px}
+  .brand-meta .chip{display:inline-flex;align-items:center;gap:5px}
+  .brand-meta .dot{width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.1)}
 </style>
 </head>
 <body data-page="blocks" data-title="Blocks">
@@ -107,6 +119,10 @@
           <button data-mode="visual" class="on"><span class="ms">dashboard_customize</span> Visual builder</button>
           <button data-mode="code"><span class="ms">code</span> Custom code</button>
         </div>
+
+        <!-- Per-client style tabs: default + one per client -->
+        <div class="brand-tabs" id="brandTabs"></div>
+        <div class="brand-meta" id="brandMeta"></div>
 
         <!-- VISUAL MODE -->
         <div id="visualPanel">
@@ -171,6 +187,7 @@
 </div>
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
+<script src="tenant-data.js"></script>
 <script src="primitives.js"></script>
 <script>
 // Palette = the primitives (coded once, in primitives.js). A block is just these arranged
@@ -231,6 +248,9 @@ function pageInit(){
   let doc = existing ? clone(P2DOC[existing.p]||[{cols:[['paragraph']]}]) : [];
   let mode = 'visual';
   let drag = null; // {kind:'new-prim'|'new-row'|'move-prim'|'move-row', ...}
+  let brand = null; // active preview brand tokens (null = default / brand-neutral)
+  // Default style + one entry per client, driving the brand tabs.
+  const BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand}))];
 
   const page=document.getElementById('page');
   const wrap=document.getElementById('cvWrap');
@@ -284,7 +304,7 @@ function pageInit(){
         <span class="tb" data-dup title="Duplicate"><span class="ms">content_copy</span></span>
         <span class="tb del" data-del title="Delete"><span class="ms">delete</span></span>
       </div>
-      <div class="vb-body">${renderPrimitive(pid)}</div>
+      <div class="vb-body">${renderPrimitive(pid, brand)}</div>
     </div>`;
   }
   function render(){
@@ -317,6 +337,38 @@ function pageInit(){
     doc = key ? clone(P2DOC[key]||[]) : [];
     document.getElementById('tpl').value=key;
     render();
+  }
+
+  // ---- Per-client brand tabs: default style + each client's style ----
+  function buildBrandTabs(){
+    const el=document.getElementById('brandTabs');
+    el.innerHTML=BRANDS.map((b,i)=>{
+      const on = b.brand===brand;
+      const mark = b.brand
+        ? `<span class="sw"><i style="background:${b.brand.primary}"></i><i style="background:${b.brand.secondary}"></i></span>`
+        : `<span class="ms">palette</span>`;
+      return `<span class="brand-tab${on?' on':''}" data-bi="${i}">${mark}${b.name}</span>`;
+    }).join('');
+    el.querySelectorAll('.brand-tab').forEach(t=>t.addEventListener('click',()=>{
+      brand=BRANDS[+t.dataset.bi].brand; buildBrandTabs(); applyBrand(); renderMeta(); render(); renderCode();
+    }));
+  }
+  function renderMeta(){
+    const m=document.getElementById('brandMeta');
+    const entry=BRANDS.find(x=>x.brand===brand);
+    if(!brand){ m.innerHTML='<span class="chip"><span class="ms" style="font-size:14px;color:var(--light)">info</span> Brand-neutral default — every client inherits this unless their brand overrides it.</span>'; return; }
+    m.innerHTML=`<span class="chip"><span class="dot" style="background:${brand.primary}"></span>${brand.primary}</span>`
+      +`<span class="chip"><span class="dot" style="background:${brand.secondary}"></span>${brand.secondary}</span>`
+      +`<span class="chip"><span class="ms" style="font-size:14px;color:var(--light)">text_fields</span>${brand.font} / ${brand.bodyFont}</span>`
+      +`<span class="chip" style="margin-left:auto;color:var(--teal);font-weight:600"><span class="ms" style="font-size:15px">check_circle</span>In ${entry.name}'s block set</span>`;
+  }
+  // Expose brand as CSS vars so custom-code blocks using var(--brand-*) restyle too.
+  function applyBrand(){
+    [page, codePrev].forEach(elm=>{
+      if(!elm) return;
+      if(brand){ elm.style.setProperty('--brand-primary',brand.primary); elm.style.setProperty('--brand-secondary',brand.secondary); elm.style.setProperty('--brand-bg',brand.background); }
+      else { elm.style.removeProperty('--brand-primary'); elm.style.removeProperty('--brand-secondary'); elm.style.removeProperty('--brand-bg'); }
+    });
   }
 
   function wire(){
@@ -469,7 +521,7 @@ function pageInit(){
     });
   });
 
-  render(); syncBar(); renderAvail();
+  buildBrandTabs(); applyBrand(); renderMeta(); render(); syncBar(); renderAvail();
 }
 </script>
 </body>
