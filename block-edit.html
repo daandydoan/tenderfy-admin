@@ -92,7 +92,7 @@
     <div class="pg-head">
       <div>
         <div class="tn-title" id="pg-title">New Custom Block</div>
-        <div class="pg-sub">Start from a template and rearrange it visually, or switch to <strong>Custom code</strong> for full control. Either way it becomes a reusable block, rendered in each client's brand.</div>
+        <div class="pg-sub">Build visually or in code. Rendered per client's brand.</div>
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" href="blocks.html">Cancel</a>
@@ -111,10 +111,8 @@
         <!-- VISUAL MODE -->
         <div id="visualPanel">
           <div class="vb-toolbar">
-            <span class="ms" style="font-size:17px;color:var(--teal)">bolt</span>
             <span>Start from</span>
             <select id="tpl" class="fin fin-sm"></select>
-            <span class="muted">— then drag elements to tweak.</span>
           </div>
           <div class="vb-canvas" id="cvWrap">
             <div class="vb-bar">
@@ -123,15 +121,15 @@
               <span class="muted" id="bar-count" style="font-weight:400"></span>
             </div>
             <div class="vb-page" id="page"></div>
-            <div class="vb-tail" id="tail"><span class="ms">add</span> Drag an element or structure here</div>
+            <div class="vb-tail" id="tail"><span class="ms">add</span> Drop here</div>
           </div>
         </div>
 
         <!-- CODE MODE -->
         <div id="codePanel" style="display:none">
           <div class="code-note">
-            <span class="ms">tips_and_updates</span>
-            <div>For layouts the elements can't cover, write HTML directly. Use brand tokens like <code>var(--brand-primary)</code> and <code>var(--brand-secondary)</code> so the block still restyles for every client. Custom-coded blocks skip the visual builder.</div>
+            <span class="ms">info</span>
+            <div>Use brand tokens (<code>var(--brand-primary)</code>, <code>var(--brand-secondary)</code>) so the block restyles per client.</div>
           </div>
           <div class="code-split">
             <div class="code-pane">
@@ -150,23 +148,17 @@
         <div class="card" id="elementsCard">
           <h3 class="ed-h">Elements</h3>
           <div class="vb-pal" id="palette"></div>
-          <div class="fhint" style="margin-top:10px">Drag onto the canvas, or click to append. Drop a <strong>structure</strong> for side-by-side columns.</div>
         </div>
         <div class="card" id="codeCard" style="display:none">
           <h3 class="ed-h">Custom code</h3>
-          <a class="btn btn-outline btn-sm" id="genBtn" style="width:100%;justify-content:center;margin-bottom:12px"><span class="ms" style="font-size:16px">bolt</span> Generate from visual layout</a>
-          <div class="fhint">Starts your code from whatever you built in the visual builder — then edit freely.</div>
-          <div style="border-top:1px solid var(--border);margin:14px 0"></div>
-          <div class="fhint" style="line-height:1.6">Handy tokens:<br><code style="font-size:11px">var(--brand-primary)</code> · headings<br><code style="font-size:11px">var(--brand-secondary)</code> · accents<br><code style="font-size:11px">var(--brand-bg)</code> · panels</div>
+          <a class="btn btn-outline btn-sm" id="genBtn" style="width:100%;justify-content:center;margin-bottom:14px"><span class="ms" style="font-size:16px">bolt</span> Generate from visual layout</a>
+          <div class="fhint" style="line-height:1.7"><code style="font-size:11px">var(--brand-primary)</code> · headings<br><code style="font-size:11px">var(--brand-secondary)</code> · accents<br><code style="font-size:11px">var(--brand-bg)</code> · panels</div>
         </div>
         <div class="card">
           <h3 class="ed-h">Block details</h3>
-          <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout">
-            <span class="fhint">What the team calls it in the super admin.</span></div>
-          <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box">
-            <span class="fhint">What the client sees in Add Block — plain language.</span></div>
-          <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text.">
-            <span class="fhint">One line telling the client what this inserts.</span></div>
+          <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"></div>
+          <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"></div>
+          <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text."></div>
           <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
         </div>
         <div class="card">
@@ -297,7 +289,7 @@ function pageInit(){
   }
   function render(){
     if(!doc.length){
-      page.innerHTML=`<div class="vb-empty"><span class="ms big">dashboard_customize</span>Empty block — pick a starting point or drag an element from the panel
+      page.innerHTML=`<div class="vb-empty"><span class="ms big">dashboard_customize</span>Empty block
         <div class="qp"><b>Quick start</b>${
           TEMPLATES.filter(t=>t.key).slice(0,6).map(t=>`<span class="vb-qbtn" data-tpl="${t.key}"><span class="ms">${t.icon}</span>${t.label}</span>`).join('')
         }</div></div>`;
