@@ -16,11 +16,10 @@
 <body data-page="tenants" data-title="Clients">
 <div id="app-content">
   <div class="pad">
-    <div class="crumb"><a href="tenants.html">Clients</a> <span class="ms">chevron_right</span> <span id="cr-name">New Client</span></div>
     <div class="pg-head">
       <div>
         <div class="tn-title" id="pg-title">New Client</div>
-        <div class="pg-sub">Register the company and define its <strong>Brand Kit</strong> — every tender template assigned to this client takes on these colours and typography automatically.</div>
+        <div class="pg-sub">Define the company's <strong>Brand Kit</strong> — applied to every template assigned to it.</div>
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" href="tenants.html">Cancel</a>
@@ -105,7 +104,6 @@ function pageInit(){
     document.getElementById('c-bg').value=t.brand.background;
     document.getElementById('c-font').value=t.brand.font;
     document.getElementById('c-bodyfont').value=t.brand.bodyFont;
-    document.getElementById('cr-name').textContent=t.name;
     document.getElementById('pg-title').textContent='Edit — '+t.name;
     document.getElementById('delBtn').style.display='';
   }
@@ -139,7 +137,6 @@ function pageInit(){
   });
   document.getElementById('c-name').addEventListener('input',e=>{
     const v=e.target.value.trim()||'New Client';
-    document.getElementById('cr-name').textContent=v;
     if(!t) document.getElementById('pg-title').textContent=v;
   });
 

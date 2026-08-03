@@ -16,7 +16,6 @@
 <body data-page="subcontractors" data-title="View Sub-contractor">
 <div id="app-content">
   <div class="pad">
-    <div class="crumb"><a href="subcontractors.html">Subcontractors</a> <span class="ms">chevron_right</span> <span id="vCrumb">View Sub-contractor</span></div>
     <div class="vs-head">
       <a class="vs-back" href="subcontractors.html"><span class="ms" style="font-size:18px">chevron_left</span></a>
       <div class="h1" id="vName" style="display:flex;align-items:center;gap:12px"></div>
@@ -96,7 +95,6 @@ function timeline(s){
 
 function render(){
   const s=SUBS[cur];
-  document.getElementById('vCrumb').textContent = s.name;
   const badge=`<span class="badge ${s.suspended?'b-suspended':s.badge}">${s.suspended?'Suspended':s.status}</span>`;
   document.getElementById('vName').innerHTML = esc(s.name)+' '+badge
     + (s.verified?'<span class="ms" title="Verified subcontractor" style="font-size:20px;color:var(--teal)">verified</span>':'');

@@ -16,7 +16,6 @@
 <body data-page="library" data-title="Component Library">
 <div id="app-content">
   <div class="pad">
-    <div class="crumb"><a href="library.html">Component Library</a> <span class="ms">chevron_right</span> <span id="cr-name">Component</span></div>
     <div class="pg-head">
       <div>
         <div class="tn-title" id="c-name">—</div>
@@ -71,7 +70,6 @@ function pageInit(){
   const id = new URLSearchParams(location.search || location.hash.slice(1)).get('id') || COMPONENTS[0].id;
   const c = COMPONENTS.find(x=>x.id===id) || COMPONENTS[0];
   const badge = (s)=>`<span class="badge b-${s}"><span class="b-dot"></span>${s[0].toUpperCase()+s.slice(1)}</span>`;
-  document.getElementById('cr-name').textContent = c.name;
   document.getElementById('c-name').textContent = c.name;
   document.getElementById('c-desc').textContent = c.desc;
   document.getElementById('d-title').textContent = c.name;

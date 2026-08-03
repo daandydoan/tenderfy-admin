@@ -68,7 +68,7 @@ a{text-decoration:none;color:inherit}
 .content{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column}
 .content>#screen{flex:1;min-height:0;display:flex;flex-direction:column}
 .content>#screen>.pad{flex:1}
-.pad{padding:24px}
+.pad{padding:20px}
 /* Dashboard: table card stretches to fill the viewport, rows scroll inside */
 .pad.fillv{display:flex;flex-direction:column;min-height:0}
 .pad.fillv .tcard{flex:1;min-height:0}
@@ -180,7 +180,7 @@ table.req .ccell{min-width:0}
 .qmenu .qfopt:hover{background:#f2f4f5}
 
 /* generic */
-.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px}
 h3{font-size:15px;font-weight:600;margin-bottom:14px}
 .sub{color:var(--gray);font-size:13px}
 .row{display:flex;gap:18px;align-items:flex-start}

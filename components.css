@@ -10,7 +10,7 @@
 .hsearch input::placeholder{color:rgba(255,255,255,.7)}
 
 /* ---- Generic page header (title row + actions) inside content ---- */
-.pg-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.pg-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap}
 .pg-head .tn-title{margin:0}
 .pg-sub{color:var(--gray);font-size:13.5px;margin-top:4px;max-width:640px}
 .pg-acts{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
