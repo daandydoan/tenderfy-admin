@@ -14,21 +14,20 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
-  /* ---- 3-column editor: scrollable Elements | fixed canvas | scrollable inspector ---- */
-  .ed3{display:grid;grid-template-columns:250px minmax(0,1fr) 308px;gap:16px;align-items:stretch;height:calc(100vh - 158px);min-height:500px}
+  .ed3{display:grid;grid-template-columns:250px minmax(0,1fr) 308px;gap:16px;align-items:stretch;height:calc(100vh - 152px);min-height:500px}
   .ed3.code-mode{grid-template-columns:250px minmax(0,1fr)}
   .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
   .ed3-col .card{margin-bottom:14px}
   .ed3-mid{height:100%;min-width:0;display:flex;flex-direction:column}
   #visualPanel{display:flex;flex-direction:column;height:100%;min-height:0}
   #codePanel{display:flex;flex-direction:column;height:100%;min-height:0}
-  /* Hide scrollbars everywhere in the editor to save space (scroll still works) */
-  .ed3-col,.vb-canvas,.code-ta,.code-prev{scrollbar-width:none;-ms-overflow-style:none}
-  .ed3-col::-webkit-scrollbar,.vb-canvas::-webkit-scrollbar,.code-ta::-webkit-scrollbar,.code-prev::-webkit-scrollbar{width:0;height:0;display:none}
+  .ed3-col,.vb-canvas,.code-ta,.code-prev,.ver-list{scrollbar-width:none;-ms-overflow-style:none}
+  .ed3-col::-webkit-scrollbar,.vb-canvas::-webkit-scrollbar,.code-ta::-webkit-scrollbar,.code-prev::-webkit-scrollbar,.ver-list::-webkit-scrollbar{width:0;height:0;display:none}
   .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px;margin-right:6px}
   .hdr-brand .ms{font-size:17px;color:var(--teal)}
   .hdr-brand .fin-sm{min-width:172px}
-  /* ---- Mode toggle ---- */
+  .use-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--gray);background:#eef2f1;border:1px solid var(--border);border-radius:100px;padding:4px 10px;margin-right:8px}
+  .use-chip .ms{font-size:14px;color:var(--teal)}
   .vb-modes{display:flex;background:#eef2f1;border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:14px;gap:2px}
   .vb-modes button{flex:1;border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);padding:7px 10px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
   .vb-modes button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.09)}
@@ -39,11 +38,16 @@
   .sel-pill .ms{font-size:15px}
   .sel-pill .x{cursor:pointer;font-size:16px;border-radius:50%;padding:1px}
   .sel-pill .x:hover{color:#d5493f}
+  .tb-group{display:inline-flex;gap:3px}
+  .tb-btn{width:30px;height:30px;border:1px solid var(--border);background:#fff;border-radius:7px;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .tb-btn:hover:not(:disabled){border-color:var(--teal);color:var(--teal)}
+  .tb-btn:disabled{opacity:.4;cursor:default}
+  .tb-btn .ms{font-size:17px}
+  .autosave{margin-left:auto;font-size:11px;color:var(--light);display:flex;align-items:center;gap:5px}
+  .autosave .ms{font-size:13px}
   .fin-sm{padding:7px 10px;font-size:12.5px;width:auto;min-width:190px}
-  /* ---- Visual builder canvas ---- */
   .vb-canvas{flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
   .vb-bar{display:flex;align-items:center;gap:9px;width:620px;max-width:100%;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
-  /* A4-width page (fixed document surface); the block content sits inside it */
   .vb-page{width:620px;max-width:100%;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px;display:flex;flex-direction:column}
   .vb-block{display:flex;flex-direction:column;min-width:0}
   .vb-row{position:relative;display:flex;gap:14px;padding:3px;border-radius:8px}
@@ -63,10 +67,16 @@
   .vb-el{position:relative;padding:4px 8px;border-radius:7px;border:1.5px solid transparent;cursor:pointer}
   .vb-el:hover{border-color:var(--teal)}
   .vb-el.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
+  .vb-el.is-editable{border-color:#c9a9e8;border-style:dashed}
+  .vb-el.is-locked{border-color:#c2ccc9;border-style:dashed}
   .vb-el.dragging{opacity:.4}
   .vb-el.ins-before::before{content:'';position:absolute;top:-3px;left:6px;right:6px;height:3px;background:var(--teal);border-radius:2px}
   .vb-name{position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;transition:.1s;display:flex;align-items:center;gap:4px;z-index:2;white-space:nowrap}
   .vb-el:hover .vb-name,.vb-el.selected .vb-name{opacity:1}
+  .vb-perm{position:absolute;bottom:-9px;left:8px;display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:1px 6px;border-radius:5px;z-index:2}
+  .vb-perm .ms{font-size:11px}
+  .vb-perm.edit{background:#f2e8fb;color:#8646c4}
+  .vb-perm.lock{background:#eef1f0;color:#6b7773}
   .vb-tools{position:absolute;top:-13px;right:8px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:3}
   .vb-el:hover .vb-tools,.vb-el.selected .vb-tools{opacity:1}
   .vb-tools .tb{width:24px;height:24px;border-radius:6px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.3)}
@@ -84,7 +94,6 @@
   .vb-tail{width:620px;max-width:100%;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:11px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
   .vb-tail.active{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .vb-tail .ms{font-size:17px}
-  /* ---- Widget palette ---- */
   .vb-pal{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .vb-widget{display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid var(--border);border-radius:9px;padding:12px 8px;cursor:grab;background:#fff;text-align:center;font-size:11.5px;font-weight:500;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
   .vb-widget:hover{border-color:var(--teal);background:var(--teal-tint);color:var(--teal);transform:translateY(-1px)}
@@ -93,7 +102,6 @@
   .vb-widget.struct{background:#f4f7f6}
   .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
   .pal-tag:first-child{margin-top:0}
-  /* ---- Custom code mode (simplified) ---- */
   .code-split{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .code-pane{display:flex;flex-direction:column;min-width:0}
   .code-pane .ph{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:6px}
@@ -101,12 +109,17 @@
   .code-ta:focus{border-color:var(--teal)}
   .code-prev{flex:1;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto}
   .code-prev-page{width:100%;max-width:460px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:40px 44px}
-  /* ---- Style inspector ---- */
-  #styleTarget{font-size:12px;color:var(--teal);font-weight:600;margin:-4px 0 12px;display:flex;align-items:center;gap:6px}
+  #styleTarget{font-size:12px;color:var(--teal);font-weight:600;margin:-4px 0 10px;display:flex;align-items:center;gap:6px}
   #styleTarget .ms{font-size:15px}
+  .insp-actions{display:flex;gap:6px;margin-bottom:12px}
+  .insp-ico{width:32px;height:32px;flex-shrink:0;border:1px solid var(--border);background:#fff;border-radius:7px;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .insp-ico:hover:not(:disabled){border-color:var(--teal);color:var(--teal)}
+  .insp-ico:disabled{opacity:.4;cursor:default}
+  .insp-ico .ms{font-size:16px}
   .insp-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--light);font-weight:700;margin:16px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border)}
-  .insp-sec:first-child .insp-h{margin-top:0}
+  .insp-sec:first-of-type .insp-h{margin-top:0}
   .insp-row{display:grid;grid-template-columns:56px 1fr;align-items:center;gap:10px;margin-bottom:9px}
+  .insp-row.tall{align-items:start}
   .insp-row>label{font-size:12px;color:var(--gray)}
   .insp-ctl{display:flex;align-items:center;gap:7px;min-width:0}
   .insp-range{flex:1;min-width:0;accent-color:var(--teal);height:4px}
@@ -117,17 +130,27 @@
   .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
   .seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .seg.full{display:flex;width:100%}
+  .seg.full button{flex:1;justify-content:center}
   .seg button{border:none;background:#fff;padding:6px 10px;cursor:pointer;color:var(--gray);display:flex;align-items:center;font-family:inherit;font-size:12px;font-weight:600;border-left:1px solid var(--border)}
   .seg button:first-child{border-left:none}
   .seg button.on{background:var(--teal-tint);color:var(--teal)}
   .seg button .ms{font-size:16px}
-  /* ---- Save details modal ---- */
-  #saveModal .cfm{text-align:left;max-width:440px}
-  #saveModal .cfm h3{margin-bottom:2px}
-  #saveModal .cfm .sub{color:var(--gray);font-size:12.5px;margin-bottom:14px}
+  #saveModal .cfm,#verModal .cfm{text-align:left;max-width:460px}
+  #saveModal .cfm h3,#verModal .cfm h3{margin-bottom:2px}
+  #saveModal .cfm .sub,#verModal .cfm .sub{color:var(--gray);font-size:12.5px;margin-bottom:14px}
   .fld-err{display:none;color:#d5493f;font-size:11.5px;margin-top:4px}
   .fld-err.show{display:block}
   .fin.err{border-color:#d5493f;background:#fdf3f2}
+  .sv-sync{display:flex;gap:9px;align-items:flex-start;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:9px;padding:10px 12px;font-size:12px;color:#1f5a50;margin-bottom:14px;line-height:1.5}
+  .sv-sync .ms{font-size:17px;color:var(--teal);flex-shrink:0}
+  .sv-sync label{display:flex;gap:6px;align-items:center;margin-top:6px;font-weight:600;cursor:pointer}
+  .ver-list{max-height:320px;overflow:auto;margin-bottom:14px}
+  .ver-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--border)}
+  .ver-row .vi{flex:1;min-width:0}
+  .ver-row .vt{font-weight:600;font-size:13px}
+  .ver-row .vm{font-size:11.5px;color:var(--gray)}
+  .ver-empty{color:var(--light);font-size:12.5px;text-align:center;padding:26px 0}
 </style>
 </head>
 <body data-page="blocks" data-title="Blocks">
@@ -139,6 +162,7 @@
         <div class="pg-sub">Build visually or in code. Rendered per client's brand.</div>
       </div>
       <div class="pg-acts">
+        <span class="use-chip" id="useChip" style="display:none"></span>
         <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span>
         <a class="btn btn-outline btn-sm" id="cancelBtn" href="blocks.html">Cancel</a>
         <a class="btn btn-danger btn-sm" id="delBtn" style="display:none"><span class="ms" style="font-size:17px">delete</span> Delete</a>
@@ -147,7 +171,6 @@
     </div>
 
     <div class="ed3">
-      <!-- LEFT: mode toggle + elements / code tips (scrolls) -->
       <div class="ed3-col">
         <div class="vb-modes">
           <button data-mode="visual" class="on"><span class="ms">dashboard_customize</span> Visual</button>
@@ -160,15 +183,20 @@
         <div class="card" id="codeCard" style="display:none">
           <h3 class="ed-h">Custom code</h3>
           <a class="btn btn-outline btn-sm" id="genBtn" style="width:100%;justify-content:center;margin-bottom:14px"><span class="ms" style="font-size:16px">bolt</span> Generate from visual layout</a>
-          <div class="fhint" style="line-height:1.7"><code style="font-size:11px">var(--brand-primary)</code> · headings<br><code style="font-size:11px">var(--brand-secondary)</code> · accents<br><code style="font-size:11px">var(--brand-bg)</code> · panels</div>
+          <div class="fhint" style="line-height:1.7"><code style="font-size:11px">var(--brand-primary)</code> · headings<br><code style="font-size:11px">var(--brand-secondary)</code> · accents<br><code style="font-size:11px">{{client.name}}</code> · merge field</div>
         </div>
       </div>
 
-      <!-- MIDDLE: canvas (fixed) -->
       <div class="ed3-mid">
         <div id="visualPanel">
           <div class="vb-toolbar">
             <span class="sel-pill" id="selPill"></span>
+            <span class="tb-group">
+              <button class="tb-btn" id="undoBtn" title="Undo (Ctrl+Z)"><span class="ms">undo</span></button>
+              <button class="tb-btn" id="redoBtn" title="Redo (Ctrl+Y)"><span class="ms">redo</span></button>
+              <button class="tb-btn" id="histBtn" title="Version history"><span class="ms">history</span></button>
+            </span>
+            <span class="autosave" id="autosave"></span>
           </div>
           <div class="vb-canvas" id="cvWrap">
             <div class="vb-bar">
@@ -194,11 +222,40 @@
         </div>
       </div>
 
-      <!-- RIGHT: contextual style inspector (scrolls) -->
       <div class="ed3-col" id="rightCol">
         <div class="card" id="styleCard">
           <h3 class="ed-h">Style</h3>
           <div id="styleTarget"></div>
+          <div class="insp-actions">
+            <select class="insp-sel" id="s-preset"></select>
+            <button class="insp-ico" id="s-copy" title="Copy style"><span class="ms">content_copy</span></button>
+            <button class="insp-ico" id="s-paste" title="Paste style"><span class="ms">content_paste</span></button>
+            <button class="insp-ico" id="s-reset" title="Reset style"><span class="ms">restart_alt</span></button>
+          </div>
+
+          <div class="insp-sec" id="sec-field" style="display:none">
+            <div class="insp-h">Merge field</div>
+            <div class="insp-row"><label>Field</label><select class="insp-sel" id="s-field"></select></div>
+            <div class="fhint">Resolves to the client/project value when a document is generated.</div>
+          </div>
+
+          <div class="insp-sec" id="sec-imgsrc" style="display:none">
+            <div class="insp-h">Image source</div>
+            <div class="insp-row"><label>Source</label><div class="seg full" id="s-imgsrc">
+              <button data-src="placeholder">Placeholder</button>
+              <button data-src="client">Client asset</button>
+            </div></div>
+            <div class="fhint">“Client asset” inherits each client’s logo — pick a client in Preview style to see it.</div>
+          </div>
+
+          <div class="insp-sec" id="sec-perm" style="display:none">
+            <div class="insp-h">Client permission</div>
+            <div class="insp-row"><label>Access</label><div class="seg full" id="s-perm">
+              <button data-perm="fixed" title="Part of the block; clients can't change it">Fixed</button>
+              <button data-perm="editable" title="Clients can edit this content">Editable</button>
+              <button data-perm="locked" title="Pinned — can't be moved or removed">Locked</button>
+            </div></div>
+          </div>
 
           <div class="insp-sec" data-sec="layout">
             <div class="insp-h">Layout</div>
@@ -207,14 +264,12 @@
               <input type="number" class="insp-num" id="s-wpx"><span class="insp-unit">px</span>
             </div></div>
           </div>
-
           <div class="insp-sec" data-sec="dim">
             <div class="insp-h">Dimension</div>
             <div class="insp-row" data-field="pad"><label>Padding</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-pad" min="0" max="120"><input type="number" class="insp-num" id="s-padN"><span class="insp-unit">px</span></div></div>
             <div class="insp-row" data-field="sp"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
             <div class="insp-row" data-field="bg"><label>Fill</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bg"><input type="text" class="insp-hex" id="s-bgH" placeholder="None (inherit)"></div></div>
           </div>
-
           <div class="insp-sec" data-sec="typo">
             <div class="insp-h">Typography</div>
             <div class="insp-row" data-field="font"><label>Font</label><select class="insp-sel" id="s-font"></select></div>
@@ -229,7 +284,6 @@
             </div></div>
             <div class="fhint" style="margin:2px 0 0">Blank fields inherit the client’s brand &amp; styling.</div>
           </div>
-
           <div class="insp-sec" data-sec="border">
             <div class="insp-h">Border</div>
             <div class="insp-row" data-field="rad"><label>Radius</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-rad" min="0" max="40"><input type="number" class="insp-num" id="s-radN"><span class="insp-unit">px</span></div></div>
@@ -242,11 +296,11 @@
   </div>
 </div>
 
-<!-- Save details popup -->
 <div class="modal-overlay" id="saveModal">
   <div class="cfm">
     <h3>Save block</h3>
     <div class="sub">Name it so it reads clearly in the Block Builder.</div>
+    <div class="sv-sync" id="svSync"></div>
     <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"><span class="fld-err" id="b-name-err"></span></div>
     <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"><span class="fld-err" id="b-label-err"></span></div>
     <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text."></div>
@@ -258,60 +312,81 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="verModal">
+  <div class="cfm">
+    <h3>Version history</h3>
+    <div class="sub">Saved versions of this block. Restoring replaces the current canvas.</div>
+    <div class="ver-list" id="verList"></div>
+    <div class="cfm-acts"><a class="btn btn-outline" id="verClose">Close</a></div>
+  </div>
+</div>
+
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
 <script src="tenant-data.js"></script>
 <script src="primitives.js"></script>
 <script>
-const PRIM_ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height'};
+const PRIM_ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height',field:'data_object',callout:'campaign',stat:'trending_up',button:'smart_button',cover:'title',toc:'toc',pagebreak:'insert_page_break'};
 const P2DOC={
-  heading:[{cols:[['heading']]}],
-  subheading:[{cols:[['subheading']]}],
-  divider:[{cols:[['heading','divider','paragraph']]}],
-  paragraph:[{cols:[['paragraph']]}],
-  double:[{cols:[['paragraph'],['paragraph']]}],
-  headpara:[{cols:[['subheading'],['paragraph']]}],
-  parahead:[{cols:[['paragraph'],['subheading']]}],
-  quote:[{cols:[['quote']]}],
-  list:[{cols:[['list']]}],
-  callout:[{cols:[['heading','paragraph']]}],
-  docdetails:[{cols:[['subheading'],['keyvalue']]}],
-  docpara:[{cols:[['subheading'],['paragraph']]}],
-  docdblpara:[{cols:[['subheading'],['paragraph'],['paragraph']]}],
-  img1:[{cols:[['image']]}],
-  img2:[{cols:[['image'],['image']]}],
-  img3:[{cols:[['image'],['image'],['image']]}],
-  imggrid:[{cols:[['image'],['image']]},{cols:[['image'],['image']]}],
-  imgtext:[{cols:[['image'],['paragraph']]}],
-  textimg:[{cols:[['paragraph'],['image']]}],
-  imgcap:[{cols:[['image','subheading']]}],
-  feature:[{cols:[['image'],['heading','paragraph']]}],
-  table:[{cols:[['table']]}],
-  signature:[{cols:[['signature']]}],
-  catalogue:[{cols:[['image'],['subheading','paragraph']]}],
+  heading:[{cols:[['heading']]}], subheading:[{cols:[['subheading']]}],
+  divider:[{cols:[['heading','divider','paragraph']]}], paragraph:[{cols:[['paragraph']]}],
+  double:[{cols:[['paragraph'],['paragraph']]}], headpara:[{cols:[['subheading'],['paragraph']]}],
+  parahead:[{cols:[['paragraph'],['subheading']]}], quote:[{cols:[['quote']]}], list:[{cols:[['list']]}],
+  callout:[{cols:[['callout']]}], docdetails:[{cols:[['subheading'],['keyvalue']]}],
+  docpara:[{cols:[['subheading'],['paragraph']]}], docdblpara:[{cols:[['subheading'],['paragraph'],['paragraph']]}],
+  img1:[{cols:[['image']]}], img2:[{cols:[['image'],['image']]}], img3:[{cols:[['image'],['image'],['image']]}],
+  imggrid:[{cols:[['image'],['image']]},{cols:[['image'],['image']]}], imgtext:[{cols:[['image'],['paragraph']]}],
+  textimg:[{cols:[['paragraph'],['image']]}], imgcap:[{cols:[['image','subheading']]}],
+  feature:[{cols:[['image'],['heading','paragraph']]}], table:[{cols:[['table']]}],
+  signature:[{cols:[['signature']]}], catalogue:[{cols:[['image'],['subheading','paragraph']]}],
 };
 const TEMPLATES=[
-  {key:'heading',   label:'Heading',             icon:'title'},
-  {key:'headpara',  label:'Heading + text',      icon:'view_sidebar'},
-  {key:'paragraph', label:'Paragraph',           icon:'notes'},
-  {key:'imgtext',   label:'Image + text',        icon:'wysiwyg'},
-  {key:'double',    label:'Two columns of text', icon:'view_column'},
-  {key:'feature',   label:'Feature panel',       icon:'featured_video'},
+  {key:'heading',label:'Heading',icon:'title'},{key:'headpara',label:'Heading + text',icon:'view_sidebar'},
+  {key:'paragraph',label:'Paragraph',icon:'notes'},{key:'imgtext',label:'Image + text',icon:'wysiwyg'},
+  {key:'double',label:'Two columns of text',icon:'view_column'},{key:'feature',label:'Feature panel',icon:'featured_video'},
 ];
 const CODE_STARTER=`<div style="display:flex;gap:24px">
   <div style="flex:1">
-    <h3 style="font-family:inherit;color:var(--brand-primary,#27535C);border-bottom:2px solid var(--brand-secondary,#38988A);padding-bottom:6px;margin:0 0 10px">Section title</h3>
-    <p style="color:#3A4442;line-height:1.6;margin:0">Write anything here. Use <b>var(--brand-primary)</b> and <b>var(--brand-secondary)</b> so this block restyles for each client automatically.</p>
+    <h3 style="font-family:inherit;color:var(--brand-primary,#27535C);border-bottom:2px solid var(--brand-secondary,#38988A);padding-bottom:6px;margin:0 0 10px">{{client.name}}</h3>
+    <p style="color:#3A4442;line-height:1.6;margin:0">Use <b>var(--brand-primary)</b> and merge fields like <b>{{client.name}}</b> so this block personalises per client automatically.</p>
   </div>
 </div>`;
-
-// Which inspector fields make sense for a given element kind.
+// Dynamic fields available to insert / bind.
+const FIELDS=[
+  {key:'client.name',label:'Client name'},{key:'client.industry',label:'Client industry'},{key:'client.abn',label:'Client ABN'},
+  {key:'project.name',label:'Project name'},{key:'project.ref',label:'Tender reference'},{key:'project.value',label:'Contract value'},
+  {key:'date.today',label:'Today’s date'},{key:'contact.name',label:'Contact name'},
+];
+function fieldLabel(k){ const f=FIELDS.find(x=>x.key===k); return f?f.label:k; }
+function resolveField(k, t){
+  if(!t) return null;
+  switch(k){
+    case 'client.name': return t.name;
+    case 'client.industry': return t.industry;
+    case 'client.abn': return 'ABN '+(t.name.length*3+31)+' 244 700 '+(100+t.name.length);
+    case 'project.name': return 'Northline Rail Upgrade';
+    case 'project.ref': return 'TND-2026-'+(100+t.name.length);
+    case 'project.value': return '$1.24M';
+    case 'date.today': return '3 Aug 2026';
+    case 'contact.name': return 'Kenzie May';
+    default: return '—';
+  }
+}
+// Style presets applied to the selected element.
+const PRESETS=[
+  {key:'',label:'Apply a style preset…',st:{}},
+  {key:'emphasis',label:'Emphasis',st:{weight:'700',color:'#111827',size:22}},
+  {key:'muted',label:'Muted note',st:{color:'#6B7280',size:12}},
+  {key:'callout',label:'Callout box',st:{bg:'#F1F6F5',pad:16,rad:10,bw:1,bstyle:'solid',bcolor:'#BFE0D9'}},
+  {key:'fineprint',label:'Fine print',st:{size:10,color:'#9AA5A3',lh:15}},
+  {key:'accentborder',label:'Accent border',st:{bw:2,bstyle:'solid',bcolor:'#38988A',rad:8,pad:12}},
+];
 function kindOf(id){
   if(id==='image') return 'image';
   if(id==='divider') return 'divider';
-  if(id==='spacer') return 'spacer';
+  if(id==='spacer'||id==='pagebreak') return 'spacer';
   if(id==='table') return 'table';
-  return 'text'; // heading/subheading/paragraph/list/quote/keyvalue/signature
+  return 'text';
 }
 
 function pageInit(){
@@ -320,20 +395,22 @@ function pageInit(){
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   const existing=id?BLOCKS.find(b=>b.id===id):null;
 
-  // Elements are objects {id, st}; st starts empty (inherit) — reasonable defaults until edited.
   const elDef=()=>({pad:0,bg:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,bw:0,bstyle:'solid',bcolor:'#38988a'});
-  const mkEl=pid=>({id:pid, st:elDef()});
+  const mkEl=pid=>{ const e={id:pid, st:elDef()}; if(pid==='field') e.field='client.name'; if(pid==='image') e.src='placeholder'; return e; };
   const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
   let doc = existing ? normDoc(clone(P2DOC[existing.p]||[{cols:[['paragraph']]}])) : [];
   let mode = 'visual';
   let drag = null;
-  let brand = null;
-  let sel = null; // {r,c,k} selected element, or null = whole block
+  let brand = null, brandIdx = 0, activeTenant = null;
+  let sel = null;
+  let styleClip = null;
   const BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand}))];
-  // Block content style (applied to the block wrapper INSIDE the page, not the page itself).
   const blockStyle={wmode:'fill', wpx:520, pad:0, sp:8, bg:'', rad:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6'};
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
+  const selEl=()=> sel ? doc[sel.r].cols[sel.c][sel.k] : null;
+  // Fabricated "used in N documents" for the synced-block story.
+  const usage = existing ? (existing.label.length*3 % 17) + 4 : 0;
 
   const page=document.getElementById('page');
   const wrap=document.getElementById('cvWrap');
@@ -342,8 +419,12 @@ function pageInit(){
   const codePrev=document.getElementById('codePrev');
 
   document.getElementById('b-cat').innerHTML=BLOCK_CATS.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('s-field').innerHTML=FIELDS.map(f=>`<option value="${f.key}">${f.label}</option>`).join('');
+  document.getElementById('s-preset').innerHTML=PRESETS.map(p=>`<option value="${p.key}">${p.label}</option>`).join('');
 
-  // ---- Widget palette ----
+  if(usage>0){ const uc=document.getElementById('useChip'); uc.style.display=''; uc.innerHTML=`<span class="ms">description</span> Used in ${usage} documents`; }
+
+  // ---- Palette ----
   const byTag={};
   PRIMITIVES.forEach(p=>{ (byTag[p.tag]=byTag[p.tag]||[]).push(p); });
   let pal=`<div class="pal-tag">Structure</div>`
@@ -363,7 +444,7 @@ function pageInit(){
     w.addEventListener('click',()=>{
       if(w.dataset.row) doc.push({cols:Array.from({length:+w.dataset.row},()=>[])});
       else doc.push({cols:[[mkEl(w.dataset.id)]]});
-      sel=null; render();
+      sel=null; render(); commit();
     });
   });
 
@@ -376,25 +457,44 @@ function pageInit(){
     document.getElementById('delBtn').style.display='';
   }
 
-  // ---- Render (visual) ----
+  // ---- Render ----
+  function elBody(el){
+    if(el.id==='field'){
+      const val=resolveField(el.field, activeTenant);
+      return val!=null
+        ? `<span style="border-bottom:1px dashed ${activeTenant?activeTenant.brand.secondary:'#38988a'};color:#3A4442;font-size:13px">${val}</span>`
+        : `<span style="background:var(--teal-tint);color:var(--teal);border:1px solid #bfe0d9;border-radius:5px;padding:1px 8px;font-size:12.5px;font-weight:600">{{ ${fieldLabel(el.field)} }}</span>`;
+    }
+    if(el.id==='image' && el.src==='client'){
+      if(activeTenant){ const t=activeTenant;
+        return `<div style="display:flex;align-items:center;gap:11px;background:${t.brand.background};border:1px solid ${t.brand.primary}22;border-radius:8px;padding:12px 14px">
+          <span style="width:40px;height:40px;border-radius:8px;background:${t.brand.primary};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'${t.brand.font}',sans-serif">${t.initials}</span>
+          <div><div style="font-weight:700;font-family:'${t.brand.font}',sans-serif;color:${t.brand.primary}">${t.name}</div><div style="font-size:11px;color:#7A8583">Client logo</div></div></div>`;
+      }
+      return `<div style="height:84px;border:1.5px dashed #b7c2bf;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--light)"><span class="ms">account_balance</span><span style="font-size:11px">Client logo — per client</span></div>`;
+    }
+    return renderPrimitive(el.id, brand);
+  }
   function elHtml(el,r,c,k){
     const on = sel && sel.r===r && sel.c===c && sel.k===k;
-    return `<div class="vb-el${on?' selected':''}" data-r="${r}" data-c="${c}" data-k="${k}">
+    const perm = el.perm||'fixed';
+    const cls = 'vb-el'+(on?' selected':'')+(perm==='editable'?' is-editable':'')+(perm==='locked'?' is-locked':'');
+    const badge = perm==='editable' ? '<span class="vb-perm edit"><span class="ms">edit</span>Editable</span>'
+      : perm==='locked' ? '<span class="vb-perm lock"><span class="ms">lock</span>Locked</span>' : '';
+    return `<div class="${cls}" data-r="${r}" data-c="${c}" data-k="${k}">
       <div class="vb-name"><span class="ms" style="font-size:12px">${PRIM_ICON[el.id]||'widgets'}</span>${ELEMS[el.id]||el.id}</div>
       <div class="vb-tools">
         <span class="tb grab" data-handle title="Drag to move"><span class="ms">drag_indicator</span></span>
         <span class="tb" data-dup title="Duplicate"><span class="ms">content_copy</span></span>
         <span class="tb del" data-del title="Delete"><span class="ms">delete</span></span>
       </div>
-      <div class="vb-body">${renderPrimitive(el.id, brand)}</div>
+      <div class="vb-body">${elBody(el)}</div>${badge}
     </div>`;
   }
   function render(){
     if(!doc.length){
       page.innerHTML=`<div class="vb-empty"><span class="ms big">dashboard_customize</span>Empty block
-        <div class="qp"><b>Quick start</b>${
-          TEMPLATES.map(t=>`<span class="vb-qbtn" data-tpl="${t.key}"><span class="ms">${t.icon}</span>${t.label}</span>`).join('')
-        }</div></div>`;
+        <div class="qp"><b>Quick start</b>${TEMPLATES.map(t=>`<span class="vb-qbtn" data-tpl="${t.key}"><span class="ms">${t.icon}</span>${t.label}</span>`).join('')}</div></div>`;
       page.querySelectorAll('[data-tpl]').forEach(b=>b.addEventListener('click',()=>loadTemplate(b.dataset.tpl)));
     } else {
       page.innerHTML=`<div class="vb-block" id="blockWrap">`+doc.map((row,r)=>`
@@ -412,110 +512,89 @@ function pageInit(){
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
-    wire();
-    applyAllElStyles();
-    applyBlockStyle();
-    applySelection();
-    syncInspector();
+    wire(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
+  function loadTemplate(key){ doc = key ? normDoc(clone(P2DOC[key]||[])) : []; sel=null; render(); commit(); }
 
-  function loadTemplate(key){
-    doc = key ? normDoc(clone(P2DOC[key]||[])) : [];
-    sel=null; render();
-  }
-
-  const hasContent=()=> doc.reduce((s,row)=>s+row.cols.reduce((a,c)=>a+c.length,0),0)>0 || (mode==='code' && !!codeArea.value.trim());
-
-  // ---- Per-client style selector ----
-  let brandIdx=0;
+  // ---- Brand preview ----
   function buildBrandSelect(){
     const el=document.getElementById('brandSel');
     el.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.brand?b.name:'Default (brand-neutral)'}</option>`).join('');
     el.value=String(brandIdx);
     el.addEventListener('change',()=>{
-      const newIdx=+el.value; el.value=String(brandIdx); // hold until confirmed
+      const newIdx=+el.value; el.value=String(brandIdx);
       if(newIdx===brandIdx) return;
       const to=BRANDS[newIdx];
-      const proceed=()=>{ brandIdx=newIdx; el.value=String(newIdx); brand=to.brand; applyBrand(); render(); renderCode(); };
-      if(hasContent()) confirmAction({
-        title:'Change preview style?',
-        body:`Previewing in ${to.brand?to.name+'’s brand':'the brand-neutral default'} re-renders the block. Style tweaks you’ve made are shown as-is and can’t be automatically reverted.`,
-        confirm:'Change style'
-      }, proceed);
+      const proceed=()=>{ brandIdx=newIdx; el.value=String(newIdx); brand=to.brand; activeTenant=to.brand?TENANTS.find(t=>t.id===to.id):null; applyBrand(); render(); renderCode(); };
+      if(hasContent()) confirmAction({title:'Change preview style?',body:`Previewing in ${to.brand?to.name+'’s brand':'the brand-neutral default'} re-renders the block. Style tweaks you’ve made are shown as-is and can’t be automatically reverted.`,confirm:'Change style'}, proceed);
       else proceed();
     });
   }
   function applyBrand(){
-    [page, codePrev].forEach(elm=>{
-      if(!elm) return;
+    [page, codePrev].forEach(elm=>{ if(!elm) return;
       if(brand){ elm.style.setProperty('--brand-primary',brand.primary); elm.style.setProperty('--brand-secondary',brand.secondary); elm.style.setProperty('--brand-bg',brand.background); }
       else { elm.style.removeProperty('--brand-primary'); elm.style.removeProperty('--brand-secondary'); elm.style.removeProperty('--brand-bg'); }
     });
   }
 
-  // ---- Style: block content wrapper (not the page) + selected element ----
+  // ---- Style application ----
   function applyBlockStyle(){
-    const w=document.getElementById('blockWrap'); if(!w) return;
-    const bs=blockStyle;
-    w.style.width = bs.wmode==='fixed' ? bs.wpx+'px' : '100%';
-    w.style.maxWidth='100%';
-    w.style.marginLeft = bs.wmode==='fixed' ? 'auto':''; w.style.marginRight = bs.wmode==='fixed' ? 'auto':'';
-    w.style.padding = bs.pad?bs.pad+'px':'';
-    w.style.gap = bs.sp+'px';
-    w.style.background = bs.bg||'';
-    w.style.borderRadius = bs.rad?bs.rad+'px':'';
+    const w=document.getElementById('blockWrap'); if(!w) return; const bs=blockStyle;
+    w.style.width = bs.wmode==='fixed' ? bs.wpx+'px' : '100%'; w.style.maxWidth='100%';
+    w.style.marginLeft = bs.wmode==='fixed'?'auto':''; w.style.marginRight = bs.wmode==='fixed'?'auto':'';
+    w.style.padding = bs.pad?bs.pad+'px':''; w.style.gap = bs.sp+'px';
+    w.style.background = bs.bg||''; w.style.borderRadius = bs.rad?bs.rad+'px':'';
     w.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+bs.bcolor):'none';
   }
   function applyElStyle(node, st){
     if(!node) return;
-    node.style.padding = st.pad?st.pad+'px':'';
-    node.style.background = (st.bg&&st.bg!=='transparent')?st.bg:'';
-    node.style.borderRadius = st.rad?st.rad+'px':'';
-    node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+st.bcolor):'';
+    node.style.padding = st.pad?st.pad+'px':''; node.style.background = (st.bg&&st.bg!=='transparent')?st.bg:'';
+    node.style.borderRadius = st.rad?st.rad+'px':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+st.bcolor):'';
     node.style.textAlign = st.align||'';
     const typo={};
-    if(st.font) typo.fontFamily=`'${st.font}',sans-serif`;
-    if(st.weight) typo.fontWeight=st.weight;
-    if(st.size) typo.fontSize=st.size+'px';
-    if(st.lh) typo.lineHeight=st.lh+'px';
-    if(st.color) typo.color=st.color;
+    if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
+    if(st.size) typo.fontSize=st.size+'px'; if(st.lh) typo.lineHeight=st.lh+'px'; if(st.color) typo.color=st.color;
     [node, ...node.querySelectorAll('h1,h2,h3,h4,h5,p,li,span,a,blockquote,strong,em,td,th,ul,div')].forEach(n=>Object.assign(n.style,typo));
   }
   function elNode(r,c,k){ return page.querySelector(`.vb-el[data-r="${r}"][data-c="${c}"][data-k="${k}"] .vb-body`); }
   function applyAllElStyles(){ doc.forEach((row,r)=>row.cols.forEach((col,c)=>col.forEach((el,k)=>applyElStyle(elNode(r,c,k), el.st)))); }
   function applyActive(){ if(sel){ applyElStyle(elNode(sel.r,sel.c,sel.k), target()); } else { applyBlockStyle(); } }
 
-  // Which fields to show for the current target.
   function fieldsFor(){
     if(!sel) return new Set(['width','pad','sp','bg','rad','bwstyle','bcolor']);
-    switch(kindOf(doc[sel.r].cols[sel.c][sel.k].id)){
+    switch(kindOf(selEl().id)){
       case 'image':   return new Set(['pad','bg','rad','bwstyle','bcolor']);
       case 'table':   return new Set(['sizelh','color','pad','bg','rad','bwstyle','bcolor']);
       case 'divider': return new Set(['pad','bg']);
       case 'spacer':  return new Set(['pad']);
-      default:        return new Set(['font','weight','sizelh','color','align','pad','bg','rad','bwstyle','bcolor']); // text
+      default:        return new Set(['font','weight','sizelh','color','align','pad','bg','rad','bwstyle','bcolor']);
     }
   }
   function renderInspector(){
     const allowed=fieldsFor();
-    document.querySelectorAll('#styleCard .insp-sec').forEach(sec=>{
+    document.querySelectorAll('#styleCard .insp-sec[data-sec]').forEach(sec=>{
       let any=false;
       sec.querySelectorAll('.insp-row').forEach(row=>{ const show=allowed.has(row.dataset.field); row.style.display=show?'':'none'; if(show)any=true; });
       sec.style.display=any?'':'none';
     });
+    const id = sel?selEl().id:null;
+    document.getElementById('sec-perm').style.display = sel?'':'none';
+    document.getElementById('sec-field').style.display = id==='field'?'':'none';
+    document.getElementById('sec-imgsrc').style.display = id==='image'?'':'none';
+    document.getElementById('s-preset').style.display = sel?'':'none';
   }
 
   function bindRange(rangeId,numId,key){
     const r=document.getElementById(rangeId), n=document.getElementById(numId);
-    const set=v=>{ v=Math.max(+r.min||0,Math.min(+r.max||9999,Math.round(+v||0))); target()[key]=v; r.value=v; n.value=v; applyActive(); };
+    const set=v=>{ v=Math.max(+r.min||0,Math.min(+r.max||9999,Math.round(+v||0))); target()[key]=v; r.value=v; n.value=v; applyActive(); commitStyle(); };
     r.addEventListener('input',()=>set(r.value)); n.addEventListener('input',()=>set(n.value));
   }
-  function bindNum(numId,key){ const n=document.getElementById(numId); n.addEventListener('input',()=>{ target()[key]=+n.value||0; applyActive(); }); }
-  function bindSel(id,key){ const el=document.getElementById(id); el.addEventListener('change',()=>{ target()[key]=el.value; applyActive(); }); }
+  function bindNum(numId,key){ const n=document.getElementById(numId); n.addEventListener('input',()=>{ target()[key]=+n.value||0; applyActive(); commitStyle(); }); }
+  function bindSel(id,key){ const el=document.getElementById(id); el.addEventListener('change',()=>{ target()[key]=el.value; applyActive(); commitStyle(); }); }
   function bindColor(colId,hexId,key){
     const c=document.getElementById(colId), h=document.getElementById(hexId);
-    c.addEventListener('input',()=>{ target()[key]=c.value; h.value=c.value; applyActive(); });
-    h.addEventListener('change',()=>{ const v=h.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ target()[key]=v; c.value=v; applyActive(); } });
+    c.addEventListener('input',()=>{ target()[key]=c.value; h.value=c.value; applyActive(); commitStyle(); });
+    h.addEventListener('change',()=>{ const v=h.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ target()[key]=v; c.value=v; applyActive(); commitStyle(); } });
   }
   function syncInspector(){
     const t=target();
@@ -527,14 +606,17 @@ function pageInit(){
     document.getElementById('s-color').value=t.color||'#333333'; document.getElementById('s-colorH').value=t.color||'';
     document.getElementById('s-bcolor').value=t.bcolor||'#38988a'; document.getElementById('s-bcolorH').value=t.bcolor||'';
     document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.al===(t.align||'')));
-    // width (block only)
     document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x.dataset.w===blockStyle.wmode));
     document.getElementById('s-wpx').value=blockStyle.wpx; document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed';
-    // context + section visibility
-    const st=document.getElementById('styleTarget');
-    st.innerHTML = sel
-      ? `<span class="ms">check_circle</span> Editing: ${ELEMS[doc[sel.r].cols[sel.c][sel.k].id]||'element'}`
-      : `<span class="ms" style="color:var(--light)">dashboard</span> Editing: whole block`;
+    const e=selEl();
+    if(e){ if(e.id==='field') document.getElementById('s-field').value=e.field;
+      document.querySelectorAll('#s-imgsrc button').forEach(b=>b.classList.toggle('on',b.dataset.src===(e.src||'placeholder')));
+      document.querySelectorAll('#s-perm button').forEach(b=>b.classList.toggle('on',b.dataset.perm===(e.perm||'fixed'))); }
+    document.getElementById('s-preset').value='';
+    document.getElementById('s-paste').disabled=!styleClip;
+    const stt=document.getElementById('styleTarget');
+    stt.innerHTML = sel ? `<span class="ms">check_circle</span> Editing: ${ELEMS[selEl().id]||'element'}`
+                        : `<span class="ms" style="color:var(--light)">dashboard</span> Editing: whole block`;
     renderInspector();
   }
   function initStyle(){
@@ -543,14 +625,18 @@ function pageInit(){
     bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
     bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
     bindColor('s-bg','s-bgH','bg'); bindColor('s-color','s-colorH','color'); bindColor('s-bcolor','s-bcolorH','bcolor');
-    document.getElementById('s-align').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
-      target().align=b.dataset.al; document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyActive();
-    }));
-    document.querySelectorAll('#s-wmode button').forEach(b=>b.addEventListener('click',()=>{
-      blockStyle.wmode=b.dataset.w; document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x===b));
-      document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed'; applyActive();
-    }));
-    document.getElementById('s-wpx').addEventListener('input',e=>{ blockStyle.wpx=+e.target.value||0; applyActive(); });
+    document.getElementById('s-align').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ target().align=b.dataset.al; document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
+    document.querySelectorAll('#s-wmode button').forEach(b=>b.addEventListener('click',()=>{ blockStyle.wmode=b.dataset.w; document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x===b)); document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed'; applyActive(); commitStyle(); }));
+    document.getElementById('s-wpx').addEventListener('input',e=>{ blockStyle.wpx=+e.target.value||0; applyActive(); commitStyle(); });
+    // field / image-source / permission
+    document.getElementById('s-field').addEventListener('change',e=>{ if(selEl()){ selEl().field=e.target.value; render(); commit(); } });
+    document.querySelectorAll('#s-imgsrc button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().src=b.dataset.src; render(); commit(); } }));
+    document.querySelectorAll('#s-perm button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().perm=b.dataset.perm; render(); commit(); } }));
+    // presets / copy / paste / reset
+    document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
+    document.getElementById('s-copy').addEventListener('click',()=>{ styleClip=clone(target()); document.getElementById('s-paste').disabled=false; showToast('Style copied'); });
+    document.getElementById('s-paste').addEventListener('click',()=>{ if(!styleClip) return; Object.assign(target(), clone(styleClip)); applyActive(); syncInspector(); commit(); showToast('Style pasted'); });
+    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,pad:0,sp:8,bg:'',rad:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6'}); } applyActive(); render(); commit(); showToast('Style reset'); });
     syncInspector();
   }
 
@@ -564,8 +650,7 @@ function pageInit(){
   function renderPill(){
     const el=document.getElementById('selPill');
     if(!sel){ el.className='sel-pill'; el.innerHTML='<span class="ms">dashboard</span> Whole block'; return; }
-    const it=doc[sel.r].cols[sel.c][sel.k];
-    el.className='sel-pill on';
+    const it=selEl(); el.className='sel-pill on';
     el.innerHTML=`<span class="ms">${PRIM_ICON[it.id]||'widgets'}</span> ${ELEMS[it.id]||it.id} <span class="ms x" data-selclear title="Edit whole block">close</span>`;
   }
   document.getElementById('selPill').addEventListener('click',e=>{ if(e.target.closest('[data-selclear]')){ sel=null; applySelection(); syncInspector(); } });
@@ -575,8 +660,8 @@ function pageInit(){
     page.querySelectorAll('.vb-el').forEach(el=>{
       const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k;
       el.addEventListener('click',e=>{ if(e.target.closest('[data-handle],[data-dup],[data-del]'))return; e.stopPropagation(); selectEl(r,c,k); });
-      el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();doc[r].cols[c].splice(k,1);cleanup();sel=null;render();});
-      el.querySelector('[data-dup]').addEventListener('click',e=>{e.stopPropagation();doc[r].cols[c].splice(k+1,0,clone(doc[r].cols[c][k]));sel=null;render();});
+      el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();doc[r].cols[c].splice(k,1);cleanup();sel=null;render();commit();});
+      el.querySelector('[data-dup]').addEventListener('click',e=>{e.stopPropagation();doc[r].cols[c].splice(k+1,0,clone(doc[r].cols[c][k]));sel=null;render();commit();});
       const h=el.querySelector('[data-handle]');
       h.addEventListener('mousedown',()=>{el.draggable=true;});
       el.addEventListener('mouseup',()=>{el.draggable=false;});
@@ -585,9 +670,9 @@ function pageInit(){
     });
     page.querySelectorAll('.vb-row').forEach(rowEl=>{
       const r=+rowEl.dataset.r;
-      rowEl.querySelector('[data-addcol]').addEventListener('click',e=>{e.stopPropagation();if(doc[r].cols.length<3){doc[r].cols.push([]);sel=null;render();}else showToast('A row can have up to 3 columns');});
-      rowEl.querySelector('[data-delcol]').addEventListener('click',e=>{e.stopPropagation();if(doc[r].cols.length>1){const last=doc[r].cols.pop();if(last.length)doc[r].cols[doc[r].cols.length-1].push(...last);sel=null;render();}else showToast('A row needs at least one column');});
-      rowEl.querySelector('[data-delrow]').addEventListener('click',e=>{e.stopPropagation();doc.splice(r,1);sel=null;render();});
+      rowEl.querySelector('[data-addcol]').addEventListener('click',e=>{e.stopPropagation();if(doc[r].cols.length<3){doc[r].cols.push([]);sel=null;render();commit();}else showToast('A row can have up to 3 columns');});
+      rowEl.querySelector('[data-delcol]').addEventListener('click',e=>{e.stopPropagation();if(doc[r].cols.length>1){const last=doc[r].cols.pop();if(last.length)doc[r].cols[doc[r].cols.length-1].push(...last);sel=null;render();commit();}else showToast('A row needs at least one column');});
+      rowEl.querySelector('[data-delrow]').addEventListener('click',e=>{e.stopPropagation();doc.splice(r,1);sel=null;render();commit();});
       const rh=rowEl.querySelector('[data-rhandle]');
       rh.addEventListener('mousedown',()=>{rowEl.draggable=true;});
       rowEl.addEventListener('mouseup',()=>{rowEl.draggable=false;});
@@ -598,23 +683,14 @@ function pageInit(){
 
   function cleanup(){ doc = doc.filter(row => !(row.cols.length===1 && row.cols[0].length===0)); }
   function pluck(d){ const el=doc[d.r].cols[d.c][d.k]; doc[d.r].cols[d.c].splice(d.k,1); return el; }
-
   function clearInd(){
     page.querySelectorAll('.ins-before').forEach(e=>e.classList.remove('ins-before'));
     page.querySelectorAll('.vb-col.over,.vb-col.ins-end').forEach(e=>e.classList.remove('over','ins-end'));
     page.querySelectorAll('.row-ins-before').forEach(e=>e.classList.remove('row-ins-before'));
     tail.classList.remove('active');
   }
-  function rowIndexFromY(y){
-    const rows=[...page.querySelectorAll('.vb-row')];
-    for(let i=0;i<rows.length;i++){ const b=rows[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; }
-    return rows.length;
-  }
-  function colIndexFromY(col,y){
-    const els=[...col.querySelectorAll(':scope > .vb-el')];
-    for(let i=0;i<els.length;i++){ const b=els[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; }
-    return els.length;
-  }
+  function rowIndexFromY(y){ const rows=[...page.querySelectorAll('.vb-row')]; for(let i=0;i<rows.length;i++){ const b=rows[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; } return rows.length; }
+  function colIndexFromY(col,y){ const els=[...col.querySelectorAll(':scope > .vb-el')]; for(let i=0;i<els.length;i++){ const b=els[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; } return els.length; }
 
   wrap.addEventListener('dragover',e=>{
     if(!drag) return; e.preventDefault();
@@ -622,16 +698,8 @@ function pageInit(){
     const rowMode = drag.kind==='new-row' || drag.kind==='move-row' || !overCol;
     if(e.dataTransfer) e.dataTransfer.dropEffect = drag.kind==='new-prim'?'copy':'move';
     clearInd();
-    if(rowMode){
-      const ri=rowIndexFromY(e.clientY);
-      const rows=[...page.querySelectorAll('.vb-row')];
-      if(ri<rows.length) rows[ri].classList.add('row-ins-before'); else tail.classList.add('active');
-    } else {
-      overCol.classList.add('over');
-      const ki=colIndexFromY(overCol,e.clientY);
-      const els=[...overCol.querySelectorAll(':scope > .vb-el')];
-      if(ki<els.length) els[ki].classList.add('ins-before'); else overCol.classList.add('ins-end');
-    }
+    if(rowMode){ const ri=rowIndexFromY(e.clientY); const rows=[...page.querySelectorAll('.vb-row')]; if(ri<rows.length) rows[ri].classList.add('row-ins-before'); else tail.classList.add('active'); }
+    else { overCol.classList.add('over'); const ki=colIndexFromY(overCol,e.clientY); const els=[...overCol.querySelectorAll(':scope > .vb-el')]; if(ki<els.length) els[ki].classList.add('ins-before'); else overCol.classList.add('ins-end'); }
   });
   wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) clearInd(); });
   wrap.addEventListener('drop',e=>{
@@ -644,66 +712,88 @@ function pageInit(){
       else if(drag.kind==='move-row'){ let to=ri; const [m]=doc.splice(drag.r,1); if(drag.r<to)to--; doc.splice(to,0,m); }
       else { const item = drag.kind==='new-prim'?mkEl(drag.id):pluck(drag); doc.splice(ri,0,{cols:[[item]]}); }
     } else {
-      const r=+overCol.dataset.r, c=+overCol.dataset.c;
-      let ki=colIndexFromY(overCol,e.clientY);
+      const r=+overCol.dataset.r, c=+overCol.dataset.c; let ki=colIndexFromY(overCol,e.clientY);
       if(drag.kind==='new-prim'){ doc[r].cols[c].splice(ki,0,mkEl(drag.id)); }
       else { if(drag.r===r && drag.c===c && drag.k<ki) ki--; const item=pluck(drag); doc[r].cols[c].splice(ki,0,item); }
     }
-    cleanup(); clearInd(); drag=null; sel=null; render();
+    cleanup(); clearInd(); drag=null; sel=null; render(); commit();
   });
 
-  // ---- Custom code mode ----
+  // ---- Code mode ----
   function docToHtml(){
     if(!doc.length) return '<!-- Empty block -->';
+    const one=el=> el.id==='field' ? `{{${el.field}}}` : renderPrimitive(el.id);
     return doc.map(row=>{
       const multi=row.cols.length>1;
-      if(!multi){ return row.cols[0].map(el=>renderPrimitive(el.id)).join('\n'); }
-      const cols=row.cols.map(col=>`  <div style="flex:1">\n    ${col.map(el=>renderPrimitive(el.id)).join('\n    ')}\n  </div>`).join('\n');
+      if(!multi){ return row.cols[0].map(one).join('\n'); }
+      const cols=row.cols.map(col=>`  <div style="flex:1">\n    ${col.map(one).join('\n    ')}\n  </div>`).join('\n');
       return `<div style="display:flex;gap:24px">\n${cols}\n</div>`;
     }).join('\n\n');
   }
   function renderCode(){ codePrev.innerHTML = codeArea.value.trim() || '<div style="color:#9aa5a3;text-align:center;padding:50px 0">Preview appears as you type</div>'; }
-  codeArea.addEventListener('input',renderCode);
+  codeArea.addEventListener('input',()=>{renderCode();autosave();});
   document.getElementById('genBtn').addEventListener('click',()=>{
     const fill=()=>{ codeArea.value=docToHtml(); renderCode(); showToast('Generated code from the visual layout'); };
     if(codeArea.value.trim()) confirmAction({title:'Replace your code?',body:'This overwrites the editor with markup generated from the visual layout.',confirm:'Replace'},fill);
     else fill();
   });
-
   function setMode(m){
-    if(m===mode) return;
-    mode=m;
+    if(m===mode) return; mode=m;
     document.querySelectorAll('.vb-modes button').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
     document.getElementById('visualPanel').style.display = m==='visual'?'':'none';
     document.getElementById('codePanel').style.display  = m==='code'?'':'none';
     document.getElementById('elementsCard').style.display = m==='visual'?'':'none';
     document.getElementById('codeCard').style.display     = m==='code'?'':'none';
-    // Code mode has no style inspector; drop the right column and go 2-up.
     document.getElementById('rightCol').style.display = m==='code'?'none':'';
     document.querySelector('.ed3').classList.toggle('code-mode', m==='code');
-    if(m==='code'){
-      if(!codeArea.value.trim()){ codeArea.value = doc.length?docToHtml():CODE_STARTER; }
-      renderCode();
-      if(doc.length) showToast('Editing custom code — the visual layout stays intact until you save');
-    }
+    if(m==='code'){ if(!codeArea.value.trim()){ codeArea.value = doc.length?docToHtml():CODE_STARTER; } renderCode(); if(doc.length) showToast('Editing custom code — the visual layout stays intact until you save'); }
   }
   document.querySelectorAll('.vb-modes button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
 
-  // ---- Naming (kept in sync from the save popup fields) ----
+  // ---- Undo / redo / history / autosave ----
+  const VKEY='tf_bver_'+(existing?existing.id:'new');
+  const DKEY='tf_bdraft_'+(existing?existing.id:'new');
+  let history=[], hidx=-1, restoring=false, autoT=null, styleT=null;
+  const snap=()=>JSON.stringify({doc, blockStyle});
+  function pushHist(){ if(restoring) return; history=history.slice(0,hidx+1); history.push(snap()); if(history.length>60) history.shift(); hidx=history.length-1; updateHistBtns(); }
+  function commit(){ pushHist(); autosave(); }
+  function commitStyle(){ clearTimeout(styleT); styleT=setTimeout(commit,350); }
+  function updateHistBtns(){ document.getElementById('undoBtn').disabled=hidx<=0; document.getElementById('redoBtn').disabled=hidx>=history.length-1; }
+  function restore(){ restoring=true; const s=JSON.parse(history[hidx]); doc=s.doc; for(const k in s.blockStyle) blockStyle[k]=s.blockStyle[k]; sel=null; render(); restoring=false; updateHistBtns(); autosave(); }
+  function undo(){ if(hidx>0){ hidx--; restore(); } }
+  function redo(){ if(hidx<history.length-1){ hidx++; restore(); } }
+  document.getElementById('undoBtn').addEventListener('click',undo);
+  document.getElementById('redoBtn').addEventListener('click',redo);
+  document.addEventListener('keydown',e=>{ if(e.target.matches('input,textarea,select'))return; const m=e.ctrlKey||e.metaKey; if(m&&e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); } else if(m&&e.key.toLowerCase()==='y'){ e.preventDefault(); redo(); } });
+  function autosave(){ clearTimeout(autoT); autoT=setTimeout(()=>{ try{ localStorage.setItem(DKEY, JSON.stringify({doc, blockStyle})); }catch(e){} const t=new Date(); document.getElementById('autosave').innerHTML=`<span class="ms">cloud_done</span> Autosaved · ${t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`; },600); }
+
+  // Version history
+  function loadVersions(){ try{ return JSON.parse(localStorage.getItem(VKEY))||[]; }catch(e){ return []; } }
+  function saveVersion(label){ const v=loadVersions(); v.unshift({ts:new Date().toISOString(), label, doc:clone(doc), blockStyle:clone(blockStyle)}); try{ localStorage.setItem(VKEY, JSON.stringify(v.slice(0,10))); }catch(e){} }
+  function renderVersions(){
+    const v=loadVersions(); const list=document.getElementById('verList');
+    if(!v.length){ list.innerHTML='<div class="ver-empty">No saved versions yet — Save Block creates one.</div>'; return; }
+    list.innerHTML=v.map((x,i)=>`<div class="ver-row"><div class="vi"><div class="vt">${x.label||'Version'}</div><div class="vm">${new Date(x.ts).toLocaleString()} · ${x.doc.reduce((s,r)=>s+r.cols.reduce((a,c)=>a+c.length,0),0)} elements</div></div><a class="btn btn-outline btn-sm" data-restore="${i}"><span class="ms" style="font-size:15px">restore</span> Restore</a></div>`).join('');
+    list.querySelectorAll('[data-restore]').forEach(b=>b.addEventListener('click',()=>{
+      const x=loadVersions()[+b.dataset.restore];
+      confirmAction({title:'Restore this version?',body:'The current canvas will be replaced with this saved version.',confirm:'Restore'},()=>{
+        doc=clone(x.doc); for(const k in x.blockStyle) blockStyle[k]=x.blockStyle[k]; sel=null; render(); commit();
+        document.getElementById('verModal').classList.remove('open'); showToast('Restored version');
+      });
+    }));
+  }
+  document.getElementById('histBtn').addEventListener('click',()=>{ renderVersions(); document.getElementById('verModal').classList.add('open'); });
+  document.getElementById('verClose').addEventListener('click',()=>document.getElementById('verModal').classList.remove('open'));
+  document.getElementById('verModal').addEventListener('click',e=>{ if(e.target.id==='verModal') e.currentTarget.classList.remove('open'); });
+
+  // ---- Naming / save ----
+  const hasContent=()=> doc.reduce((s,row)=>s+row.cols.reduce((a,c)=>a+c.length,0),0)>0 || (mode==='code' && !!codeArea.value.trim());
   function syncBar(){ document.getElementById('bar-name').textContent=document.getElementById('b-label').value.trim()||'Untitled block'; }
   document.getElementById('b-label').addEventListener('input',syncBar);
-  document.getElementById('b-name').addEventListener('input',e=>{
-    if(!existing) document.getElementById('pg-title').textContent=e.target.value.trim()||'New Custom Block';
-  });
+  document.getElementById('b-name').addEventListener('input',e=>{ if(!existing) document.getElementById('pg-title').textContent=e.target.value.trim()||'New Custom Block'; });
 
-  // ---- Cancel: warn about discarding unsaved work ----
-  document.getElementById('cancelBtn').addEventListener('click',e=>{
-    if(!hasContent()) return; // nothing to lose — let the link navigate
-    e.preventDefault();
-    confirmAction({title:'Discard changes?',body:'This block hasn’t been saved. Leaving now discards your layout and style changes.',confirm:'Discard',danger:true},()=>{ location.href='blocks.html'; });
-  });
+  document.getElementById('cancelBtn').addEventListener('click',e=>{ if(!hasContent()) return; e.preventDefault(); confirmAction({title:'Discard changes?',body:'This block hasn’t been saved. Leaving now discards your layout and style changes.',confirm:'Discard',danger:true},()=>{ location.href='blocks.html'; }); });
 
-  // ---- Save flow: details in a popup opened from Save Block ----
   const saveModal=document.getElementById('saveModal');
   function fldErr(idn,msg){ document.getElementById(idn).classList.add('err'); const e=document.getElementById(idn+'-err'); e.textContent=msg; e.classList.add('show'); }
   function fldClear(idn){ document.getElementById(idn).classList.remove('err'); document.getElementById(idn+'-err').classList.remove('show'); }
@@ -712,32 +802,33 @@ function pageInit(){
     const total=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     if(mode==='code'){ if(!codeArea.value.trim()){showToast('Add some code, or switch to the visual builder');return;} }
     else if(!total){ showToast('Add at least one element to the canvas'); return; }
-    fldClear('b-name'); fldClear('b-label');
-    saveModal.classList.add('open');
-    document.getElementById('b-name').focus();
+    document.getElementById('svSync').innerHTML = usage>0
+      ? `<span class="ms">sync</span><div>This is a <strong>synced block</strong> used in ${usage} documents. Saving updates them all (clients keep any detached overrides).<label><input type="checkbox" id="svPush" checked> Push this update to all ${usage} documents</label></div>`
+      : `<span class="ms">library_add</span><div>New block — it becomes available in every client’s Block Builder, rendered in their brand.</div>`;
+    fldClear('b-name'); fldClear('b-label'); saveModal.classList.add('open'); document.getElementById('b-name').focus();
   }
   function closeSave(){ saveModal.classList.remove('open'); }
   document.getElementById('saveBtn').addEventListener('click',openSave);
   document.getElementById('svCancel').addEventListener('click',closeSave);
   saveModal.addEventListener('click',e=>{ if(e.target===saveModal) closeSave(); });
   document.getElementById('svConfirm').addEventListener('click',()=>{
-    const nm=document.getElementById('b-name').value.trim();
-    const l=document.getElementById('b-label').value.trim();
+    const nm=document.getElementById('b-name').value.trim(); const l=document.getElementById('b-label').value.trim();
     let ok=true, first=null;
     if(!nm){ fldErr('b-name','Give the block an internal name.'); ok=false; first=first||'b-name'; } else fldClear('b-name');
     if(!l){ fldErr('b-label','Add a customer-facing label so clients know what they’re inserting.'); ok=false; first=first||'b-label'; } else fldClear('b-label');
     if(!ok){ document.getElementById(first).focus(); return; }
-    showToast((existing?'Updated':'Created')+(mode==='code'?' custom-coded':'')+' block: '+l);
-    setTimeout(()=>location.href='blocks.html',700);
+    saveVersion(nm);
+    const push=document.getElementById('svPush');
+    showToast((existing?'Updated':'Created')+(mode==='code'?' custom-coded':'')+' block: '+l + (usage>0 && push && push.checked?` · pushed to ${usage} documents`:''));
+    setTimeout(()=>location.href='blocks.html',800);
   });
-
   document.getElementById('delBtn').addEventListener('click',()=>{
     confirmAction({title:'Delete this block?',body:`“${existing.label}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
       showToast('Deleted block: '+existing.label); setTimeout(()=>location.href='blocks.html',700);
     });
   });
 
-  buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar();
+  buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar(); pushHist();
 }
 </script>
 </body>
