@@ -1,6 +1,7 @@
 /* ===== Tenderfy Subbie Portal — shared styles (from Figma 568:2199) ===== */
 :root{
   --teal:#38988A; --teal-bright:#6ADDB5; --teal-tint:rgba(56,152,138,.15);
+  --cta:#45A799; --cta-dark:#3A8E81;
   --nav:#27535C; --header:#2E343C;
   --ink:#2E3C3B; --gray:#596262; --light:#A1ADAB; --lighter:#CBD5D3; --bg-shade:#EAEDEC;
   --secondary:#FFBC4A; --accent:#F95246;
@@ -187,8 +188,8 @@ h3{font-size:15px;font-weight:600;margin-bottom:14px}
 .grow{flex:1;min-width:0}
 .rail{width:340px;flex-shrink:0;display:flex;flex-direction:column;gap:16px}
 .btn{font-family:inherit;font-size:14px;font-weight:600;padding:11px 18px;border-radius:12px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:8px;justify-content:center}
-.btn-primary{background:var(--teal);color:#fff}
-.btn-primary:hover{background:#2f8276}
+.btn-primary{background:var(--cta);color:#fff}
+.btn-primary:hover{background:var(--cta-dark)}
 .btn-outline{background:#fff;color:var(--ink);border-color:var(--light)}
 .btn-block{width:100%}
 .btn-danger-outline{background:#fff;color:var(--st-pink-tx);border-color:#eebcbc}
@@ -218,7 +219,7 @@ h3{font-size:15px;font-weight:600;margin-bottom:14px}
 .resp-card h3{color:#fff;font-size:16px;margin-bottom:4px}
 .resp-card .lead{color:#b7c0c4;font-size:12px;margin-bottom:14px}
 .resp-card .sec2{color:#fff;font-size:16px;font-weight:600;margin:20px 0 4px}
-.resp-btn-primary{width:100%;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;display:block;text-align:center}
+.resp-btn-primary{width:100%;background:var(--cta);color:#fff;border:none;border-radius:10px;padding:12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;display:block;text-align:center}
 .resp-btn-white{width:100%;background:#fff;color:var(--ink);border:none;border-radius:10px;padding:12px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:10px;display:flex;justify-content:center;align-items:center;position:relative}
 .resp-btn-white .car{position:absolute;right:14px;color:var(--gray)}
 .qsent{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px}
