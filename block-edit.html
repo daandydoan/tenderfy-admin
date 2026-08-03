@@ -93,9 +93,9 @@
   .vb-qbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;border-radius:100px;padding:7px 13px;font-size:12px;font-weight:500;color:var(--ink);cursor:pointer}
   .vb-qbtn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .vb-qbtn .ms{font-size:15px;color:var(--teal)}
-  .vb-tail{width:620px;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:11px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
-  .vb-tail.active{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
-  .vb-tail .ms{font-size:17px}
+  /* Drop indicators land inside the page itself (the section is the drop zone) */
+  .vb-block.drop-end::after{content:'';display:block;height:3px;background:var(--teal);border-radius:2px;margin:8px 2px 0}
+  .vb-page.drop-active{outline:2px dashed var(--teal);outline-offset:-8px}
   .vb-pal{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .vb-widget{display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid var(--border);border-radius:9px;padding:12px 8px;cursor:grab;background:#fff;text-align:center;font-size:11.5px;font-weight:500;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
   .vb-widget:hover{border-color:var(--teal);background:var(--teal-tint);color:var(--teal);transform:translateY(-1px)}
@@ -232,7 +232,6 @@
               <span class="muted" id="bar-count" style="font-weight:400"></span>
             </div>
             <div class="vb-page" id="page"></div>
-            <div class="vb-tail" id="tail"><span class="ms">add</span> Drop here</div>
           </div>
         </div>
         <div id="codePanel" style="display:none">
@@ -464,7 +463,6 @@ function pageInit(){
 
   const page=document.getElementById('page');
   const wrap=document.getElementById('cvWrap');
-  const tail=document.getElementById('tail');
   const codeArea=document.getElementById('codeArea');
   const codePrev=document.getElementById('codePrev');
 
@@ -767,7 +765,8 @@ function pageInit(){
     page.querySelectorAll('.ins-before').forEach(e=>e.classList.remove('ins-before'));
     page.querySelectorAll('.vb-col.over,.vb-col.ins-end').forEach(e=>e.classList.remove('over','ins-end'));
     page.querySelectorAll('.row-ins-before').forEach(e=>e.classList.remove('row-ins-before'));
-    tail.classList.remove('active');
+    const bw=document.getElementById('blockWrap'); if(bw) bw.classList.remove('drop-end');
+    page.classList.remove('drop-active');
   }
   function rowIndexFromY(y){ const rows=[...page.querySelectorAll('.vb-row')]; for(let i=0;i<rows.length;i++){ const b=rows[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; } return rows.length; }
   function colIndexFromY(col,y){ const els=[...col.querySelectorAll(':scope > .vb-el')]; for(let i=0;i<els.length;i++){ const b=els[i].getBoundingClientRect(); if(y<b.top+b.height/2) return i; } return els.length; }
@@ -778,7 +777,7 @@ function pageInit(){
     const rowMode = drag.kind==='new-row' || drag.kind==='move-row' || !overCol;
     if(e.dataTransfer) e.dataTransfer.dropEffect = drag.kind==='new-prim'?'copy':'move';
     clearInd();
-    if(rowMode){ const ri=rowIndexFromY(e.clientY); const rows=[...page.querySelectorAll('.vb-row')]; if(ri<rows.length) rows[ri].classList.add('row-ins-before'); else tail.classList.add('active'); }
+    if(rowMode){ const ri=rowIndexFromY(e.clientY); const rows=[...page.querySelectorAll('.vb-row')]; if(ri<rows.length) rows[ri].classList.add('row-ins-before'); else { const bw=document.getElementById('blockWrap'); if(bw) bw.classList.add('drop-end'); else page.classList.add('drop-active'); } }
     else { overCol.classList.add('over'); const ki=colIndexFromY(overCol,e.clientY); const els=[...overCol.querySelectorAll(':scope > .vb-el')]; if(ki<els.length) els[ki].classList.add('ins-before'); else overCol.classList.add('ins-end'); }
   });
   wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) clearInd(); });
