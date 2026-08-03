@@ -202,6 +202,7 @@
         <div class="card" id="elementsCard">
           <h3 class="ed-h">Elements</h3>
           <div class="vb-pal" id="palette"></div>
+          <div class="fhint" style="margin-top:10px">Drag onto the page, or click to add.</div>
         </div>
         <div class="card" id="codeCard" style="display:none">
           <h3 class="ed-h">Custom code</h3>
@@ -547,6 +548,7 @@ function pageInit(){
           <select id="emptyAdd" class="fin" style="max-width:280px">
             <option value="">Choose an element…</option>${opts}
           </select>
+          <div class="fhint" style="width:100%;margin-top:9px">…or drag elements straight onto this page from the <strong>Elements</strong> panel.</div>
         </div></div>`;
       document.getElementById('emptyAdd').addEventListener('change',e=>{ const v=e.target.value; if(!v)return; doc.push({cols:[[mkEl(v)]]}); sel={r:0,c:0,k:0}; render(); commit(); });
     } else {
