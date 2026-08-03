@@ -543,9 +543,14 @@ function pageInit(){
   }
   function render(){
     if(!doc.length){
+      const opts=Object.entries(byTag).map(([tag,ps])=>`<optgroup label="${tag}">${ps.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</optgroup>`).join('');
       page.innerHTML=`<div class="vb-empty"><span class="ms big">dashboard_customize</span>Empty block
-        <div class="qp"><b>Quick start</b>${TEMPLATES.map(t=>`<span class="vb-qbtn" data-tpl="${t.key}"><span class="ms">${t.icon}</span>${t.label}</span>`).join('')}</div></div>`;
-      page.querySelectorAll('[data-tpl]').forEach(b=>b.addEventListener('click',()=>loadTemplate(b.dataset.tpl)));
+        <div class="qp"><b>Add your first element</b>
+          <select id="emptyAdd" class="fin" style="max-width:280px">
+            <option value="">Choose an element…</option>${opts}
+          </select>
+        </div></div>`;
+      document.getElementById('emptyAdd').addEventListener('change',e=>{ const v=e.target.value; if(!v)return; doc.push({cols:[[mkEl(v)]]}); sel={r:0,c:0,k:0}; render(); commit(); });
     } else {
       page.innerHTML=`<div class="vb-block" id="blockWrap">`+doc.map((row,r)=>`
         <div class="vb-row" data-r="${r}">
