@@ -2,8 +2,14 @@
    Interactions referenced from the live staging site (stgsuperadmin.tenderfy.org). */
 
 /* ---- Sidebar: teal rail, wordmark logo, bottom logout (client-portal style) ---- */
-.c-side{transition:width .18s ease;width:87px;background:var(--nav);gap:0;padding:18px 0 16px;align-items:stretch;overflow-x:hidden}
-.c-side:hover{width:240px}
+/* Expands as an overlay ON TOP of the page and dims the main content — the main
+   section keeps its position/width (no reflow). */
+.capp{position:relative}
+.c-side{transition:width .18s ease;position:absolute;top:0;left:0;height:100vh;z-index:60;width:87px;background:var(--nav);gap:0;padding:18px 0 16px;align-items:stretch;overflow-x:hidden}
+.c-side:hover{width:240px;box-shadow:6px 0 28px rgba(0,0,0,.28)}
+.c-main{position:relative;margin-left:87px}
+.c-main::before{content:'';position:absolute;inset:0;background:rgba(16,26,23,.42);opacity:0;visibility:hidden;transition:opacity .18s ease;z-index:30;pointer-events:none}
+.c-side:hover ~ .c-main::before{opacity:1;visibility:visible}
 
 .c-side .clogo{margin:0 0 22px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0}
 .c-side .clogo img{object-fit:contain}
