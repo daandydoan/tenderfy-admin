@@ -129,6 +129,8 @@
   .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
   .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
+  .insp-ctl.col{flex-direction:column;align-items:stretch;gap:6px}
+  .bind-note{font-size:11px;color:var(--teal);display:flex;align-items:center;gap:5px}
   .seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
   .seg.full{display:flex;width:100%}
   .seg.full button{flex:1;justify-content:center}
@@ -268,7 +270,18 @@
             <div class="insp-h">Dimension</div>
             <div class="insp-row" data-field="pad"><label>Padding</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-pad" min="0" max="120"><input type="number" class="insp-num" id="s-padN"><span class="insp-unit">px</span></div></div>
             <div class="insp-row" data-field="sp"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
-            <div class="insp-row" data-field="bg"><label>Fill</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bg"><input type="text" class="insp-hex" id="s-bgH" placeholder="None (inherit)"></div></div>
+            <div class="insp-row tall" data-field="bg"><label>Fill</label><div class="insp-ctl col">
+              <select class="insp-sel" id="s-bgBind">
+                <option value="">Custom colour</option>
+                <option value="primary">Brand · Primary</option>
+                <option value="secondary">Brand · Secondary</option>
+                <option value="tint">Brand · Tint</option>
+                <option value="background">Brand · Background</option>
+                <option value="none">None (transparent)</option>
+              </select>
+              <div class="insp-ctl" id="s-bgLit"><input type="color" class="insp-color" id="s-bg"><input type="text" class="insp-hex" id="s-bgH" placeholder="#hex"></div>
+              <div class="bind-note" id="s-bgNote" style="display:none"></div>
+            </div></div>
           </div>
           <div class="insp-sec" data-sec="typo">
             <div class="insp-h">Typography</div>
@@ -288,7 +301,17 @@
             <div class="insp-h">Border</div>
             <div class="insp-row" data-field="rad"><label>Radius</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-rad" min="0" max="40"><input type="number" class="insp-num" id="s-radN"><span class="insp-unit">px</span></div></div>
             <div class="insp-row" data-field="bwstyle"><label>Width</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-bw"><span class="insp-unit">px</span><select class="insp-sel" id="s-bstyle" style="flex:1"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div></div>
-            <div class="insp-row" data-field="bcolor"><label>Colour</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-bcolor"><input type="text" class="insp-hex" id="s-bcolorH" placeholder="Inherit from brand"></div></div>
+            <div class="insp-row tall" data-field="bcolor"><label>Colour</label><div class="insp-ctl col">
+              <select class="insp-sel" id="s-bcolorBind">
+                <option value="">Custom colour</option>
+                <option value="primary">Brand · Primary</option>
+                <option value="secondary">Brand · Secondary</option>
+                <option value="tint">Brand · Tint</option>
+                <option value="background">Brand · Background</option>
+              </select>
+              <div class="insp-ctl" id="s-bcolorLit"><input type="color" class="insp-color" id="s-bcolor"><input type="text" class="insp-hex" id="s-bcolorH" placeholder="#hex"></div>
+              <div class="bind-note" id="s-bcolorNote" style="display:none"></div>
+            </div></div>
           </div>
         </div>
       </div>
@@ -395,7 +418,7 @@ function pageInit(){
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   const existing=id?BLOCKS.find(b=>b.id===id):null;
 
-  const elDef=()=>({pad:0,bg:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,bw:0,bstyle:'solid',bcolor:'#38988a'});
+  const elDef=()=>({pad:0,bg:'',bgBind:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:''});
   const mkEl=pid=>{ const e={id:pid, st:elDef()}; if(pid==='field') e.field='client.name'; if(pid==='image') e.src='placeholder'; return e; };
   const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
@@ -406,7 +429,8 @@ function pageInit(){
   let sel = null;
   let styleClip = null;
   const BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand}))];
-  const blockStyle={wmode:'fill', wpx:520, pad:0, sp:8, bg:'', rad:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6'};
+  const NEUTRAL={primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
+  const blockStyle={wmode:'fill', wpx:520, pad:0, sp:8, bg:'', bgBind:'', rad:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:''};
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
   const selEl=()=> sel ? doc[sel.r].cols[sel.c][sel.k] : null;
   // Fabricated "used in N documents" for the synced-block story.
@@ -538,18 +562,28 @@ function pageInit(){
   }
 
   // ---- Style application ----
+  // Colours can bind to a brand token so they resolve per client; geometry stays shared.
+  function tokens(){ return brand || NEUTRAL; }
+  function resolveFill(st){
+    const bd=st.bgBind; if(!bd) return (st.bg&&st.bg!=='transparent')?st.bg:''; if(bd==='none') return '';
+    const b=tokens(); return bd==='primary'?b.primary : bd==='secondary'?b.secondary : bd==='tint'?b.secondary+'22' : bd==='background'?b.background : '';
+  }
+  function resolveBColor(st){
+    const bd=st.bcolorBind; if(!bd) return st.bcolor;
+    const b=tokens(); return bd==='primary'?b.primary : bd==='secondary'?b.secondary : bd==='tint'?b.secondary+'55' : bd==='background'?b.background : st.bcolor;
+  }
   function applyBlockStyle(){
     const w=document.getElementById('blockWrap'); if(!w) return; const bs=blockStyle;
     w.style.width = bs.wmode==='fixed' ? bs.wpx+'px' : '100%'; w.style.maxWidth='100%';
     w.style.marginLeft = bs.wmode==='fixed'?'auto':''; w.style.marginRight = bs.wmode==='fixed'?'auto':'';
     w.style.padding = bs.pad?bs.pad+'px':''; w.style.gap = bs.sp+'px';
-    w.style.background = bs.bg||''; w.style.borderRadius = bs.rad?bs.rad+'px':'';
-    w.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+bs.bcolor):'none';
+    w.style.background = resolveFill(bs)||''; w.style.borderRadius = bs.rad?bs.rad+'px':'';
+    w.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+resolveBColor(bs)):'none';
   }
   function applyElStyle(node, st){
     if(!node) return;
-    node.style.padding = st.pad?st.pad+'px':''; node.style.background = (st.bg&&st.bg!=='transparent')?st.bg:'';
-    node.style.borderRadius = st.rad?st.rad+'px':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+st.bcolor):'';
+    node.style.padding = st.pad?st.pad+'px':''; node.style.background = resolveFill(st)||'';
+    node.style.borderRadius = st.rad?st.rad+'px':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+resolveBColor(st)):'';
     node.style.textAlign = st.align||'';
     const typo={};
     if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
@@ -596,15 +630,28 @@ function pageInit(){
     c.addEventListener('input',()=>{ target()[key]=c.value; h.value=c.value; applyActive(); commitStyle(); });
     h.addEventListener('change',()=>{ const v=h.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ target()[key]=v; c.value=v; applyActive(); commitStyle(); } });
   }
+  function syncColor(key){
+    const t=target(), bind=t[key+'Bind']||'';
+    document.getElementById('s-'+key+'Bind').value=bind;
+    const lit=document.getElementById('s-'+key+'Lit'), note=document.getElementById('s-'+key+'Note');
+    if(bind){
+      lit.style.display='none'; note.style.display='';
+      const col = key==='bg'?resolveFill(t):resolveBColor(t);
+      note.innerHTML=`<span style="display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.12);background:${col||'transparent'}"></span> Follows the client’s brand${brand?'':' (Default preview)'}`;
+    } else {
+      lit.style.display=''; note.style.display='none';
+      document.getElementById('s-'+key).value=t[key]||(key==='bg'?'#ffffff':'#38988a');
+      document.getElementById('s-'+key+'H').value=t[key]||'';
+    }
+  }
   function syncInspector(){
     const t=target();
     const setR=(rId,nId,k)=>{ document.getElementById(rId).value=t[k]||0; document.getElementById(nId).value=t[k]||0; };
     setR('s-pad','s-padN','pad'); setR('s-sp','s-spN','sp'); setR('s-rad','s-radN','rad');
     document.getElementById('s-size').value=t.size||''; document.getElementById('s-lh').value=t.lh||''; document.getElementById('s-bw').value=t.bw||0;
     document.getElementById('s-font').value=t.font||''; document.getElementById('s-weight').value=t.weight||''; document.getElementById('s-bstyle').value=t.bstyle||'solid';
-    document.getElementById('s-bg').value=t.bg||'#ffffff'; document.getElementById('s-bgH').value=t.bg||'';
+    syncColor('bg'); syncColor('bcolor');
     document.getElementById('s-color').value=t.color||'#333333'; document.getElementById('s-colorH').value=t.color||'';
-    document.getElementById('s-bcolor').value=t.bcolor||'#38988a'; document.getElementById('s-bcolorH').value=t.bcolor||'';
     document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.al===(t.align||'')));
     document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x.dataset.w===blockStyle.wmode));
     document.getElementById('s-wpx').value=blockStyle.wpx; document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed';
@@ -625,6 +672,8 @@ function pageInit(){
     bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
     bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
     bindColor('s-bg','s-bgH','bg'); bindColor('s-color','s-colorH','color'); bindColor('s-bcolor','s-bcolorH','bcolor');
+    document.getElementById('s-bgBind').addEventListener('change',e=>{ target().bgBind=e.target.value; applyActive(); syncInspector(); commitStyle(); });
+    document.getElementById('s-bcolorBind').addEventListener('change',e=>{ target().bcolorBind=e.target.value; applyActive(); syncInspector(); commitStyle(); });
     document.getElementById('s-align').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ target().align=b.dataset.al; document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
     document.querySelectorAll('#s-wmode button').forEach(b=>b.addEventListener('click',()=>{ blockStyle.wmode=b.dataset.w; document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x===b)); document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed'; applyActive(); commitStyle(); }));
     document.getElementById('s-wpx').addEventListener('input',e=>{ blockStyle.wpx=+e.target.value||0; applyActive(); commitStyle(); });
@@ -633,10 +682,10 @@ function pageInit(){
     document.querySelectorAll('#s-imgsrc button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().src=b.dataset.src; render(); commit(); } }));
     document.querySelectorAll('#s-perm button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().perm=b.dataset.perm; render(); commit(); } }));
     // presets / copy / paste / reset
-    document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
+    document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); if('bg' in p.st) target().bgBind=''; if('bcolor' in p.st) target().bcolorBind=''; applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
     document.getElementById('s-copy').addEventListener('click',()=>{ styleClip=clone(target()); document.getElementById('s-paste').disabled=false; showToast('Style copied'); });
     document.getElementById('s-paste').addEventListener('click',()=>{ if(!styleClip) return; Object.assign(target(), clone(styleClip)); applyActive(); syncInspector(); commit(); showToast('Style pasted'); });
-    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,pad:0,sp:8,bg:'',rad:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6'}); } applyActive(); render(); commit(); showToast('Style reset'); });
+    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,pad:0,sp:8,bg:'',bgBind:'',rad:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:''}); } applyActive(); render(); commit(); showToast('Style reset'); });
     syncInspector();
   }
 
