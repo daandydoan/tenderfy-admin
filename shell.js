@@ -82,7 +82,7 @@ function buildShell(){
     </aside>
     <div class="c-main">
       <div class="c-header">
-        <div class="l"><span class="ms fill" style="font-size:20px">home</span> <span>${title}</span></div>
+        <div class="l"><span class="ms nav-burger" id="navToggle">menu</span><span class="ms fill" style="font-size:20px">home</span> <span>${title}</span></div>
         <div class="r">
           <span class="hsearch"><span class="ms">search</span><input type="text" placeholder="Search everything…"></span>
           <span class="hbtn"><span class="ms fill" style="cursor:pointer">notifications</span><span class="hbadge">26</span>
@@ -94,7 +94,8 @@ function buildShell(){
         </div>
       </div>
       <div class="c-content"></div>
-    </div>`;
+    </div>
+    <div class="c-scrim"></div>`;
 
   const contentHost = capp.querySelector('.c-content');
   if(src){ while(src.firstChild) contentHost.appendChild(src.firstChild); src.remove(); }
@@ -102,6 +103,11 @@ function buildShell(){
 
   wireHeader();
   buildDrawer();
+  // Hamburger nav drawer (small screens)
+  const burger = document.getElementById('navToggle');
+  const scrim = capp.querySelector('.c-scrim');
+  if(burger) burger.addEventListener('click', (e)=>{ e.stopPropagation(); capp.classList.toggle('nav-open'); });
+  if(scrim) scrim.addEventListener('click', ()=>capp.classList.remove('nav-open'));
   // Collapsible sidebar groups (parent header toggles its submenu)
   document.querySelectorAll('.cgroup-head').forEach(h=>{
     h.addEventListener('click', (e)=>{ e.preventDefault(); h.closest('.cgroup').classList.toggle('open'); });

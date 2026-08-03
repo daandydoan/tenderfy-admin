@@ -10,6 +10,8 @@
 .c-main{position:relative;margin-left:87px}
 .c-main::before{content:'';position:absolute;inset:0;background:rgba(16,26,23,.42);opacity:0;visibility:hidden;transition:opacity .18s ease;z-index:30;pointer-events:none}
 .c-side:hover ~ .c-main::before{opacity:1;visibility:visible}
+.nav-burger{display:none;cursor:pointer;font-size:24px;margin-right:6px}
+.c-scrim{display:none;position:fixed;inset:0;background:rgba(16,26,23,.42);opacity:0;visibility:hidden;transition:opacity .2s ease;z-index:55}
 
 .c-side .clogo{margin:0 0 22px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0}
 .c-side .clogo img{object-fit:contain}
@@ -112,3 +114,26 @@
 .rmodal .iinput{display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;background:#fff;padding-right:10px}
 .rmodal .iinput input,.rmodal .iinput select{border:none;background:transparent;flex:1;font-family:inherit;font-size:14px;padding:10px 12px;min-width:0}
 .rmodal .iinput .ms{font-size:18px;color:var(--light);flex-shrink:0}
+
+/* ---- Small screens: sidebar becomes a hamburger drawer (placed last so it wins) ---- */
+@media(max-width:1100px){
+  .nav-burger{display:inline-flex}
+  .c-scrim{display:block}
+  .capp.nav-open .c-scrim{opacity:1;visibility:visible}
+  .c-side{width:240px;transform:translateX(-100%);box-shadow:none}
+  .c-side:hover{width:240px;box-shadow:none}
+  .capp.nav-open .c-side{transform:translateX(0);box-shadow:6px 0 28px rgba(0,0,0,.28)}
+  .c-main{margin-left:0}
+  .c-side:hover ~ .c-main::before{opacity:0;visibility:hidden}
+  /* force the expanded look while it's a drawer */
+  .c-side .clogo{justify-content:flex-start;padding-left:26px}
+  .c-side .clogo .logo-sym{display:none}
+  .c-side .clogo .logo-word{display:block}
+  .c-side .cic{justify-content:flex-start;padding-left:26px;gap:15px}
+  .c-side .clbl{display:inline}
+  .c-side .cchev{display:inline-block}
+  .c-side .cgroup.open .c-subnav{display:flex}
+  .c-side .c-subnav .cic{padding-left:56px}
+  .c-side .c-logout,.c-side:not(:hover) .c-logout{width:auto;margin:14px 16px 0;border-radius:100px}
+  .c-side .c-logout .clbl{display:inline}
+}
