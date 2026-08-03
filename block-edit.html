@@ -373,7 +373,7 @@ function pageInit(){
     document.getElementById('b-desc').value=existing.desc;
     document.getElementById('b-cat').value=BLOCK_CATS.includes(existing.cat)?existing.cat:BLOCK_CATS[0];
     document.getElementById('pg-title').textContent='Edit — '+existing.label;
-    if(existing.bespoke) document.getElementById('delBtn').style.display='';
+    document.getElementById('delBtn').style.display='';
   }
 
   // ---- Render (visual) ----

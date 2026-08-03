@@ -19,10 +19,9 @@
     <div class="pg-head">
       <div>
         <div class="tn-title">Blocks</div>
-        <div class="pg-sub">The building blocks behind the Block Builder — one shared set for every client; <strong>Bespoke</strong> still needs standardising.</div>
+        <div class="pg-sub">The building blocks behind the Block Builder — one shared set for every client.</div>
       </div>
       <div class="pg-acts">
-        <a class="btn btn-outline btn-sm" id="stdBtn" style="display:none"></a>
         <a class="btn btn-primary btn-sm" href="block-edit.html"><span class="ms" style="font-size:18px">add</span> Create Custom Block</a>
       </div>
     </div>
@@ -38,13 +37,6 @@ function pageInit(){
   const cats=['All Blocks', ...BLOCK_CATS];
   let active='All Blocks';
 
-  function bespokeCount(){ return BLOCKS.filter(b=>b.bespoke).length; }
-  function renderStdBtn(){
-    const n=bespokeCount(), btn=document.getElementById('stdBtn');
-    if(!n){ btn.style.display='none'; return; }
-    btn.style.display='';
-    btn.innerHTML=`<span class="ms" style="font-size:17px">published_with_changes</span> Standardise ${n} bespoke`;
-  }
   function renderTabs(){
     document.getElementById('tabs').innerHTML=cats.map(c=>`<span class="blk-tab ${c===active?'on':''}" data-cat="${c}">${c}</span>`).join('');
     document.querySelectorAll('#tabs .blk-tab').forEach(t=>t.addEventListener('click',()=>{active=t.dataset.cat;renderTabs();renderGrid();}));
@@ -53,21 +45,13 @@ function pageInit(){
     const list=BLOCKS.filter(b=>active==='All Blocks'||b.cat===active);
     document.getElementById('grid').innerHTML=list.map(b=>`
       <a class="blk-card" href="block-edit.html#id=${b.id}">
-        <div class="blk-name">${b.label} ${b.bespoke?'<span class="blk-custom">Bespoke</span>':''}</div>
+        <div class="blk-name">${b.label}</div>
         <div class="blk-preview">${blockPreview(b.p)}</div>
         <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>
-        ${b.bespoke&&b.seen?`<div style="font-size:11px;color:var(--st-amber-tx);padding-top:5px">Seen in: ${b.seen}</div>`:''}
       </a>`).join('');
   }
-  document.getElementById('stdBtn').addEventListener('click',()=>{
-    const gaps=BLOCKS.filter(b=>b.bespoke);
-    if(!gaps.length) return;
-    confirmAction({title:`Standardise ${gaps.length} blocks?`,body:`${gaps.map(g=>g.label).join(', ')} will be made available to every client, so one block builder covers the whole customer base.`,confirm:'Standardise'},()=>{
-      gaps.forEach(b=>b.bespoke=false); renderGrid(); renderStdBtn(); showToast(`Standardised ${gaps.length} blocks across all clients`);
-    });
-  });
 
-  renderTabs(); renderGrid(); renderStdBtn();
+  renderTabs(); renderGrid();
 }
 </script>
 </body>

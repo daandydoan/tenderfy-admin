@@ -1,13 +1,7 @@
 // Content blocks behind Tenderfy's Block Builder — the pieces Documents are built from.
 // Shared by the Blocks library, the block editor and the document editor.
 //
-// Goal: ONE block set for every client. Blocks are "standard" (available to all)
-// unless flagged `bespoke` — those need standardising. `label` is what the client
-// sees in Add Block; `seen` records which tenancies currently carry a bespoke block.
-//
-// Bespoke set below comes from the 28 Jul 2026 component audit (with Shivam):
-// 8 tenancies run defaults; CPM, EIWA and Pirrota carry Table, Signature and
-// (EIWA only) Catalogue. Everything else is already uniform across the platform.
+// Goal: ONE shared block set for every client. `label` is what the client sees in Add Block.
 const BLOCKS = [
   {id:'heading',    name:'Heading',             label:'Heading',            desc:'A single section heading.',                            cat:'Title Blocks', p:'heading'},
   {id:'subheading', name:'Sub-Heading',         label:'Sub-heading',        desc:'A smaller heading with a supporting line.',            cat:'Title Blocks', p:'subheading'},
@@ -30,10 +24,9 @@ const BLOCKS = [
   {id:'textimg',    name:'Text & Image',        label:'Text with image',    desc:'Text on the left, an image on the right.',             cat:'Image & Text', p:'textimg'},
   {id:'imgcap',     name:'Image + Caption',     label:'Image with caption', desc:'An image with a caption underneath.',                  cat:'Image & Text', p:'imgcap'},
   {id:'feature',    name:'Two-Column Feature',  label:'Feature panel',      desc:'An image beside a headline and supporting text.',      cat:'Image & Text', p:'feature'},
-  // Bespoke — from the 28 Jul audit; only some tenancies have these today.
-  {id:'table',      name:'Table',               label:'Table',              desc:'Rows and columns for rates, schedules or comparisons.',cat:'Tables & Sign-off', p:'table',     bespoke:true, seen:'CPM, EIWA, Pirrota'},
-  {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',            cat:'Tables & Sign-off', p:'signature', bespoke:true, seen:'CPM, EIWA, Pirrota'},
-  {id:'catalogue',  name:'Catalogue',           label:'Catalogue',          desc:'A list of items with an image, title and details.',    cat:'Image & Text',      p:'catalogue', bespoke:true, seen:'EIWA'},
+  {id:'table',      name:'Table',               label:'Table',              desc:'Rows and columns for rates, schedules or comparisons.',cat:'Tables & Sign-off', p:'table'},
+  {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',            cat:'Tables & Sign-off', p:'signature'},
+  {id:'catalogue',  name:'Catalogue',           label:'Catalogue',          desc:'A list of items with an image, title and details.',    cat:'Image & Text',      p:'catalogue'},
 ];
 const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text','Tables & Sign-off'];
 
