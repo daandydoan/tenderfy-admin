@@ -545,10 +545,10 @@ function pageInit(){
       const opts=Object.entries(byTag).map(([tag,ps])=>`<optgroup label="${tag}">${ps.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</optgroup>`).join('');
       page.innerHTML=`<div class="vb-empty"><span class="ms big">dashboard_customize</span>Empty block
         <div class="qp"><b>Add your first element</b>
+          <div class="fhint" style="width:100%;margin:0 0 3px">Drag elements onto this page from the <strong>Elements</strong> panel, or choose one:</div>
           <select id="emptyAdd" class="fin" style="max-width:280px">
             <option value="">Choose an element…</option>${opts}
           </select>
-          <div class="fhint" style="width:100%;margin-top:9px">…or drag elements straight onto this page from the <strong>Elements</strong> panel.</div>
         </div></div>`;
       document.getElementById('emptyAdd').addEventListener('change',e=>{ const v=e.target.value; if(!v)return; doc.push({cols:[[mkEl(v)]]}); sel={r:0,c:0,k:0}; render(); commit(); });
     } else {
