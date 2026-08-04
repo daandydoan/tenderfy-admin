@@ -89,6 +89,28 @@
   .doc-tools .tb.grab{cursor:grab}
   .doc-tools .tb.del{background:#d5493f}
   .doc-tools .tb .ms{font-size:15px}
+  /* Layout / Preview mode toggle (in the canvas bar, next to the doc name) */
+  .mode-seg{margin-left:auto;display:inline-flex;background:#dde5e2;border-radius:8px;padding:2px}
+  .mode-seg button{border:none;background:transparent;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--gray);padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px}
+  .mode-seg button .ms{font-size:15px}
+  .mode-seg button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  /* Selected block + per-block style box */
+  .doc-blk{border-radius:12px}
+  .doc-blk.sel{outline:2px solid var(--teal);outline-offset:3px}
+  .doc-blk .blk-box{transition:padding .1s,background .1s,border-color .1s,border-radius .1s}
+  /* Block inspector */
+  .bi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .bi-x{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .bi-x:hover{border-color:var(--teal);color:var(--teal)}
+  .bi-x .ms{font-size:16px}
+  .bi-tog{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray);cursor:pointer}
+  .bi-tog input[type=checkbox]{accent-color:var(--teal);width:14px;height:14px;margin:0}
+  .ds-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:16px 0 8px}
+  .ds-lbl:first-child{margin-top:2px}
+  .ds-fld{margin-bottom:9px}
+  .ds-fld>label{display:block;font-size:11px;color:var(--gray);margin-bottom:4px}
+  .ds-in{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:8px 9px;font-family:inherit;font-size:12.5px;color:var(--ink);background:#fff}
+  textarea.ds-in{resize:vertical;line-height:1.5}
 </style>
 </head>
 <body data-page="library" data-title="Documents">
@@ -97,7 +119,7 @@
     <div class="pg-head">
       <div>
         <input id="d-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:320px" value="Untitled Document">
-        <div class="pg-sub">Structure only, built from <a href="blocks.html" style="color:var(--teal)">blocks</a> — client branding applies when a template is assigned.</div>
+        <div class="pg-sub">Built from <a href="blocks.html" style="color:var(--teal)">blocks</a> — style each block, set example content, and pick a client to preview with their brand.</div>
       </div>
       <div class="pg-acts">
         <span class="badge b-draft" id="d-badge"><span class="b-dot"></span>Draft</span>
@@ -124,7 +146,12 @@
           <button class="tb-btn on" id="styleBtn" title="Toggle Properties panel" style="margin-left:auto"><span class="ms">tune</span> Properties</button>
         </div>
         <div class="vb-canvas" id="cvWrap">
-          <div class="vb-bar"><span class="ms" style="font-size:16px;color:var(--teal)">description</span> <span id="doc-bar">Untitled Document</span> <span class="muted" id="doc-count" style="font-weight:400"></span></div>
+          <div class="vb-bar"><span class="ms" style="font-size:16px;color:var(--teal)">description</span> <span id="doc-bar">Untitled Document</span> <span class="muted" id="doc-count" style="font-weight:400"></span>
+            <div class="mode-seg" id="modeSeg">
+              <button data-mode="layout" class="on"><span class="ms">dashboard</span> Layout</button>
+              <button data-mode="preview"><span class="ms">visibility</span> Preview</button>
+            </div>
+          </div>
           <div class="vb-page" id="canvas"></div>
           <div class="vb-tail" id="drop"><span class="ms">add</span> Drag a block here, or click one on the left</div>
         </div>
@@ -132,8 +159,30 @@
 
       <!-- RIGHT: document properties -->
       <div class="ed3-col" id="rightCol">
+        <!-- Block inspector: shown when a block is selected in Layout mode -->
+        <div id="blockInspector" style="display:none">
+          <div class="card">
+            <div class="bi-head"><h3 class="ed-h" style="margin:0">Block</h3><button class="bi-x" id="bi-close" title="Deselect"><span class="ms">close</span></button></div>
+            <strong id="bi-name" style="font-size:13.5px;color:var(--ink)"></strong>
+            <div class="fhint" id="bi-desc" style="margin-top:3px"></div>
+
+            <div class="ds-lbl" id="bi-content-lbl" style="display:none">Example content</div>
+            <div id="bi-content"></div>
+
+            <div class="ds-lbl">Block style</div>
+            <div class="ds-row"><label>Padding</label><div class="ds-ctl"><input type="range" id="bs-pad" min="0" max="48"><input type="number" class="ds-num" id="bs-padN"><span class="ds-u">px</span></div></div>
+            <div class="ds-row"><label>Spacing</label><div class="ds-ctl"><input type="range" id="bs-gap" min="0" max="60"><input type="number" class="ds-num" id="bs-gapN"><span class="ds-u">px</span></div></div>
+            <div class="ds-row"><label>Radius</label><div class="ds-ctl"><input type="range" id="bs-rad" min="0" max="24"><input type="number" class="ds-num" id="bs-radN"><span class="ds-u">px</span></div></div>
+            <div class="ds-row"><label class="bi-tog"><input type="checkbox" id="bs-bgOn">Fill</label><div class="ds-ctl"><input type="color" id="bs-bg"><input class="ds-hex" id="bs-bgH"></div></div>
+            <div class="ds-row"><label class="bi-tog"><input type="checkbox" id="bs-bcOn">Border</label><div class="ds-ctl"><input type="color" id="bs-bc"><input class="ds-hex" id="bs-bcH"></div></div>
+          </div>
+        </div>
+
+        <div id="docSettings">
         <div class="card">
           <h3 class="ed-h">Document</h3>
+          <div class="fld"><label for="d-client">Client this document is for</label><select class="fin" id="d-client"></select></div>
+          <div class="fhint" id="d-client-hint" style="margin:-6px 0 12px">Brand-neutral — no client brand applied.</div>
           <div class="fld"><label for="d-type">Document type</label><select class="fin" id="d-type"></select></div>
           <div class="fld"><label for="d-status">Status</label><select class="fin" id="d-status"><option value="draft">Draft</option><option value="published">Published</option><option value="deprecated">Deprecated</option></select></div>
           <div class="fld"><label for="d-desc">Description</label><textarea class="fin" id="d-desc" rows="2" placeholder="What is this document for?"></textarea></div>
@@ -150,6 +199,7 @@
           <h3 class="ed-h">Composition</h3>
           <div class="hstack"><span class="ms" style="color:var(--teal)">grid_view</span> <strong id="p-count">0</strong> <span class="muted">blocks</span></div>
         </div>
+        </div>
       </div>
     </div>
     <div class="ed3-scrim" id="ed3Scrim"></div>
@@ -158,6 +208,9 @@
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
 <script src="library-data.js"></script>
+<script src="tenant-data.js"></script>
+<script src="primitives.js"></script>
+<script src="block-layouts.js"></script>
 <script>
 function pageInit(){
   const bById=Object.fromEntries(BLOCKS.map(b=>[b.id,b]));
@@ -166,7 +219,12 @@ function pageInit(){
 
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   const doc=id?COMPONENTS.find(c=>c.id===id):null;
-  let items = doc ? ['heading','paragraph','imgtext','list','img2'] : [];
+  // Each block on the canvas is an INSTANCE with its own style + example content.
+  let uid=0;
+  function mkInst(bid){ return {k:++uid, bid, style:{pad:0,gap:16,rad:0,bgOn:false,bg:'#ffffff',bcOn:false,bc:'#dbe3e0'}, content:{}}; }
+  let items = doc ? ['heading','paragraph','imgtext','list','img2'].map(mkInst) : [];
+  // Editor state
+  let mode='layout', selK=null, curItem=null, brand=null;
 
   if(doc){
     document.getElementById('d-name').value=doc.name;
@@ -200,37 +258,57 @@ function pageInit(){
 
   // ---- Canvas ----
   const wrap=document.getElementById('cvWrap'), canvas=document.getElementById('canvas'), drop=document.getElementById('drop');
+  function boxStyle(s){ let c=`padding:${s.pad}px;border-radius:${s.rad}px;`; if(s.bgOn)c+=`background:${s.bg};`; if(s.bcOn)c+=`border:1px solid ${s.bc};`; return c; }
+  // Render a block instance as a real, brand-styled document block (Preview mode).
+  function renderBlockInstance(it){
+    const b=bById[it.bid], tmp=document.createElement('div');
+    tmp.innerHTML=(typeof composeBlock==='function')?composeBlock(b, brand):blockPreview(b.p);
+    if(it.content.title){ const h=tmp.querySelector('h3,h4,h2'); if(h) h.textContent=it.content.title; }
+    if(it.content.body){ const p=tmp.querySelector('p,li,blockquote'); if(p) p.textContent=it.content.body; }
+    const s=it.style; let c=`box-sizing:border-box;padding:${s.pad}px;border-radius:${s.rad}px;margin-bottom:${s.gap}px;`;
+    if(s.bgOn)c+=`background:${s.bg};`; if(s.bcOn)c+=`border:1px solid ${s.bc};`;
+    return `<div class="pv-blk" style="${c}">${tmp.innerHTML}</div>`;
+  }
+  function applyCanvasGap(){ canvas.style.gap=(mode==='preview'?0:docStyle.gap)+'px'; }
   function render(){
+    applyCanvasGap();
+    canvas.style.setProperty('--teal', brand?brand.secondary:'');
     if(!items.length){
       canvas.innerHTML=`<div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div>`;
+      drop.style.display='';
+    } else if(mode==='preview'){
+      canvas.innerHTML=items.map(renderBlockInstance).join('');
+      drop.style.display='none';
     } else {
-      canvas.innerHTML=items.map((bid,i)=>{const b=bById[bid];return `
-        <div class="doc-blk blk-card" draggable="true" data-i="${i}">
+      canvas.innerHTML=items.map((it,i)=>{const b=bById[it.bid];return `
+        <div class="doc-blk blk-card ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}">
           <div class="doc-tools"><span class="tb grab" data-grip><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}"><span class="ms">delete</span></span></div>
           <div class="blk-name">${b.label} ${b.bespoke?'<span class="blk-custom">Bespoke</span>':''}</div>
-          <div class="blk-preview">${blockPreview(b.p)}</div>
+          <div class="blk-box blk-preview" style="${boxStyle(it.style)}">${blockPreview(b.p)}</div>
           <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>
         </div>`;}).join('');
+      drop.style.display='';
     }
     document.getElementById('p-count').textContent=items.length;
     document.getElementById('doc-count').textContent=items.length?`· ${items.length} block${items.length>1?'s':''}`:'';
     wire();
   }
   function wire(){
-    canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();items.splice(+x.dataset.rm,1);render();}));
+    canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();const [rm]=items.splice(+x.dataset.rm,1);if(rm&&rm.k===selK)selK=null;render();renderInspector();}));
     canvas.querySelectorAll('.doc-blk').forEach(el=>{
+      el.addEventListener('click',e=>{ if(e.target.closest('.doc-tools'))return; selK=+el.dataset.k; render(); renderInspector(); });
       el.addEventListener('dragstart',e=>{e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');});
       el.addEventListener('dragend',()=>el.classList.remove('dragging'));
       el.addEventListener('dragover',e=>e.preventDefault());
       el.addEventListener('drop',e=>{
         e.preventDefault();e.stopPropagation();
         const mv=e.dataTransfer.getData('move'), add=e.dataTransfer.getData('add'), to=+el.dataset.i;
-        if(add){items.splice(to,0,add);} else if(mv!==''){const [m]=items.splice(+mv,1);items.splice(to,0,m);}
+        if(add){items.splice(to,0,mkInst(add));} else if(mv!==''){const [m]=items.splice(+mv,1);items.splice(to,0,m);}
         render();
       });
     });
   }
-  function addItem(bid){ items.push(bid); render(); showToast('Added block: '+bById[bid].label); }
+  function addItem(bid){ const it=mkInst(bid); items.push(it); selK=(mode==='layout')?it.k:null; render(); renderInspector(); showToast('Added block: '+bById[bid].label); }
   wrap.addEventListener('dragover',e=>{ if(e.dataTransfer.types.includes('add')){ e.preventDefault(); drop.classList.add('over'); } });
   wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) drop.classList.remove('over'); });
   wrap.addEventListener('drop',e=>{ drop.classList.remove('over'); const add=e.dataTransfer.getData('add'); if(add && !e.target.closest('.doc-blk')){ e.preventDefault(); addItem(add); } });
@@ -254,7 +332,7 @@ function pageInit(){
     const p=document.getElementById('canvas');
     p.style.background=docStyle.bg;
     p.style.padding=docStyle.pad+'px';
-    p.style.gap=docStyle.gap+'px';
+    p.style.gap=(mode==='preview'?0:docStyle.gap)+'px';
     p.style.borderRadius=docStyle.rad+'px';
   }
   function bindRange(rId,nId,key){
@@ -267,6 +345,71 @@ function pageInit(){
   dbg.value=docStyle.bg; dbgH.value=docStyle.bg.toUpperCase();
   dbg.addEventListener('input',()=>{ docStyle.bg=dbg.value; dbgH.value=dbg.value.toUpperCase(); applyDocStyle(); });
   dbgH.addEventListener('input',e=>{ const v=e.target.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ docStyle.bg=v; dbg.value=v; applyDocStyle(); } });
+
+  // ---- Client / brand inheritance ----
+  const clientSel=document.getElementById('d-client');
+  const CLIENTS=[{name:'No client (brand-neutral)',brand:null}, ...TENANTS.map(t=>({name:t.name,brand:t.brand}))];
+  clientSel.innerHTML=CLIENTS.map((c,i)=>`<option value="${i}">${c.name}</option>`).join('');
+  clientSel.addEventListener('change',()=>{
+    const c=CLIENTS[+clientSel.value]; brand=c.brand;
+    document.getElementById('d-client-hint').innerHTML = brand
+      ? `Brand applied — <strong style="color:${brand.primary}">${c.name}</strong>'s colours &amp; fonts inherit into each block. See it in Preview.`
+      : 'Brand-neutral — no client brand applied.';
+    render();
+  });
+
+  // ---- Mode toggle (Layout / Preview) ----
+  function setMode(m){
+    mode=m;
+    document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x.dataset.mode===m));
+    if(m==='preview') selK=null;
+    applyDocStyle(); renderInspector(); render();
+  }
+  document.querySelectorAll('#modeSeg button').forEach(x=>x.addEventListener('click',()=>setMode(x.dataset.mode)));
+
+  // ---- Block inspector (per-block content + style) ----
+  function renderInspector(){
+    const it=items.find(x=>x.k===selK), show=it&&mode==='layout';
+    document.getElementById('blockInspector').style.display=show?'':'none';
+    document.getElementById('docSettings').style.display=show?'none':'';
+    if(show) fillInspector(it);
+  }
+  function fillInspector(it){
+    curItem=it; const b=bById[it.bid];
+    document.getElementById('bi-name').textContent=b.label;
+    document.getElementById('bi-desc').textContent=b.desc;
+    const s=it.style, setv=(r,n,v)=>{document.getElementById(r).value=v;document.getElementById(n).value=v;};
+    setv('bs-pad','bs-padN',s.pad); setv('bs-gap','bs-gapN',s.gap); setv('bs-rad','bs-radN',s.rad);
+    document.getElementById('bs-bgOn').checked=s.bgOn; document.getElementById('bs-bg').value=s.bg; document.getElementById('bs-bgH').value=s.bg.toUpperCase();
+    document.getElementById('bs-bcOn').checked=s.bcOn; document.getElementById('bs-bc').value=s.bc; document.getElementById('bs-bcH').value=s.bc.toUpperCase();
+    const els=(typeof blockElements==='function')?blockElements(b):[];
+    const hasTitle=els.some(e=>['heading','subheading','cover'].includes(e));
+    const hasBody=els.some(e=>['paragraph','list','quote','callout'].includes(e));
+    document.getElementById('bi-content-lbl').style.display=(hasTitle||hasBody)?'':'none';
+    let html='';
+    if(hasTitle) html+=`<div class="ds-fld"><label>Title</label><input class="ds-in" id="ct-title" placeholder="Heading text…"></div>`;
+    if(hasBody)  html+=`<div class="ds-fld"><label>Body text</label><textarea class="ds-in" id="ct-body" rows="3" placeholder="Body copy…"></textarea></div>`;
+    if(!hasTitle&&!hasBody) html=`<div class="fhint" style="margin:2px 0 4px">No editable text in this block — style it below, then check Preview.</div>`;
+    const cw=document.getElementById('bi-content'); cw.innerHTML=html;
+    const t=document.getElementById('ct-title'); if(t){ t.value=it.content.title||''; t.addEventListener('input',()=>{it.content.title=t.value; if(mode==='preview')render();}); }
+    const bd=document.getElementById('ct-body'); if(bd){ bd.value=it.content.body||''; bd.addEventListener('input',()=>{it.content.body=bd.value; if(mode==='preview')render();}); }
+  }
+  function biNum(rId,nId,key){
+    const R=document.getElementById(rId),N=document.getElementById(nId);
+    const set=v=>{ if(!curItem)return; v=Math.max(+R.min,Math.min(+R.max,Math.round(+v||0))); curItem.style[key]=v; R.value=v; N.value=v; render(); };
+    R.addEventListener('input',()=>set(R.value)); N.addEventListener('input',()=>set(N.value));
+  }
+  biNum('bs-pad','bs-padN','pad'); biNum('bs-gap','bs-gapN','gap'); biNum('bs-rad','bs-radN','rad');
+  function biColor(togId,colId,hexId,onKey,valKey){
+    const T=document.getElementById(togId),C=document.getElementById(colId),H=document.getElementById(hexId);
+    const push=()=>{ if(!curItem)return; curItem.style[onKey]=T.checked; curItem.style[valKey]=C.value; H.value=C.value.toUpperCase(); render(); };
+    T.addEventListener('change',push);
+    C.addEventListener('input',()=>{ if(!T.checked)T.checked=true; push(); });
+    H.addEventListener('input',()=>{ if(!curItem)return; const v=H.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ C.value=v; if(!T.checked)T.checked=true; push(); } });
+  }
+  biColor('bs-bgOn','bs-bg','bs-bgH','bgOn','bg'); biColor('bs-bcOn','bs-bc','bs-bcH','bcOn','bc');
+  document.getElementById('bi-close').addEventListener('click',()=>{ selK=null; renderInspector(); render(); });
+  canvas.addEventListener('click',e=>{ if(mode==='layout' && !e.target.closest('.doc-blk')){ selK=null; renderInspector(); render(); } });
 
   // ---- Responsive panels (Properties collapsible / drawers on small screens) ----
   const ed3=document.querySelector('.ed3');
@@ -282,7 +425,7 @@ function pageInit(){
   document.getElementById('ed3Scrim').addEventListener('click',()=>{ elOpen=false; styleOpen=false; applyPanels(); });
   window.addEventListener('resize',()=>{ const wide=window.innerWidth>1100; if(wide!==lastWide){ lastWide=wide; styleOpen=wide; elOpen=false; applyPanels(); } });
 
-  renderPalette(); render(); applyDocStyle(); applyPanels();
+  renderPalette(); render(); applyDocStyle(); applyPanels(); renderInspector();
 }
 </script>
 </body>
