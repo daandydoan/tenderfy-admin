@@ -20,14 +20,14 @@
   .bt-note .ms{font-size:16px;color:var(--teal)}
   .bt-cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
   .bt-tok{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}
-  .bt-sw{height:46px}
+  .bt-sw{height:64px;position:relative}
   .bt-tok .bt-body{padding:9px 11px}
   .bt-tok .nm{font-weight:600;font-size:12.5px;display:flex;align-items:center;justify-content:space-between;gap:6px}
   .bt-tok .val{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--gray);margin-top:1px}
   .bt-tok .ap{font-size:10.5px;color:var(--light);margin-top:5px;line-height:1.35}
   .bt-tok .row2{margin-top:7px;display:flex;gap:5px}
   .bt-bind{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--teal);background:var(--teal-tint);border-radius:100px;padding:2px 7px}
-  .bt-scope{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--gray);background:#eef2f1;border:1px solid var(--border);border-radius:100px;padding:2px 7px}
+  .bt-scope{position:absolute;top:9px;right:9px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#3a4442;background:rgba(255,255,255,.92);border-radius:100px;padding:3px 9px;box-shadow:0 1px 2px rgba(0,0,0,.08)}
   .bt-fonts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
   .bt-font{border:1px solid var(--border);border-radius:10px;padding:11px 13px}
   .bt-font .big{font-size:28px;line-height:1;margin-bottom:6px}
@@ -35,6 +35,8 @@
   .bt-scale-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
   .bt-scale-row:last-child{border-bottom:none}
   .bt-scale-row .meta{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--light);white-space:nowrap}
+  .bt-scale-l{display:flex;align-items:center;gap:12px;min-width:0}
+  .bt-scale-l .sq{width:16px;height:16px;border-radius:4px;flex-shrink:0}
   .bt-space{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end}
   .bt-space .bar{background:var(--teal);border-radius:3px;height:16px;margin:0 auto 6px}
   .bt-space .lbl{font-size:11px;color:var(--gray);font-family:ui-monospace,Menlo,Consolas,monospace;text-align:center}
@@ -112,7 +114,7 @@
       </aside>
 
       <div class="card">
-        <div class="cd2-cardhead"><h3>Brand tokens</h3><span class="sub">The design tokens blocks &amp; templates inherit for this client</span><a class="lnk" id="brandEditLnk">Edit</a></div>
+        <div class="cd2-cardhead"><h3>Brand tokens</h3><span class="sub">The design tokens blocks &amp; templates inherit for this client</span></div>
         <div class="bt-board" id="btBoard"></div>
       </div>
     </div>
@@ -181,7 +183,6 @@ function pageInit(){
 
   // Edit entry points open the two popups
   document.getElementById('brandBtn').addEventListener('click',openBrand);
-  document.getElementById('brandEditLnk').addEventListener('click',openBrand);
   document.getElementById('editBtn').addEventListener('click',openClient);
   document.getElementById('delBtn').addEventListener('click',()=>{
     confirmAction({title:'Delete this client?',body:`“${t.name}” and its brand kit will be removed. Assigned tender templates stay in the library.`,confirm:'Delete client',danger:true},()=>{
@@ -194,37 +195,21 @@ function pageInit(){
   const scopeLabel = s => s==='brand'?'Brand':s==='derived'?'Derived':'Shared';
   const colCard = r=>{
     const v = roleValue(b, r.key);
-    return `<div class="bt-tok"><div class="bt-sw" style="background:${v}"></div>
-      <div class="bt-body"><div class="nm">${r.label}${r.bindable?'<span class="bt-bind">Bindable</span>':''}</div>
-      <div class="val">${v.toUpperCase()}</div><div class="ap">${r.applies}</div>
-      <div class="row2"><span class="bt-scope">${scopeLabel(r.scope)}</span></div></div></div>`;
+    return `<div class="bt-tok"><div class="bt-sw" style="background:${v}"><span class="bt-scope">${scopeLabel(r.scope)}</span></div>
+      <div class="bt-body"><div class="nm">${r.label}</div>
+      <div class="val">${v.toUpperCase()}</div><div class="ap">${r.applies}</div></div></div>`;
   };
   const fontCard = (label, fam)=>`<div class="bt-font"><div class="big" style="font-family:'${fam}',sans-serif;color:${b.primary}">Ag</div><div style="font-weight:600;font-size:12.5px">${label}</div><div class="val" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--gray)">${fam}</div></div>`;
-  const typeRows = TYPE_SCALE.map(s=>{ const fam = s.font==='heading'?b.font:b.bodyFont; return `<div class="bt-scale-row"><span style="font-family:'${fam}',sans-serif;font-size:${Math.min(s.size,24)}px;font-weight:${s.weight};color:${s.font==='heading'?b.primary:'#2E3C3B'}">${s.label}</span><span class="meta">${s.size}/${s.lh} · ${s.weight} · ${s.font}</span></div>`; }).join('');
-  const spaceHtml = SPACE_SCALE.map(s=>`<div><div class="bar" style="width:${s.v}px"></div><div class="lbl">${s.key} · ${s.v}</div></div>`).join('');
-  const radiusHtml = RADIUS_SCALE.map(r=>`<div class="r" style="border-radius:${r.v}px">${r.key}</div>`).join('');
+  const typeRows = TYPE_SCALE.map(s=>{ const fam = s.font==='heading'?b.font:b.bodyFont; const col = s.font==='heading'?b.primary:'#2E3C3B'; const sq = s.font==='heading'?b.primary : s.key==='small'?b.secondary : '#2E3C3B'; return `<div class="bt-scale-row"><span class="bt-scale-l"><span class="sq" style="background:${sq}"></span><span style="font-family:'${fam}',sans-serif;font-size:${s.size}px;font-weight:${s.weight};color:${col}">${s.label}</span></span><span class="meta">${s.size}/${s.lh} · ${s.weight} · ${s.font}</span></div>`; }).join('');
   const logoHtml = `<div style="display:flex;align-items:center;gap:12px"><span style="width:48px;height:48px;border-radius:10px;background:${b.primary};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'${b.font}',sans-serif;font-size:17px">${t.initials}</span><div><div style="font-weight:600;font-size:12.5px">Logo</div><div class="ap" style="font-size:10.5px;color:var(--light)">Cover lockup &amp; running header</div></div></div>`;
-  const liveHtml = `<div class="bk-live-wrap">
-    <div style="background:${b.primary};color:#fff;padding:12px 14px"><div style="font-family:'${b.font}',sans-serif;font-weight:700;font-size:13px">${t.name}</div><div style="font-size:10px;opacity:.85;font-family:'${b.bodyFont}',sans-serif">Tender Response</div></div>
-    <div style="padding:12px 14px;background:${b.background}"><div style="font-weight:700;color:${b.primary};border-bottom:2px solid ${b.secondary};padding-bottom:4px;font-size:12px;font-family:'${b.font}',sans-serif">Executive Summary</div><div style="height:6px;background:#e4e8e7;border-radius:4px;margin:9px 0;width:92%"></div><div style="height:6px;background:#e4e8e7;border-radius:4px;width:74%"></div><div style="margin-top:10px;border:1px solid ${b.secondary};border-radius:5px;padding:6px 8px;font-size:9.5px;color:${b.primary};font-family:'${b.bodyFont}',sans-serif">Highlight box</div></div></div>`;
   document.getElementById('btBoard').innerHTML = `
-    <div>
-      <div class="bt-sec-h">Colours</div>
-      <div class="bt-cols">${COLOUR_ROLES.map(colCard).join('')}</div>
-      <div class="bt-note"><span class="ms">link</span> <strong style="color:var(--ink)">Bindable</strong>&nbsp;roles can be attached to any element's fill or border in the <a class="lnk" href="blocks.html">Block Builder</a>, resolving to this client automatically.</div>
-    </div>
+    <div><div class="bt-sec-h">Logo</div>${logoHtml}</div>
+    <div><div class="bt-sec-h">Colours</div><div class="bt-cols">${COLOUR_ROLES.map(colCard).join('')}</div></div>
     <div>
       <div class="bt-sec-h">Typography</div>
       <div class="bt-fonts">${fontCard('Heading font', b.font)}${fontCard('Body font', b.bodyFont)}</div>
       <div class="bt-scale">${typeRows}</div>
-    </div>
-    <div><div class="bt-sec-h">Logo</div>${logoHtml}</div>
-    <div>
-      <div class="bt-sec-h">Spacing &amp; radius <span class="shared">Shared across all clients</span></div>
-      <div class="bt-space">${spaceHtml}</div>
-      <div class="bt-radii">${radiusHtml}</div>
-    </div>
-    <div><div class="bt-sec-h">Live preview</div>${liveHtml}</div>`;
+    </div>`;
   }
 
   // Subscription & credits
