@@ -41,28 +41,29 @@
   .bt-radii{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
   .bt-radii .r{width:54px;height:54px;background:var(--teal-tint);border:1.5px solid var(--teal);display:flex;align-items:flex-end;justify-content:center;font-size:10px;color:var(--teal);font-family:ui-monospace,Menlo,Consolas,monospace;padding-bottom:4px}
   .bk-live-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden;max-width:340px}
+  /* ---- Layout: left identity+subscription rail, Brand tokens main, templates full width ---- */
+  .cd-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+  .cd-rail{display:flex;flex-direction:column;gap:18px}
+  .cd-templates{margin-top:24px}
+  .cd-idhead{display:flex;gap:13px;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:2px}
+  .cd-avatar{width:56px;height:56px;border-radius:12px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;flex-shrink:0}
+  .cd-name{font-size:18px;font-weight:700;line-height:1.2}
+  .cd-sub{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gray);margin-top:6px}
+  .cd-field{display:flex;gap:11px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border)}
+  .cd-field:last-child{border-bottom:none;padding-bottom:2px}
+  .cd-field .ms{font-size:18px;color:var(--light);margin-top:2px}
+  .cd-field .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700}
+  .cd-field .v{font-size:13.5px;color:var(--ink);margin-top:3px;word-break:break-word}
+  @media(max-width:900px){ .cd-grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body data-page="tenants" data-title="Clients">
 <div id="app-content">
   <div class="pad">
-    <a class="cd2-back" href="tenants.html"><span class="ms">chevron_left</span> Clients</a>
-
-    <!-- Identity hero: who this is + the actions, ranked -->
-    <div class="cd2-hero">
-      <div class="cd2-id">
-        <div class="cd2-avatar" id="vc-avatar"></div>
-        <div>
-          <div class="cd2-name" id="vc-name">—</div>
-          <div class="cd2-meta">
-            <span class="badge b-active">Active</span>
-            <span id="vc-company"></span>
-            <span>·</span>
-            <span>Client since 2025</span>
-          </div>
-        </div>
-      </div>
-      <div class="cd2-actions">
+    <!-- Header: page title + ranked actions -->
+    <div class="pg-head">
+      <div><div class="tn-title">Client Details</div></div>
+      <div class="pg-acts">
         <a class="btn btn-primary" href="templates.html"><span class="ms" style="font-size:18px">add</span> Assign Template</a>
         <a class="btn btn-outline" id="brandBtn"><span class="ms" style="font-size:17px">palette</span> Brand Kit</a>
         <div class="cd2-morewrap">
@@ -78,24 +79,22 @@
       </div>
     </div>
 
-    <!-- Body: wide main column + supporting rail -->
-    <div class="cd2-grid">
-      <div class="cd2-main">
-        <!-- Brand tokens -->
+    <!-- Body: identity + subscription rail (left), Brand tokens (right) -->
+    <div class="cd-grid">
+      <aside class="cd-rail">
         <div class="card">
-          <div class="cd2-cardhead"><h3>Brand tokens</h3><span class="sub">The design tokens blocks &amp; templates inherit for this client</span><a class="lnk" id="brandEditLnk">Edit</a></div>
-          <div class="bt-board" id="btBoard"></div>
+          <div class="cd-idhead">
+            <div class="cd-avatar" id="vc-avatar"></div>
+            <div>
+              <div class="cd-name" id="vc-name">—</div>
+              <div class="cd-sub"><span class="badge b-active">Active</span><span>Client since 2025</span></div>
+            </div>
+          </div>
+          <div class="cd-field"><span class="ms">mail</span><div><div class="k">Email</div><div class="v" id="vc-email"></div></div></div>
+          <div class="cd-field"><span class="ms">call</span><div><div class="k">Phone</div><div class="v" id="vc-phone"></div></div></div>
+          <div class="cd-field"><span class="ms">business</span><div><div class="k">Industry</div><div class="v" id="vc-industry"></div></div></div>
+          <div class="cd-field"><span class="ms">description</span><div><div class="k">Templates used</div><div class="v" id="vc-quota"></div></div></div>
         </div>
-
-        <!-- Assigned templates -->
-        <div>
-          <div class="cd2-sec-h"><h2>Assigned templates</h2><span class="muted" id="asg-total" style="font-size:13px"></span></div>
-          <div id="assigned"></div>
-        </div>
-      </div>
-
-      <aside class="cd2-rail">
-        <!-- Subscription & credits -->
         <div class="card">
           <div class="cd2-cardhead"><h3>Subscription</h3><a class="lnk" href="subscriptions.html">Manage</a></div>
           <div class="cd2-plan"><span class="pl" id="cd-plan">—</span><span class="pt">Renews <span id="cd-renews"></span></span></div>
@@ -110,16 +109,18 @@
             <div class="note">Used after plan credits run out</div>
           </div>
         </div>
-
-        <!-- Details -->
-        <div class="card">
-          <div class="cd2-cardhead"><h3>Details</h3></div>
-          <div class="cd2-detail-row"><span class="ms">mail</span><span class="dv"><span class="dk">Email</span><span id="vc-email"></span></span></div>
-          <div class="cd2-detail-row"><span class="ms">call</span><span class="dv"><span class="dk">Phone</span><span id="vc-phone"></span></span></div>
-          <div class="cd2-detail-row"><span class="ms">business</span><span class="dv"><span class="dk">Industry</span><span id="vc-industry"></span></span></div>
-          <div class="cd2-detail-row"><span class="ms">description</span><span class="dv"><span class="dk">Templates used</span><span id="vc-quota"></span></span></div>
-        </div>
       </aside>
+
+      <div class="card">
+        <div class="cd2-cardhead"><h3>Brand tokens</h3><span class="sub">The design tokens blocks &amp; templates inherit for this client</span><a class="lnk" id="brandEditLnk">Edit</a></div>
+        <div class="bt-board" id="btBoard"></div>
+      </div>
+    </div>
+
+    <!-- Assigned templates: full width -->
+    <div class="cd-templates">
+      <div class="cd2-sec-h"><h2>Assigned templates</h2><span class="muted" id="asg-total" style="font-size:13px"></span></div>
+      <div id="assigned"></div>
     </div>
   </div>
 </div>
@@ -165,7 +166,6 @@ function pageInit(){
   function renderIdentity(){
     const av=document.getElementById('vc-avatar'); av.textContent=t.initials; av.style.background=b.primary; av.style.fontFamily=`'${b.font}',sans-serif`;
     document.getElementById('vc-name').textContent=t.name;
-    document.getElementById('vc-company').textContent=t.industry;
   }
   function renderDetails(){
     document.getElementById('vc-email').textContent=emailOf();
