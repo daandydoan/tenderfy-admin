@@ -52,8 +52,10 @@
   /* Stage holds one A4 page (Layout) or many (multi-page Preview) */
   .vb-stage{display:flex;flex-direction:column;align-items:center;gap:22px;min-height:100%}
   /* A4-sized document page by default (grows with content) */
-  .vb-page{position:relative;width:620px;min-height:877px;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:36px;display:flex;flex-direction:column}
-  .pg-num{position:absolute;bottom:8px;right:12px;font-size:10px;color:var(--light)}
+  .vb-page{position:relative;width:620px;min-height:877px;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);display:flex;flex-direction:column;overflow:hidden}
+  .doc-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .doc-body{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;padding:36px;min-height:0}
+  .pg-num{position:absolute;bottom:8px;right:12px;font-size:10px;color:var(--light);z-index:2}
   .vb-tail{width:620px;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:12px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
   .vb-tail.over{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .vb-tail .ms{font-size:17px}
@@ -150,6 +152,23 @@
   .furn-prev{pointer-events:none}
   .furn-empty{color:var(--gray);font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px}
   .furn-empty .ms{font-size:16px;color:var(--teal)}
+  /* Background layer editor (fill regions + custom CSS) */
+  .bg-modeseg{display:flex;gap:3px;background:#e6ece9;border-radius:8px;padding:3px;margin-bottom:12px}
+  .bg-modeseg button{flex:1;border:none;background:transparent;font-family:inherit;font-size:11px;font-weight:600;color:var(--gray);padding:6px;border-radius:6px;cursor:pointer}
+  .bg-modeseg button.on{background:#fff;color:var(--teal);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+  .bg-add{width:100%;border:1px dashed var(--teal);background:var(--teal-tint);color:var(--teal);border-radius:8px;padding:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+  .bg-add .ms{font-size:16px}
+  .bg-reg{border:1px solid var(--border);border-radius:9px;padding:10px;margin-bottom:9px;background:#fbfcfc}
+  .bg-reg-h{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+  .bg-reg-h .ds-sel{flex:1}
+  .bg-del{width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+  .bg-del:hover{border-color:#d5493f;color:#d5493f}
+  .bg-del .ms{font-size:15px}
+  .bg-geo{display:flex;gap:5px;margin-bottom:8px}
+  .bg-geo .g{flex:1;min-width:0}
+  .bg-geo .g label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.3px;color:var(--light);margin-bottom:2px;text-align:center}
+  .bg-geo input{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:6px;padding:5px 4px;font-family:inherit;font-size:11px;text-align:center}
+  .bg-css{width:100%;box-sizing:border-box;min-height:120px;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.5;color:var(--ink);background:#fbfcfc;resize:vertical}
 </style>
 </head>
 <body data-page="library" data-title="Documents">
@@ -185,13 +204,20 @@
         <div id="paneLayers" style="display:none">
           <!-- Background layer (sample — pending scope sign-off) -->
           <div class="card lyr-card">
-            <div class="lyr-head"><span class="lyr-ic"><span class="ms">wallpaper</span></span><div><div class="lyr-t">Background</div><div class="lyr-s">Behind all content</div></div><span class="lyr-tag">Sample</span></div>
-            <div class="lyr-locked">
-              <div class="samp-row"><span class="samp-swatch" style="background:#ffffff"></span><div class="lyr-fld" style="flex:1;margin:0"><label>Page fill</label><input class="lyr-sel" value="#FFFFFF" readonly></div></div>
-              <div class="lyr-fld"><label>Watermark</label><input class="lyr-sel" value="“DRAFT” · 8% opacity" readonly></div>
-              <div class="lyr-fld" style="margin-bottom:2px"><label>Background image / pattern</label><div class="samp-drop"><span class="ms">add_photo_alternate</span>Drop image or pattern</div></div>
+            <div class="lyr-head"><span class="lyr-ic"><span class="ms">wallpaper</span></span><div><div class="lyr-t">Background</div><div class="lyr-s">Fills behind content, per page</div></div></div>
+            <div class="bg-modeseg" id="bgModeSeg">
+              <button data-bgm="regions" class="on">Regions</button>
+              <button data-bgm="code">Custom CSS</button>
             </div>
-            <div class="fhint" style="margin-top:10px">Sample only — fill, watermark and a background image/pattern. Not wired yet; awaiting your sign-off on scope.</div>
+            <div id="bgRegionsPane">
+              <div id="bgRegions"></div>
+              <button class="bg-add" id="bgAdd"><span class="ms">add</span> Add fill region</button>
+            </div>
+            <div id="bgCodePane" style="display:none">
+              <textarea id="bgCss" class="bg-css" spellcheck="false" placeholder="/* Drawn behind content */&#10;background: linear-gradient(135deg,#123B66,#38988A);"></textarea>
+              <div class="fhint" style="margin-top:6px">CSS / SVG only, no scripts. Applied behind content on every page.</div>
+            </div>
+            <div class="fhint" style="margin-top:8px">Overlays the base page fill (Properties ▸ Style).</div>
           </div>
 
           <!-- Main layer (the document body) -->
@@ -385,7 +411,7 @@ function pageInit(){
       if(cur.length||!pages.length) pages.push(cur);
     }catch(e){ pages=[blocks]; }
     const n=pages.length;
-    canvas.innerHTML=pages.map((pg,pi)=>`<div class="vb-page">${head}${pg.join('')}${foot}${n>1?`<span class="pg-num">${pi+1} / ${n}</span>`:''}</div>`).join('');
+    canvas.innerHTML=pages.map((pg,pi)=>`<div class="vb-page"><div class="doc-bg">${renderDocBg(pi)}</div><div class="doc-body">${head}${pg.join('')}${foot}</div>${n>1?`<span class="pg-num">${pi+1} / ${n}</span>`:''}</div>`).join('');
   }
   function render(){
     canvas.style.setProperty('--teal', brand?brand.secondary:'');
@@ -406,7 +432,7 @@ function pageInit(){
       }
       // Layout mode shows fixed letterhead/footer slots top & bottom (Top Layer).
       const inner = (mode==='layout') ? furnSlot('header')+body+furnSlot('footer',true) : body;
-      canvas.innerHTML=`<div class="vb-page">${inner}</div>`;
+      canvas.innerHTML=`<div class="vb-page"><div class="doc-bg">${renderDocBg(0)}</div><div class="doc-body">${inner}</div></div>`;
       drop.style.display = mode==='preview'?'none':'';
     }
     const lc=document.getElementById('lyr-count'); if(lc) lc.textContent=items.length;
@@ -452,12 +478,8 @@ function pageInit(){
   const docStyle={bg:'#ffffff', pad:36, gap:12, rad:4};
   // Styles every A4 page in the stage (one in Layout, one-per-page in Preview).
   function applyDocStyle(){
-    document.querySelectorAll('#canvas .vb-page').forEach(p=>{
-      p.style.background=docStyle.bg;
-      p.style.padding=docStyle.pad+'px';
-      p.style.gap=(mode==='preview'?0:docStyle.gap)+'px';
-      p.style.borderRadius=docStyle.rad+'px';
-    });
+    document.querySelectorAll('#canvas .vb-page').forEach(p=>{ p.style.background=docStyle.bg; p.style.borderRadius=docStyle.rad+'px'; });
+    document.querySelectorAll('#canvas .doc-body').forEach(b=>{ b.style.padding=docStyle.pad+'px'; b.style.gap=(mode==='preview'?0:docStyle.gap)+'px'; });
   }
   // Re-paginate in Preview when page metrics change; otherwise just restyle.
   function syncDoc(){ if(mode==='preview') render(); else applyDocStyle(); }
@@ -505,6 +527,83 @@ function pageInit(){
   lfSel.addEventListener('change',()=>{ topLayer.footer=lfSel.value||null; furnMini(document.getElementById('lf-mini'),topLayer.footer); render(); });
   furnMini(document.getElementById('lh-mini'),topLayer.header);
   furnMini(document.getElementById('lf-mini'),topLayer.footer);
+
+  // ---- Background layer (fill regions + custom CSS) ----
+  const docBg={ mode:'regions', regions:[], css:'' };
+  let bgUid=0;
+  const BG_SHAPES=[['full','Full page'],['band-top','Top band'],['band-bottom','Bottom band'],['half-top','Top half'],['half-bottom','Bottom half'],['half-left','Left half'],['half-right','Right half'],['col-left','Left column'],['col-right','Right column'],['region','Custom region']];
+  function mkRegion(){ return {id:++bgUid, shape:'band-top', h:120, w:200, x:40, y:40, color:(brand?brand.primary:'#27535C'), gradOn:false, color2:(brand?brand.secondary:'#38988A'), op:1, firstOnly:false}; }
+  function bgGeom(r){ switch(r.shape){
+      case 'full': return 'inset:0';
+      case 'band-top': return `left:0;right:0;top:0;height:${r.h}px`;
+      case 'band-bottom': return `left:0;right:0;bottom:0;height:${r.h}px`;
+      case 'half-top': return 'left:0;right:0;top:0;height:50%';
+      case 'half-bottom': return 'left:0;right:0;bottom:0;height:50%';
+      case 'half-left': return 'top:0;bottom:0;left:0;width:50%';
+      case 'half-right': return 'top:0;bottom:0;right:0;width:50%';
+      case 'col-left': return `top:0;bottom:0;left:0;width:${r.w}px`;
+      case 'col-right': return `top:0;bottom:0;right:0;width:${r.w}px`;
+      case 'region': return `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px`;
+      default: return 'inset:0';
+  } }
+  function bgFill(r){ return r.gradOn?`linear-gradient(135deg, ${r.color}, ${r.color2})`:r.color; }
+  // Returns the background HTML for a page (pi = page index; first-page-only regions only on 0).
+  function renderDocBg(pi){
+    if(docBg.mode==='code'){ const css=(docBg.css||'').replace(/[<>]/g,'').replace(/"/g,"'"); return css?`<div style="position:absolute;inset:0;${css}"></div>`:''; }
+    return docBg.regions.filter(r=>!r.firstOnly||pi===0).map(r=>`<div style="position:absolute;${bgGeom(r)};background:${bgFill(r)};opacity:${r.op}"></div>`).join('');
+  }
+  function bgGeoFields(r){
+    const num=(k,l)=>`<div class="g"><label>${l}</label><input type="number" data-geo="${k}" value="${r[k]}"></div>`;
+    if(r.shape==='band-top'||r.shape==='band-bottom') return num('h','Height');
+    if(r.shape==='col-left'||r.shape==='col-right') return num('w','Width');
+    if(r.shape==='region') return num('x','X')+num('y','Y')+num('w','W')+num('h','H');
+    return '';
+  }
+  function regionRow(r){
+    const colorInput=(f,v)=>`<div class="samp-row" style="margin-bottom:8px"><input type="color" data-f="${f}" value="${v}" style="width:30px;height:28px;border:1px solid var(--border);border-radius:6px;padding:2px;flex:none"><input class="ds-hex" data-f="${f}H" value="${v.toUpperCase()}" style="flex:1"></div>`;
+    const geo=bgGeoFields(r);
+    return `<div class="bg-reg" data-id="${r.id}">
+      <div class="bg-reg-h"><select class="ds-sel" data-f="shape">${BG_SHAPES.map(s=>`<option value="${s[0]}"${s[0]===r.shape?' selected':''}>${s[1]}</option>`).join('')}</select><button class="bg-del" title="Remove"><span class="ms">delete</span></button></div>
+      ${geo?`<div class="bg-geo">${geo}</div>`:''}
+      ${colorInput('color',r.color)}
+      <label class="bi-tog" style="margin-bottom:8px"><input type="checkbox" data-f="gradOn"${r.gradOn?' checked':''}>Gradient</label>
+      ${r.gradOn?colorInput('color2',r.color2):''}
+      <div class="ds-row" style="margin-bottom:8px"><label>Opacity</label><div class="ds-ctl"><input type="range" data-f="op" min="0" max="100" value="${Math.round(r.op*100)}"><span class="ds-u">${Math.round(r.op*100)}%</span></div></div>
+      <label class="bi-tog"><input type="checkbox" data-f="firstOnly"${r.firstOnly?' checked':''}>First page only</label>
+    </div>`;
+  }
+  function renderBgRegions(){
+    const wrap=document.getElementById('bgRegions');
+    wrap.innerHTML = docBg.regions.length ? docBg.regions.map(regionRow).join('') : `<div class="fhint" style="margin:2px 0 10px">No fill regions yet — add one, or switch to Custom CSS.</div>`;
+    wrap.querySelectorAll('.bg-reg').forEach(el=>{
+      const r=docBg.regions.find(x=>x.id==el.dataset.id);
+      el.querySelector('.bg-del').addEventListener('click',()=>{ docBg.regions=docBg.regions.filter(x=>x!==r); renderBgRegions(); render(); });
+      el.querySelectorAll('[data-f]').forEach(inp=>{
+        const f=inp.dataset.f, ev=(inp.type==='checkbox')?'change':'input';
+        inp.addEventListener(ev,()=>{
+          if(f==='shape'){ r.shape=inp.value; renderBgRegions(); render(); }
+          else if(f==='gradOn'){ r.gradOn=inp.checked; renderBgRegions(); render(); }
+          else if(f==='firstOnly'){ r.firstOnly=inp.checked; render(); }
+          else if(f==='color'){ r.color=inp.value; const h=el.querySelector('[data-f=colorH]'); if(h)h.value=inp.value.toUpperCase(); render(); }
+          else if(f==='colorH'){ const v=inp.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ r.color=v; const c=el.querySelector('[data-f=color]'); if(c)c.value=v; render(); } }
+          else if(f==='color2'){ r.color2=inp.value; const h=el.querySelector('[data-f=color2H]'); if(h)h.value=inp.value.toUpperCase(); render(); }
+          else if(f==='color2H'){ const v=inp.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ r.color2=v; const c=el.querySelector('[data-f=color2]'); if(c)c.value=v; render(); } }
+          else if(f==='op'){ r.op=(+inp.value)/100; inp.nextElementSibling.textContent=inp.value+'%'; render(); }
+        });
+      });
+      el.querySelectorAll('[data-geo]').forEach(inp=>inp.addEventListener('input',()=>{ r[inp.dataset.geo]=Math.max(0,Math.round(+inp.value||0)); render(); }));
+    });
+  }
+  document.getElementById('bgAdd').addEventListener('click',()=>{ docBg.regions.push(mkRegion()); renderBgRegions(); render(); });
+  document.querySelectorAll('#bgModeSeg button').forEach(b=>b.addEventListener('click',()=>{
+    docBg.mode=b.dataset.bgm;
+    document.querySelectorAll('#bgModeSeg button').forEach(x=>x.classList.toggle('on',x===b));
+    document.getElementById('bgRegionsPane').style.display=docBg.mode==='regions'?'':'none';
+    document.getElementById('bgCodePane').style.display=docBg.mode==='code'?'':'none';
+    render();
+  }));
+  document.getElementById('bgCss').addEventListener('input',e=>{ docBg.css=e.target.value; render(); });
+  renderBgRegions();
 
   // ---- Mode toggle (Layout / Preview) ----
   function setMode(m){
