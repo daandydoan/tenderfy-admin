@@ -25,7 +25,8 @@
   .d-search input{border:none;outline:none;font-family:inherit;font-size:12.5px;width:100%;background:transparent}
   .vb-canvas{flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
   .vb-bar{display:flex;align-items:center;gap:9px;width:620px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
-  .vb-page{width:620px;min-height:200px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:36px;display:flex;flex-direction:column}
+  /* A4-sized document page by default (grows with content) */
+  .vb-page{width:620px;min-height:877px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:36px;display:flex;flex-direction:column}
   .vb-tail{width:620px;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:12px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
   .vb-tail.over{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .vb-tail .ms{font-size:17px}
@@ -48,9 +49,18 @@
   .doc-empty{border:1.5px dashed #b3beba;border-radius:10px;padding:44px 20px;text-align:center;color:var(--gray);margin:auto;width:100%}
   .doc-empty .ms.big{font-size:32px;color:var(--light);display:block;margin-bottom:8px}
   /* Blocks in the document render exactly like the block listing cards */
-  .doc-blk{position:relative;margin-bottom:12px;cursor:grab}
+  .doc-blk{position:relative;margin-bottom:0;cursor:grab}
   .doc-blk.dragging{opacity:.4}
   .doc-tools{position:absolute;top:-12px;right:10px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:2}
+  /* Document style controls */
+  .ds-row{display:grid;grid-template-columns:56px 1fr;align-items:center;gap:10px;margin-bottom:9px}
+  .ds-row>label{font-size:12px;color:var(--gray)}
+  .ds-ctl{display:flex;align-items:center;gap:7px;min-width:0}
+  .ds-ctl input[type=range]{flex:1;min-width:0;accent-color:var(--teal);height:4px}
+  .ds-num{width:50px;padding:6px 7px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink);text-align:center}
+  .ds-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
+  .ds-ctl input[type=color]{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
+  .ds-u{font-size:10.5px;color:var(--light);flex-shrink:0}
   .doc-blk:hover .doc-tools{opacity:1}
   .doc-tools .tb{width:24px;height:24px;border-radius:6px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.3)}
   .doc-tools .tb.grab{cursor:grab}
@@ -103,9 +113,11 @@
         </div>
         <div class="card">
           <h3 class="ed-h">Style</h3>
-          <div class="fld"><label for="d-style">Preview style</label><select class="fin" id="d-style"></select></div>
-          <div id="d-style-sum" style="margin-top:2px"></div>
-          <div class="fhint" style="margin-top:8px">Documents are brand-neutral — the assigned client's brand is applied when this document is used in a template.</div>
+          <div class="ds-row"><label>Fill</label><div class="ds-ctl"><input type="color" id="ds-bg"><input class="ds-hex" id="ds-bgH"></div></div>
+          <div class="ds-row"><label>Padding</label><div class="ds-ctl"><input type="range" id="ds-pad" min="0" max="80"><input type="number" class="ds-num" id="ds-padN"><span class="ds-u">px</span></div></div>
+          <div class="ds-row"><label>Spacing</label><div class="ds-ctl"><input type="range" id="ds-gap" min="0" max="48"><input type="number" class="ds-num" id="ds-gapN"><span class="ds-u">px</span></div></div>
+          <div class="ds-row"><label>Radius</label><div class="ds-ctl"><input type="range" id="ds-rad" min="0" max="24"><input type="number" class="ds-num" id="ds-radN"><span class="ds-u">px</span></div></div>
+          <div class="fhint" style="margin-top:6px">Document-level styling. The assigned client's brand is layered on top.</div>
         </div>
         <div class="card">
           <h3 class="ed-h">Composition</h3>
@@ -118,7 +130,6 @@
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
 <script src="library-data.js"></script>
-<script src="tenant-data.js"></script>
 <script>
 function pageInit(){
   const bById=Object.fromEntries(BLOCKS.map(b=>[b.id,b]));
@@ -209,20 +220,27 @@ function pageInit(){
     });
   });
 
-  // ---- Style (preview style + brand summary) ----
-  const BRANDS=[{name:'Default (brand-neutral)',brand:null}, ...TENANTS.map(t=>({name:t.name,brand:t.brand}))];
-  const dstyle=document.getElementById('d-style');
-  dstyle.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.name}</option>`).join('');
-  function renderStyleSummary(){
-    const b=BRANDS[+dstyle.value].brand, sum=document.getElementById('d-style-sum');
-    const sw=c=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:${c};border:1px solid rgba(0,0,0,.1)"></span>${c}</span>`;
-    sum.innerHTML = b
-      ? `<div class="hstack" style="gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--gray)">${sw(b.primary)}${sw(b.secondary)}<span><span class="ms" style="font-size:13px;vertical-align:-2px;color:var(--light)">text_fields</span> ${b.font} / ${b.bodyFont}</span></div>`
-      : '<div class="hstack" style="font-size:12px;color:var(--gray)"><span class="ms" style="font-size:15px;color:var(--light)">info</span> Structure only — no client brand applied.</div>';
+  // ---- Document style (page fill / padding / spacing / radius) ----
+  const docStyle={bg:'#ffffff', pad:36, gap:12, rad:4};
+  function applyDocStyle(){
+    const p=document.getElementById('canvas');
+    p.style.background=docStyle.bg;
+    p.style.padding=docStyle.pad+'px';
+    p.style.gap=docStyle.gap+'px';
+    p.style.borderRadius=docStyle.rad+'px';
   }
-  dstyle.addEventListener('change',renderStyleSummary); renderStyleSummary();
+  function bindRange(rId,nId,key){
+    const R=document.getElementById(rId), N=document.getElementById(nId);
+    const set=v=>{ v=Math.max(+R.min,Math.min(+R.max,Math.round(+v||0))); docStyle[key]=v; R.value=v; N.value=v; applyDocStyle(); };
+    R.addEventListener('input',()=>set(R.value)); N.addEventListener('input',()=>set(N.value)); set(docStyle[key]);
+  }
+  bindRange('ds-pad','ds-padN','pad'); bindRange('ds-gap','ds-gapN','gap'); bindRange('ds-rad','ds-radN','rad');
+  const dbg=document.getElementById('ds-bg'), dbgH=document.getElementById('ds-bgH');
+  dbg.value=docStyle.bg; dbgH.value=docStyle.bg.toUpperCase();
+  dbg.addEventListener('input',()=>{ docStyle.bg=dbg.value; dbgH.value=dbg.value.toUpperCase(); applyDocStyle(); });
+  dbgH.addEventListener('input',e=>{ const v=e.target.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ docStyle.bg=v; dbg.value=v; applyDocStyle(); } });
 
-  renderPalette(); render();
+  renderPalette(); render(); applyDocStyle();
 }
 </script>
 </body>
