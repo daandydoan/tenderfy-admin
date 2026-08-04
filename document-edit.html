@@ -34,7 +34,14 @@
   .vb-widget{display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid var(--border);border-radius:9px;padding:12px 8px;cursor:grab;background:#fff;text-align:center;font-size:11.5px;font-weight:500;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
   .vb-widget:hover{border-color:var(--teal);background:var(--teal-tint);color:var(--teal);transform:translateY(-1px)}
   .vb-widget:active{cursor:grabbing}
+  .vb-widget{align-items:stretch}
   .vb-widget .ms{font-size:21px;color:var(--teal)}
+  .pal-lbl{text-align:center;font-size:11.5px}
+  /* Palette shows the block's schematic preview (same as the block listing) */
+  .pal-prev{width:100%;min-height:0;height:76px;padding:9px 11px;gap:5px;overflow:hidden;background:#fff;border:1px solid var(--border);border-radius:7px;pointer-events:none;justify-content:center}
+  .vb-widget:hover .pal-prev{border-color:var(--teal-bright)}
+  .pal-prev .blk-img{min-height:0;height:30px}
+  .pal-prev .blk-imgs{gap:5px}
   .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
   .pal-tag:first-child{margin-top:0}
   /* Document blocks on the canvas */
@@ -141,7 +148,7 @@ function pageInit(){
     const avail=BLOCKS.filter(b=>!pq||(b.name+' '+b.cat).toLowerCase().includes(pq));
     palette.innerHTML=BLOCK_CATS.filter(c=>avail.some(b=>b.cat===c)).map(cat=>
       `<div class="pal-tag">${cat}</div>`+avail.filter(b=>b.cat===cat).map(b=>
-        `<div class="vb-widget" draggable="true" data-id="${b.id}" title="${b.desc}"><span class="ms">${b.custom?'auto_fix_high':'grid_view'}</span>${b.label}</div>`).join('')
+        `<div class="vb-widget" draggable="true" data-id="${b.id}" title="${b.desc}"><div class="pal-prev blk-preview">${blockPreview(b.p)}</div><span class="pal-lbl">${b.label}</span></div>`).join('')
     ).join('');
     document.getElementById('pal-count').textContent=`(${avail.length})`;
     palette.querySelectorAll('.vb-widget').forEach(el=>{
