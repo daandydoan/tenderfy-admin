@@ -61,8 +61,21 @@ const TYPE_SCALE = [
 const SPACE_SCALE  = [{key:'xs',v:4},{key:'sm',v:8},{key:'md',v:16},{key:'lg',v:24},{key:'xl',v:40}];
 const RADIUS_SCALE = [{key:'sm',v:4},{key:'md',v:8},{key:'lg',v:14}];
 
-// Resolve a colour-role key to a concrete value for a given brand ({primary,secondary,background}) or the neutral default.
+// Curated font list (loaded on demand) offered in the Brand Kit editor.
+const FONTS = ['Outfit','Inter','Poppins','Lora','Roboto','Montserrat','Work Sans','Nunito','Merriweather','Playfair Display','DM Sans','Manrope','Raleway','Rubik','Source Sans 3'];
+
+// Lazily give a client an editable, per-client token set (colours + type styles),
+// seeded from the shared defaults the first time its Brand Kit is opened.
+function ensureBrandTokens(t){
+  const b=t.brand;
+  if(!b.colours) b.colours = COLOUR_ROLES.map(r=>({key:r.key, name:r.label, value:roleValue(b, r.key), scope:r.scope, applies:r.applies}));
+  if(!b.type)    b.type    = TYPE_SCALE.map(s=>({name:s.label, size:s.size, lh:s.lh, weight:String(s.weight), font:s.font, color:(s.font==='heading'?'primary':(s.key==='small'?'secondary':'ink'))}));
+}
+
+// Resolve a colour-role key to a concrete value for a given brand or the neutral default.
+// Prefers the client's own editable colours[] when present.
 function roleValue(brand, key){
+  if(brand && brand.colours){ const c=brand.colours.find(x=>x.key===key); if(c) return c.value; }
   const b = brand || {primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
   switch(key){
     case 'primary':    return b.primary;
@@ -80,4 +93,5 @@ if(typeof window!=='undefined'){
   window.TENANTS = TENANTS; window.PLANS = PLANS; window.BRAND_TOKENS = BRAND_TOKENS;
   window.COLOUR_ROLES = COLOUR_ROLES; window.TYPE_SCALE = TYPE_SCALE;
   window.SPACE_SCALE = SPACE_SCALE; window.RADIUS_SCALE = RADIUS_SCALE; window.roleValue = roleValue;
+  window.FONTS = FONTS; window.ensureBrandTokens = ensureBrandTokens;
 }
