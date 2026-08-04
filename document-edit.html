@@ -12,11 +12,53 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
+<style>
+  /* Aligned to the block builder: scrollable palette | fixed canvas | scrollable properties */
+  .ed3{display:grid;grid-template-columns:250px minmax(0,1fr) 300px;gap:16px;align-items:stretch;height:calc(100vh - 152px);min-height:500px}
+  .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
+  .ed3-col .card{margin-bottom:14px}
+  .ed3-mid{height:100%;min-width:0;display:flex;flex-direction:column}
+  .ed3-col,.vb-canvas{scrollbar-width:none;-ms-overflow-style:none}
+  .ed3-col::-webkit-scrollbar,.vb-canvas::-webkit-scrollbar{width:0;height:0;display:none}
+  .d-search{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:12px}
+  .d-search .ms{font-size:17px;color:var(--light)}
+  .d-search input{border:none;outline:none;font-family:inherit;font-size:12.5px;width:100%;background:transparent}
+  .vb-canvas{flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
+  .vb-bar{display:flex;align-items:center;gap:9px;width:620px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
+  .vb-page{width:620px;min-height:200px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:36px;display:flex;flex-direction:column}
+  .vb-tail{width:620px;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:12px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
+  .vb-tail.over{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
+  .vb-tail .ms{font-size:17px}
+  /* Palette (block-edit widget style) */
+  .vb-pal{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .vb-widget{display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid var(--border);border-radius:9px;padding:12px 8px;cursor:grab;background:#fff;text-align:center;font-size:11.5px;font-weight:500;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
+  .vb-widget:hover{border-color:var(--teal);background:var(--teal-tint);color:var(--teal);transform:translateY(-1px)}
+  .vb-widget:active{cursor:grabbing}
+  .vb-widget .ms{font-size:21px;color:var(--teal)}
+  .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
+  .pal-tag:first-child{margin-top:0}
+  /* Document blocks on the canvas */
+  .doc-empty{border:1.5px dashed #b3beba;border-radius:10px;padding:44px 20px;text-align:center;color:var(--gray);margin:auto;width:100%}
+  .doc-empty .ms.big{font-size:32px;color:var(--light);display:block;margin-bottom:8px}
+  .doc-blk{position:relative;border:1.5px solid var(--border);border-radius:9px;padding:13px 15px;margin-bottom:12px;background:#fff}
+  .doc-blk:hover{border-color:var(--teal)}
+  .doc-blk.dragging{opacity:.4}
+  .doc-blk .dn{font-weight:600;font-size:13px;display:flex;align-items:center;gap:7px}
+  .doc-blk .dn .ms{font-size:16px;color:var(--teal)}
+  .doc-blk .dcat{font-size:10px;color:var(--light);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-left:auto}
+  .doc-blk .dprev{margin-top:10px;border:1px solid var(--border);border-radius:7px;padding:11px}
+  .doc-tools{position:absolute;top:-12px;right:10px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:2}
+  .doc-blk:hover .doc-tools{opacity:1}
+  .doc-tools .tb{width:24px;height:24px;border-radius:6px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.3)}
+  .doc-tools .tb.grab{cursor:grab}
+  .doc-tools .tb.del{background:#d5493f}
+  .doc-tools .tb .ms{font-size:15px}
+</style>
 </head>
 <body data-page="library" data-title="Documents">
 <div id="app-content">
   <div class="pad">
-    <div class="pg-head" style="margin-bottom:14px">
+    <div class="pg-head">
       <div>
         <input id="d-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:320px" value="Untitled Document">
         <div class="pg-sub">Structure only, built from <a href="blocks.html" style="color:var(--teal)">blocks</a> — client branding applies when a template is assigned.</div>
@@ -29,42 +71,41 @@
       </div>
     </div>
 
-    <div class="tb-wrap">
-      <!-- Block palette -->
-      <div class="tb-col palette">
-        <div class="tb-colhead">Blocks <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0" id="pal-count"></span></div>
-        <div class="tb-colbody">
-          <div class="tb-psearch"><span class="ms" style="font-size:17px">search</span><input id="pq" placeholder="Search blocks…"></div>
-          <div id="palette"></div>
+    <div class="ed3">
+      <!-- LEFT: block palette -->
+      <div class="ed3-col">
+        <div class="card">
+          <h3 class="ed-h">Blocks <span class="muted" style="font-weight:400;font-size:12px" id="pal-count"></span></h3>
+          <div class="d-search"><span class="ms">search</span><input id="pq" placeholder="Search blocks…"></div>
+          <div class="vb-pal" id="palette"></div>
         </div>
       </div>
 
-      <!-- Document canvas -->
-      <div class="tb-canvas">
-        <div class="tb-sheet">
-          <div id="canvas"></div>
-          <div class="tb-drop" id="drop">Click or drag a block from the left to start building this document</div>
+      <!-- MIDDLE: document canvas -->
+      <div class="ed3-mid">
+        <div class="vb-canvas" id="cvWrap">
+          <div class="vb-bar"><span class="ms" style="font-size:16px;color:var(--teal)">description</span> <span id="doc-bar">Untitled Document</span> <span class="muted" id="doc-count" style="font-weight:400"></span></div>
+          <div class="vb-page" id="canvas"></div>
+          <div class="vb-tail" id="drop"><span class="ms">add</span> Drag a block here, or click one on the left</div>
         </div>
       </div>
 
-      <!-- Properties -->
-      <div class="tb-col props">
-        <div class="tb-colhead">Document</div>
-        <div style="overflow:auto;flex:1">
-          <div class="props-sec">
-            <div class="fld"><label for="d-type">Document type</label><select class="fin" id="d-type"></select></div>
-            <div class="fld"><label for="d-status">Status</label><select class="fin" id="d-status"><option value="draft">Draft</option><option value="published">Published</option><option value="deprecated">Deprecated</option></select></div>
-            <div class="fld"><label for="d-desc">Description</label><textarea class="fin" id="d-desc" rows="2" placeholder="What is this document for?"></textarea></div>
-          </div>
-          <div class="props-sec">
-            <h4>Availability</h4>
-            <div class="fld"><label for="d-avail">Clients</label><select class="fin" id="d-avail"><option value="all">All clients (default)</option><option value="restricted">Restricted to selected clients</option></select></div>
-            <div class="fhint">Global by default — restricting is a deliberate exception.</div>
-          </div>
-          <div class="props-sec">
-            <h4>Composition</h4>
-            <div class="hstack"><span class="ms" style="color:var(--teal)">grid_view</span> <strong id="p-count">0</strong> <span class="muted">blocks</span></div>
-          </div>
+      <!-- RIGHT: document properties -->
+      <div class="ed3-col">
+        <div class="card">
+          <h3 class="ed-h">Document</h3>
+          <div class="fld"><label for="d-type">Document type</label><select class="fin" id="d-type"></select></div>
+          <div class="fld"><label for="d-status">Status</label><select class="fin" id="d-status"><option value="draft">Draft</option><option value="published">Published</option><option value="deprecated">Deprecated</option></select></div>
+          <div class="fld"><label for="d-desc">Description</label><textarea class="fin" id="d-desc" rows="2" placeholder="What is this document for?"></textarea></div>
+        </div>
+        <div class="card">
+          <h3 class="ed-h">Availability</h3>
+          <div class="fld"><label for="d-avail">Clients</label><select class="fin" id="d-avail"><option value="all">All clients (default)</option><option value="restricted">Restricted to selected clients</option></select></div>
+          <div class="fhint">Global by default — restricting is a deliberate exception.</div>
+        </div>
+        <div class="card">
+          <h3 class="ed-h">Composition</h3>
+          <div class="hstack"><span class="ms" style="color:var(--teal)">grid_view</span> <strong id="p-count">0</strong> <span class="muted">blocks</span></div>
         </div>
       </div>
     </div>
@@ -92,17 +133,21 @@ function pageInit(){
     document.getElementById('delBtn').style.display='';
     setBadge(doc.status);
   }
+  const syncBar=()=>document.getElementById('doc-bar').textContent=document.getElementById('d-name').value.trim()||'Untitled Document';
+  document.getElementById('d-name').addEventListener('input',syncBar); syncBar();
   document.getElementById('d-status').addEventListener('change',e=>setBadge(e.target.value));
   function setBadge(s){ const b=document.getElementById('d-badge'); b.className='badge b-'+s; b.innerHTML=`<span class="b-dot"></span>${s[0].toUpperCase()+s.slice(1)}`; }
 
-  // palette
+  // ---- Palette ----
   const palette=document.getElementById('palette'); let pq='';
   function renderPalette(){
     const avail=BLOCKS.filter(b=>!pq||(b.name+' '+b.cat).toLowerCase().includes(pq));
-    palette.innerHTML=BLOCK_CATS.filter(c=>avail.some(b=>b.cat===c)).map(cat=>`<div class="tb-cat">${cat}</div>${avail.filter(b=>b.cat===cat).map(b=>`
-      <div class="tb-comp" draggable="true" data-id="${b.id}" title="${b.desc}"><span class="ci"><span class="ms">${b.custom?'auto_fix_high':'grid_view'}</span></span><span class="cn">${b.label}</span><span class="ms cadd">add_circle</span></div>`).join('')}`).join('');
+    palette.innerHTML=BLOCK_CATS.filter(c=>avail.some(b=>b.cat===c)).map(cat=>
+      `<div class="pal-tag">${cat}</div>`+avail.filter(b=>b.cat===cat).map(b=>
+        `<div class="vb-widget" draggable="true" data-id="${b.id}" title="${b.desc}"><span class="ms">${b.custom?'auto_fix_high':'grid_view'}</span>${b.label}</div>`).join('')
+    ).join('');
     document.getElementById('pal-count').textContent=`(${avail.length})`;
-    palette.querySelectorAll('.tb-comp').forEach(el=>{
+    palette.querySelectorAll('.vb-widget').forEach(el=>{
       el.addEventListener('click',()=>addItem(el.dataset.id));
       el.addEventListener('dragstart',e=>{e.dataTransfer.setData('add',el.dataset.id);el.classList.add('dragging');});
       el.addEventListener('dragend',()=>el.classList.remove('dragging'));
@@ -110,20 +155,26 @@ function pageInit(){
   }
   document.getElementById('pq').addEventListener('input',e=>{pq=e.target.value.toLowerCase().trim();renderPalette();});
 
-  // canvas
-  const canvas=document.getElementById('canvas'), drop=document.getElementById('drop');
+  // ---- Canvas ----
+  const wrap=document.getElementById('cvWrap'), canvas=document.getElementById('canvas'), drop=document.getElementById('drop');
   function render(){
-    canvas.innerHTML=items.map((bid,i)=>{const b=bById[bid];return `
-      <div class="tb-block" draggable="true" data-i="${i}">
-        <span class="ms grip">drag_indicator</span>
-        <div class="bmain"><div class="bn">${b.label}</div><div class="bc">${b.cat}</div>
-          <div class="blk-preview" style="min-height:0;padding:12px;margin-top:9px;gap:7px">${blockPreview(b.p)}</div></div>
-        <span class="ms bx" data-rm="${i}">close</span>
-      </div>`;}).join('');
+    if(!items.length){
+      canvas.innerHTML=`<div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div>`;
+    } else {
+      canvas.innerHTML=items.map((bid,i)=>{const b=bById[bid];return `
+        <div class="doc-blk" draggable="true" data-i="${i}">
+          <div class="doc-tools"><span class="tb grab" data-grip><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}"><span class="ms">delete</span></span></div>
+          <div class="dn"><span class="ms">grid_view</span>${b.label}<span class="dcat">${b.cat}</span></div>
+          <div class="dprev"><div class="blk-preview" style="min-height:0;padding:0;gap:7px">${blockPreview(b.p)}</div></div>
+        </div>`;}).join('');
+    }
     document.getElementById('p-count').textContent=items.length;
-    drop.style.display=items.length?'none':'block';
-    canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',()=>{items.splice(+x.dataset.rm,1);render();}));
-    canvas.querySelectorAll('.tb-block').forEach(el=>{
+    document.getElementById('doc-count').textContent=items.length?`· ${items.length} block${items.length>1?'s':''}`:'';
+    wire();
+  }
+  function wire(){
+    canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();items.splice(+x.dataset.rm,1);render();}));
+    canvas.querySelectorAll('.doc-blk').forEach(el=>{
       el.addEventListener('dragstart',e=>{e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');});
       el.addEventListener('dragend',()=>el.classList.remove('dragging'));
       el.addEventListener('dragover',e=>e.preventDefault());
@@ -136,11 +187,9 @@ function pageInit(){
     });
   }
   function addItem(bid){ items.push(bid); render(); showToast('Added block: '+bById[bid].label); }
-  [drop,canvas].forEach(z=>{
-    z.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('add')){e.preventDefault();drop.classList.add('over');}});
-    z.addEventListener('dragleave',()=>drop.classList.remove('over'));
-    z.addEventListener('drop',e=>{drop.classList.remove('over');const add=e.dataTransfer.getData('add');if(add&&!e.target.closest('.tb-block')){e.preventDefault();addItem(add);}});
-  });
+  wrap.addEventListener('dragover',e=>{ if(e.dataTransfer.types.includes('add')){ e.preventDefault(); drop.classList.add('over'); } });
+  wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) drop.classList.remove('over'); });
+  wrap.addEventListener('drop',e=>{ drop.classList.remove('over'); const add=e.dataTransfer.getData('add'); if(add && !e.target.closest('.doc-blk')){ e.preventDefault(); addItem(add); } });
 
   document.getElementById('saveBtn').addEventListener('click',()=>{
     const n=document.getElementById('d-name').value.trim();
