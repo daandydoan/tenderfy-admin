@@ -35,7 +35,7 @@ window.confirmAction = function(opts, onConfirm){
 };
 
 const NAV = [
-  {key:'dashboard', icon:'desktop_mac',    label:'Dashboard', href:'index.html'},
+  {key:'dashboard', icon:'desktop_mac',    label:'Dashboard', href:'dashboard.html'},
   {group:'content', icon:'layers',         label:'Content', children:[
     {key:'blocks',    icon:'grid_view',      label:'Blocks',    href:'blocks.html'},
     {key:'library',   icon:'description',    label:'Documents', href:'library.html'},
