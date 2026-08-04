@@ -18,6 +18,29 @@
   .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
   .ed3-col .card{margin-bottom:14px}
   .ed3-mid{height:100%;min-width:0;display:flex;flex-direction:column}
+  .vb-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .tb-btn{width:auto;padding:0 11px;height:30px;gap:6px;border:1px solid var(--border);background:#fff;border-radius:7px;color:var(--gray);font-family:inherit;font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .tb-btn:hover{border-color:var(--teal);color:var(--teal)}
+  .tb-btn .ms{font-size:17px}
+  .tb-btn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
+  /* Responsive panels — Properties collapsible on desktop, drawers on small screens */
+  #elBtn{display:none}
+  .ed3-scrim{display:none}
+  @media(min-width:1101px){
+    .ed3:not(.st-on) #rightCol{display:none}
+    .ed3:not(.st-on){grid-template-columns:250px minmax(0,1fr)}
+  }
+  @media(max-width:1100px){
+    #elBtn{display:flex}
+    .ed3{grid-template-columns:minmax(0,1fr)!important}
+    #leftCol,#rightCol{position:fixed;top:58px;bottom:0;width:290px;max-width:86vw;z-index:70;background:var(--page,#eef2f1);box-shadow:0 14px 44px rgba(0,0,0,.24);transition:transform .22s ease;overflow-y:auto;padding:16px}
+    #leftCol{left:0;transform:translateX(-106%)}
+    #rightCol{right:0;transform:translateX(106%);display:block}
+    .ed3.el-on #leftCol{transform:translateX(0)}
+    .ed3.st-on #rightCol{transform:translateX(0)}
+    .ed3-scrim{display:block;position:fixed;inset:0;background:rgba(16,26,23,.4);opacity:0;visibility:hidden;transition:opacity .2s;z-index:65}
+    .ed3.el-on ~ .ed3-scrim,.ed3.st-on ~ .ed3-scrim{opacity:1;visibility:visible}
+  }
   .ed3-col,.vb-canvas{scrollbar-width:none;-ms-overflow-style:none}
   .ed3-col::-webkit-scrollbar,.vb-canvas::-webkit-scrollbar{width:0;height:0;display:none}
   .d-search{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:12px}
@@ -84,9 +107,9 @@
       </div>
     </div>
 
-    <div class="ed3">
+    <div class="ed3 st-on">
       <!-- LEFT: block palette -->
-      <div class="ed3-col">
+      <div class="ed3-col" id="leftCol">
         <div class="card">
           <h3 class="ed-h">Blocks <span class="muted" style="font-weight:400;font-size:12px" id="pal-count"></span></h3>
           <div class="d-search"><span class="ms">search</span><input id="pq" placeholder="Search blocks…"></div>
@@ -96,6 +119,10 @@
 
       <!-- MIDDLE: document canvas -->
       <div class="ed3-mid">
+        <div class="vb-toolbar">
+          <button class="tb-btn" id="elBtn" title="Toggle Blocks panel"><span class="ms">grid_view</span> Blocks</button>
+          <button class="tb-btn on" id="styleBtn" title="Toggle Properties panel" style="margin-left:auto"><span class="ms">tune</span> Properties</button>
+        </div>
         <div class="vb-canvas" id="cvWrap">
           <div class="vb-bar"><span class="ms" style="font-size:16px;color:var(--teal)">description</span> <span id="doc-bar">Untitled Document</span> <span class="muted" id="doc-count" style="font-weight:400"></span></div>
           <div class="vb-page" id="canvas"></div>
@@ -104,7 +131,7 @@
       </div>
 
       <!-- RIGHT: document properties -->
-      <div class="ed3-col">
+      <div class="ed3-col" id="rightCol">
         <div class="card">
           <h3 class="ed-h">Document</h3>
           <div class="fld"><label for="d-type">Document type</label><select class="fin" id="d-type"></select></div>
@@ -125,6 +152,7 @@
         </div>
       </div>
     </div>
+    <div class="ed3-scrim" id="ed3Scrim"></div>
   </div>
 </div>
 <script src="shell.js"></script>
@@ -240,7 +268,21 @@ function pageInit(){
   dbg.addEventListener('input',()=>{ docStyle.bg=dbg.value; dbgH.value=dbg.value.toUpperCase(); applyDocStyle(); });
   dbgH.addEventListener('input',e=>{ const v=e.target.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ docStyle.bg=v; dbg.value=v; applyDocStyle(); } });
 
-  renderPalette(); render(); applyDocStyle();
+  // ---- Responsive panels (Properties collapsible / drawers on small screens) ----
+  const ed3=document.querySelector('.ed3');
+  let styleOpen=window.innerWidth>1100, elOpen=false, lastWide=window.innerWidth>1100;
+  function applyPanels(){
+    ed3.classList.toggle('st-on', styleOpen);
+    ed3.classList.toggle('el-on', elOpen);
+    document.getElementById('styleBtn').classList.toggle('on', styleOpen);
+    document.getElementById('elBtn').classList.toggle('on', elOpen);
+  }
+  document.getElementById('styleBtn').addEventListener('click',()=>{ styleOpen=!styleOpen; if(styleOpen && window.innerWidth<=1100) elOpen=false; applyPanels(); });
+  document.getElementById('elBtn').addEventListener('click',()=>{ elOpen=!elOpen; if(elOpen && window.innerWidth<=1100) styleOpen=false; applyPanels(); });
+  document.getElementById('ed3Scrim').addEventListener('click',()=>{ elOpen=false; styleOpen=false; applyPanels(); });
+  window.addEventListener('resize',()=>{ const wide=window.innerWidth>1100; if(wide!==lastWide){ lastWide=wide; styleOpen=wide; elOpen=false; applyPanels(); } });
+
+  renderPalette(); render(); applyDocStyle(); applyPanels();
 }
 </script>
 </body>
