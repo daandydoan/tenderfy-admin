@@ -7,11 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
+<style>
+  .cd-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:26px;overflow:auto;max-height:calc(100vh - 210px)}
+  .cd-canvas::-webkit-scrollbar{width:9px}.cd-canvas::-webkit-scrollbar-thumb{background:#c3ccc9;border-radius:9px}
+  /* A4 page (595:842 ratio) at 620px wide */
+  .cd-a4{width:620px;min-height:877px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.16);overflow:hidden}
+  .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px;margin-right:6px}
+  .hdr-brand .ms{font-size:17px;color:var(--teal)}
+  .hdr-brand .fin-sm{min-width:180px;padding:7px 10px;font-size:12.5px;width:auto}
+  .cd-mockchip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--teal);background:var(--teal-tint);border-radius:100px;padding:3px 10px;margin-left:8px}
+  .cd-mockchip .ms{font-size:14px}
+</style>
 </head>
 <body data-page="library" data-title="Component Library">
 <div id="app-content">
@@ -22,6 +34,7 @@
         <div class="pg-sub" id="c-desc"></div>
       </div>
       <div class="pg-acts">
+        <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span>
         <a class="btn btn-outline btn-sm" data-toast="Duplicate component"><span class="ms" style="font-size:17px">content_copy</span> Duplicate</a>
         <a class="btn btn-outline btn-sm" id="editBtn"><span class="ms" style="font-size:17px">edit</span> Edit Structure</a>
         <a class="btn btn-primary btn-sm" id="pubbtn" data-toast="Publish component">Publish</a>
@@ -30,13 +43,9 @@
 
     <div class="row">
       <div class="grow">
-        <div class="sa-sech" style="justify-content:flex-start">Structure preview <span class="muted" style="font-weight:400;font-size:13px;margin-left:8px">— brand-neutral</span></div>
-        <div class="cd-preview">
-          <div class="cd-doc">
-            <h3 id="d-title">Section</h3>
-            <div class="cd-meta">Structure only · brand applied at template level</div>
-            <div id="d-body"></div>
-          </div>
+        <div class="sa-sech" style="justify-content:flex-start">Document preview <span class="cd-mockchip" id="mockchip" style="display:none"><span class="ms">check_circle</span> Sample content</span></div>
+        <div class="cd-canvas">
+          <div class="cd-a4" id="d-page"></div>
         </div>
       </div>
       <div class="rail cd-side">
@@ -65,6 +74,9 @@
 </div>
 <script src="shell.js"></script>
 <script src="library-data.js"></script>
+<script src="tenant-data.js"></script>
+<script src="primitives.js"></script>
+<script src="document-content.js"></script>
 <script>
 function pageInit(){
   const id = new URLSearchParams(location.search || location.hash.slice(1)).get('id') || COMPONENTS[0].id;
@@ -72,7 +84,6 @@ function pageInit(){
   const badge = (s)=>`<span class="badge b-${s}"><span class="b-dot"></span>${s[0].toUpperCase()+s.slice(1)}</span>`;
   document.getElementById('c-name').textContent = c.name;
   document.getElementById('c-desc').textContent = c.desc;
-  document.getElementById('d-title').textContent = c.name;
   document.getElementById('a-cat').textContent = c.category;
   document.getElementById('a-status').innerHTML = badge(c.status);
   document.getElementById('a-ver').textContent = 'v'+c.version;
@@ -83,18 +94,14 @@ function pageInit(){
   if(c.status==='published'){ const b=document.getElementById('pubbtn'); b.textContent='Deprecate'; b.className='btn btn-danger-outline btn-sm'; b.setAttribute('data-toast','Deprecate component'); }
   if(c.status==='deprecated'){ const b=document.getElementById('pubbtn'); b.textContent='Restore'; b.setAttribute('data-toast','Restore component'); }
 
-  // structure preview body varies by thumb type
-  const line=(cls='')=>`<div class="cd-line ${cls}"></div>`;
-  let body='';
-  if(c.thumb==='rows'){
-    body = line('xs') + '<div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:6px">' +
-      Array.from({length:4}).map(()=>`<div class="cd-frow" style="padding:9px 10px;margin:0;border-bottom:1px solid var(--row)">${line('m')}${line('xs')}</div>`).join('') + '</div>';
-  } else if(c.thumb==='icon'){
-    body = `<div style="display:flex;align-items:center;justify-content:center;height:140px;color:var(--lighter)"><span class="ms" style="font-size:64px">${c.icon}</span></div>`;
-  } else {
-    body = line('s')+line()+line('m')+`<div class="cd-frow">${line()}${line()}</div>`+line('s')+line('m');
-  }
-  document.getElementById('d-body').innerHTML = body;
+  // A4 document preview with per-client brand styling
+  if(typeof DOC_MOCKED!=='undefined' && DOC_MOCKED.includes(c.id)) document.getElementById('mockchip').style.display='';
+  const BRANDS = [{name:'Default (brand-neutral)', brand:null}, ...TENANTS.map(t=>({name:t.name, brand:t.brand}))];
+  const sel = document.getElementById('brandSel');
+  sel.innerHTML = BRANDS.map((x,i)=>`<option value="${i}">${x.name}</option>`).join('');
+  function renderDoc(){ document.getElementById('d-page').innerHTML = renderDocument(c.id, BRANDS[+sel.value].brand); }
+  sel.addEventListener('change', renderDoc);
+  renderDoc();
 
   // availability
   const av = document.getElementById('avail');
