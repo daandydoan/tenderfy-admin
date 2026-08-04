@@ -102,11 +102,7 @@ function pageInit(){
   // Actions
   document.getElementById('editBtn').setAttribute('href','block-edit.html#id='+block.id);
   document.getElementById('dupBtn').addEventListener('click',()=>showToast('Duplicated block: '+block.label));
-  document.getElementById('delBtn').addEventListener('click',()=>{
-    confirmAction({title:'Delete this block?',body:`“${block.label}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
-      showToast('Deleted block: '+block.label); setTimeout(()=>location.href='blocks.html',700);
-    });
-  });
+  document.getElementById('delBtn').addEventListener('click',()=>deleteBlock(block.label));
 
   renderPreview();
 }

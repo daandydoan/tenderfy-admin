@@ -914,11 +914,7 @@ function pageInit(){
     showToast((existing?'Updated':'Created')+(mode==='code'?' custom-coded':'')+' block: '+l + (usage>0 && push && push.checked?` · pushed to ${usage} documents`:''));
     setTimeout(()=>location.href='blocks.html',800);
   });
-  document.getElementById('delBtn').addEventListener('click',()=>{
-    confirmAction({title:'Delete this block?',body:`“${existing.label}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
-      showToast('Deleted block: '+existing.label); setTimeout(()=>location.href='blocks.html',700);
-    });
-  });
+  document.getElementById('delBtn').addEventListener('click',()=>deleteBlock(existing.label));
 
   // ---- Responsive panels (Style collapsible / drawers on small screens) ----
   const ed3=document.querySelector('.ed3');
