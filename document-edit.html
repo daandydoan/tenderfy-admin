@@ -40,13 +40,9 @@
   /* Document blocks on the canvas */
   .doc-empty{border:1.5px dashed #b3beba;border-radius:10px;padding:44px 20px;text-align:center;color:var(--gray);margin:auto;width:100%}
   .doc-empty .ms.big{font-size:32px;color:var(--light);display:block;margin-bottom:8px}
-  .doc-blk{position:relative;border:1.5px solid var(--border);border-radius:9px;padding:13px 15px;margin-bottom:12px;background:#fff}
-  .doc-blk:hover{border-color:var(--teal)}
+  /* Blocks in the document render exactly like the block listing cards */
+  .doc-blk{position:relative;margin-bottom:12px;cursor:grab}
   .doc-blk.dragging{opacity:.4}
-  .doc-blk .dn{font-weight:600;font-size:13px;display:flex;align-items:center;gap:7px}
-  .doc-blk .dn .ms{font-size:16px;color:var(--teal)}
-  .doc-blk .dcat{font-size:10px;color:var(--light);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-left:auto}
-  .doc-blk .dprev{margin-top:10px;border:1px solid var(--border);border-radius:7px;padding:11px}
   .doc-tools{position:absolute;top:-12px;right:10px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:2}
   .doc-blk:hover .doc-tools{opacity:1}
   .doc-tools .tb{width:24px;height:24px;border-radius:6px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.3)}
@@ -99,9 +95,10 @@
           <div class="fld"><label for="d-desc">Description</label><textarea class="fin" id="d-desc" rows="2" placeholder="What is this document for?"></textarea></div>
         </div>
         <div class="card">
-          <h3 class="ed-h">Availability</h3>
-          <div class="fld"><label for="d-avail">Clients</label><select class="fin" id="d-avail"><option value="all">All clients (default)</option><option value="restricted">Restricted to selected clients</option></select></div>
-          <div class="fhint">Global by default — restricting is a deliberate exception.</div>
+          <h3 class="ed-h">Style</h3>
+          <div class="fld"><label for="d-style">Preview style</label><select class="fin" id="d-style"></select></div>
+          <div id="d-style-sum" style="margin-top:2px"></div>
+          <div class="fhint" style="margin-top:8px">Documents are brand-neutral — the assigned client's brand is applied when this document is used in a template.</div>
         </div>
         <div class="card">
           <h3 class="ed-h">Composition</h3>
@@ -114,6 +111,7 @@
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
 <script src="library-data.js"></script>
+<script src="tenant-data.js"></script>
 <script>
 function pageInit(){
   const bById=Object.fromEntries(BLOCKS.map(b=>[b.id,b]));
@@ -129,7 +127,6 @@ function pageInit(){
     document.getElementById('d-type').value=doc.category;
     document.getElementById('d-status').value=doc.status;
     document.getElementById('d-desc').value=doc.desc;
-    document.getElementById('d-avail').value=doc.restricted?'restricted':'all';
     document.getElementById('delBtn').style.display='';
     setBadge(doc.status);
   }
@@ -162,10 +159,11 @@ function pageInit(){
       canvas.innerHTML=`<div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div>`;
     } else {
       canvas.innerHTML=items.map((bid,i)=>{const b=bById[bid];return `
-        <div class="doc-blk" draggable="true" data-i="${i}">
+        <div class="doc-blk blk-card" draggable="true" data-i="${i}">
           <div class="doc-tools"><span class="tb grab" data-grip><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}"><span class="ms">delete</span></span></div>
-          <div class="dn"><span class="ms">grid_view</span>${b.label}<span class="dcat">${b.cat}</span></div>
-          <div class="dprev"><div class="blk-preview" style="min-height:0;padding:0;gap:7px">${blockPreview(b.p)}</div></div>
+          <div class="blk-name">${b.label} ${b.bespoke?'<span class="blk-custom">Bespoke</span>':''}</div>
+          <div class="blk-preview">${blockPreview(b.p)}</div>
+          <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>
         </div>`;}).join('');
     }
     document.getElementById('p-count').textContent=items.length;
@@ -203,6 +201,19 @@ function pageInit(){
       showToast('Deleted document: '+doc.name); setTimeout(()=>location.href='library.html',700);
     });
   });
+
+  // ---- Style (preview style + brand summary) ----
+  const BRANDS=[{name:'Default (brand-neutral)',brand:null}, ...TENANTS.map(t=>({name:t.name,brand:t.brand}))];
+  const dstyle=document.getElementById('d-style');
+  dstyle.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.name}</option>`).join('');
+  function renderStyleSummary(){
+    const b=BRANDS[+dstyle.value].brand, sum=document.getElementById('d-style-sum');
+    const sw=c=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:${c};border:1px solid rgba(0,0,0,.1)"></span>${c}</span>`;
+    sum.innerHTML = b
+      ? `<div class="hstack" style="gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--gray)">${sw(b.primary)}${sw(b.secondary)}<span><span class="ms" style="font-size:13px;vertical-align:-2px;color:var(--light)">text_fields</span> ${b.font} / ${b.bodyFont}</span></div>`
+      : '<div class="hstack" style="font-size:12px;color:var(--gray)"><span class="ms" style="font-size:15px;color:var(--light)">info</span> Structure only — no client brand applied.</div>';
+  }
+  dstyle.addEventListener('change',renderStyleSummary); renderStyleSummary();
 
   renderPalette(); render();
 }
