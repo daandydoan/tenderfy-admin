@@ -27,8 +27,15 @@ const BLOCKS = [
   {id:'table',      name:'Table',               label:'Table',              desc:'Rows and columns for rates, schedules or comparisons.',cat:'Tables & Sign-off', p:'table'},
   {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',            cat:'Tables & Sign-off', p:'signature'},
   {id:'catalogue',  name:'Catalogue',           label:'Catalogue',          desc:'A list of items with an image, title and details.',    cat:'Image & Text',      p:'catalogue'},
+  // Headers & Footers — page furniture for the document's Top Layer (repeats on every page).
+  {id:'lh-brand',   name:'Branded Letterhead',  label:'Branded letterhead', desc:'Logo, company name and a brand rule across the top of every page.', cat:'Headers & Footers', p:'lh-brand',   slot:'header'},
+  {id:'lh-contact', name:'Contact Letterhead',  label:'Contact letterhead', desc:'Company name with contact details in a top bar.',                   cat:'Headers & Footers', p:'lh-contact', slot:'header'},
+  {id:'lh-min',     name:'Minimal Letterhead',  label:'Minimal letterhead', desc:'A small logo with a thin rule — understated.',                      cat:'Headers & Footers', p:'lh-min',     slot:'header'},
+  {id:'lf-page',    name:'Page-number Footer',  label:'Page-number footer', desc:'Company name with a page number on every page.',                    cat:'Headers & Footers', p:'lf-page',    slot:'footer'},
+  {id:'lf-legal',   name:'Legal Footer',        label:'Legal footer',       desc:'A confidentiality or disclaimer line across the bottom.',           cat:'Headers & Footers', p:'lf-legal',   slot:'footer'},
+  {id:'lf-contact', name:'Contact Footer',      label:'Contact footer',     desc:'Address, phone and web in a bottom strip.',                         cat:'Headers & Footers', p:'lf-contact', slot:'footer'},
 ];
-const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text','Tables & Sign-off'];
+const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text','Tables & Sign-off','Headers & Footers'];
 
 // Schematic preview for a block layout key.
 function blockPreview(p){
@@ -60,6 +67,12 @@ function blockPreview(p){
     case 'docdetails':{ const cell='<div class="doc-cell"><span class="blk-bar h" style="width:75%"></span><span class="blk-bar" style="width:100%"></span><span class="blk-bar" style="width:82%"></span></div>'; return `<div class="doc-row"><div class="doc-title"></div><div class="doc-grid">${cell+cell+cell+cell}</div></div>`; }
     case 'docpara':   return `<div class="doc-row"><div class="doc-title"></div><div class="doc-body">${bar('46%',1)+bar('92%')+bar('84%')+bar('64%')}</div></div>`;
     case 'docdblpara':{ const col='<div class="doc-col"><span class="blk-bar h" style="width:72%"></span><span class="blk-bar" style="width:100%"></span><span class="blk-bar" style="width:90%"></span><span class="blk-bar" style="width:72%"></span></div>'; return `<div class="doc-row"><div class="doc-title"></div><div class="doc-cols">${col+col}</div></div>`; }
+    case 'lh-brand':  return `<div style="display:flex;align-items:center;gap:7px;border-bottom:2px solid var(--teal);padding-bottom:8px"><span style="width:20px;height:20px;border-radius:5px;background:var(--teal);flex:none"></span><span class="blk-bar h" style="width:44%"></span></div>`;
+    case 'lh-contact':return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--teal);padding-bottom:8px"><span class="blk-bar h" style="width:36%"></span><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex:1">${bar('60%')}${bar('44%')}</div></div>`;
+    case 'lh-min':    return `<div style="display:flex;align-items:center;gap:6px;border-bottom:1px solid #c2ccc9;padding-bottom:6px"><span style="width:14px;height:14px;border-radius:4px;background:var(--teal);flex:none"></span><span class="blk-bar h" style="width:34%"></span></div>`;
+    case 'lf-page':   return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--teal);padding-top:8px;margin-top:4px">${bar('46%')}<span class="blk-bar" style="width:18%"></span></div>`;
+    case 'lf-legal':  return `<div style="border-top:1px solid #c2ccc9;padding-top:8px;margin-top:4px;display:flex;flex-direction:column;gap:4px;align-items:center">${bar('90%')}${bar('68%')}</div>`;
+    case 'lf-contact':return `<div style="display:flex;justify-content:space-between;gap:8px;border-top:2px solid var(--teal);padding-top:8px;margin-top:4px">${bar('26%')}${bar('22%')}${bar('24%')}</div>`;
     default:          return bar('80%');
   }
 }
