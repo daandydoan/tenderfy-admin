@@ -44,7 +44,7 @@ function pageInit(){
   function renderGrid(){
     const list=BLOCKS.filter(b=>active==='All Blocks'||b.cat===active);
     document.getElementById('grid').innerHTML=list.map(b=>`
-      <a class="blk-card" href="block-edit.html#id=${b.id}">
+      <a class="blk-card" href="block-view.html#id=${b.id}">
         <div class="blk-name">${b.label}</div>
         <div class="blk-preview">${blockPreview(b.p)}</div>
         <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>

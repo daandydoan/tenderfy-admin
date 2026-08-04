@@ -375,21 +375,9 @@
 <script src="tenant-data.js"></script>
 <script src="brand-editor.js"></script>
 <script src="primitives.js"></script>
+<script src="block-layouts.js"></script>
 <script>
 const PRIM_ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height',field:'data_object',callout:'campaign',stat:'trending_up',button:'smart_button',cover:'title',toc:'toc',pagebreak:'insert_page_break'};
-const P2DOC={
-  heading:[{cols:[['heading']]}], subheading:[{cols:[['subheading']]}],
-  divider:[{cols:[['heading','divider','paragraph']]}], paragraph:[{cols:[['paragraph']]}],
-  double:[{cols:[['paragraph'],['paragraph']]}], headpara:[{cols:[['subheading'],['paragraph']]}],
-  parahead:[{cols:[['paragraph'],['subheading']]}], quote:[{cols:[['quote']]}], list:[{cols:[['list']]}],
-  callout:[{cols:[['callout']]}], docdetails:[{cols:[['subheading'],['keyvalue']]}],
-  docpara:[{cols:[['subheading'],['paragraph']]}], docdblpara:[{cols:[['subheading'],['paragraph'],['paragraph']]}],
-  img1:[{cols:[['image']]}], img2:[{cols:[['image'],['image']]}], img3:[{cols:[['image'],['image'],['image']]}],
-  imggrid:[{cols:[['image'],['image']]},{cols:[['image'],['image']]}], imgtext:[{cols:[['image'],['paragraph']]}],
-  textimg:[{cols:[['paragraph'],['image']]}], imgcap:[{cols:[['image','subheading']]}],
-  feature:[{cols:[['image'],['heading','paragraph']]}], table:[{cols:[['table']]}],
-  signature:[{cols:[['signature']]}], catalogue:[{cols:[['image'],['subheading','paragraph']]}],
-};
 const TEMPLATES=[
   {key:'heading',label:'Heading',icon:'title'},{key:'headpara',label:'Heading + text',icon:'view_sidebar'},
   {key:'paragraph',label:'Paragraph',icon:'notes'},{key:'imgtext',label:'Image + text',icon:'wysiwyg'},

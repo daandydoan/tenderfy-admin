@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  .bv-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+  .bv-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:28px;overflow:auto}
+  .bv-page{width:100%;max-width:620px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:44px 48px;min-height:200px}
+  .bv-meta .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin-bottom:5px}
+  .bv-meta .v{font-size:13.5px;color:var(--ink)}
+  .bv-meta .row{padding:12px 0;border-bottom:1px solid var(--border)}
+  .bv-meta .row:first-child{padding-top:0}
+  .bv-meta .row:last-child{border-bottom:none}
+  .bv-elems{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .bv-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--ink);background:#fff;border:1px solid var(--border);border-radius:100px;padding:5px 11px}
+  .bv-chip .ms{font-size:15px;color:var(--teal)}
+  .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px;margin-right:6px}
+  .hdr-brand .ms{font-size:17px;color:var(--teal)}
+  .hdr-brand .fin-sm{min-width:172px;padding:7px 10px;font-size:12.5px;width:auto}
+  @media(max-width:900px){ .bv-grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body data-page="blocks" data-title="Blocks">
+<div id="app-content">
+  <div class="pad">
+    <a class="cd2-back" href="blocks.html"><span class="ms">chevron_left</span> Blocks</a>
+    <div class="pg-head">
+      <div>
+        <div class="tn-title" id="bl-title">Block</div>
+        <div class="pg-sub" id="bl-desc"></div>
+      </div>
+      <div class="pg-acts">
+        <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span>
+        <a class="btn btn-outline btn-sm" id="dupBtn"><span class="ms" style="font-size:17px">content_copy</span> Duplicate</a>
+        <a class="btn btn-danger btn-sm" id="delBtn"><span class="ms" style="font-size:17px">delete</span> Delete</a>
+        <a class="btn btn-primary btn-sm" id="editBtn"><span class="ms" style="font-size:17px">edit</span> Edit block</a>
+      </div>
+    </div>
+
+    <div class="bv-grid">
+      <div class="card">
+        <h3 class="ed-h">Preview</h3>
+        <div class="bv-canvas"><div class="bv-page" id="bl-preview"></div></div>
+      </div>
+      <aside class="card">
+        <h3 class="ed-h">Details</h3>
+        <div class="bv-meta">
+          <div class="row"><div class="k">Customer-facing label</div><div class="v" id="bl-label"></div></div>
+          <div class="row"><div class="k">Category</div><div class="v" id="bl-cat"></div></div>
+          <div class="row"><div class="k">Description</div><div class="v" id="bl-desc2" style="line-height:1.5"></div></div>
+          <div class="row"><div class="k">Made of</div><div class="bv-elems" id="bl-elems"></div></div>
+          <div class="row"><div class="k">Availability</div><div class="v"><span class="badge b-published"><span class="b-dot"></span>Standard</span></div></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script src="blocks-data.js"></script>
+<script src="tenant-data.js"></script>
+<script src="primitives.js"></script>
+<script src="block-layouts.js"></script>
+<script>
+function pageInit(){
+  const ELEMS=Object.fromEntries(PRIMITIVES.map(p=>[p.id,p.name]));
+  const ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height',callout:'campaign'};
+  const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
+  const block=(id?BLOCKS.find(b=>b.id===id):null)||BLOCKS[0];
+  let brand=null;
+
+  document.title='Tenderfy — Super Admin · '+block.label;
+  document.getElementById('bl-title').textContent=block.name;
+  document.getElementById('bl-desc').textContent=block.desc;
+  document.getElementById('bl-label').textContent=block.label;
+  document.getElementById('bl-cat').textContent=block.cat;
+  document.getElementById('bl-desc2').textContent=block.desc;
+  document.getElementById('bl-elems').innerHTML=blockElements(block).map(pid=>`<span class="bv-chip"><span class="ms">${ICON[pid]||'widgets'}</span>${ELEMS[pid]||pid}</span>`).join('') || '<span class="muted" style="font-size:12.5px">Custom code block</span>';
+
+  // Preview-style dropdown (brand-neutral + each client)
+  const BRANDS=[{id:'default',name:'Default (brand-neutral)',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand}))];
+  const sel=document.getElementById('brandSel');
+  sel.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.name}</option>`).join('');
+  function applyBrand(){
+    const page=document.getElementById('bl-preview');
+    if(brand){ page.style.setProperty('--brand-primary',brand.primary); page.style.setProperty('--brand-secondary',brand.secondary); page.style.setProperty('--brand-bg',brand.background); }
+    else { page.style.removeProperty('--brand-primary'); page.style.removeProperty('--brand-secondary'); page.style.removeProperty('--brand-bg'); }
+  }
+  function renderPreview(){ document.getElementById('bl-preview').innerHTML=composeBlock(block, brand); applyBrand(); }
+  sel.addEventListener('change',e=>{ brand=BRANDS[+e.target.value].brand; renderPreview(); });
+
+  // Actions
+  document.getElementById('editBtn').setAttribute('href','block-edit.html#id='+block.id);
+  document.getElementById('dupBtn').addEventListener('click',()=>showToast('Duplicated block: '+block.label));
+  document.getElementById('delBtn').addEventListener('click',()=>{
+    confirmAction({title:'Delete this block?',body:`“${block.label}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
+      showToast('Deleted block: '+block.label); setTimeout(()=>location.href='blocks.html',700);
+    });
+  });
+
+  renderPreview();
+}
+</script>
+</body>
+</html>
