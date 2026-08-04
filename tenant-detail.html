@@ -123,6 +123,34 @@
     </div>
   </div>
 </div>
+<div class="modal-overlay" id="clientModal">
+  <div class="cfm" style="text-align:left;max-width:440px">
+    <h3>Edit client</h3>
+    <div style="color:var(--gray);font-size:12.5px;margin:-2px 0 14px">Company identity and contact details.</div>
+    <div class="fld"><label for="e-name">Company name</label><input class="fin" id="e-name"></div>
+    <div class="fld"><label for="e-industry">Industry</label><input class="fin" id="e-industry"></div>
+    <div class="fld"><label for="e-email">Email</label><input class="fin" id="e-email"></div>
+    <div class="fld"><label for="e-phone">Phone</label><input class="fin" id="e-phone"></div>
+    <div class="cfm-acts"><a class="btn btn-outline" data-close="clientModal">Cancel</a><a class="btn btn-primary" id="clientSave"><span class="ms" style="font-size:17px">save</span> Save</a></div>
+  </div>
+</div>
+<div class="modal-overlay" id="brandModal">
+  <div class="cfm" style="text-align:left;max-width:470px">
+    <h3>Brand Kit</h3>
+    <div style="color:var(--gray);font-size:12.5px;margin:-2px 0 14px">Colours, fonts and logo — blocks &amp; templates inherit these tokens for this client.</div>
+    <div class="fld"><label>Logo</label><div class="bk-logo" data-toast="Upload client logo"><span class="ms">upload</span> Upload logo</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fld"><label for="e-pri">Primary</label><div class="color-row"><input type="color" id="e-pri"><input class="fin" id="e-pri-hex"></div></div>
+      <div class="fld"><label for="e-sec">Secondary</label><div class="color-row"><input type="color" id="e-sec"><input class="fin" id="e-sec-hex"></div></div>
+    </div>
+    <div class="fld"><label for="e-bg">Background</label><div class="color-row"><input type="color" id="e-bg"><input class="fin" id="e-bg-hex"></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fld"><label for="e-font">Heading font</label><select class="fin" id="e-font"><option>Outfit</option><option>Poppins</option><option>Inter</option><option>Lora</option><option>Roboto</option></select></div>
+      <div class="fld"><label for="e-bodyfont">Body font</label><select class="fin" id="e-bodyfont"><option>Outfit</option><option>Poppins</option><option>Inter</option><option>Lora</option><option>Roboto</option></select></div>
+    </div>
+    <div class="cfm-acts"><a class="btn btn-outline" data-close="brandModal">Cancel</a><a class="btn btn-primary" id="brandSave"><span class="ms" style="font-size:17px">save</span> Save Brand Kit</a></div>
+  </div>
+</div>
 <script src="shell.js"></script>
 <script src="tenant-data.js"></script>
 <script>
@@ -130,22 +158,31 @@ function pageInit(){
   const id=new URLSearchParams(location.search || location.hash.slice(1)).get('id')||TENANTS[0].id;
   const t=TENANTS.find(x=>x.id===id)||TENANTS[0];
   const b=t.brand;
+  const initialsOf = n => (n.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2)||'—').toUpperCase();
+  const emailOf = ()=> t.email || (t.id+'@'+t.name.toLowerCase().replace(/[^a-z]+/g,'')+'.com.au');
+  const phoneOf = ()=> t.phone || ('+61 7 '+(3000+t.name.length*13)+' '+(1000+t.templates*97));
 
-  // Hero
-  const av=document.getElementById('vc-avatar'); av.textContent=t.initials; av.style.background=b.primary; av.style.fontFamily=`'${b.font}',sans-serif`;
-  document.getElementById('vc-name').textContent=t.name;
-  document.getElementById('vc-company').textContent=t.industry;
+  function renderIdentity(){
+    const av=document.getElementById('vc-avatar'); av.textContent=t.initials; av.style.background=b.primary; av.style.fontFamily=`'${b.font}',sans-serif`;
+    document.getElementById('vc-name').textContent=t.name;
+    document.getElementById('vc-company').textContent=t.industry;
+  }
+  function renderDetails(){
+    document.getElementById('vc-email').textContent=emailOf();
+    document.getElementById('vc-phone').textContent=phoneOf();
+    document.getElementById('vc-industry').textContent=t.industry;
+    document.getElementById('vc-quota').textContent=t.templates+' / 30';
+  }
 
   // Kebab menu
   const mb=document.getElementById('moreBtn'), mm=document.getElementById('moreMenu');
   mb.addEventListener('click', ()=>{ if(typeof closePopovers==='function') closePopovers(mm); mm.classList.toggle('open'); });
   mm.addEventListener('click', ()=>mm.classList.remove('open'));
 
-  // CRUD entry points
-  const editHref='client-edit.html#id='+t.id;
-  document.getElementById('brandBtn').setAttribute('href',editHref);
-  document.getElementById('editBtn').setAttribute('href',editHref);
-  document.getElementById('brandEditLnk').setAttribute('href',editHref);
+  // Edit entry points open the two popups
+  document.getElementById('brandBtn').addEventListener('click',openBrand);
+  document.getElementById('brandEditLnk').addEventListener('click',openBrand);
+  document.getElementById('editBtn').addEventListener('click',openClient);
   document.getElementById('delBtn').addEventListener('click',()=>{
     confirmAction({title:'Delete this client?',body:`“${t.name}” and its brand kit will be removed. Assigned tender templates stay in the library.`,confirm:'Delete client',danger:true},()=>{
       showToast('Deleted client: '+t.name); setTimeout(()=>location.href='tenants.html',700);
@@ -153,6 +190,7 @@ function pageInit(){
   });
 
   // ---- Brand tokens board ----
+  function renderBoard(){
   const scopeLabel = s => s==='brand'?'Brand':s==='derived'?'Derived':'Shared';
   const colCard = r=>{
     const v = roleValue(b, r.key);
@@ -187,6 +225,7 @@ function pageInit(){
       <div class="bt-radii">${radiusHtml}</div>
     </div>
     <div><div class="bt-sec-h">Live preview</div>${liveHtml}</div>`;
+  }
 
   // Subscription & credits
   const meterFill=(el,pct)=>{el.style.width=pct+'%';};
@@ -196,12 +235,6 @@ function pageInit(){
   meterFill(document.getElementById('cd-pc-m'),t.planCredits);
   document.getElementById('cd-tu-v').textContent=t.topup?t.topup+'% left':'None';
   meterFill(document.getElementById('cd-tu-m'),t.topup);
-
-  // Details
-  document.getElementById('vc-email').textContent=t.id+'@'+t.name.toLowerCase().replace(/[^a-z]+/g,'')+'.com.au';
-  document.getElementById('vc-phone').textContent='+61 7 '+(3000+t.name.length*13)+' '+(1000+t.templates*97);
-  document.getElementById('vc-industry').textContent=t.industry;
-  document.getElementById('vc-quota').textContent=t.templates+' / 30';
 
   // Assigned templates by document type
   const has=t.templates>0;
@@ -230,6 +263,46 @@ function pageInit(){
       </div>
       <div class="asec-body">${d.items.length ? d.items.map(n=>card(n,d.band)).join('') : '<span class="asec-empty">No '+d.type.toLowerCase().replace(' templates','')+' templates assigned yet.</span>'}</div>
     </div>`).join('');
+
+  renderIdentity(); renderDetails(); renderBoard();
+
+  // ---- Popups: Edit client + Brand Kit (two separate dialogs) ----
+  const closeM = idn => document.getElementById(idn).classList.remove('open');
+  document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click',()=>closeM(x.dataset.close)));
+  ['clientModal','brandModal'].forEach(idn=>document.getElementById(idn).addEventListener('click',e=>{ if(e.target.id===idn) closeM(idn); }));
+
+  function openClient(){
+    document.getElementById('e-name').value=t.name;
+    document.getElementById('e-industry').value=t.industry;
+    document.getElementById('e-email').value=emailOf();
+    document.getElementById('e-phone').value=phoneOf();
+    document.getElementById('clientModal').classList.add('open');
+    document.getElementById('e-name').focus();
+  }
+  document.getElementById('clientSave').addEventListener('click',()=>{
+    const nm=document.getElementById('e-name').value.trim(); if(!nm){showToast('Enter a company name');return;}
+    t.name=nm; t.initials=initialsOf(nm);
+    t.industry=document.getElementById('e-industry').value.trim()||t.industry;
+    t.email=document.getElementById('e-email').value.trim();
+    t.phone=document.getElementById('e-phone').value.trim();
+    renderIdentity(); renderDetails(); renderBoard(); closeM('clientModal'); showToast('Client details updated');
+  });
+
+  const setCol = (colId,hexId,val)=>{ document.getElementById(colId).value=val; document.getElementById(hexId).value=(val||'').toUpperCase(); };
+  function openBrand(){
+    setCol('e-pri','e-pri-hex',b.primary); setCol('e-sec','e-sec-hex',b.secondary); setCol('e-bg','e-bg-hex',b.background);
+    document.getElementById('e-font').value=b.font; document.getElementById('e-bodyfont').value=b.bodyFont;
+    document.getElementById('brandModal').classList.add('open');
+  }
+  [['e-pri','e-pri-hex'],['e-sec','e-sec-hex'],['e-bg','e-bg-hex']].forEach(([c,h])=>{
+    document.getElementById(c).addEventListener('input',()=>document.getElementById(h).value=document.getElementById(c).value.toUpperCase());
+    document.getElementById(h).addEventListener('input',e=>{ const v=e.target.value.trim(); if(/^#[0-9a-f]{6}$/i.test(v)) document.getElementById(c).value=v; });
+  });
+  document.getElementById('brandSave').addEventListener('click',()=>{
+    b.primary=document.getElementById('e-pri').value; b.secondary=document.getElementById('e-sec').value; b.background=document.getElementById('e-bg').value;
+    b.font=document.getElementById('e-font').value; b.bodyFont=document.getElementById('e-bodyfont').value;
+    renderIdentity(); renderBoard(); closeM('brandModal'); showToast('Brand Kit updated');
+  });
 }
 </script>
 </body>
