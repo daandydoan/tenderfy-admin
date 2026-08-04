@@ -63,11 +63,14 @@ function blockPreview(p){
     default:          return bar('80%');
   }
 }
-// Shared delete flow — confirm, toast, return to the library. Used by the block
-// view and the block editor so the wording and behaviour stay in one place.
+// Shared block actions — kept in one place so the block view and the block
+// editor share identical wording and behaviour.
 function deleteBlock(label){
   confirmAction({title:'Delete this block?',body:`“${label}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
     showToast('Deleted block: '+label); setTimeout(()=>location.href='blocks.html',700);
   });
 }
-if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; }
+function duplicateBlock(label){
+  showToast('Duplicated block: “'+label+' copy” — find it in the library'); setTimeout(()=>location.href='blocks.html',800);
+}
+if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; }

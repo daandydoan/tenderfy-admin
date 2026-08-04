@@ -188,6 +188,7 @@
         <span class="use-chip" id="useChip" style="display:none"></span>
         <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select><button class="tb-btn" id="editBrandBtn" title="Edit this brand style" style="margin-left:4px"><span class="ms">edit</span></button></span>
         <a class="btn btn-outline btn-sm" id="cancelBtn" href="blocks.html">Cancel</a>
+        <a class="btn btn-outline btn-sm" id="dupBtn" style="display:none"><span class="ms" style="font-size:17px">content_copy</span> Duplicate</a>
         <a class="btn btn-danger btn-sm" id="delBtn" style="display:none"><span class="ms" style="font-size:17px">delete</span> Delete</a>
         <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Block</a>
       </div>
@@ -495,7 +496,9 @@ function pageInit(){
     document.getElementById('b-desc').value=existing.desc;
     document.getElementById('b-cat').value=BLOCK_CATS.includes(existing.cat)?existing.cat:BLOCK_CATS[0];
     document.getElementById('pg-title').textContent='Edit — '+existing.label;
+    document.getElementById('dupBtn').style.display='';
     document.getElementById('delBtn').style.display='';
+    document.getElementById('dupBtn').addEventListener('click',()=>duplicateBlock(existing.label));
   }
 
   // ---- Render ----

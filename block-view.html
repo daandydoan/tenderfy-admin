@@ -101,7 +101,7 @@ function pageInit(){
 
   // Actions
   document.getElementById('editBtn').setAttribute('href','block-edit.html#id='+block.id);
-  document.getElementById('dupBtn').addEventListener('click',()=>showToast('Duplicated block: '+block.label));
+  document.getElementById('dupBtn').addEventListener('click',()=>duplicateBlock(block.label));
   document.getElementById('delBtn').addEventListener('click',()=>deleteBlock(block.label));
 
   renderPreview();
