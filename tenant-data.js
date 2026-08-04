@@ -32,4 +32,52 @@ const PLANS = [
   {name:'Growth',  price:499, per:'mo', quota:50,  tokens:'8M',   subs:21, popular:true},
   {name:'Pro',     price:999, per:'mo', quota:100, tokens:'15M',  subs:8,  popular:false},
 ];
-if(typeof window!=='undefined'){ window.TENANTS = TENANTS; window.PLANS = PLANS; window.BRAND_TOKENS = BRAND_TOKENS; }
+// ============================================================================
+// Design tokens — the single source of truth shared by the client Brand-tokens
+// board (tenant-detail) and the block builder's bindings. A block references a
+// token *role* (e.g. "primary"), and it resolves to each client's value at render.
+// ============================================================================
+
+// Colour roles. scope: 'brand' = comes from the client's kit; 'derived' = computed;
+// 'shared' = one neutral value for every client. `bindable` roles appear in the block builder.
+const COLOUR_ROLES = [
+  {key:'primary',    label:'Primary',    scope:'brand',   bindable:true,  applies:'Headings, cover panel, table header fill'},
+  {key:'secondary',  label:'Secondary',  scope:'brand',   bindable:true,  applies:'Accents, heading rules, dividers, bullets'},
+  {key:'tint',       label:'Tint',       scope:'derived', bindable:true,  applies:'Callout & highlight-box fills'},
+  {key:'background', label:'Background',  scope:'brand',   bindable:true,  applies:'Cover wash, panel backgrounds'},
+  {key:'ink',        label:'Ink / Text', scope:'shared',  bindable:true,  applies:'Body copy, captions'},
+  {key:'surface',    label:'Surface',    scope:'shared',  bindable:true,  applies:'Cards, table cells'},
+  {key:'border',     label:'Border',     scope:'shared',  bindable:true,  applies:'Dividers, table & box borders'},
+];
+// Type scale (shared design scale; the font family per role comes from the client's kit).
+const TYPE_SCALE = [
+  {key:'h1',    label:'Heading 1', size:28, weight:700, lh:34, font:'heading'},
+  {key:'h2',    label:'Heading 2', size:20, weight:700, lh:26, font:'heading'},
+  {key:'h3',    label:'Heading 3', size:15, weight:600, lh:20, font:'heading'},
+  {key:'body',  label:'Body',      size:13, weight:400, lh:20, font:'body'},
+  {key:'small', label:'Caption',   size:11, weight:400, lh:15, font:'body'},
+];
+// Spacing & radius aliases (shared across every client — geometry is not brand-specific).
+const SPACE_SCALE  = [{key:'xs',v:4},{key:'sm',v:8},{key:'md',v:16},{key:'lg',v:24},{key:'xl',v:40}];
+const RADIUS_SCALE = [{key:'sm',v:4},{key:'md',v:8},{key:'lg',v:14}];
+
+// Resolve a colour-role key to a concrete value for a given brand ({primary,secondary,background}) or the neutral default.
+function roleValue(brand, key){
+  const b = brand || {primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
+  switch(key){
+    case 'primary':    return b.primary;
+    case 'secondary':  return b.secondary;
+    case 'tint':       return b.secondary + '22';
+    case 'background': return b.background;
+    case 'ink':        return '#2E3C3B';
+    case 'surface':    return '#FFFFFF';
+    case 'border':     return '#E2E8E6';
+  }
+  return '#000000';
+}
+
+if(typeof window!=='undefined'){
+  window.TENANTS = TENANTS; window.PLANS = PLANS; window.BRAND_TOKENS = BRAND_TOKENS;
+  window.COLOUR_ROLES = COLOUR_ROLES; window.TYPE_SCALE = TYPE_SCALE;
+  window.SPACE_SCALE = SPACE_SCALE; window.RADIUS_SCALE = RADIUS_SCALE; window.roleValue = roleValue;
+}

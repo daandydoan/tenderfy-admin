@@ -594,15 +594,10 @@ function pageInit(){
 
   // ---- Style application ----
   // Colours can bind to a brand token so they resolve per client; geometry stays shared.
-  function tokens(){ return brand || NEUTRAL; }
-  function resolveFill(st){
-    const bd=st.bgBind; if(!bd) return (st.bg&&st.bg!=='transparent')?st.bg:''; if(bd==='none') return '';
-    const b=tokens(); return bd==='primary'?b.primary : bd==='secondary'?b.secondary : bd==='tint'?b.secondary+'22' : bd==='background'?b.background : '';
-  }
-  function resolveBColor(st){
-    const bd=st.bcolorBind; if(!bd) return st.bcolor;
-    const b=tokens(); return bd==='primary'?b.primary : bd==='secondary'?b.secondary : bd==='tint'?b.secondary+'55' : bd==='background'?b.background : st.bcolor;
-  }
+  // Colour roles resolve through the shared token catalog (tenant-data.js) so the
+  // block builder and the client Brand-tokens board always agree.
+  function resolveFill(st){ const bd=st.bgBind; if(!bd) return (st.bg&&st.bg!=='transparent')?st.bg:''; if(bd==='none') return ''; return roleValue(brand, bd); }
+  function resolveBColor(st){ const bd=st.bcolorBind; if(!bd) return st.bcolor; return roleValue(brand, bd); }
   function applyBlockStyle(){
     const w=document.getElementById('blockWrap'); if(!w) return; const bs=blockStyle;
     w.style.width = bs.wmode==='fixed' ? bs.wpx+'px' : '100%'; w.style.maxWidth='100%';
@@ -699,6 +694,10 @@ function pageInit(){
   }
   function initStyle(){
     document.getElementById('s-font').innerHTML='<option value="">Inherit from brand</option>'+['Outfit','Inter','Poppins','Lora','Roboto'].map(f=>`<option>${f}</option>`).join('');
+    // Colour-bind options come from the shared brand-token catalog.
+    const colOpts=COLOUR_ROLES.map(r=>`<option value="${r.key}">Brand · ${r.label}</option>`).join('');
+    document.getElementById('s-bgBind').innerHTML=`<option value="">Custom colour</option>${colOpts}<option value="none">None (transparent)</option>`;
+    document.getElementById('s-bcolorBind').innerHTML=`<option value="">Custom colour</option>${colOpts}`;
     bindRange('s-pad','s-padN','pad'); bindRange('s-sp','s-spN','sp'); bindRange('s-rad','s-radN','rad');
     bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
     bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
