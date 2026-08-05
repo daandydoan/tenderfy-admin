@@ -202,6 +202,16 @@
   .ray-h{display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#4a3f8a;margin-bottom:8px}
   .ray-h .ms{font-size:17px;color:#7b61c9}
   .ray-draft textarea{width:100%;box-sizing:border-box;margin-bottom:8px;resize:vertical}
+  .ray-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;color:#6a5fb0;margin:2px 0 5px}
+  .ray-ref{margin-bottom:10px}
+  .ray-drop{display:flex;align-items:center;justify-content:center;gap:7px;border:1.5px dashed #c3b8ea;border-radius:9px;background:#faf9ff;color:#5b46b8;font-size:12px;font-weight:600;padding:15px;cursor:pointer;text-align:center}
+  .ray-drop:hover{background:#f3f0fb;border-color:#a893e0}
+  .ray-drop .ms{font-size:19px}
+  .ray-thumb{position:relative;border-radius:9px;overflow:hidden;border:1px solid #d9d0f2;background:#faf9ff}
+  .ray-thumb img{display:block;width:100%;max-height:130px;object-fit:cover}
+  .ray-thumb .ray-x{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,.55);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .ray-thumb .ray-x .ms{font-size:15px}
+  .ray-cap{font-size:10.5px;color:var(--gray);padding:5px 9px}
   .btn-ray{background:#5b46b8;color:#fff;border:none}
   .btn-ray:hover{background:#4c3aa0}
 </style>
@@ -354,6 +364,12 @@
     <div class="modal-b">
       <div class="ray-draft">
         <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
+        <div class="ray-lbl">Client's document (reference)</div>
+        <div class="ray-ref" id="rayDocRef">
+          <input type="file" accept="image/*" id="rayDocImg" hidden>
+          <label for="rayDocImg" class="ray-drop"><span class="ms">upload_file</span> Add a client document to match</label>
+        </div>
+        <div class="ray-lbl">Description</div>
         <textarea id="rayDocPrompt" class="fin" rows="2" placeholder="Describe the document — e.g. “a case study for a council road project”"></textarea>
         <button type="button" class="btn btn-ray btn-sm" id="rayDocBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
       </div>
@@ -608,11 +624,23 @@ function pageInit(){
     selK=null; render(); renderInspector();
     return items.length;
   }
+  // Client-document reference drop zone (mock — Ray "matches" the uploaded doc)
+  let rayDocHasImg=false;
+  (function bindRayImg(){
+    const ref=document.getElementById('rayDocRef'), inputId='rayDocImg', label="Add a client document to match";
+    function reset(){ rayDocHasImg=false; ref.innerHTML=`<input type="file" accept="image/*" id="${inputId}" hidden><label for="${inputId}" class="ray-drop"><span class="ms">upload_file</span> ${label}</label>`; wire(); }
+    function wire(){ document.getElementById(inputId).addEventListener('change',e=>{
+      const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+      r.onload=()=>{ rayDocHasImg=true; ref.innerHTML=`<div class="ray-thumb"><img src="${r.result}" alt="reference"><button type="button" class="ray-x"><span class="ms">close</span></button><div class="ray-cap">Client reference · ${f.name}</div></div>`; ref.querySelector('.ray-x').addEventListener('click',reset); };
+      r.readAsDataURL(f);
+    }); }
+    wire();
+  })();
   document.getElementById('rayDocBtn').addEventListener('click',()=>{
     const p=document.getElementById('rayDocPrompt').value.trim();
-    if(!p && !document.getElementById('d-type').value){ showToast('Describe the document, or pick a type'); return; }
+    if(!p && !document.getElementById('d-type').value && !rayDocHasImg){ showToast('Add a client document, describe it, or pick a type'); return; }
     const n=rayDraftDoc(p); closeDocDialog();
-    showToast('Ray drafted '+n+' blocks — refine, then Save');
+    showToast('Ray drafted '+n+' blocks'+(rayDocHasImg?' to match your reference':'')+' — refine, then Save');
   });
 
   // ---- Left-panel tabs (Blocks / Layers) ----

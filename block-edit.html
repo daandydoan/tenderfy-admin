@@ -154,6 +154,16 @@
   .ray-h{display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#4a3f8a;margin-bottom:8px}
   .ray-h .ms{font-size:17px;color:#7b61c9}
   .ray-draft textarea{width:100%;box-sizing:border-box;margin-bottom:8px;resize:vertical}
+  .ray-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;color:#6a5fb0;margin:2px 0 5px}
+  .ray-ref{margin-bottom:10px}
+  .ray-drop{display:flex;align-items:center;justify-content:center;gap:7px;border:1.5px dashed #c3b8ea;border-radius:9px;background:#faf9ff;color:#5b46b8;font-size:12px;font-weight:600;padding:15px;cursor:pointer}
+  .ray-drop:hover{background:#f3f0fb;border-color:#a893e0}
+  .ray-drop .ms{font-size:19px}
+  .ray-thumb{position:relative;border-radius:9px;overflow:hidden;border:1px solid #d9d0f2;background:#faf9ff}
+  .ray-thumb img{display:block;width:100%;max-height:120px;object-fit:cover}
+  .ray-thumb .ray-x{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,.55);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .ray-thumb .ray-x .ms{font-size:15px}
+  .ray-cap{font-size:10.5px;color:var(--gray);padding:5px 9px}
   .btn-ray{background:#5b46b8;color:#fff;border:none}
   .btn-ray:hover{background:#4c3aa0}
   .pub-sum{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:16px}
@@ -365,6 +375,12 @@
     <div class="sub">Name it so it reads clearly in the Block Builder — you can tweak this any time.</div>
     <div class="ray-draft">
       <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
+      <div class="ray-lbl">Reference image</div>
+      <div class="ray-ref" id="rayBlockRef">
+        <input type="file" accept="image/*" id="rayBlockImg" hidden>
+        <label for="rayBlockImg" class="ray-drop"><span class="ms">add_photo_alternate</span> Add a reference image</label>
+      </div>
+      <div class="ray-lbl">Description</div>
       <textarea id="rayBlockPrompt" class="fin" rows="2" placeholder="Describe the block — e.g. “a highlighted callout box for key terms”"></textarea>
       <button type="button" class="btn btn-ray btn-sm" id="rayBlockBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
     </div>
@@ -967,11 +983,24 @@ function pageInit(){
     doc=normDoc(layout); sel=null; render(); commit(); syncBar();
     document.getElementById('pg-title').textContent=document.getElementById('b-name').value.trim()||'New Custom Block';
   }
+  // Reference-image drop zone (mock — Ray "reads" the image alongside the description)
+  let rayBlockHasImg=false;
+  function bindRayImg(inputId, refId, label){
+    const ref=document.getElementById(refId);
+    function reset(){ rayBlockHasImg=false; ref.innerHTML=`<input type="file" accept="image/*" id="${inputId}" hidden><label for="${inputId}" class="ray-drop"><span class="ms">add_photo_alternate</span> ${label}</label>`; wire(); }
+    function wire(){ document.getElementById(inputId).addEventListener('change',e=>{
+      const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+      r.onload=()=>{ rayBlockHasImg=true; ref.innerHTML=`<div class="ray-thumb"><img src="${r.result}" alt="reference"><button type="button" class="ray-x"><span class="ms">close</span></button><div class="ray-cap">Reference · ${f.name}</div></div>`; ref.querySelector('.ray-x').addEventListener('click',reset); };
+      r.readAsDataURL(f);
+    }); }
+    wire();
+  }
+  bindRayImg('rayBlockImg','rayBlockRef','Add a reference image');
   document.getElementById('rayBlockBtn').addEventListener('click',()=>{
     const p=document.getElementById('rayBlockPrompt').value.trim();
-    if(!p){ showToast('Tell Ray what the block is for'); return; }
+    if(!p && !rayBlockHasImg){ showToast('Add a reference image or describe the block'); return; }
     rayDraftBlock(p); closeDetails();
-    showToast('Ray drafted a starting point — refine it, then Save');
+    showToast('Ray drafted a starting point'+(rayBlockHasImg?' from your reference':'')+' — refine it, then Save');
   });
 
   // ---- Save → publish confirmation ----
