@@ -197,6 +197,13 @@
   .modal-x:hover{background:#f0f3f2}
   .modal-b{padding:20px 22px}
   .modal-f{padding:15px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+  /* Ray draft box */
+  .ray-draft{background:linear-gradient(135deg,#eef7f4,#f3f0fb);border:1px solid #cfe6df;border-radius:11px;padding:12px;margin-bottom:16px}
+  .ray-h{display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#4a3f8a;margin-bottom:8px}
+  .ray-h .ms{font-size:17px;color:#7b61c9}
+  .ray-draft textarea{width:100%;box-sizing:border-box;margin-bottom:8px;resize:vertical}
+  .btn-ray{background:#5b46b8;color:#fff;border:none}
+  .btn-ray:hover{background:#4c3aa0}
 </style>
 </head>
 <body data-page="library" data-title="Documents">
@@ -345,6 +352,11 @@
   <div class="modal-card">
     <div class="modal-h"><h3>Document details</h3><button class="modal-x" id="docDialogX" title="Close"><span class="ms">close</span></button></div>
     <div class="modal-b">
+      <div class="ray-draft">
+        <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
+        <textarea id="rayDocPrompt" class="fin" rows="2" placeholder="Describe the document — e.g. “a case study for a council road project”"></textarea>
+        <button type="button" class="btn btn-ray btn-sm" id="rayDocBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
+      </div>
       <div class="fld"><label for="d-client">Client this document is for</label><select class="fin" id="d-client"></select></div>
       <div class="fhint" id="d-client-hint" style="margin:-6px 0 12px">Brand-neutral — no client brand applied.</div>
       <div class="fld"><label for="d-type">Document type</label><select class="fin" id="d-type"></select></div>
@@ -580,6 +592,29 @@ function pageInit(){
   document.getElementById('editDetailsBtn').addEventListener('click',openDocDialog);
   ['d-type','d-status'].forEach(id=>document.getElementById(id).addEventListener('change',updateDocSummary));
 
+  // ---- Ray: draft a document (block sequence) from a description / type ----
+  function rayDraftDoc(desc){
+    const s=((desc||'')+' '+document.getElementById('d-type').value).toLowerCase();
+    let seq;
+    if(/case stud|project profile|reference/.test(s)) seq=['heading','doc-details','headpara','img2','doc-para','quote'];
+    else if(/policy|policies|whs|quality|environmental|hse/.test(s)) seq=['heading','paragraph','list','callout','signature'];
+    else if(/cv|resume|bio|personnel|staff/.test(s)) seq=['headpara','list','doc-details','signature'];
+    else if(/rate|pricing|schedule of rates|cost|quote/.test(s)) seq=['heading','paragraph','table','callout'];
+    else if(/cover/.test(s)) seq=['feature','doc-details'];
+    else if(/methodology|method|approach/.test(s)) seq=['heading','doc-para','list','doc-dblpara'];
+    else if(/capability|company profile|about/.test(s)) seq=['heading','paragraph','img2','doc-details','quote'];
+    else seq=['heading','paragraph','imgtext','list','doc-details'];
+    items = seq.filter(id=>bById[id]).map(mkInst);
+    selK=null; render(); renderInspector();
+    return items.length;
+  }
+  document.getElementById('rayDocBtn').addEventListener('click',()=>{
+    const p=document.getElementById('rayDocPrompt').value.trim();
+    if(!p && !document.getElementById('d-type').value){ showToast('Describe the document, or pick a type'); return; }
+    const n=rayDraftDoc(p); closeDocDialog();
+    showToast('Ray drafted '+n+' blocks — refine, then Save');
+  });
+
   // ---- Left-panel tabs (Blocks / Layers) ----
   function showLeftTab(which){
     document.querySelectorAll('.lt-tab').forEach(x=>x.classList.toggle('on',x.dataset.lt===which));
@@ -686,6 +721,15 @@ function pageInit(){
   }
   document.querySelectorAll('#modeSeg button').forEach(x=>x.addEventListener('click',()=>setMode(x.dataset.mode)));
 
+  // ---- Ray sample-content bank (per-block "Draft content") ----
+  const RAY_TITLES=['Project Overview','Scope of Works','Our Approach','Key Personnel','Delivery & Programme','Quality & Safety','Company Profile','Why Choose Us'];
+  const RAY_BODIES=[
+    'Our team delivered the full civil works package on time and on budget — coordinating traffic management, bulk earthworks and drainage across a live site.',
+    'We bring a disciplined, safety-first approach honed over fifteen years on transport and infrastructure projects across the region.',
+    'A fully sequenced delivery plan keeps the corridor open throughout, with self-performed drainage to control the programme and protect the deadline.',
+    'Every project is led by a dedicated project director accountable from award through to the defects liability period.',
+    'We hold current accreditations across WHS, quality and environmental management, and have a five-year record with zero lost-time injuries.'
+  ];
   // ---- Block inspector (per-block content + style) ----
   function renderInspector(){
     const it=items.find(x=>x.k===selK), show=it&&mode==='layout';
@@ -709,10 +753,16 @@ function pageInit(){
     let html='';
     if(hasTitle) html+=`<div class="ds-fld"><label>Title</label><input class="ds-in" id="ct-title" placeholder="Heading text…"></div>`;
     if(hasBody)  html+=`<div class="ds-fld"><label>Body text</label><textarea class="ds-in" id="ct-body" rows="3" placeholder="Body copy…"></textarea></div>`;
+    if(hasTitle||hasBody) html+=`<button type="button" class="btn btn-ray btn-sm btn-block" id="ctDraft" style="margin-bottom:2px"><span class="ms" style="font-size:15px">auto_awesome</span> Draft content with Ray</button>`;
     if(!hasTitle&&!hasBody) html=`<div class="fhint" style="margin:2px 0 4px">No editable text in this block — style it below, then check Preview.</div>`;
     const cw=document.getElementById('bi-content'); cw.innerHTML=html;
     const t=document.getElementById('ct-title'); if(t){ t.value=it.content.title||''; t.addEventListener('input',()=>{it.content.title=t.value; if(mode==='preview')render();}); }
     const bd=document.getElementById('ct-body'); if(bd){ bd.value=it.content.body||''; bd.addEventListener('input',()=>{it.content.body=bd.value; if(mode==='preview')render();}); }
+    const dc=document.getElementById('ctDraft'); if(dc) dc.addEventListener('click',()=>{
+      if(hasTitle) it.content.title=RAY_TITLES[it.k % RAY_TITLES.length];
+      if(hasBody)  it.content.body =RAY_BODIES[it.k % RAY_BODIES.length];
+      fillInspector(it); render(); showToast('Ray drafted example content');
+    });
   }
   function biNum(rId,nId,key){
     const R=document.getElementById(rId),N=document.getElementById(nId);

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenderfy — Super Admin · Demo Flows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  .flow-intro{display:flex;align-items:flex-start;gap:10px;background:linear-gradient(135deg,#eef7f4,#f3f0fb);border:1px solid #cfe6df;border-radius:12px;padding:14px 16px;margin-bottom:22px;font-size:13px;color:#3f4b49;line-height:1.55}
+  .flow-intro .ms{font-size:20px;color:#7b61c9;flex-shrink:0}
+  .flow-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  @media(max-width:900px){.flow-grid{grid-template-columns:minmax(0,1fr)}}
+  .flow-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s}
+  .flow-card:hover{box-shadow:0 12px 30px rgba(20,45,38,.1);transform:translateY(-2px)}
+  .flow-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .flow-ic{width:42px;height:42px;border-radius:11px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center}
+  .flow-ic .ms{font-size:23px}
+  .flow-tag{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;color:var(--gray);background:#f0f3f2;border-radius:100px;padding:4px 11px}
+  .flow-title{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:5px}
+  .flow-desc{font-size:13px;color:var(--gray);line-height:1.55;margin-bottom:14px}
+  .flow-steps{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:18px}
+  .flow-step{font-size:11.5px;font-weight:600;color:var(--ink);background:#f6f9f8;border:1px solid var(--border);border-radius:7px;padding:4px 9px}
+  .flow-step.ray{color:#5b46b8;background:#f1eefb;border-color:#dcd4f4}
+  .flow-arrow{color:var(--light);font-size:13px}
+  .flow-card .btn{margin-top:auto}
+  .btn-block{width:100%;justify-content:center}
+</style>
+</head>
+<body data-page="flows" data-title="Demo Flows">
+<div id="app-content">
+  <div class="pad">
+    <div class="pg-head">
+      <div>
+        <div class="tn-title">Demo Flows</div>
+        <div class="pg-sub">Ready-made click-throughs of the block &amp; document builder — each starts you at the right screen for a walkthrough.</div>
+      </div>
+    </div>
+    <div class="flow-intro"><span class="ms">auto_awesome</span><div>Steps marked in <strong style="color:#5b46b8">purple</strong> are where <strong>Ray</strong> drafts a starting point — describe what you want and it lays out the block or document for you before you refine it.</div></div>
+    <div class="flow-grid" id="flowGrid"></div>
+  </div>
+</div>
+<script src="shell.js"></script>
+<script>
+function pageInit(){
+  const FLOWS=[
+    {icon:'add_box', tag:'Blocks', title:'Create a new block', href:'block-edit.html', cta:'Start creating',
+     desc:'Open the block details step, let Ray draft a primitive layout from a description, refine it, style it to a brand, then publish it to every client’s Block Builder.',
+     steps:[['Describe with Ray',1],['Build layout',0],['Style',0],['Save',0],['Publish',0]]},
+    {icon:'edit_square', tag:'Blocks', title:'Edit an existing block', href:'block-view.html#id=callout', cta:'Open a block',
+     desc:'View a published block on its A4 preview, jump into the editor to tweak its layout or style, then re-publish — with a confirmation step before it goes live.',
+     steps:[['View',0],['Edit',0],['Refine',0],['Save',0],['Publish',0]]},
+    {icon:'note_add', tag:'Documents', title:'Create a new document', href:'document-edit.html', cta:'Start a document',
+     desc:'Describe the document and let Ray draft the block sequence, fill example content, add a letterhead and background, then preview it across A4 pages and save.',
+     steps:[['Draft with Ray',1],['Assemble',0],['Draft content',1],['Layers',0],['Preview',0],['Save',0]]},
+    {icon:'description', tag:'Documents', title:'View & edit a document', href:'component-detail.html#id=case-study', cta:'Open a document',
+     desc:'See a finished A4 document with a client’s brand applied, then open the editor to adjust its layout, per-block content and background/top layers.',
+     steps:[['A4 preview',0],['Edit',0],['Layout / Preview',0],['Save',0]]},
+  ];
+  document.getElementById('flowGrid').innerHTML=FLOWS.map(f=>`
+    <div class="flow-card">
+      <div class="flow-top"><span class="flow-ic"><span class="ms">${f.icon}</span></span><span class="flow-tag">${f.tag}</span></div>
+      <div class="flow-title">${f.title}</div>
+      <div class="flow-desc">${f.desc}</div>
+      <div class="flow-steps">${f.steps.map((s,i)=>`${i?'<span class="flow-arrow">›</span>':''}<span class="flow-step${s[1]?' ray':''}">${s[0]}</span>`).join('')}</div>
+      <a class="btn btn-primary btn-block" href="${f.href}"><span class="ms" style="font-size:18px">play_arrow</span> ${f.cta}</a>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>

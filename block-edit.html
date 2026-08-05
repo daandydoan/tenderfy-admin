@@ -149,6 +149,18 @@
   .sv-sync{display:flex;gap:9px;align-items:flex-start;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:9px;padding:10px 12px;font-size:12px;color:#1f5a50;margin-bottom:14px;line-height:1.5}
   .sv-sync .ms{font-size:17px;color:var(--teal);flex-shrink:0}
   .sv-sync label{display:flex;gap:6px;align-items:center;margin-top:6px;font-weight:600;cursor:pointer}
+  /* Ray draft box (inside the block details dialog) */
+  .ray-draft{background:linear-gradient(135deg,#eef7f4,#f3f0fb);border:1px solid #cfe6df;border-radius:11px;padding:12px;margin-bottom:16px}
+  .ray-h{display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#4a3f8a;margin-bottom:8px}
+  .ray-h .ms{font-size:17px;color:#7b61c9}
+  .ray-draft textarea{width:100%;box-sizing:border-box;margin-bottom:8px;resize:vertical}
+  .btn-ray{background:#5b46b8;color:#fff;border:none}
+  .btn-ray:hover{background:#4c3aa0}
+  .pub-sum{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:16px}
+  .pub-row{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:12.5px}
+  .pub-row:last-child{border-bottom:none}
+  .pub-row span{color:var(--gray)}
+  .pub-row strong{color:var(--ink);font-weight:600;text-align:right}
   .ver-list{max-height:320px;overflow:auto;margin-bottom:14px}
   .ver-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--border)}
   .ver-row .vi{flex:1;min-width:0}
@@ -351,6 +363,11 @@
   <div class="cfm">
     <h3>Block details</h3>
     <div class="sub">Name it so it reads clearly in the Block Builder — you can tweak this any time.</div>
+    <div class="ray-draft">
+      <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
+      <textarea id="rayBlockPrompt" class="fin" rows="2" placeholder="Describe the block — e.g. “a highlighted callout box for key terms”"></textarea>
+      <button type="button" class="btn btn-ray btn-sm" id="rayBlockBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
+    </div>
     <div class="sv-sync" id="svSync"></div>
     <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"><span class="fld-err" id="b-name-err"></span></div>
     <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"><span class="fld-err" id="b-label-err"></span></div>
@@ -359,6 +376,19 @@
     <div class="cfm-acts">
       <a class="btn btn-outline" id="svCancel">Cancel</a>
       <a class="btn btn-primary" id="svConfirm"><span class="ms" style="font-size:17px">arrow_forward</span> Start editing</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pubModal">
+  <div class="cfm">
+    <h3>Publish block?</h3>
+    <div class="sub">Publishing makes this block available in every client’s Block Builder, rendered in their brand.</div>
+    <div class="pub-sum" id="pubSum"></div>
+    <div class="cfm-acts">
+      <a class="btn btn-outline" id="pubCancel">Keep editing</a>
+      <a class="btn btn-outline" id="pubDraft"><span class="ms" style="font-size:17px">edit_note</span> Save as draft</a>
+      <a class="btn btn-primary" id="pubConfirm"><span class="ms" style="font-size:17px">publish</span> Publish block</a>
     </div>
   </div>
 </div>
@@ -914,21 +944,68 @@ function pageInit(){
   document.getElementById('svCancel').addEventListener('click',()=>{ if(!existing && !hasContent()) location.href='blocks.html'; else closeDetails(); });
   saveModal.addEventListener('click',e=>{ if(e.target===saveModal) closeDetails(); });
   document.getElementById('blockDetailsBtn').addEventListener('click',openDetails);
+
+  // ---- Ray: draft a block from a description ----
+  function rayDraftBlock(desc){
+    const d=(desc||'').toLowerCase();
+    let layout,name,label,cat,help;
+    if(/callout|highlight|note|important|warning|key/.test(d)){ layout=[{cols:[['callout']]}]; name='Branded Callout'; label='Highlight box'; cat='Text Blocks'; help='A coloured box that draws attention to key text.'; }
+    else if(/quote|testimonial|review/.test(d)){ layout=[{cols:[['quote']]}]; name='Pull Quote'; label='Quote'; cat='Text Blocks'; help='A highlighted quote or testimonial.'; }
+    else if(/table|rate|price|pricing|schedule|cost/.test(d)){ layout=[{cols:[['heading','table']]}]; name='Rates Table'; label='Rate table'; cat='Tables & Sign-off'; help='A heading above a rates or pricing table.'; }
+    else if(/sign|signature|approval|authoris/.test(d)){ layout=[{cols:[['signature']]}]; name='Signature Block'; label='Signature'; cat='Tables & Sign-off'; help='A sign-off area with name, role and date.'; }
+    else if(/gallery|grid|photos|images/.test(d)){ layout=[{cols:[['image'],['image']]},{cols:[['image'],['image']]}]; name='Image Grid'; label='Image grid'; cat='Images'; help='A four-image grid.'; }
+    else if(/(image|photo|picture).*(text|caption|beside|detail)|(text|caption|beside|detail).*(image|photo|picture)/.test(d)){ layout=[{cols:[['image'],['heading','paragraph']]}]; name='Image & Text'; label='Image with text'; cat='Image & Text'; help='An image beside a heading and supporting text.'; }
+    else if(/image|photo|picture/.test(d)){ layout=[{cols:[['image']]}]; name='Single Image'; label='One image'; cat='Images'; help='A single full-width image.'; }
+    else if(/list|bullet|points|checklist/.test(d)){ layout=[{cols:[['heading','list']]}]; name='Bulleted List'; label='Bulleted list'; cat='Text Blocks'; help='A heading above a list of points.'; }
+    else if(/detail|spec|key.?value|facts|fields/.test(d)){ layout=[{cols:[['heading','keyvalue']]}]; name='Details Grid'; label='Details grid'; cat='Text Blocks'; help='A heading beside a grid of detail rows.'; }
+    else if(/(heading|title)/.test(d) && !/para|text|body/.test(d)){ layout=[{cols:[['heading']]}]; name='Heading'; label='Heading'; cat='Title Blocks'; help='A single section heading.'; }
+    else { layout=[{cols:[['heading','paragraph']]}]; name='Heading & Text'; label='Heading and text'; cat='Text Blocks'; help='A heading with a paragraph of body text.'; }
+    const setIf=(idn,v)=>{ const el=document.getElementById(idn); if(!el.value.trim()) el.value=v; };
+    setIf('b-name',name); setIf('b-label',label); setIf('b-desc',help);
+    if(BLOCK_CATS.includes(cat)) document.getElementById('b-cat').value=cat;
+    if(mode==='code'){ document.querySelector('#modeSeg [data-mode=visual]')?.click(); }
+    doc=normDoc(layout); sel=null; render(); commit(); syncBar();
+    document.getElementById('pg-title').textContent=document.getElementById('b-name').value.trim()||'New Custom Block';
+  }
+  document.getElementById('rayBlockBtn').addEventListener('click',()=>{
+    const p=document.getElementById('rayBlockPrompt').value.trim();
+    if(!p){ showToast('Tell Ray what the block is for'); return; }
+    rayDraftBlock(p); closeDetails();
+    showToast('Ray drafted a starting point — refine it, then Save');
+  });
+
+  // ---- Save → publish confirmation ----
+  const pubModal=document.getElementById('pubModal');
+  function openPublish(){
+    const l=document.getElementById('b-label').value.trim(), cat=document.getElementById('b-cat').value;
+    document.getElementById('pubSum').innerHTML =
+      `<div class="pub-row"><span>Customer-facing label</span><strong>${l}</strong></div>`+
+      `<div class="pub-row"><span>Category</span><strong>${cat}</strong></div>`+
+      (usage>0?`<div class="pub-row"><span>In use</span><strong>${usage} documents — will update</strong></div>`:`<div class="pub-row"><span>Availability</span><strong>All clients</strong></div>`);
+    pubModal.classList.add('open');
+  }
+  function finishSave(published){
+    const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
+    saveVersion(nm);
+    const msg = published
+      ? (existing?'Updated & published':'Published')+(mode==='code'?' custom-coded':'')+' block: '+l+(usage>0?` · pushed to ${usage} documents`:'')
+      : 'Saved “'+l+'” as a draft';
+    showToast(msg);
+    setTimeout(()=>location.href='blocks.html',900);
+  }
   function doSave(){
     const total=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     if(mode==='code'){ if(!codeArea.value.trim()){showToast('Add some code, or switch to the visual builder');return;} }
     else if(!total){ showToast('Add at least one element to the canvas'); return; }
     const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
     if(!nm||!l){ openDetails(); detailsValid(); return; }
-    const finish=(pushed)=>{
-      saveVersion(nm);
-      showToast((existing?'Updated':'Created')+(mode==='code'?' custom-coded':'')+' block: '+l+(pushed?` · pushed to ${usage} documents`:''));
-      setTimeout(()=>location.href='blocks.html',800);
-    };
-    if(usage>0) confirmAction({title:`Push update to ${usage} documents?`,body:`“${l}” is used in ${usage} documents. Saving updates them all — clients keep any detached overrides.`,confirm:'Save & push'},()=>finish(true));
-    else finish(false);
+    openPublish();
   }
   document.getElementById('saveBtn').addEventListener('click',doSave);
+  document.getElementById('pubCancel').addEventListener('click',()=>pubModal.classList.remove('open'));
+  pubModal.addEventListener('click',e=>{ if(e.target===pubModal) pubModal.classList.remove('open'); });
+  document.getElementById('pubConfirm').addEventListener('click',()=>{ pubModal.classList.remove('open'); finishSave(true); });
+  document.getElementById('pubDraft').addEventListener('click',()=>{ pubModal.classList.remove('open'); finishSave(false); });
   document.getElementById('delBtn').addEventListener('click',()=>deleteBlock(existing.label));
 
   // ---- Responsive panels (Style collapsible / drawers on small screens) ----
