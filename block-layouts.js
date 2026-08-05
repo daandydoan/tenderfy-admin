@@ -13,6 +13,10 @@ const P2DOC={
   textimg:[{cols:[['paragraph'],['image']]}], imgcap:[{cols:[['image','subheading']]}],
   feature:[{cols:[['image'],['heading','paragraph']]}], table:[{cols:[['table']]}],
   signature:[{cols:[['signature']]}], catalogue:[{cols:[['image'],['subheading','paragraph']]}],
+  // Headers & Footers default to a 2-column band (edited in the block editor).
+  'lh-brand':[{cols:[['image','heading'],['paragraph']]}], 'lh-contact':[{cols:[['heading'],['paragraph']]}],
+  'lh-min':[{cols:[['image'],['heading']]}], 'lf-page':[{cols:[['paragraph'],['paragraph']]}],
+  'lf-legal':[{cols:[['paragraph'],['paragraph']]}], 'lf-contact':[{cols:[['paragraph'],['paragraph']]}],
 };
 
 // Letterhead / footer bands (the document's Top Layer) — rendered bespoke and

@@ -51,6 +51,8 @@
   .vb-bar{display:flex;align-items:center;gap:9px;width:620px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
   /* Always A4 width (content-driven height); canvas scrolls if it can't fit */
   .vb-page{width:620px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px;display:flex;flex-direction:column}
+  /* Letterhead / footer bands edit shorter, with tighter padding */
+  .vb-page.band{min-height:96px;padding:22px 30px}
   .vb-block{display:flex;flex-direction:column;min-width:0}
   .vb-row{position:relative;display:flex;gap:14px;padding:3px;border-radius:8px}
   .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.3)}
@@ -389,6 +391,12 @@
     <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"><span class="fld-err" id="b-label-err"></span></div>
     <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text."></div>
     <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
+    <div class="fld" id="slotFld" style="display:none"><label>Save as</label>
+      <div class="seg full" id="b-slot">
+        <button type="button" data-slot="header" class="on"><span class="ms" style="font-size:16px">flip_to_front</span> Letterhead</button>
+        <button type="button" data-slot="footer"><span class="ms" style="font-size:16px">flip_to_back</span> Footer</button>
+      </div>
+    </div>
     <div class="cfm-acts">
       <a class="btn btn-outline" id="svCancel">Cancel</a>
       <a class="btn btn-primary" id="svConfirm"><span class="ms" style="font-size:17px">arrow_forward</span> Start editing</a>
@@ -510,6 +518,24 @@ function pageInit(){
   document.getElementById('b-cat').innerHTML=BLOCK_CATS.map(c=>`<option>${c}</option>`).join('');
   document.getElementById('s-field').innerHTML=FIELDS.map(f=>`<option value="${f.key}">${f.label}</option>`).join('');
   document.getElementById('s-preset').innerHTML=PRESETS.map(p=>`<option value="${p.key}">${p.label}</option>`).join('');
+
+  // ---- Headers & Footers: shorter band, 2-column default, letterhead/footer choice ----
+  let blockSlot = (existing && existing.slot) ? existing.slot : 'header';
+  const isStationery = ()=>document.getElementById('b-cat').value==='Headers & Footers';
+  function applyStationeryUI(){
+    const st=isStationery();
+    page.classList.toggle('band', st);
+    document.getElementById('slotFld').style.display = st?'':'none';
+    document.querySelectorAll('#b-slot button').forEach(x=>x.classList.toggle('on', x.dataset.slot===blockSlot));
+  }
+  document.getElementById('b-cat').addEventListener('change',()=>{
+    applyStationeryUI();
+    if(isStationery() && !hasContent()){ doc=normDoc([{cols:[['image','heading'],['paragraph']]}]); sel=null; render(); commit(); }
+  });
+  document.querySelectorAll('#b-slot button').forEach(b=>b.addEventListener('click',()=>{
+    blockSlot=b.dataset.slot;
+    document.querySelectorAll('#b-slot button').forEach(x=>x.classList.toggle('on',x===b));
+  }));
 
   if(usage>0){ const uc=document.getElementById('useChip'); uc.style.display=''; uc.innerHTML=`<span class="ms">description</span> Used in ${usage} documents`; }
 
@@ -965,7 +991,11 @@ function pageInit(){
   function rayDraftBlock(desc){
     const d=(desc||'').toLowerCase();
     let layout,name,label,cat,help;
-    if(/callout|highlight|note|important|warning|key/.test(d)){ layout=[{cols:[['callout']]}]; name='Branded Callout'; label='Highlight box'; cat='Text Blocks'; help='A coloured box that draws attention to key text.'; }
+    if(/letterhead|masthead|header band|footer|page number|running head|top band|bottom band/.test(d)){
+      const foot=/footer|page number|bottom/.test(d);
+      layout=[{cols:[['image','heading'],['paragraph']]}]; name=foot?'Custom Footer':'Custom Letterhead'; label=foot?'Footer band':'Letterhead band'; cat='Headers & Footers'; help=foot?'A footer band that repeats on every page.':'A letterhead band that repeats on every page.'; blockSlot=foot?'footer':'header';
+    }
+    else if(/callout|highlight|note|important|warning|key/.test(d)){ layout=[{cols:[['callout']]}]; name='Branded Callout'; label='Highlight box'; cat='Text Blocks'; help='A coloured box that draws attention to key text.'; }
     else if(/quote|testimonial|review/.test(d)){ layout=[{cols:[['quote']]}]; name='Pull Quote'; label='Quote'; cat='Text Blocks'; help='A highlighted quote or testimonial.'; }
     else if(/table|rate|price|pricing|schedule|cost/.test(d)){ layout=[{cols:[['heading','table']]}]; name='Rates Table'; label='Rate table'; cat='Tables & Sign-off'; help='A heading above a rates or pricing table.'; }
     else if(/sign|signature|approval|authoris/.test(d)){ layout=[{cols:[['signature']]}]; name='Signature Block'; label='Signature'; cat='Tables & Sign-off'; help='A sign-off area with name, role and date.'; }
@@ -979,6 +1009,7 @@ function pageInit(){
     const setIf=(idn,v)=>{ const el=document.getElementById(idn); if(!el.value.trim()) el.value=v; };
     setIf('b-name',name); setIf('b-label',label); setIf('b-desc',help);
     if(BLOCK_CATS.includes(cat)) document.getElementById('b-cat').value=cat;
+    applyStationeryUI();
     if(mode==='code'){ document.querySelector('#modeSeg [data-mode=visual]')?.click(); }
     doc=normDoc(layout); sel=null; render(); commit(); syncBar();
     document.getElementById('pg-title').textContent=document.getElementById('b-name').value.trim()||'New Custom Block';
@@ -1010,14 +1041,16 @@ function pageInit(){
     document.getElementById('pubSum').innerHTML =
       `<div class="pub-row"><span>Customer-facing label</span><strong>${l}</strong></div>`+
       `<div class="pub-row"><span>Category</span><strong>${cat}</strong></div>`+
+      (isStationery()?`<div class="pub-row"><span>Save as</span><strong>${blockSlot==='footer'?'Footer':'Letterhead'}</strong></div>`:'')+
       (usage>0?`<div class="pub-row"><span>In use</span><strong>${usage} documents — will update</strong></div>`:`<div class="pub-row"><span>Availability</span><strong>All clients</strong></div>`);
     pubModal.classList.add('open');
   }
   function finishSave(published){
     const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
     saveVersion(nm);
+    const kind = isStationery() ? (blockSlot==='footer'?'footer':'letterhead') : 'block';
     const msg = published
-      ? (existing?'Updated & published':'Published')+(mode==='code'?' custom-coded':'')+' block: '+l+(usage>0?` · pushed to ${usage} documents`:'')
+      ? (existing?'Updated & published':'Published')+(mode==='code'?' custom-coded':'')+' '+kind+': '+l+(usage>0?` · pushed to ${usage} documents`:'')
       : 'Saved “'+l+'” as a draft';
     showToast(msg);
     setTimeout(()=>location.href='blocks.html',900);
@@ -1051,7 +1084,7 @@ function pageInit(){
   document.getElementById('ed3Scrim').addEventListener('click',()=>{ elOpen=false; styleOpen=false; applyPanels(); });
   window.addEventListener('resize',()=>{ const wide=window.innerWidth>1100; if(wide!==lastWide){ lastWide=wide; styleOpen=wide; elOpen=false; applyPanels(); } });
 
-  buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar(); pushHist(); applyPanels();
+  buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar(); pushHist(); applyPanels(); applyStationeryUI();
   if(!existing) openDetails(); // details are the step before editing a new block
 }
 </script>
