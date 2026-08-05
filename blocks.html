@@ -12,6 +12,14 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
+<style>
+  .blk-statusrow{display:flex;gap:8px;margin:14px 0 4px}
+  .blk-schip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--gray);background:#fff;border:1px solid var(--border);border-radius:100px;padding:6px 13px;cursor:pointer}
+  .blk-schip:hover{border-color:var(--teal);color:var(--teal)}
+  .blk-schip.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  .blk-schip .n{font-size:11px;opacity:.7}
+  .blk-schip.on .n{opacity:.85}
+</style>
 </head>
 <body data-page="blocks" data-title="Blocks">
 <div id="app-content">
@@ -21,13 +29,13 @@
         <div class="tn-title">Blocks</div>
         <div class="pg-sub">The building blocks behind the Block Builder — one shared set for every client.</div>
       </div>
-      <div class="pg-acts">
-        <a class="btn btn-primary btn-sm" href="block-edit.html"><span class="ms" style="font-size:18px">add</span> Create Custom Block</a>
-      </div>
+      <div class="pg-acts" id="pgActs"></div>
     </div>
 
     <div class="blk-tabs" id="tabs"></div>
+    <div class="blk-statusrow" id="statusRow"></div>
     <div class="blk-grid" id="grid"></div>
+    <div id="empty" style="display:none;text-align:center;color:var(--light);padding:50px 0"><span class="ms" style="font-size:40px">search_off</span><p class="mt16">No blocks with this status.</p></div>
   </div>
 </div>
 <script src="shell.js"></script>
@@ -35,24 +43,41 @@
 <script>
 function pageInit(){
   const cats=['All Blocks', ...BLOCK_CATS];
-  let active='All Blocks';
+  let active='All Blocks', activeStatus='all';
 
+  function renderActs(){
+    const acts=document.getElementById('pgActs');
+    acts.innerHTML = active==='Headers & Footers'
+      ? `<a class="btn btn-outline btn-sm" href="block-edit.html#slot=footer"><span class="ms" style="font-size:17px">flip_to_back</span> New footer</a>
+         <a class="btn btn-primary btn-sm" href="block-edit.html#slot=header"><span class="ms" style="font-size:17px">flip_to_front</span> New letterhead</a>`
+      : `<a class="btn btn-primary btn-sm" href="block-edit.html"><span class="ms" style="font-size:18px">add</span> Create Custom Block</a>`;
+  }
   function renderTabs(){
     document.getElementById('tabs').innerHTML=cats.map(c=>`<span class="blk-tab ${c===active?'on':''}" data-cat="${c}">${c}</span>`).join('');
-    document.querySelectorAll('#tabs .blk-tab').forEach(t=>t.addEventListener('click',()=>{active=t.dataset.cat;renderTabs();renderGrid();}));
+    document.querySelectorAll('#tabs .blk-tab').forEach(t=>t.addEventListener('click',()=>{active=t.dataset.cat;renderTabs();renderActs();renderStatusRow();renderGrid();}));
+  }
+  function renderStatusRow(){
+    const inCat=b=>active==='All Blocks'||b.cat===active;
+    const opts=[['all','All'],['active','Active'],['draft','Draft'],['inactive','Inactive']];
+    document.getElementById('statusRow').innerHTML=opts.map(([k,l])=>{
+      const n=k==='all'?BLOCKS.filter(inCat).length:BLOCKS.filter(b=>inCat(b)&&blockStatus(b.id)===k).length;
+      return `<span class="blk-schip ${k===activeStatus?'on':''}" data-st="${k}">${l} <span class="n">${n}</span></span>`;
+    }).join('');
+    document.querySelectorAll('#statusRow .blk-schip').forEach(c=>c.addEventListener('click',()=>{activeStatus=c.dataset.st;renderStatusRow();renderGrid();}));
   }
   function renderGrid(){
-    const list=BLOCKS.filter(b=>active==='All Blocks'||b.cat===active);
+    const list=BLOCKS.filter(b=>(active==='All Blocks'||b.cat===active)&&(activeStatus==='all'||blockStatus(b.id)===activeStatus));
     document.getElementById('grid').innerHTML=list.map(b=>`
       <a class="blk-card" href="block-view.html#id=${b.id}">
-        <div class="blk-name">${b.label}</div>
+        <div class="blk-name">${b.label} ${blockStatusBadge(b.id)}</div>
         <div class="blk-preview">${blockPreview(b.p)}</div>
         <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--light);padding-top:9px;margin-top:9px;border-top:1px solid var(--border)"><span>${b.cat}</span><span><span class="ms" style="font-size:13px;vertical-align:-2px">description</span> ${blockUsage(b.id)}</span></div>
       </a>`).join('');
+    document.getElementById('empty').style.display=list.length?'none':'block';
   }
 
-  renderTabs(); renderGrid();
+  renderActs(); renderTabs(); renderStatusRow(); renderGrid();
 }
 </script>
 </body>

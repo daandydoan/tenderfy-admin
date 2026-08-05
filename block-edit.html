@@ -486,7 +486,9 @@ function kindOf(id){
 function pageInit(){
   const ELEMS=Object.fromEntries(PRIMITIVES.map(p=>[p.id,p.name]));
   const clone=x=>JSON.parse(JSON.stringify(x));
-  const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
+  const _params=new URLSearchParams(location.search||location.hash.slice(1));
+  const id=_params.get('id');
+  const wantSlot=_params.get('slot'); // 'header' | 'footer' — deep-link to create page furniture
   const existing=id?BLOCKS.find(b=>b.id===id):null;
 
   const elDef=()=>({pad:0,bg:'',bgBind:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:''});
@@ -1042,6 +1044,7 @@ function pageInit(){
       `<div class="pub-row"><span>Customer-facing label</span><strong>${l}</strong></div>`+
       `<div class="pub-row"><span>Category</span><strong>${cat}</strong></div>`+
       (isStationery()?`<div class="pub-row"><span>Save as</span><strong>${blockSlot==='footer'?'Footer':'Letterhead'}</strong></div>`:'')+
+      (existing&&typeof blockStatus==='function'?`<div class="pub-row"><span>Current status</span><strong>${(BLOCK_STATUS_META[blockStatus(id)]||{}).label||'Active'} → Active</strong></div>`:'')+
       (usage>0?`<div class="pub-row"><span>In use</span><strong>${usage} documents — will update</strong></div>`:`<div class="pub-row"><span>Availability</span><strong>All clients</strong></div>`);
     pubModal.classList.add('open');
   }
@@ -1084,6 +1087,12 @@ function pageInit(){
   document.getElementById('ed3Scrim').addEventListener('click',()=>{ elOpen=false; styleOpen=false; applyPanels(); });
   window.addEventListener('resize',()=>{ const wide=window.innerWidth>1100; if(wide!==lastWide){ lastWide=wide; styleOpen=wide; elOpen=false; applyPanels(); } });
 
+  if(!existing && (wantSlot==='header'||wantSlot==='footer')){
+    document.getElementById('b-cat').value='Headers & Footers';
+    blockSlot=wantSlot;
+    if(!hasContent()){ doc=normDoc([{cols:[['image','heading'],['paragraph']]}]); sel=null; }
+    document.getElementById('pg-title').textContent = wantSlot==='footer'?'New footer':'New letterhead';
+  }
   buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar(); pushHist(); applyPanels(); applyStationeryUI();
   if(!existing) openDetails(); // details are the step before editing a new block
 }

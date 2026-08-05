@@ -62,6 +62,13 @@ function pageInit(){
     {icon:'description', tag:'Documents', title:'View & edit a document', href:'component-detail.html#id=case-study', cta:'Open a document',
      desc:'See a finished A4 document with a client’s brand applied, then open the editor to adjust its layout, per-block content and background/top layers.',
      steps:[['A4 preview',0],['Edit',0],['Layout / Preview',0],['Save',0]]},
+    {icon:'flip_to_front', tag:'Headers & Footers', title:'Create a letterhead or footer', cta:'Create',
+     desc:'Page furniture opens as a shorter 2-column band. Ray can draft it, you pick Letterhead or Footer, then publish it to the Headers & Footers set.',
+     steps:[['Pick type',0],['Draft with Ray',1],['Edit band',0],['Publish',0]],
+     ctas:[{label:'New letterhead', href:'block-edit.html#slot=header'},{label:'New footer', href:'block-edit.html#slot=footer'}]},
+    {icon:'auto_stories', tag:'Headers & Footers', title:'Add a letterhead & footer to a document', href:'document-edit.html#id=case-study&top=lh-brand,lf-page&layers=1', cta:'See it on a document',
+     desc:'Opens a document with a letterhead and footer already applied — shown as fixed Top-Layer slots on the page and as repeating bands, numbered, in multi-page Preview.',
+     steps:[['Top layer',0],['Letterhead + footer',0],['Preview pages',0]]},
   ];
   document.getElementById('flowGrid').innerHTML=FLOWS.map(f=>`
     <div class="flow-card">
@@ -69,7 +76,9 @@ function pageInit(){
       <div class="flow-title">${f.title}</div>
       <div class="flow-desc">${f.desc}</div>
       <div class="flow-steps">${f.steps.map((s,i)=>`${i?'<span class="flow-arrow">›</span>':''}<span class="flow-step${s[1]?' ray':''}">${s[0]}</span>`).join('')}</div>
-      <a class="btn btn-primary btn-block" href="${f.href}"><span class="ms" style="font-size:18px">play_arrow</span> ${f.cta}</a>
+      ${f.ctas
+        ? `<div style="display:flex;gap:8px;margin-top:auto">${f.ctas.map((c,i)=>`<a class="btn ${i===0?'btn-primary':'btn-outline'} btn-sm" style="flex:1;justify-content:center" href="${c.href}">${c.label}</a>`).join('')}</div>`
+        : `<a class="btn btn-primary btn-block" href="${f.href}"><span class="ms" style="font-size:18px">play_arrow</span> ${f.cta}</a>`}
     </div>`).join('');
 }
 </script>

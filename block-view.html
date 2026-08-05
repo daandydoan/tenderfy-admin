@@ -58,6 +58,7 @@
         <div class="bv-meta">
           <div class="row"><div class="k">Customer-facing label</div><div class="v" id="bl-label"></div></div>
           <div class="row"><div class="k">Category</div><div class="v" id="bl-cat"></div></div>
+          <div class="row"><div class="k">Status</div><div class="v" id="bl-status"></div></div>
           <div class="row"><div class="k">Description</div><div class="v" id="bl-desc2" style="line-height:1.5"></div></div>
           <div class="row"><div class="k">Made of</div><div class="bv-elems" id="bl-elems"></div></div>
           <div class="row"><div class="k">Used in</div><div class="v" id="bl-usage">—</div></div>
@@ -85,6 +86,7 @@ function pageInit(){
   document.getElementById('bl-desc').textContent=block.desc;
   document.getElementById('bl-label').textContent=block.label;
   document.getElementById('bl-cat').textContent=block.cat;
+  document.getElementById('bl-status').innerHTML=(typeof blockStatusBadge==='function')?blockStatusBadge(block.id):'';
   document.getElementById('bl-desc2').textContent=block.desc;
   document.getElementById('bl-elems').innerHTML=blockElements(block).map(pid=>`<span class="bv-chip"><span class="ms">${ICON[pid]||'widgets'}</span>${ELEMS[pid]||pid}</span>`).join('') || '<span class="muted" style="font-size:12.5px">Custom code block</span>';
   const n=(typeof blockUsage==='function')?blockUsage(block.id):0;

@@ -96,4 +96,18 @@ const BLOCK_USAGE = {
   'lh-brand':19, 'lh-contact':8, 'lh-min':5, 'lf-page':17, 'lf-legal':22, 'lf-contact':6,
 };
 function blockUsage(id){ return (id in BLOCK_USAGE) ? BLOCK_USAGE[id] : 6; }
-if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; }
+
+// Per-block status: Draft (being built), Active (live), Inactive (retired).
+// Default is 'active'; overrides below make the set realistic.
+const BLOCK_STATUS = {
+  imggrid:'draft', 'doc-dblpara':'draft', catalogue:'draft', 'lh-min':'draft', 'lf-contact':'draft',
+  parahead:'inactive', img3:'inactive',
+};
+function blockStatus(id){ return BLOCK_STATUS[id] || 'active'; }
+const BLOCK_STATUS_META = {
+  active:{cls:'b-published', label:'Active'},
+  draft:{cls:'b-draft', label:'Draft'},
+  inactive:{cls:'b-deprecated', label:'Inactive'},
+};
+function blockStatusBadge(id){ const m=BLOCK_STATUS_META[blockStatus(id)]||BLOCK_STATUS_META.active; return `<span class="badge ${m.cls}"><span class="b-dot"></span>${m.label}</span>`; }
+if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }
