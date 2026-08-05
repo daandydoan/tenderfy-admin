@@ -86,4 +86,14 @@ function deleteBlock(label){
 function duplicateBlock(label){
   showToast('Duplicated block: “'+label+' copy” — find it in the library'); setTimeout(()=>location.href='blocks.html',800);
 }
-if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; }
+// Realistic "used in N documents" counts, shared by the block view and editor
+// so the same block reads consistently everywhere. Common blocks are used more.
+const BLOCK_USAGE = {
+  heading:46, subheading:31, divider:12, paragraph:58, double:14, headpara:27, parahead:9,
+  quote:22, list:41, callout:18, 'doc-details':24, 'doc-para':16, 'doc-dblpara':8,
+  img1:33, img2:21, img3:7, imggrid:5, imgtext:29, textimg:12, imgcap:15, feature:11,
+  table:26, signature:34, catalogue:6,
+  'lh-brand':19, 'lh-contact':8, 'lh-min':5, 'lf-page':17, 'lf-legal':22, 'lf-contact':6,
+};
+function blockUsage(id){ return (id in BLOCK_USAGE) ? BLOCK_USAGE[id] : 6; }
+if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; }

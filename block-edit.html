@@ -483,8 +483,8 @@ function pageInit(){
   const blockStyle={wmode:'fill', wpx:520, pad:0, sp:8, bg:'', bgBind:'', rad:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:''};
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
   const selEl=()=> sel ? doc[sel.r].cols[sel.c][sel.k] : null;
-  // Fabricated "used in N documents" for the synced-block story.
-  const usage = existing ? (existing.label.length*3 % 17) + 4 : 0;
+  // Real "used in N documents" (shared with the block view) for the synced-block story.
+  const usage = existing ? (typeof blockUsage==='function' ? blockUsage(existing.id) : 0) : 0;
 
   const page=document.getElementById('page');
   const wrap=document.getElementById('cvWrap');

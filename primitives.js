@@ -49,7 +49,7 @@ function renderPrimitive(id, b){
           ${[['Traffic management','1','$8,400'],['Earthworks','320 m³','$46/m³'],['Drainage','1','$21,750']].map(r=>`<tr style="border-bottom:1px solid #E6EAE9;color:${soft}"><td style="padding:6px 10px">${r[0]}</td><td style="padding:6px 10px;text-align:right">${r[1]}</td><td style="padding:6px 10px;text-align:right">${r[2]}</td></tr>`).join('')}
         </tbody></table>`;
     case 'keyvalue':
-      return `<div style="${T}">${[['Client','Dept of Transport'],['Value','$1.2M'],['Sector','Civil / Roads'],['Duration','14 weeks']].map(kv=>`<div style="display:flex;gap:12px;padding:5px 0;border-bottom:1px solid #EEF1F0;font-size:12.5px"><span style="color:#7A8583;width:96px;flex-shrink:0">${kv[0]}</span><span style="color:${soft};font-weight:600">${kv[1]}</span></div>`).join('')}</div>`;
+      return `<div style="${T}">${[['Client','Department of Transport'],['Value','$553,560'],['Sector','Civil / Roads'],['Duration','18 weeks']].map(kv=>`<div style="display:flex;gap:12px;padding:5px 0;border-bottom:1px solid #EEF1F0;font-size:12.5px"><span style="color:#7A8583;width:96px;flex-shrink:0">${kv[0]}</span><span style="color:${soft};font-weight:600">${kv[1]}</span></div>`).join('')}</div>`;
     case 'signature':
       return `<div style="${T}"><div style="border-bottom:1px solid #9AA5A3;width:64%;height:24px;margin-bottom:7px"></div><div style="font-size:12.5px;color:${soft}"><strong style="color:${b.primary}">Kenzie May</strong> · Project Director</div><div style="font-size:11.5px;color:#8A938F;margin-top:1px">Date: 30 Jul 2026</div></div>`;
     case 'divider':

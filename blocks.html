@@ -48,6 +48,7 @@ function pageInit(){
         <div class="blk-name">${b.label}</div>
         <div class="blk-preview">${blockPreview(b.p)}</div>
         <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--light);padding-top:9px;margin-top:9px;border-top:1px solid var(--border)"><span>${b.cat}</span><span><span class="ms" style="font-size:13px;vertical-align:-2px">description</span> ${blockUsage(b.id)}</span></div>
       </a>`).join('');
   }
 

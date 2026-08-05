@@ -27,4 +27,12 @@ const COMPONENTS = [
   {id:'licences',       name:'Licences & Accreditations',category:'Certifications',   status:'published', restricted:0, version:'1.9', updated:'3 weeks ago', thumb:'rows',  icon:'workspace_premium', desc:'Trade licences and accreditation register.'},
   {id:'referees',       name:'Referees',               category:'Others',             status:'draft',     restricted:0, version:'0.3', updated:'1 day ago',   thumb:'lines', icon:'contact_page', desc:'Client referee contacts for the submission.'},
 ];
-if(typeof window!=='undefined') window.COMPONENTS = COMPONENTS;
+// Realistic "used in N tender templates" counts per document type.
+const COMP_USAGE = {
+  cover:14, toc:12, 'exec-summary':11, insurance:11, 'policy-whs':10, 'cv-standard':9,
+  licences:9, methodology:9, 'policy-quality':8, 'rate-table':8, 'case-study':8,
+  'proj-profile':7, 'policy-env':7, program:6, 'compliance-tbl':6, 'org-chart':5,
+  'cv-exec':4, referees:4, 'env-row':4, 'proj-gallery':3, 'risk-block':3, 'policy-legacy':2,
+};
+function compUsage(id){ return (id in COMP_USAGE) ? COMP_USAGE[id] : 4; }
+if(typeof window!=='undefined'){ window.COMPONENTS = COMPONENTS; window.COMP_USAGE = COMP_USAGE; window.compUsage = compUsage; }

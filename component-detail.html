@@ -88,7 +88,7 @@ function pageInit(){
   document.getElementById('a-status').innerHTML = badge(c.status);
   document.getElementById('a-ver').textContent = 'v'+c.version;
   document.getElementById('a-upd').textContent = c.updated;
-  document.getElementById('a-used').textContent = (2 + (c.name.length % 7)) + ' templates';
+  document.getElementById('a-used').textContent = (typeof compUsage==='function'?compUsage(c.id):4) + ' templates';
   document.getElementById('vh-cur').textContent = 'v'+c.version;
   document.getElementById('editBtn').setAttribute('href','document-edit.html#id='+c.id);
   if(c.status==='published'){ const b=document.getElementById('pubbtn'); b.textContent='Deprecate'; b.className='btn btn-danger-outline btn-sm'; b.setAttribute('data-toast','Deprecate component'); }
