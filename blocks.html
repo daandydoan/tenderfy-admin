@@ -13,7 +13,11 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
-  .blk-statusrow{display:flex;gap:8px;margin:14px 0 4px}
+  /* One filter bar: category tabs (left) + status filter (right) */
+  .blk-tabbar{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;border-bottom:1px solid var(--border);margin-bottom:20px}
+  .blk-tabbar .blk-tabs{border-bottom:none;margin-bottom:0;flex:1;min-width:0}
+  .blk-statusrow{display:flex;gap:6px;margin:0 0 8px;flex-shrink:0;align-self:center}
+  .blk-schip{padding:5px 11px}
   .blk-schip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--gray);background:#fff;border:1px solid var(--border);border-radius:100px;padding:6px 13px;cursor:pointer}
   .blk-schip:hover{border-color:var(--teal);color:var(--teal)}
   .blk-schip.on{background:var(--teal);border-color:var(--teal);color:#fff}
@@ -40,8 +44,10 @@
       <div class="pg-acts" id="pgActs"></div>
     </div>
 
-    <div class="blk-tabs" id="tabs"></div>
-    <div class="blk-statusrow" id="statusRow"></div>
+    <div class="blk-tabbar">
+      <div class="blk-tabs" id="tabs"></div>
+      <div class="blk-statusrow" id="statusRow"></div>
+    </div>
     <div class="blk-grid" id="grid"></div>
     <div id="empty" style="display:none;text-align:center;color:var(--light);padding:50px 0"><span class="ms" style="font-size:40px">search_off</span><p class="mt16">No blocks with this status.</p></div>
   </div>

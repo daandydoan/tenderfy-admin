@@ -27,11 +27,11 @@
       </div>
     </div>
 
-    <div class="stat-row">
-      <div class="stat-tile"><div class="st-ic"><span class="ms">description</span></div><div class="st-big" id="s-total">0</div><div class="st-lbl">Documents</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">check_circle</span></div><div class="st-big" id="s-pub">0</div><div class="st-lbl">Published</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-grey-bg);color:var(--st-grey-tx)"><span class="ms">edit_note</span></div><div class="st-big" id="s-draft">0</div><div class="st-lbl">Draft</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">lock</span></div><div class="st-big" id="s-restrict">0</div><div class="st-lbl">Client-restricted</div></div>
+    <div class="stat-row stat-compact">
+      <div class="stat-tile"><div class="st-ic"><span class="ms">description</span></div><div class="st-txt"><div class="st-big" id="s-total">0</div><div class="st-lbl">Documents</div></div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">check_circle</span></div><div class="st-txt"><div class="st-big" id="s-pub">0</div><div class="st-lbl">Published</div></div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-grey-bg);color:var(--st-grey-tx)"><span class="ms">edit_note</span></div><div class="st-txt"><div class="st-big" id="s-draft">0</div><div class="st-lbl">Draft</div></div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">lock</span></div><div class="st-txt"><div class="st-big" id="s-restrict">0</div><div class="st-lbl">Client-restricted</div></div></div>
     </div>
 
     <div class="pg-toolbar">
@@ -120,6 +120,11 @@ function pageInit(){
   .comp-body .nm{min-width:0}
   .comp-body .nm-lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .comp-body .nm .badge{flex-shrink:0}
+  /* Compact stat tiles — horizontal, less wasted space */
+  .stat-row.stat-compact{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+  .stat-compact .stat-tile{display:flex;align-items:center;gap:13px;padding:13px 16px}
+  .stat-compact .st-ic{margin-bottom:0;flex-shrink:0}
+  .stat-compact .st-lbl{margin-top:2px}
 </style>
 </body>
 </html>
