@@ -83,7 +83,7 @@ function pageInit(){
       <a class="comp-card" href="component-detail.html#id=${c.id}">
         <div class="comp-thumb">${thumb(c)}</div>
         <div class="comp-body">
-          <div class="nm">${c.name} ${badge(c.status)}</div>
+          <div class="nm"><span class="nm-lbl">${c.name}</span> ${badge(c.status)}</div>
           <div class="cat">${c.category}</div>
           <div class="foot">
             <span>${c.restricted ? `<span class="comp-restrict"><span class="ms">lock</span> ${c.restricted} clients</span>` : 'All clients'}</span>
@@ -115,6 +115,11 @@ function pageInit(){
   }));
 }
 </script>
-<style>.filter-panel a{padding:8px 10px;border-radius:8px;font-size:13px;cursor:pointer}.filter-panel a:hover,.filter-panel a.on{background:var(--teal-tint);color:var(--teal)}.filter-panel.open{display:flex}</style>
+<style>.filter-panel a{padding:8px 10px;border-radius:8px;font-size:13px;cursor:pointer}.filter-panel a:hover,.filter-panel a.on{background:var(--teal-tint);color:var(--teal)}.filter-panel.open{display:flex}
+  /* Keep the name on one line so the status pill stays put */
+  .comp-body .nm{min-width:0}
+  .comp-body .nm-lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .comp-body .nm .badge{flex-shrink:0}
+</style>
 </body>
 </html>
