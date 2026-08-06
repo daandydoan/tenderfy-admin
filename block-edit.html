@@ -975,7 +975,7 @@ function pageInit(){
       : `<span class="ms">library_add</span><div>New block — it becomes available in every client’s Block Builder, rendered in their brand.</div>`;
     saveModal.classList.add('open'); document.getElementById('b-name').focus();
   }
-  function closeDetails(){ saveModal.classList.remove('open'); }
+  function closeDetails(){ saveModal.classList.remove('open'); const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility=''; }
   function detailsValid(){
     const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
     let ok=true, first=null;
@@ -1094,7 +1094,7 @@ function pageInit(){
     document.getElementById('pg-title').textContent = wantSlot==='footer'?'New footer':'New letterhead';
   }
   buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar(); pushHist(); applyPanels(); applyStationeryUI();
-  if(!existing) openDetails(); // details are the step before editing a new block
+  if(!existing){ const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility='hidden'; openDetails(); } // details are the step before editing a new block — keep the editor hidden until Start editing
 }
 </script>
 </body>

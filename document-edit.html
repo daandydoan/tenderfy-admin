@@ -603,7 +603,7 @@ function pageInit(){
   }
   const docDialog=document.getElementById('docDialog');
   function openDocDialog(){ docDialog.style.display='flex'; }
-  function closeDocDialog(){ docDialog.style.display='none'; updateDocSummary(); }
+  function closeDocDialog(){ docDialog.style.display='none'; updateDocSummary(); const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility=''; }
   document.getElementById('docDialogDone').addEventListener('click',closeDocDialog);
   document.getElementById('docDialogX').addEventListener('click',closeDocDialog);
   document.getElementById('editDetailsBtn').addEventListener('click',openDocDialog);
@@ -843,7 +843,7 @@ function pageInit(){
     }
     if(urlP.get('layers')) showLeftTab('layers');
   })();
-  if(!urlP.get('top')) openDocDialog(); // details are the step before editing (skip when deep-linked to a result)
+  if(!urlP.get('top')){ const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility='hidden'; openDocDialog(); } // details are the step before editing (skip when deep-linked to a result)
 }
 </script>
 </body>
