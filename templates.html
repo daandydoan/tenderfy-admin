@@ -17,6 +17,17 @@
   .stat-compact .stat-tile{display:flex;align-items:center;gap:13px;padding:13px 16px}
   .stat-compact .st-ic{margin-bottom:0;flex-shrink:0}
   .stat-compact .st-lbl{margin-top:2px}
+  /* Filters toggle + reveal row */
+  .tpl-filterbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;border-radius:9px;padding:7px 13px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);cursor:pointer;flex-shrink:0;align-self:center;margin-bottom:8px}
+  .tpl-filterbtn:hover{border-color:var(--teal);color:var(--teal)}
+  .tpl-filterbtn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
+  .tpl-filterbtn .ms{font-size:17px}
+  .tpl-fcount{background:var(--teal);color:#fff;border-radius:100px;font-size:10px;padding:1px 6px;font-weight:700}
+  .tpl-filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;background:#fafbfb;border:1px solid var(--border);border-radius:12px;margin-bottom:20px}
+  /* Template packs — no preview; show pack facts */
+  .tpl-facts{display:flex;flex-wrap:wrap;gap:8px 16px;padding:12px 0 2px}
+  .tpl-fact{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);font-weight:500}
+  .tpl-fact .ms{font-size:16px;color:var(--teal)}
 </style>
 </head>
 <body data-page="templates" data-title="Tender Templates">
@@ -42,10 +53,11 @@
 
     <div class="lst-bar">
       <div class="lst-tabs" id="tabs"></div>
-      <div class="lst-tools">
-        <span class="lst-search"><span class="ms">search</span><input id="q" placeholder="Search templates…"></span>
-        <div class="lst-pills" id="statusRow"></div>
-      </div>
+      <button class="tpl-filterbtn" id="filterToggle"><span class="ms">tune</span> Filters <span class="tpl-fcount" id="fcount" style="display:none"></span></button>
+    </div>
+    <div class="tpl-filters" id="filterRow" hidden>
+      <span class="lst-search"><span class="ms">search</span><input id="q" placeholder="Search templates…"></span>
+      <div class="lst-pills" id="statusRow"></div>
     </div>
     <div class="lst-grid" id="grid"></div>
     <div id="empty" style="display:none;text-align:center;color:var(--light);padding:50px 0"><span class="ms" style="font-size:40px">search_off</span><p class="mt16">No templates match.</p></div>
@@ -58,10 +70,14 @@
 <script>
 function pageInit(){
   const cats=['All', ...TEMPLATE_CATS];
-  let activeCat='All', activeStatus='all', query='';
-  const PW=['82%','68%','74%','60%','78%'];
-  const preview=(t)=>templateDocs(t).slice(0,5).map((d,i)=>`<div class="blk-list-row"><span class="dot"></span><span class="blk-bar" style="width:${PW[i%PW.length]}"></span></div>`).join('');
+  let activeCat='All', activeStatus='all', query='', filtersOpen=false;
 
+  function updateFcount(){
+    const n=(activeStatus!=='all'?1:0)+(query?1:0);
+    const fc=document.getElementById('fcount');
+    fc.textContent=n||''; fc.style.display=n?'':'none';
+    document.getElementById('filterToggle').classList.toggle('on', filtersOpen||n>0);
+  }
   function renderTabs(){
     document.getElementById('tabs').innerHTML=cats.map(c=>`<span class="lst-tab ${c===activeCat?'on':''}" data-cat="${c}">${c}</span>`).join('');
     document.querySelectorAll('#tabs .lst-tab').forEach(t=>t.addEventListener('click',()=>{activeCat=t.dataset.cat;renderTabs();renderStatusRow();renderGrid();}));
@@ -73,7 +89,7 @@ function pageInit(){
       const n=k==='all'?TEMPLATES.filter(inCat).length:TEMPLATES.filter(t=>inCat(t)&&t.status===k).length;
       return `<span class="lst-pill ${k===activeStatus?'on':''}" data-st="${k}">${l} <span class="n">${n}</span></span>`;
     }).join('');
-    document.querySelectorAll('#statusRow .lst-pill').forEach(p=>p.addEventListener('click',()=>{activeStatus=p.dataset.st;renderStatusRow();renderGrid();}));
+    document.querySelectorAll('#statusRow .lst-pill').forEach(p=>p.addEventListener('click',()=>{activeStatus=p.dataset.st;renderStatusRow();renderGrid();updateFcount();}));
   }
   function renderGrid(){
     const list=TEMPLATES.filter(t=>
@@ -93,9 +109,12 @@ function pageInit(){
             </div>
           </span>
         </div>
-        <div class="lst-prev">${preview(t)}</div>
         <div class="lst-desc">${t.desc}</div>
-        <div class="lst-foot"><span>${t.tenants.length?t.tenants.length+' client'+(t.tenants.length>1?'s':''):'Unassigned'}</span><span>${t.comps} docs · v${t.version}</span></div>
+        <div class="tpl-facts">
+          <span class="tpl-fact"><span class="ms">description</span> ${t.comps} documents</span>
+          <span class="tpl-fact"><span class="ms">${t.tenants.length?'groups':'group_off'}</span> ${t.tenants.length?t.tenants.length+' client'+(t.tenants.length>1?'s':''):'Unassigned'}</span>
+        </div>
+        <div class="lst-foot"><span>${t.category}</span><span>v${t.version} · ${t.updated}</span></div>
       </div>`).join('');
     document.getElementById('empty').style.display=list.length?'none':'block';
   }
@@ -118,7 +137,12 @@ function pageInit(){
     const card=e.target.closest('.lst-card');
     if(card){ location.href='template-view.html#id='+card.dataset.id; }
   });
-  document.getElementById('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();renderGrid();});
+  document.getElementById('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();renderGrid();updateFcount();});
+  document.getElementById('filterToggle').addEventListener('click',()=>{
+    filtersOpen=!filtersOpen;
+    document.getElementById('filterRow').hidden=!filtersOpen;
+    updateFcount();
+  });
 
   renderTabs(); renderStatusRow(); renderGrid();
   document.getElementById('s-total').textContent=TEMPLATES.length;
