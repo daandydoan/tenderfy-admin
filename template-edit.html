@@ -13,31 +13,25 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
+  /* Inline "Draft with Ray" panel (in the properties column) */
   .ray-draft{background:linear-gradient(135deg,#eef7f4,#f3f0fb);border:1px solid #cfe6df;border-radius:11px;padding:12px;margin-bottom:16px}
   .ray-h{display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#4a3f8a;margin-bottom:8px}
   .ray-h .ms{font-size:17px;color:#7b61c9}
-  .ray-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;color:#6a5fb0;margin:2px 0 5px}
-  .ray-ref{margin-bottom:10px}
-  .ray-drop{display:flex;align-items:center;justify-content:center;gap:7px;border:1.5px dashed #c3b8ea;border-radius:9px;background:#faf9ff;color:#5b46b8;font-size:12px;font-weight:600;padding:15px;cursor:pointer;text-align:center}
-  .ray-drop:hover{background:#f3f0fb;border-color:#a893e0}
-  .ray-drop .ms{font-size:19px}
-  .ray-thumb{position:relative;border-radius:9px;overflow:hidden;border:1px solid #d9d0f2;background:#faf9ff}
-  .ray-thumb img{display:block;width:100%;max-height:120px;object-fit:cover}
-  .ray-thumb .ray-x{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,.55);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
-  .ray-thumb .ray-x .ms{font-size:15px}
-  .ray-cap{font-size:10.5px;color:var(--gray);padding:5px 9px}
-  .ray-draft textarea{width:100%;box-sizing:border-box;margin-bottom:8px;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:8px 9px;font-family:inherit;font-size:12.5px}
+  .ray-draft textarea{width:100%;box-sizing:border-box;margin-bottom:8px;resize:vertical;border:1px solid #d9d0f2;border-radius:8px;padding:8px 9px;font-family:inherit;font-size:12.5px;background:#fff}
   .btn-ray{background:#5b46b8;color:#fff;border:none}
   .btn-ray:hover{background:#4c3aa0}
-  .td-card{background:#fff;border-radius:15px;width:440px;max-width:100%;max-height:90vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.32)}
-  .td-head{padding:18px 22px 6px}
-  .td-head h3{margin:0 0 2px;font-size:16.5px}
-  .td-head .sub{color:var(--gray);font-size:12.5px}
-  .td-body{padding:14px 22px}
-  .td-body .fld{margin-bottom:12px}
-  .td-body .fld label{display:block;font-size:12px;color:var(--gray);margin-bottom:5px}
-  .td-in{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;background:#fff;color:var(--ink)}
-  .td-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+  .ray-sugg{margin-top:10px;border:1px solid #d9d0f2;border-radius:10px;overflow:hidden;background:#fff}
+  .ray-sugg-head{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:#faf9ff;border-bottom:1px solid #eee;font-size:11.5px;color:var(--gray)}
+  .ray-sugg-head a{color:#5b46b8;cursor:pointer;font-weight:700}
+  .ray-sugg-row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-bottom:1px solid var(--row);font-size:12.5px}
+  .ray-sugg-row:last-child{border-bottom:none}
+  .ray-sugg-row .ci .ms{font-size:16px;color:var(--teal)}
+  .ray-sugg-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+  .ray-sugg-row .add{width:26px;height:26px;border-radius:7px;border:1px solid var(--teal);background:var(--teal-tint);color:var(--teal);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .ray-sugg-row.in .add{border-color:var(--border);background:#eef3f1;color:#2E7D32;cursor:default}
+  .ray-sugg-row.in .nm{color:var(--gray)}
+  /* Match the block/document editor canvas — dotted backdrop around the sheet */
+  .tb-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px}
 </style>
 </head>
 <body data-page="templates" data-title="Tender Templates">
@@ -50,7 +44,7 @@
       </div>
       <div class="pg-acts">
         <span class="badge b-draft" id="tpl-status"><span class="b-dot"></span>Draft</span>
-        <a class="btn btn-outline btn-sm" id="detailsBtn"><span class="ms" style="font-size:17px">tune</span> Details</a>
+        <a class="btn btn-outline btn-sm" href="templates.html">Cancel</a>
         <a class="btn btn-outline btn-sm" id="previewBtn"><span class="ms" style="font-size:17px">visibility</span> Preview</a>
         <a class="btn btn-outline btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save</a>
         <a class="btn btn-primary btn-sm" id="reviewBtn"><span class="ms" style="font-size:17px">send</span> Submit for Review</a>
@@ -83,6 +77,14 @@
       <div class="tb-col props">
         <div class="tb-colhead">Template</div>
         <div style="overflow:auto;flex:1">
+          <div class="props-sec">
+            <div class="ray-draft">
+              <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
+              <textarea id="rayPrompt" rows="2" placeholder="Describe the tender — e.g. “a civil infrastructure response for council”"></textarea>
+              <button type="button" class="btn btn-ray btn-sm btn-block" id="raySuggestBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Suggest a tender pack</button>
+              <div id="raySuggestions"></div>
+            </div>
+          </div>
           <div class="props-sec">
             <div class="lbl" style="margin-top:0">Description</div>
             <textarea id="tpl-desc" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;resize:vertical" rows="2" placeholder="What is this template for?"></textarea>
@@ -127,31 +129,6 @@
     <div style="padding:12px 24px"><div class="assign-list" id="assignList"></div></div>
     <div style="padding:0 24px 6px"><div class="muted" style="font-size:12.5px"><span class="ms" style="font-size:15px;vertical-align:-3px;color:var(--st-amber-tx)">rate_review</span> Assigning sends it to QA to be confirmed as finalised — it goes live for the client after that.</div></div>
     <div class="rmfoot"><a class="btn btn-outline" data-close-assign>Cancel</a><a class="btn btn-primary" id="assignConfirm">Assign <span id="assignN"></span></a></div>
-  </div>
-</div>
-
-<!-- Template details dialog (step before editing) -->
-<div class="modal-overlay" id="tplDialog">
-  <div class="td-card">
-    <div class="td-head"><h3>Template details</h3><div class="sub">Name it and pick a type — Ray can draft the document list for you.</div></div>
-    <div class="td-body">
-      <div class="ray-draft">
-        <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
-        <div class="ray-lbl">Client's tender (reference)</div>
-        <div class="ray-ref" id="rayTplRef">
-          <input type="file" accept="image/*" id="rayTplImg" hidden>
-          <label for="rayTplImg" class="ray-drop"><span class="ms">upload_file</span> Add a client tender to match</label>
-        </div>
-        <div class="ray-lbl">Description</div>
-        <textarea id="rayTplPrompt" rows="2" placeholder="Describe the tender — e.g. “a civil infrastructure response for council”"></textarea>
-        <button type="button" class="btn btn-ray btn-sm" id="rayTplBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
-      </div>
-      <div class="fld"><label for="td-name">Template name</label><input class="td-in" id="td-name" placeholder="e.g. Construction — Standard Tender"></div>
-      <div class="fld"><label for="td-cat">Category</label><select class="td-in" id="td-cat"></select></div>
-      <div class="fld"><label for="td-status">Status</label><select class="td-in" id="td-status"><option value="draft">Draft</option><option value="inreview">In review</option><option value="approved">Approved</option><option value="live">Live</option></select></div>
-      <div class="fld"><label for="td-desc">Description</label><textarea class="td-in" id="td-desc" rows="2" placeholder="What is this template for?"></textarea></div>
-    </div>
-    <div class="td-foot"><a class="btn btn-outline" id="td-cancel">Cancel</a><a class="btn btn-primary" id="td-done"><span class="ms" style="font-size:16px">arrow_forward</span> Start editing</a></div>
   </div>
 </div>
 
