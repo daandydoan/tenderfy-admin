@@ -46,6 +46,14 @@ function pageInit(){
   }
   document.getElementById('pq').addEventListener('input', e=>{pq=e.target.value.toLowerCase().trim();renderPalette();});
 
+  // ---- Collapse the palette (left) / properties (right) columns ----
+  (function(){
+    const wrap=document.querySelector('.tb-wrap');
+    const pal=document.getElementById('palToggle'), prop=document.getElementById('propToggle');
+    pal.addEventListener('click',()=>{ const off=wrap.classList.toggle('l-off'); pal.classList.toggle('on',!off); });
+    prop.addEventListener('click',()=>{ const off=wrap.classList.toggle('r-off'); prop.classList.toggle('on',!off); });
+  })();
+
   // ---- Canvas: the sectioned tender structure ----
   const canvas=document.getElementById('canvas');
   function renderCanvas(){
@@ -62,6 +70,7 @@ function pageInit(){
         <div class="ts-add" data-add="${sec}"><span class="ms">add</span> ${ADDLBL[sec]}</div>
       </div>`).join('');
     document.getElementById('p-count').textContent=total();
+    const tc=document.getElementById('tb-count'); if(tc) tc.textContent=total();
 
     canvas.querySelectorAll('[data-rm]').forEach(k=>k.addEventListener('click',()=>{
       const [sec,i]=k.dataset.rm.split('|'); const [r]=sections[sec].splice(+i,1); renderCanvas(); renderPalette(); showToast('Removed: '+byId[r].name);

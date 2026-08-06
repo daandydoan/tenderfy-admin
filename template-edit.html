@@ -30,23 +30,40 @@
   .ray-sugg-row .add{width:26px;height:26px;border-radius:7px;border:1px solid var(--teal);background:var(--teal-tint);color:var(--teal);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .ray-sugg-row.in .add{border-color:var(--border);background:#eef3f1;color:#2E7D32;cursor:default}
   .ray-sugg-row.in .nm{color:var(--gray)}
-  /* Match the block/document editor canvas — dotted backdrop around the sheet */
-  .tb-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px}
+  /* Canvas split into a fixed toolbar + a scrolling stage (dotted backdrop) */
+  .tb-canvas{display:flex;flex-direction:column;padding:0;overflow:hidden;background:#fff}
+  .tb-toolbar{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);background:#fff;flex-shrink:0}
+  .tb-stage{flex:1;overflow:auto;padding:22px;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px}
+  .tb-btn{width:30px;height:30px;border:1px solid var(--border);background:#fff;border-radius:7px;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .tb-btn:hover{border-color:var(--teal);color:var(--teal)}
+  .tb-btn .ms{font-size:17px}
+  .tb-btn.tb-lbl{width:auto;padding:0 11px;gap:6px;font-size:12.5px;font-weight:600}
+  .tb-btn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
+  .tb-tbtitle{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .tb-tbtitle .muted{font-weight:400}
+  /* Collapse the palette (left) / properties (right) columns */
+  .tb-wrap.l-off{grid-template-columns:1fr 300px}
+  .tb-wrap.r-off{grid-template-columns:264px 1fr}
+  .tb-wrap.l-off.r-off{grid-template-columns:1fr}
+  .tb-wrap.l-off .palette{display:none}
+  .tb-wrap.r-off .props{display:none}
 </style>
 </head>
 <body data-page="templates" data-title="Tender Templates">
 <div id="app-content">
   <div class="pad">
     <div class="pg-head" style="margin-bottom:14px">
-      <div>
-        <input id="tpl-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:340px" value="Untitled Tender Template">
-        <div class="pg-sub">Build from a document list, then save as a <strong>Preset</strong> or assign to clients.</div>
+      <div class="dt-head-l">
+        <a class="dt-back" href="templates.html" title="Back to Templates"><span class="ms">arrow_back</span></a>
+        <div>
+          <input id="tpl-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:340px" value="Untitled Tender Template">
+          <div class="pg-sub">Build from a document list, then save as a <strong>Preset</strong> or assign to clients.</div>
+        </div>
       </div>
       <div class="pg-acts">
         <span class="badge b-draft" id="tpl-status"><span class="b-dot"></span>Draft</span>
-        <a class="btn btn-outline btn-sm" href="templates.html">Cancel</a>
-        <a class="btn btn-outline btn-sm" id="previewBtn"><span class="ms" style="font-size:17px">visibility</span> Preview</a>
-        <a class="btn btn-outline btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save</a>
+        <a class="btn btn-outline btn-sm btn-icon" id="previewBtn" title="Preview"><span class="ms">visibility</span></a>
+        <a class="btn btn-outline btn-sm btn-icon" id="saveBtn" title="Save draft"><span class="ms">save</span></a>
         <a class="btn btn-primary btn-sm" id="reviewBtn"><span class="ms" style="font-size:17px">send</span> Submit for Review</a>
       </div>
     </div>
@@ -63,13 +80,20 @@
 
       <!-- Canvas -->
       <div class="tb-canvas">
-        <div class="tb-sheet">
-          <div class="tb-brandbar" id="brandbar">
-            <div class="bl" id="bb-logo">TF</div>
-            <div><div class="bt" id="bb-name">Brand-neutral structure</div><div style="font-size:11px;opacity:.85" id="bb-sub">Pick a client to preview its brand &amp; typography</div></div>
-            <div class="bhint">Preview brand</div>
+        <div class="tb-toolbar">
+          <button class="tb-btn tb-lbl on" id="palToggle" title="Show / hide the document palette"><span class="ms">description</span> Documents</button>
+          <span class="tb-tbtitle" style="margin:0 auto"><span id="tb-count">0</span> <span class="muted">documents</span></span>
+          <button class="tb-btn tb-lbl on" id="propToggle" title="Show / hide the template panel"><span class="ms">tune</span> Template</button>
+        </div>
+        <div class="tb-stage">
+          <div class="tb-sheet">
+            <div class="tb-brandbar" id="brandbar">
+              <div class="bl" id="bb-logo">TF</div>
+              <div><div class="bt" id="bb-name">Brand-neutral structure</div><div style="font-size:11px;opacity:.85" id="bb-sub">Pick a client to preview its brand &amp; typography</div></div>
+              <div class="bhint">Preview brand</div>
+            </div>
+            <div id="canvas"></div>
           </div>
-          <div id="canvas"></div>
         </div>
       </div>
 
