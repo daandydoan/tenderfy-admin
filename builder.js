@@ -22,13 +22,13 @@ function pageInit(){
       'Policies':['policy-whs','policy-quality'], 'Insurances':['insurance'], 'Certifications':['licences'],
     });
     document.getElementById('tpl-name').value='Construction — Standard Tender';
-    document.getElementById('cr-name').textContent='Construction — Standard Tender';
+    const _cr=document.getElementById('cr-name'); if(_cr)_cr.textContent='Construction — Standard Tender';
     document.getElementById('tpl-desc').value='General head-contractor response';
   }
   let brandTenant=''; const assigned=new Set();
   const total = ()=>SECTIONS.reduce((n,s)=>n+sections[s].length,0);
 
-  document.getElementById('tpl-name').addEventListener('input', e=>document.getElementById('cr-name').textContent = e.target.value || 'Untitled Tender Template');
+  document.getElementById('tpl-name').addEventListener('input', e=>{ const cr=document.getElementById('cr-name'); if(cr) cr.textContent = e.target.value || 'Untitled Tender Template'; });
 
   // ---- Palette: available documents grouped by type ----
   const palette=document.getElementById('palette'); let pq='';
@@ -185,4 +185,61 @@ function pageInit(){
   });
 
   renderPalette(); renderCanvas(); applyBrand();
+
+  // ---- Template details are the step BEFORE editing (+ Draft with Ray) ----
+  document.getElementById('td-cat').innerHTML=(typeof TEMPLATE_CATS!=='undefined'?TEMPLATE_CATS:['Construction','Civil','Engineering','Facilities','Trades','Government']).map(c=>`<option>${c}</option>`).join('');
+  const tplDialog=document.getElementById('tplDialog');
+  const tbwrap=()=>document.querySelector('.tb-wrap');
+  function openTplDialog(){
+    const nm=document.getElementById('tpl-name').value; document.getElementById('td-name').value = nm==='Untitled Tender Template'?'':nm;
+    document.getElementById('td-desc').value=document.getElementById('tpl-desc').value;
+    tplDialog.classList.add('open'); document.getElementById('td-name').focus();
+  }
+  function closeTplDialog(){ tplDialog.classList.remove('open'); const w=tbwrap(); if(w) w.style.visibility=''; }
+  const STMETA={draft:'Draft',inreview:'In review',approved:'Approved',live:'Live'};
+  function applyDetails(){
+    const nm=document.getElementById('td-name').value.trim();
+    if(nm){ document.getElementById('tpl-name').value=nm; const cr=document.getElementById('cr-name'); if(cr) cr.textContent=nm; }
+    document.getElementById('tpl-desc').value=document.getElementById('td-desc').value.trim();
+    const st=document.getElementById('td-status').value, sb=document.getElementById('tpl-status');
+    sb.className='badge b-'+st; sb.innerHTML='<span class="b-dot"></span>'+(STMETA[st]||st);
+  }
+  document.getElementById('td-done').addEventListener('click',()=>{ applyDetails(); closeTplDialog(); });
+  document.getElementById('td-cancel').addEventListener('click',()=>{ if(!editing && !total()) location.href='templates.html'; else closeTplDialog(); });
+  tplDialog.addEventListener('click',e=>{ if(e.target===tplDialog) closeTplDialog(); });
+  document.getElementById('detailsBtn').addEventListener('click',openTplDialog);
+
+  // Reference-tender upload (mock — Ray "matches" the uploaded tender)
+  let rayTplHasImg=false;
+  (function bindRayImg(){
+    const ref=document.getElementById('rayTplRef'), inputId='rayTplImg', label='Add a client tender to match';
+    function reset(){ rayTplHasImg=false; ref.innerHTML=`<input type="file" accept="image/*" id="${inputId}" hidden><label for="${inputId}" class="ray-drop"><span class="ms">upload_file</span> ${label}</label>`; wire(); }
+    function wire(){ document.getElementById(inputId).addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{ rayTplHasImg=true; ref.innerHTML=`<div class="ray-thumb"><img src="${r.result}" alt="reference"><button type="button" class="ray-x"><span class="ms">close</span></button><div class="ray-cap">Client reference · ${f.name}</div></div>`; ref.querySelector('.ray-x').addEventListener('click',reset); }; r.readAsDataURL(f); }); }
+    wire();
+  })();
+  function rayDraftTemplate(desc){
+    const s=(desc||'').toLowerCase();
+    let ids, cat, name;
+    if(/civil|infrastructure|road|drainage/.test(s)){ ids=['cover','toc','exec-summary','methodology','rate-table','env-row','proj-profile','case-study','compliance-tbl','policy-whs','policy-env','insurance','licences']; cat='Civil'; name='Civil Infrastructure Response'; }
+    else if(/capability|eoi|expression|prequal/.test(s)){ ids=['cover','toc','exec-summary','cv-standard','cv-exec','proj-profile','licences','insurance']; cat='Engineering'; name='Engineering Capability Statement'; }
+    else if(/facilit|maintenance|hvac/.test(s)){ ids=['cover','toc','exec-summary','methodology','rate-table','program','policy-whs','risk-block','insurance','licences']; cat='Facilities'; name='Facilities Maintenance Tender'; }
+    else if(/government|panel|supplier/.test(s)){ ids=['cover','toc','exec-summary','compliance-tbl','methodology','cv-standard','policy-whs','policy-quality','policy-env','insurance','licences','referees']; cat='Government'; name='Government Supplier Panel'; }
+    else { ids=['cover','toc','exec-summary','methodology','rate-table','cv-standard','proj-profile','case-study','policy-whs','policy-quality','insurance','licences']; cat='Construction'; name='Construction — Standard Tender'; }
+    const cs=document.getElementById('td-cat'); if([...cs.options].some(o=>o.value===cat)) cs.value=cat;
+    SECTIONS.forEach(sec=>sections[sec]=[]);
+    ids.forEach(id=>{ if(byId[id]){ const sec=secOf(id); if(!sections[sec].includes(id)) sections[sec].push(id); } });
+    renderCanvas(); renderPalette();
+    return {n:total(), name};
+  }
+  document.getElementById('rayTplBtn').addEventListener('click',()=>{
+    const p=document.getElementById('rayTplPrompt').value.trim();
+    if(!p && !document.getElementById('td-cat').value && !rayTplHasImg){ showToast('Describe the tender, pick a type, or add a reference'); return; }
+    const res=rayDraftTemplate(p);
+    if(!document.getElementById('td-name').value.trim()) document.getElementById('td-name').value=res.name;
+    applyDetails(); closeTplDialog();
+    showToast('Ray drafted '+res.n+' documents'+(rayTplHasImg?' to match your reference':'')+' — refine, then Save');
+  });
+
+  // Auto-open for a new template; keep the editor hidden until Start editing
+  if(!editing){ const w=tbwrap(); if(w) w.style.visibility='hidden'; openTplDialog(); }
 }
