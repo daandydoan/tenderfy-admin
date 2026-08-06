@@ -435,6 +435,13 @@
 /* Consistent status control on the view pages */
 .status-sel{font-family:inherit;font-size:12.5px;font-weight:500;padding:5px 9px;border:1px solid var(--border);border-radius:8px;color:var(--ink);background:#fff;cursor:pointer;max-width:160px}
 .status-sel:hover{border-color:var(--teal)}
+/* Detail-page header (shared): back button + icon action buttons */
+.dt-head-l{display:flex;align-items:center;gap:14px;min-width:0}
+.dt-back{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;text-decoration:none}
+.dt-back:hover{border-color:var(--teal);color:var(--teal)}
+.dt-back .ms{font-size:20px}
+.btn.btn-icon{padding:0;width:34px;height:34px;justify-content:center}
+.btn.btn-icon .ms{font-size:18px;margin:0}
 
 .blk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:18px}
 .blk-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px 16px 16px;cursor:pointer;transition:box-shadow .15s ease,border-color .15s ease}
