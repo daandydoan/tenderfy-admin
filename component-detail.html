@@ -23,27 +23,36 @@
   .hdr-brand .fin-sm{min-width:180px;padding:7px 10px;font-size:12.5px;width:auto}
   .cd-mockchip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--teal);background:var(--teal-tint);border-radius:100px;padding:3px 10px;margin-left:8px}
   .cd-mockchip .ms{font-size:14px}
+  /* Back button + icon buttons */
+  .cd-head-l{display:flex;align-items:center;gap:14px}
+  .cd-back{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;text-decoration:none}
+  .cd-back:hover{border-color:var(--teal);color:var(--teal)}
+  .cd-back .ms{font-size:20px}
+  .btn.btn-icon{padding:0;width:34px;height:34px;justify-content:center}
+  .btn.btn-icon .ms{font-size:18px;margin:0}
 </style>
 </head>
 <body data-page="library" data-title="Component Library">
 <div id="app-content">
   <div class="pad">
     <div class="pg-head">
-      <div>
-        <div class="tn-title" id="c-name">—</div>
-        <div class="pg-sub" id="c-desc"></div>
+      <div class="cd-head-l">
+        <a class="cd-back" href="library.html" title="Back to Documents"><span class="ms">arrow_back</span></a>
+        <div>
+          <div class="tn-title" id="c-name">—</div>
+          <div class="pg-sub" id="c-desc"></div>
+        </div>
       </div>
       <div class="pg-acts">
-        <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span>
-        <a class="btn btn-outline btn-sm" data-toast="Duplicate component"><span class="ms" style="font-size:17px">content_copy</span> Duplicate</a>
+        <a class="btn btn-outline btn-sm btn-icon" data-toast="Duplicate document" title="Duplicate"><span class="ms">content_copy</span></a>
         <a class="btn btn-outline btn-sm" id="editBtn"><span class="ms" style="font-size:17px">edit</span> Edit Structure</a>
-        <a class="btn btn-primary btn-sm" id="pubbtn" data-toast="Publish component">Publish</a>
+        <a class="btn btn-primary btn-sm" id="pubbtn" data-toast="Publish document">Publish</a>
       </div>
     </div>
 
     <div class="row">
       <div class="grow">
-        <div class="sa-sech" style="justify-content:flex-start">Document preview <span class="cd-mockchip" id="mockchip" style="display:none"><span class="ms">check_circle</span> Sample content</span></div>
+        <div class="sa-sech"><span style="display:flex;align-items:center">Document preview <span class="cd-mockchip" id="mockchip" style="display:none"><span class="ms">check_circle</span> Sample content</span></span><span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span></div>
         <div class="cd-canvas">
           <div class="cd-a4" id="d-page"></div>
         </div>
