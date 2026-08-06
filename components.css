@@ -432,6 +432,9 @@
 .lst-kebab:hover{color:var(--teal);background:var(--teal-tint)}
 .lst-kebab .ms{font-size:19px}
 .lst-kebwrap .kebab-menu{min-width:172px}
+/* Consistent status control on the view pages */
+.status-sel{font-family:inherit;font-size:12.5px;font-weight:500;padding:5px 9px;border:1px solid var(--border);border-radius:8px;color:var(--ink);background:#fff;cursor:pointer;max-width:160px}
+.status-sel:hover{border-color:var(--teal)}
 
 .blk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:18px}
 .blk-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px 16px 16px;cursor:pointer;transition:box-shadow .15s ease,border-color .15s ease}

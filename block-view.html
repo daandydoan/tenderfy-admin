@@ -55,7 +55,7 @@
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm btn-icon" id="dupBtn" title="Duplicate"><span class="ms">content_copy</span></a>
         <a class="btn btn-danger btn-sm btn-icon" id="delBtn" title="Delete"><span class="ms">delete</span></a>
-        <a class="btn btn-primary btn-sm" id="editBtn"><span class="ms" style="font-size:17px">edit</span> Edit block</a>
+        <a class="btn btn-primary btn-sm" id="editBtn"><span class="ms" style="font-size:17px">edit</span> Edit</a>
       </div>
     </div>
 
@@ -100,7 +100,13 @@ function pageInit(){
   document.getElementById('bl-desc').textContent=block.desc;
   document.getElementById('bl-label').textContent=block.label;
   document.getElementById('bl-cat').textContent=block.cat;
-  document.getElementById('bl-status').innerHTML=(typeof blockStatusBadge==='function')?blockStatusBadge(block.id):'';
+  // Status control (change status inline — consistent across view pages)
+  (function(){
+    const opts=[['active','Active'],['draft','Draft'],['inactive','Inactive']];
+    const cur=(typeof blockStatus==='function')?blockStatus(block.id):'active';
+    document.getElementById('bl-status').innerHTML=`<select class="status-sel" id="statusSel">${opts.map(([v,l])=>`<option value="${v}"${v===cur?' selected':''}>${l}</option>`).join('')}</select>`;
+    document.getElementById('statusSel').addEventListener('change',e=>{ if(typeof BLOCK_STATUS!=='undefined') BLOCK_STATUS[block.id]=e.target.value; showToast('Status set to '+e.target.options[e.target.selectedIndex].text); });
+  })();
   document.getElementById('bl-desc2').textContent=block.desc;
   document.getElementById('bl-elems').innerHTML=blockElements(block).map(pid=>`<span class="bv-chip"><span class="ms">${ICON[pid]||'widgets'}</span>${ELEMS[pid]||pid}</span>`).join('') || '<span class="muted" style="font-size:12.5px">Custom code block</span>';
   const n=(typeof blockUsage==='function')?blockUsage(block.id):0;

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tenderfy — Super Admin · Component</title>
+<title>Tenderfy — Super Admin · Document</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
   .btn.btn-icon .ms{font-size:18px;margin:0}
 </style>
 </head>
-<body data-page="library" data-title="Component Library">
+<body data-page="library" data-title="Documents">
 <div id="app-content">
   <div class="pad">
     <div class="pg-head">
@@ -45,8 +45,8 @@
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm btn-icon" data-toast="Duplicate document" title="Duplicate"><span class="ms">content_copy</span></a>
-        <a class="btn btn-outline btn-sm" id="editBtn"><span class="ms" style="font-size:17px">edit</span> Edit Structure</a>
-        <a class="btn btn-primary btn-sm" id="pubbtn" data-toast="Publish document">Publish</a>
+        <a class="btn btn-danger btn-sm btn-icon" data-toast="Delete document" title="Delete"><span class="ms">delete</span></a>
+        <a class="btn btn-primary btn-sm" id="editBtn"><span class="ms" style="font-size:17px">edit</span> Edit</a>
       </div>
     </div>
 
@@ -94,14 +94,18 @@ function pageInit(){
   document.getElementById('c-name').textContent = c.name;
   document.getElementById('c-desc').textContent = c.desc;
   document.getElementById('a-cat').textContent = c.category;
-  document.getElementById('a-status').innerHTML = badge(c.status);
   document.getElementById('a-ver').textContent = 'v'+c.version;
   document.getElementById('a-upd').textContent = c.updated;
   document.getElementById('a-used').textContent = (typeof compUsage==='function'?compUsage(c.id):4) + ' templates';
   document.getElementById('vh-cur').textContent = 'v'+c.version;
   document.getElementById('editBtn').setAttribute('href','document-edit.html#id='+c.id);
-  if(c.status==='published'){ const b=document.getElementById('pubbtn'); b.textContent='Deprecate'; b.className='btn btn-danger-outline btn-sm'; b.setAttribute('data-toast','Deprecate component'); }
-  if(c.status==='deprecated'){ const b=document.getElementById('pubbtn'); b.textContent='Restore'; b.setAttribute('data-toast','Restore component'); }
+
+  // Status control (change status inline — consistent across view pages)
+  (function(){
+    const opts=[['published','Published'],['draft','Draft'],['deprecated','Deprecated']];
+    document.getElementById('a-status').innerHTML=`<select class="status-sel" id="statusSel">${opts.map(([v,l])=>`<option value="${v}"${v===c.status?' selected':''}>${l}</option>`).join('')}</select>`;
+    document.getElementById('statusSel').addEventListener('change',e=>{ c.status=e.target.value; showToast('Status set to '+e.target.options[e.target.selectedIndex].text); });
+  })();
 
   // A4 document preview with per-client brand styling
   if(typeof DOC_MOCKED!=='undefined' && DOC_MOCKED.includes(c.id)) document.getElementById('mockchip').style.display='';

@@ -29,7 +29,7 @@
       </div>
       <div class="pg-acts">
         <a class="btn btn-outline btn-sm" href="qa.html"><span class="ms" style="font-size:17px">fact_check</span> Review queue</a>
-        <a class="btn btn-primary btn-sm" href="template-builder.html"><span class="ms" style="font-size:18px">add</span> New Tender Template</a>
+        <a class="btn btn-primary btn-sm" href="template-edit.html"><span class="ms" style="font-size:18px">add</span> New Tender Template</a>
       </div>
     </div>
 
@@ -111,7 +111,7 @@ function pageInit(){
     if(item){ e.preventDefault(); e.stopPropagation();
       const card=item.closest('.lst-card'), t=TEMPLATES.find(x=>x.id===card.dataset.id);
       item.closest('.kebab-menu').classList.remove('open');
-      if(item.dataset.act==='edit'){ location.href='template-builder.html#id='+t.id; }
+      if(item.dataset.act==='edit'){ location.href='template-edit.html#id='+t.id; }
       else if(item.dataset.act==='dup'){ showToast('Duplicated: '+t.name); }
       else if(item.dataset.act==='del'){ showToast('Deleted: '+t.name); }
       return; }

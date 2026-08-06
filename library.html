@@ -121,7 +121,7 @@ function pageInit(){
       else if(item.dataset.act==='del'){ showToast('Deleted: '+c.name); }
       return; }
     const card=e.target.closest('.lst-card');
-    if(card){ location.href='component-detail.html#id='+card.dataset.id; }
+    if(card){ location.href='document-view.html#id='+card.dataset.id; }
   });
   document.getElementById('q').addEventListener('input', e=>{query=e.target.value.toLowerCase().trim();renderGrid();});
 

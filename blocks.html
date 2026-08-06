@@ -46,7 +46,7 @@ function pageInit(){
     document.getElementById('pgActs').innerHTML = active==='Headers & Footers'
       ? `<a class="btn btn-outline btn-sm" href="block-edit.html#slot=footer"><span class="ms" style="font-size:17px">flip_to_back</span> New footer</a>
          <a class="btn btn-primary btn-sm" href="block-edit.html#slot=header"><span class="ms" style="font-size:17px">flip_to_front</span> New letterhead</a>`
-      : `<a class="btn btn-primary btn-sm" href="block-edit.html"><span class="ms" style="font-size:18px">add</span> Create Custom Block</a>`;
+      : `<a class="btn btn-primary btn-sm" href="block-edit.html"><span class="ms" style="font-size:18px">add</span> New Block</a>`;
   }
   function renderTabs(){
     document.getElementById('tabs').innerHTML=cats.map(c=>`<span class="lst-tab ${c===active?'on':''}" data-cat="${c}">${c}</span>`).join('');
