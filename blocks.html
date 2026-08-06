@@ -15,7 +15,8 @@
 <style>
   /* One filter bar: category tabs (left) + status filter (right) */
   .blk-tabbar{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;border-bottom:1px solid var(--border);margin-bottom:20px}
-  .blk-tabbar .blk-tabs{border-bottom:none;margin-bottom:0;flex:1;min-width:0}
+  .blk-tabbar .blk-tabs{border-bottom:none;margin-bottom:0;flex:1;min-width:0;scrollbar-width:none;-ms-overflow-style:none}
+  .blk-tabbar .blk-tabs::-webkit-scrollbar{width:0;height:0}
   .blk-statusrow{display:flex;gap:6px;margin:0 0 8px;flex-shrink:0;align-self:center}
   .blk-schip{padding:5px 11px}
   .blk-schip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--gray);background:#fff;border:1px solid var(--border);border-radius:100px;padding:6px 13px;cursor:pointer}
@@ -31,6 +32,13 @@
   .blk-grid .blk-preview{height:134px;min-height:134px;overflow:hidden}
   .blk-grid .blk-desc{font-size:12px;color:var(--gray);padding-top:11px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:35px;box-sizing:content-box}
   .blk-grid .blk-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--light);padding-top:9px;margin-top:auto;border-top:1px solid var(--border)}
+  /* Quick-action kebab on each card */
+  .blk-grid .blk-name{gap:6px}
+  .blk-kebwrap{position:relative;flex-shrink:0;display:flex}
+  .blk-kebab{border:none;background:transparent;color:var(--light);cursor:pointer;padding:2px;border-radius:6px;display:flex;line-height:0}
+  .blk-kebab:hover{color:var(--teal);background:var(--teal-tint)}
+  .blk-kebab .ms{font-size:19px}
+  .blk-kebwrap .kebab-menu{min-width:172px}
 </style>
 </head>
 <body data-page="blocks" data-title="Blocks">
@@ -81,15 +89,53 @@ function pageInit(){
   }
   function renderGrid(){
     const list=BLOCKS.filter(b=>(active==='All Blocks'||b.cat===active)&&(activeStatus==='all'||blockStatus(b.id)===activeStatus));
-    document.getElementById('grid').innerHTML=list.map(b=>`
-      <a class="blk-card" href="block-view.html#id=${b.id}">
-        <div class="blk-name"><span class="blk-lbl">${b.label}</span> ${blockStatusBadge(b.id)}</div>
+    document.getElementById('grid').innerHTML=list.map(b=>{
+      const active=blockStatus(b.id)!=='inactive';
+      return `
+      <div class="blk-card" data-id="${b.id}">
+        <div class="blk-name"><span class="blk-lbl">${b.label}</span> ${blockStatusBadge(b.id)}
+          <span class="blk-kebwrap">
+            <button class="blk-kebab" data-kebab aria-label="Actions"><span class="ms">more_vert</span></button>
+            <div class="kebab-menu">
+              <a data-act="edit"><span class="ms">edit</span> Edit</a>
+              <a data-act="dup"><span class="ms">content_copy</span> Duplicate</a>
+              <div class="kebab-sep"></div>
+              <a class="${active?'danger':''}" data-act="toggle"><span class="ms">${active?'block':'check_circle'}</span> ${active?'Deactivate':'Reactivate'}</a>
+            </div>
+          </span>
+        </div>
         <div class="blk-preview">${blockPreview(b.p)}</div>
         <div class="blk-desc">${b.desc}</div>
         <div class="blk-foot"><span>${b.cat}</span><span><span class="ms" style="font-size:13px;vertical-align:-2px">description</span> ${blockUsage(b.id)}</span></div>
-      </a>`).join('');
+      </div>`;}).join('');
     document.getElementById('empty').style.display=list.length?'none':'block';
   }
+
+  // Quick actions: navigate on card click, kebab opens Edit / Duplicate / Deactivate
+  const grid=document.getElementById('grid');
+  grid.addEventListener('click', e=>{
+    const kebab=e.target.closest('.blk-kebab');
+    if(kebab){ e.preventDefault(); e.stopPropagation();
+      const menu=kebab.parentElement.querySelector('.kebab-menu'), isOpen=menu.classList.contains('open');
+      grid.querySelectorAll('.kebab-menu.open').forEach(m=>m.classList.remove('open'));
+      if(!isOpen) menu.classList.add('open');
+      return; }
+    const item=e.target.closest('.kebab-menu a');
+    if(item){ e.preventDefault(); e.stopPropagation();
+      const card=item.closest('.blk-card'), id=card.dataset.id, blk=BLOCKS.find(x=>x.id===id);
+      item.closest('.kebab-menu').classList.remove('open');
+      if(item.dataset.act==='edit'){ location.href='block-edit.html#id='+id; }
+      else if(item.dataset.act==='dup'){ duplicateBlock(blk.label); }
+      else if(item.dataset.act==='toggle'){
+        const nowInactive=blockStatus(id)==='inactive';
+        BLOCK_STATUS[id]=nowInactive?'active':'inactive';
+        renderStatusRow(); renderGrid();
+        showToast((nowInactive?'Reactivated':'Deactivated')+': '+blk.label);
+      }
+      return; }
+    const card=e.target.closest('.blk-card');
+    if(card){ location.href='block-view.html#id='+card.dataset.id; }
+  });
 
   renderActs(); renderTabs(); renderStatusRow(); renderGrid();
 }

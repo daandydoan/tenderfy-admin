@@ -601,23 +601,27 @@ table.req tbody tr.po{display:none}
 /* Fixed table viewport so switching tabs never changes the card height;
    extra rows scroll vertically, with the header pinned at the top. */
 .tscroll{overflow:auto;height:440px}
-html,.content,.tabs .set,.tscroll{scrollbar-width:none;-ms-overflow-style:none}
+html,.content,.c-content,.tabs .set,.tscroll{scrollbar-width:none;-ms-overflow-style:none}
 html::-webkit-scrollbar,
 .content::-webkit-scrollbar,
+.c-content::-webkit-scrollbar,
 .tabs .set::-webkit-scrollbar,
 .tscroll::-webkit-scrollbar{width:0;height:0}
 
 /* Revealed on request */
 html.show-scrollbars,
 html.show-scrollbars .content,
+html.show-scrollbars .c-content,
 html.show-scrollbars .tabs .set,
 html.show-scrollbars .tscroll{scrollbar-width:thin}
 html.show-scrollbars::-webkit-scrollbar,
 html.show-scrollbars .content::-webkit-scrollbar,
+html.show-scrollbars .c-content::-webkit-scrollbar,
 html.show-scrollbars .tabs .set::-webkit-scrollbar,
 html.show-scrollbars .tscroll::-webkit-scrollbar{width:10px;height:10px}
 html.show-scrollbars::-webkit-scrollbar-thumb,
 html.show-scrollbars .content::-webkit-scrollbar-thumb,
+html.show-scrollbars .c-content::-webkit-scrollbar-thumb,
 html.show-scrollbars .tabs .set::-webkit-scrollbar-thumb,
 html.show-scrollbars .tscroll::-webkit-scrollbar-thumb{background:var(--lighter);border-radius:8px}
 
