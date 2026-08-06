@@ -12,6 +12,13 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
+<style>
+  /* Compact stat tiles — horizontal, less wasted space */
+  .stat-row.stat-compact{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+  .stat-compact .stat-tile{display:flex;align-items:center;gap:13px;padding:13px 16px}
+  .stat-compact .st-ic{margin-bottom:0;flex-shrink:0}
+  .stat-compact .st-lbl{margin-top:2px}
+</style>
 </head>
 <body data-page="library" data-title="Documents">
 <div id="app-content">
@@ -34,97 +41,96 @@
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">lock</span></div><div class="st-txt"><div class="st-big" id="s-restrict">0</div><div class="st-lbl">Client-restricted</div></div></div>
     </div>
 
-    <div class="pg-toolbar">
-      <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search documents…"></span>
-      <div class="filter-dd" id="statusdd">
-        <button class="filter-toggle" data-kebab><span class="ms" style="font-size:16px">filter_list</span> <span id="statuslabel">All statuses</span></button>
-        <div class="filter-panel" id="statuspanel">
-          <a data-st="all" class="on">All statuses</a>
-          <a data-st="published">Published</a>
-          <a data-st="draft">Draft</a>
-          <a data-st="deprecated">Deprecated</a>
-        </div>
+    <div class="lst-bar">
+      <div class="lst-tabs" id="tabs"></div>
+      <div class="lst-tools">
+        <span class="lst-search"><span class="ms">search</span><input id="q" placeholder="Search documents…"></span>
+        <div class="lst-pills" id="statusRow"></div>
       </div>
     </div>
-
-    <div class="cat-chips mt16" id="cats"></div>
-    <div class="comp-grid mt24" id="grid"></div>
-    <div id="empty" style="display:none;text-align:center;color:var(--light);padding:60px 0"><span class="ms" style="font-size:44px">search_off</span><p class="mt16">No documents match your filters.</p></div>
+    <div class="lst-grid" id="grid"></div>
+    <div id="empty" style="display:none;text-align:center;color:var(--light);padding:50px 0"><span class="ms" style="font-size:40px">search_off</span><p class="mt16">No documents match.</p></div>
   </div>
 </div>
 <script src="shell.js"></script>
+<script src="blocks-data.js"></script>
 <script src="library-data.js"></script>
 <script>
 function pageInit(){
   const cats = ['All', ...Array.from(new Set(COMPONENTS.map(c=>c.category)))];
-  let activeCat = 'All', activeStatus = 'all', query = '';
+  let activeCat='All', activeStatus='all', query='';
 
-  const thumb = (c)=>{
-    if(c.thumb==='rows') return `<div class="ph-rows"><span></span><span></span><span></span><span></span></div>`;
+  const preview = (c)=>{
+    if(c.thumb==='rows') return blockPreview('table');
     if(c.thumb==='icon') return `<span class="ms picon">${c.icon}</span>`;
-    return `<div class="ph"><i class="t"></i><i class="s"></i><i class="m"></i><i class="s"></i></div>`;
+    return blockPreview('paragraph');
   };
   const badge = (s)=>`<span class="badge b-${s}"><span class="b-dot"></span>${s[0].toUpperCase()+s.slice(1)}</span>`;
 
-  function renderCats(){
-    document.getElementById('cats').innerHTML = cats.map(c=>{
-      const n = c==='All' ? COMPONENTS.length : COMPONENTS.filter(x=>x.category===c).length;
-      return `<span class="cat-chip ${c===activeCat?'on':''}" data-cat="${c}">${c} <span class="n">${n}</span></span>`;
+  function renderTabs(){
+    document.getElementById('tabs').innerHTML = cats.map(c=>`<span class="lst-tab ${c===activeCat?'on':''}" data-cat="${c}">${c}</span>`).join('');
+    document.querySelectorAll('#tabs .lst-tab').forEach(t=>t.addEventListener('click',()=>{activeCat=t.dataset.cat;renderTabs();renderStatusRow();renderGrid();}));
+  }
+  function renderStatusRow(){
+    const inCat=c=>activeCat==='All'||c.category===activeCat;
+    const opts=[['all','All'],['published','Published'],['draft','Draft'],['deprecated','Deprecated']];
+    document.getElementById('statusRow').innerHTML=opts.map(([k,l])=>{
+      const n=k==='all'?COMPONENTS.filter(inCat).length:COMPONENTS.filter(c=>inCat(c)&&c.status===k).length;
+      return `<span class="lst-pill ${k===activeStatus?'on':''}" data-st="${k}">${l} <span class="n">${n}</span></span>`;
     }).join('');
-    document.querySelectorAll('#cats .cat-chip').forEach(ch=>ch.addEventListener('click',()=>{activeCat=ch.dataset.cat;renderCats();renderGrid();}));
+    document.querySelectorAll('#statusRow .lst-pill').forEach(p=>p.addEventListener('click',()=>{activeStatus=p.dataset.st;renderStatusRow();renderGrid();}));
   }
   function renderGrid(){
     const list = COMPONENTS.filter(c=>
       (activeCat==='All'||c.category===activeCat) &&
       (activeStatus==='all'||c.status===activeStatus) &&
-      (!query || (c.name+' '+c.category).toLowerCase().includes(query)));
-    const g = document.getElementById('grid');
-    g.innerHTML = list.map(c=>`
-      <a class="comp-card" href="component-detail.html#id=${c.id}">
-        <div class="comp-thumb">${thumb(c)}</div>
-        <div class="comp-body">
-          <div class="nm"><span class="nm-lbl">${c.name}</span> ${badge(c.status)}</div>
-          <div class="cat">${c.category}</div>
-          <div class="foot">
-            <span>${c.restricted ? `<span class="comp-restrict"><span class="ms">lock</span> ${c.restricted} clients</span>` : 'All clients'}</span>
-            <span>v${c.version}</span>
-          </div>
+      (!query || (c.name+' '+c.category+' '+c.desc).toLowerCase().includes(query)));
+    document.getElementById('grid').innerHTML = list.map(c=>`
+      <div class="lst-card" data-id="${c.id}">
+        <div class="lst-name"><span class="lst-lbl">${c.name}</span> ${badge(c.status)}
+          <span class="lst-kebwrap">
+            <button class="lst-kebab" data-kebab aria-label="Actions"><span class="ms">more_vert</span></button>
+            <div class="kebab-menu">
+              <a data-act="edit"><span class="ms">edit</span> Edit structure</a>
+              <a data-act="dup"><span class="ms">content_copy</span> Duplicate</a>
+              <div class="kebab-sep"></div>
+              <a class="danger" data-act="del"><span class="ms">delete</span> Delete</a>
+            </div>
+          </span>
         </div>
-      </a>`).join('');
+        <div class="lst-prev">${preview(c)}</div>
+        <div class="lst-desc">${c.desc}</div>
+        <div class="lst-foot"><span>${c.restricted?`<span style="color:var(--st-amber-tx)"><span class="ms" style="font-size:13px;vertical-align:-2px">lock</span> ${c.restricted} clients</span>`:c.category}</span><span>v${c.version}</span></div>
+      </div>`).join('');
     document.getElementById('empty').style.display = list.length ? 'none':'block';
   }
-  renderCats(); renderGrid();
 
-  // stats
+  const grid=document.getElementById('grid');
+  grid.addEventListener('click', e=>{
+    const kebab=e.target.closest('.lst-kebab');
+    if(kebab){ e.preventDefault(); e.stopPropagation();
+      const menu=kebab.parentElement.querySelector('.kebab-menu'), isOpen=menu.classList.contains('open');
+      grid.querySelectorAll('.kebab-menu.open').forEach(m=>m.classList.remove('open'));
+      if(!isOpen) menu.classList.add('open'); return; }
+    const item=e.target.closest('.kebab-menu a');
+    if(item){ e.preventDefault(); e.stopPropagation();
+      const card=item.closest('.lst-card'), c=COMPONENTS.find(x=>x.id===card.dataset.id);
+      item.closest('.kebab-menu').classList.remove('open');
+      if(item.dataset.act==='edit'){ location.href='document-edit.html#id='+c.id; }
+      else if(item.dataset.act==='dup'){ showToast('Duplicated: '+c.name); }
+      else if(item.dataset.act==='del'){ showToast('Deleted: '+c.name); }
+      return; }
+    const card=e.target.closest('.lst-card');
+    if(card){ location.href='component-detail.html#id='+card.dataset.id; }
+  });
+  document.getElementById('q').addEventListener('input', e=>{query=e.target.value.toLowerCase().trim();renderGrid();});
+
+  renderTabs(); renderStatusRow(); renderGrid();
   document.getElementById('s-total').textContent = COMPONENTS.length;
   document.getElementById('s-pub').textContent = COMPONENTS.filter(c=>c.status==='published').length;
   document.getElementById('s-draft').textContent = COMPONENTS.filter(c=>c.status==='draft').length;
   document.getElementById('s-restrict').textContent = COMPONENTS.filter(c=>c.restricted).length;
-
-  document.getElementById('q').addEventListener('input', e=>{query=e.target.value.toLowerCase().trim();renderGrid();});
-
-  const dd = document.getElementById('statusdd');
-  dd.querySelector('.filter-toggle').addEventListener('click', ()=>document.getElementById('statuspanel').classList.toggle('open'));
-  document.querySelectorAll('#statuspanel a').forEach(a=>a.addEventListener('click', ()=>{
-    activeStatus=a.dataset.st;
-    document.querySelectorAll('#statuspanel a').forEach(x=>x.classList.remove('on'));
-    a.classList.add('on');
-    document.getElementById('statuslabel').textContent=a.textContent;
-    document.getElementById('statuspanel').classList.remove('open');
-    renderGrid();
-  }));
 }
 </script>
-<style>.filter-panel a{padding:8px 10px;border-radius:8px;font-size:13px;cursor:pointer}.filter-panel a:hover,.filter-panel a.on{background:var(--teal-tint);color:var(--teal)}.filter-panel.open{display:flex}
-  /* Keep the name on one line so the status pill stays put */
-  .comp-body .nm{min-width:0}
-  .comp-body .nm-lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .comp-body .nm .badge{flex-shrink:0}
-  /* Compact stat tiles — horizontal, less wasted space */
-  .stat-row.stat-compact{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
-  .stat-compact .stat-tile{display:flex;align-items:center;gap:13px;padding:13px 16px}
-  .stat-compact .st-ic{margin-bottom:0;flex-shrink:0}
-  .stat-compact .st-lbl{margin-top:2px}
-</style>
 </body>
 </html>

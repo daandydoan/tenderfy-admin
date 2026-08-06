@@ -399,6 +399,40 @@
 .blk-tab:hover{color:var(--ink)}
 .blk-tab.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
 
+/* ===== Shared listing pattern: Blocks / Documents / Templates =====
+   Toolbar (category tabs left, search + status pills right) + a common card. */
+.lst-bar{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
+.lst-tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.lst-tabs::-webkit-scrollbar{width:0;height:0}
+.lst-tab{padding:11px 16px;font-size:14px;font-weight:500;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.lst-tab:hover{color:var(--ink)}
+.lst-tab.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
+.lst-tools{display:flex;align-items:center;gap:10px;flex-shrink:0;padding-bottom:8px;flex-wrap:wrap;justify-content:flex-end}
+.lst-search{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:9px;padding:6px 11px;background:#fff}
+.lst-search .ms{font-size:17px;color:var(--light)}
+.lst-search input{border:none;outline:none;font-family:inherit;font-size:12.5px;background:transparent;width:150px}
+.lst-pills{display:flex;gap:6px;flex-wrap:wrap}
+.lst-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--gray);background:#fff;border:1px solid var(--border);border-radius:100px;padding:5px 12px;cursor:pointer}
+.lst-pill:hover{border-color:var(--teal);color:var(--teal)}
+.lst-pill.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.lst-pill .n{font-size:11px;opacity:.75}
+
+.lst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.lst-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px 16px 16px;cursor:pointer;display:flex;flex-direction:column;transition:box-shadow .15s ease,border-color .15s ease}
+.lst-card:hover{box-shadow:0 10px 26px rgba(12,12,13,.1);border-color:var(--lighter)}
+.lst-name{display:flex;align-items:center;gap:6px;margin-bottom:11px}
+.lst-lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--teal);font-weight:600;font-size:14px}
+.lst-name .badge{flex-shrink:0}
+.lst-prev{height:132px;min-height:132px;border:1px solid var(--border);border-radius:8px;background:#fcfdfd;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:9px;padding:16px}
+.lst-prev .picon{margin:auto;color:var(--lighter);font-size:44px}
+.lst-desc{font-size:12px;color:var(--gray);padding-top:11px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:35px;box-sizing:content-box}
+.lst-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--light);padding-top:9px;margin-top:auto;border-top:1px solid var(--border)}
+.lst-kebwrap{position:relative;flex-shrink:0;display:flex}
+.lst-kebab{border:none;background:transparent;color:var(--light);cursor:pointer;padding:2px;border-radius:6px;display:flex;line-height:0}
+.lst-kebab:hover{color:var(--teal);background:var(--teal-tint)}
+.lst-kebab .ms{font-size:19px}
+.lst-kebwrap .kebab-menu{min-width:172px}
+
 .blk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:18px}
 .blk-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px 16px 16px;cursor:pointer;transition:box-shadow .15s ease,border-color .15s ease}
 .blk-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);border-color:var(--lighter)}

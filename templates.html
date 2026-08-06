@@ -12,6 +12,12 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
+<style>
+  .stat-row.stat-compact{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+  .stat-compact .stat-tile{display:flex;align-items:center;gap:13px;padding:13px 16px}
+  .stat-compact .st-ic{margin-bottom:0;flex-shrink:0}
+  .stat-compact .st-lbl{margin-top:2px}
+</style>
 </head>
 <body data-page="templates" data-title="Tender Templates">
 <div id="app-content">
@@ -27,72 +33,98 @@
       </div>
     </div>
 
-    <div class="stat-row">
-      <div class="stat-tile"><div class="st-ic"><span class="ms">space_dashboard</span></div><div class="st-big" id="s-total">0</div><div class="st-lbl">Tender templates</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">rocket_launch</span></div><div class="st-big" id="s-live">0</div><div class="st-lbl">Live</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">rate_review</span></div><div class="st-big" id="s-review">0</div><div class="st-lbl">In review</div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-grey-bg);color:var(--st-grey-tx)"><span class="ms">edit_note</span></div><div class="st-big" id="s-draft">0</div><div class="st-lbl">Draft</div></div>
+    <div class="stat-row stat-compact">
+      <div class="stat-tile"><div class="st-ic"><span class="ms">space_dashboard</span></div><div class="st-txt"><div class="st-big" id="s-total">0</div><div class="st-lbl">Tender templates</div></div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">rocket_launch</span></div><div class="st-txt"><div class="st-big" id="s-live">0</div><div class="st-lbl">Live</div></div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">rate_review</span></div><div class="st-txt"><div class="st-big" id="s-review">0</div><div class="st-lbl">In review</div></div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--st-grey-bg);color:var(--st-grey-tx)"><span class="ms">edit_note</span></div><div class="st-txt"><div class="st-big" id="s-draft">0</div><div class="st-lbl">Draft</div></div></div>
     </div>
 
-    <div class="pg-toolbar">
-      <span class="psearch"><span class="ms">search</span><input id="q" type="text" placeholder="Search templates…"></span>
-      <div class="cat-chips" id="stfilter">
-        <span class="cat-chip on" data-st="all">All</span>
-        <span class="cat-chip" data-st="live">Live</span>
-        <span class="cat-chip" data-st="approved">Approved</span>
-        <span class="cat-chip" data-st="inreview">In review</span>
-        <span class="cat-chip" data-st="draft">Draft</span>
+    <div class="lst-bar">
+      <div class="lst-tabs" id="tabs"></div>
+      <div class="lst-tools">
+        <span class="lst-search"><span class="ms">search</span><input id="q" placeholder="Search templates…"></span>
+        <div class="lst-pills" id="statusRow"></div>
       </div>
     </div>
-
-    <table class="dtable">
-      <thead><tr><th>Template</th><th>Components</th><th>Assigned clients</th><th>Version</th><th>Status</th><th>Updated</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
+    <div class="lst-grid" id="grid"></div>
+    <div id="empty" style="display:none;text-align:center;color:var(--light);padding:50px 0"><span class="ms" style="font-size:40px">search_off</span><p class="mt16">No templates match.</p></div>
   </div>
 </div>
 <script src="shell.js"></script>
+<script src="blocks-data.js"></script>
 <script src="tenant-data.js"></script>
+<script src="template-data.js"></script>
 <script>
-const TEMPLATES = [
-  {id:'t1', name:'Construction — Standard Tender', desc:'General head-contractor response', comps:9, tenants:['taylor','hansen','acme'], version:3, status:'live',     updated:'2 days ago'},
-  {id:'t2', name:'Civil Infrastructure Response',  desc:'Includes environmental rows',        comps:11,tenants:['cpm-civil','cpm-infra'],    version:2, status:'live',     updated:'1 week ago'},
-  {id:'t3', name:'Engineering Capability Statement',desc:'Short capability / EOI',            comps:6, tenants:['velocity'],                 version:1, status:'approved', updated:'3 days ago'},
-  {id:'t4', name:'HVAC Maintenance Tender',        desc:'Facilities / maintenance scope',     comps:8, tenants:['civic'],                    version:2, status:'inreview', updated:'5 hours ago'},
-  {id:'t5', name:'Trades Prequalification',        desc:'Subcontractor prequal pack',         comps:5, tenants:[],                           version:1, status:'draft',    updated:'Yesterday'},
-  {id:'t6', name:'Government Supplier Panel',       desc:'Compliance-heavy panel submission',  comps:12,tenants:['taylor','cpm-civil'],       version:4, status:'inreview', updated:'1 day ago'},
-];
 function pageInit(){
-  const byId = Object.fromEntries(TENANTS.map(t=>[t.id,t]));
-  let activeSt='all', query='';
-  const badge=(s)=>{const m={live:'Live',approved:'Approved',inreview:'In review',draft:'Draft'};return `<span class="badge b-${s}"><span class="b-dot"></span>${m[s]}</span>`;};
-  const stack=(ids)=>{
-    if(!ids.length) return '<span class="muted" style="font-size:12.5px">Unassigned</span>';
-    const shown=ids.slice(0,3).map(id=>`<span title="${byId[id].name}">${byId[id].initials}</span>`).join('');
-    const more=ids.length>3?`<span class="more">+${ids.length-3}</span>`:'';
-    return `<span class="avatstack">${shown}${more}</span>`;
-  };
-  function render(){
-    const list=TEMPLATES.filter(t=>(activeSt==='all'||t.status===activeSt)&&(!query||t.name.toLowerCase().includes(query)));
-    document.getElementById('rows').innerHTML = list.map(t=>`
-      <tr onclick="location.href='template-builder.html#id=${t.id}'">
-        <td><div class="nm">${t.name}</div><div class="sub">${t.desc}</div></td>
-        <td>${t.comps}</td>
-        <td>${stack(t.tenants)}</td>
-        <td>v${t.version}</td>
-        <td>${badge(t.status)}</td>
-        <td class="muted">${t.updated}</td>
-      </tr>`).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--light);padding:40px">No templates match.</td></tr>`;
+  const cats=['All', ...TEMPLATE_CATS];
+  let activeCat='All', activeStatus='all', query='';
+  const PW=['82%','68%','74%','60%','78%'];
+  const preview=(t)=>templateDocs(t).slice(0,5).map((d,i)=>`<div class="blk-list-row"><span class="dot"></span><span class="blk-bar" style="width:${PW[i%PW.length]}"></span></div>`).join('');
+
+  function renderTabs(){
+    document.getElementById('tabs').innerHTML=cats.map(c=>`<span class="lst-tab ${c===activeCat?'on':''}" data-cat="${c}">${c}</span>`).join('');
+    document.querySelectorAll('#tabs .lst-tab').forEach(t=>t.addEventListener('click',()=>{activeCat=t.dataset.cat;renderTabs();renderStatusRow();renderGrid();}));
   }
-  render();
+  function renderStatusRow(){
+    const inCat=t=>activeCat==='All'||t.category===activeCat;
+    const opts=[['all','All'],['live','Live'],['approved','Approved'],['inreview','In review'],['draft','Draft']];
+    document.getElementById('statusRow').innerHTML=opts.map(([k,l])=>{
+      const n=k==='all'?TEMPLATES.filter(inCat).length:TEMPLATES.filter(t=>inCat(t)&&t.status===k).length;
+      return `<span class="lst-pill ${k===activeStatus?'on':''}" data-st="${k}">${l} <span class="n">${n}</span></span>`;
+    }).join('');
+    document.querySelectorAll('#statusRow .lst-pill').forEach(p=>p.addEventListener('click',()=>{activeStatus=p.dataset.st;renderStatusRow();renderGrid();}));
+  }
+  function renderGrid(){
+    const list=TEMPLATES.filter(t=>
+      (activeCat==='All'||t.category===activeCat) &&
+      (activeStatus==='all'||t.status===activeStatus) &&
+      (!query||(t.name+' '+t.category+' '+t.desc).toLowerCase().includes(query)));
+    document.getElementById('grid').innerHTML=list.map(t=>`
+      <div class="lst-card" data-id="${t.id}">
+        <div class="lst-name"><span class="lst-lbl">${t.name}</span> ${templateBadge(t.status)}
+          <span class="lst-kebwrap">
+            <button class="lst-kebab" data-kebab aria-label="Actions"><span class="ms">more_vert</span></button>
+            <div class="kebab-menu">
+              <a data-act="edit"><span class="ms">edit</span> Edit template</a>
+              <a data-act="dup"><span class="ms">content_copy</span> Duplicate</a>
+              <div class="kebab-sep"></div>
+              <a class="danger" data-act="del"><span class="ms">delete</span> Delete</a>
+            </div>
+          </span>
+        </div>
+        <div class="lst-prev">${preview(t)}</div>
+        <div class="lst-desc">${t.desc}</div>
+        <div class="lst-foot"><span>${t.tenants.length?t.tenants.length+' client'+(t.tenants.length>1?'s':''):'Unassigned'}</span><span>${t.comps} docs · v${t.version}</span></div>
+      </div>`).join('');
+    document.getElementById('empty').style.display=list.length?'none':'block';
+  }
+
+  const grid=document.getElementById('grid');
+  grid.addEventListener('click', e=>{
+    const kebab=e.target.closest('.lst-kebab');
+    if(kebab){ e.preventDefault(); e.stopPropagation();
+      const menu=kebab.parentElement.querySelector('.kebab-menu'), isOpen=menu.classList.contains('open');
+      grid.querySelectorAll('.kebab-menu.open').forEach(m=>m.classList.remove('open'));
+      if(!isOpen) menu.classList.add('open'); return; }
+    const item=e.target.closest('.kebab-menu a');
+    if(item){ e.preventDefault(); e.stopPropagation();
+      const card=item.closest('.lst-card'), t=TEMPLATES.find(x=>x.id===card.dataset.id);
+      item.closest('.kebab-menu').classList.remove('open');
+      if(item.dataset.act==='edit'){ location.href='template-builder.html#id='+t.id; }
+      else if(item.dataset.act==='dup'){ showToast('Duplicated: '+t.name); }
+      else if(item.dataset.act==='del'){ showToast('Deleted: '+t.name); }
+      return; }
+    const card=e.target.closest('.lst-card');
+    if(card){ location.href='template-view.html#id='+card.dataset.id; }
+  });
+  document.getElementById('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();renderGrid();});
+
+  renderTabs(); renderStatusRow(); renderGrid();
   document.getElementById('s-total').textContent=TEMPLATES.length;
   document.getElementById('s-live').textContent=TEMPLATES.filter(t=>t.status==='live').length;
   document.getElementById('s-review').textContent=TEMPLATES.filter(t=>t.status==='inreview').length;
   document.getElementById('s-draft').textContent=TEMPLATES.filter(t=>t.status==='draft').length;
-  document.getElementById('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();render();});
-  document.querySelectorAll('#stfilter .cat-chip').forEach(c=>c.addEventListener('click',()=>{
-    activeSt=c.dataset.st;document.querySelectorAll('#stfilter .cat-chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');render();
-  }));
 }
 </script>
 </body>
