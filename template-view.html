@@ -52,7 +52,7 @@
     <div class="row">
       <div class="grow">
         <div class="sa-sech"><span>Template preview</span><span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span></div>
-        <div class="cd-canvas"><div class="cd-a4" id="t-page"></div></div>
+        <div class="cd-canvas"><div id="t-page" style="display:flex;flex-direction:column;gap:22px;align-items:center"></div></div>
       </div>
       <div class="rail cd-side">
         <div class="card">
@@ -74,6 +74,11 @@
 </div>
 <script src="shell.js"></script>
 <script src="tenant-data.js"></script>
+<script src="blocks-data.js"></script>
+<script src="library-data.js"></script>
+<script src="primitives.js"></script>
+<script src="block-layouts.js"></script>
+<script src="document-content.js"></script>
 <script src="template-data.js"></script>
 <script>
 function pageInit(){
@@ -99,27 +104,32 @@ function pageInit(){
   document.getElementById('dupBtn').addEventListener('click',()=>showToast('Duplicated: '+t.name));
   document.getElementById('delBtn').addEventListener('click',()=>showToast('Deleted: '+t.name));
 
+  const byComp = Object.fromEntries(COMPONENTS.map(c=>[c.id,c]));
   const docs = templateDocs(t);
-  document.getElementById('a-doclist').innerHTML = docs.map((d,i)=>`<div class="tpl-doc"><span class="n">${i+1}</span><span>${d}</span></div>`).join('');
+  document.getElementById('a-doclist').innerHTML = docs.map((id,i)=>{ const c=byComp[id]; return `<div class="tpl-doc"><span class="n">${i+1}</span><span>${c?c.name:id}</span></div>`; }).join('');
 
-  // Brand-aware A4 preview of the template structure
+  // Brand-aware A4 preview — cover page + every document rendered in the pack
   const BRANDS = [{name:'Default (brand-neutral)', brand:null}, ...TENANTS.map(x=>({name:x.name, brand:x.brand}))];
   const sel = document.getElementById('brandSel');
   sel.innerHTML = BRANDS.map((x,i)=>`<option value="${i}">${x.name}</option>`).join('');
-  function renderTemplate(){
-    const b = brand || {primary:'#27535C', secondary:'#38988A', font:'Outfit', bodyFont:'Outfit'};
+  function coverPage(b){
     const H=`font-family:'${b.font}',sans-serif`, T=`font-family:'${b.bodyFont}',sans-serif`;
-    const cover=`<div style="${H};background:${b.primary};color:#fff;padding:44px 46px">
+    return `<div class="cd-a4">
+      <div style="${H};background:${b.primary};color:#fff;padding:44px 46px">
         <div style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:${b.secondary};font-weight:600">Tender Template</div>
         <div style="font-size:30px;font-weight:700;margin-top:12px;line-height:1.15">${t.name}</div>
         <div style="width:56px;height:4px;background:${b.secondary};margin:20px 0"></div>
         <div style="font-size:13px;opacity:.85">${docs.length} documents · v${t.version} · ${t.category}</div>
-      </div>`;
-    const contents=`<div style="padding:34px 46px">
+      </div>
+      <div style="padding:32px 46px">
         <div style="${H};font-size:16px;font-weight:700;color:${b.primary};border-bottom:2px solid ${b.secondary};padding-bottom:8px;margin-bottom:6px">Contents</div>
-        ${docs.map((d,i)=>`<div style="${T};display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #EEF1F0;font-size:13.5px;color:#3A4442"><span style="${H};color:${b.secondary};font-weight:700;width:26px">${String(i+1).padStart(2,'0')}</span><span style="flex:1">${d}</span><span style="color:#9aa5a3;font-size:11px">Section</span></div>`).join('')}
-      </div>`;
-    document.getElementById('t-page').innerHTML = cover + contents;
+        ${docs.map((id,i)=>{ const c=byComp[id]; return `<div style="${T};display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #EEF1F0;font-size:13.5px;color:#3A4442"><span style="${H};color:${b.secondary};font-weight:700;width:26px">${String(i+1).padStart(2,'0')}</span><span style="flex:1">${c?c.name:id}</span><span style="color:#9aa5a3;font-size:11px">${c?c.category:''}</span></div>`; }).join('')}
+      </div></div>`;
+  }
+  function renderTemplate(){
+    const b = brand || (typeof DOC_BRAND_DEFAULT!=='undefined'?DOC_BRAND_DEFAULT:{primary:'#27535C',secondary:'#38988A',font:'Outfit',bodyFont:'Outfit'});
+    const pages = docs.map(id=>`<div class="cd-a4">${(typeof renderDocument==='function')?renderDocument(id, brand):''}</div>`).join('');
+    document.getElementById('t-page').innerHTML = coverPage(b) + pages;
   }
   sel.addEventListener('change', e=>{ brand = BRANDS[+e.target.value].brand; renderTemplate(); });
   renderTemplate();
