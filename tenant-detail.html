@@ -57,6 +57,16 @@
   .cd-field .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700}
   .cd-field .v{font-size:13.5px;color:var(--ink);margin-top:3px;word-break:break-word}
   @media(max-width:900px){ .cd-grid{grid-template-columns:1fr} }
+  /* Tabs: Overview / Template preview */
+  .cd-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:20px}
+  .cd-prev-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .cd-prev-l{display:flex;align-items:center;gap:10px;min-width:0}
+  .cd-prev-l .ttl{font-size:15px;font-weight:700}
+  .cd-prev-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px}
+  .cd-prev-brand .ms{font-size:17px;color:var(--teal)}
+  .cd-prev-stage{max-height:calc(100vh - 250px)}
+  .cd-prev-empty{border:1px dashed var(--border);border-radius:12px;padding:52px 24px;text-align:center;color:var(--gray)}
+  .cd-prev-empty .ms{font-size:34px;color:var(--light);display:block;margin-bottom:10px}
 </style>
 </head>
 <body data-page="tenants" data-title="Clients">
@@ -84,6 +94,14 @@
       </div>
     </div>
 
+    <!-- Tabs -->
+    <div class="cd-tabs">
+      <div class="lst-tab on" data-tab="overview">Overview</div>
+      <div class="lst-tab" data-tab="preview">Template preview</div>
+    </div>
+
+    <!-- Overview tab -->
+    <div id="tab-overview">
     <!-- Body: identity + subscription rail (left), Brand tokens (right) -->
     <div class="cd-grid">
       <aside class="cd-rail">
@@ -127,6 +145,19 @@
       <div class="cd2-sec-h"><h2>Assigned templates</h2><span class="muted" id="asg-total" style="font-size:13px"></span></div>
       <div id="assigned"></div>
     </div>
+    </div><!-- /tab-overview -->
+
+    <!-- Template preview tab -->
+    <div id="tab-preview" style="display:none">
+      <div class="cd-prev-head">
+        <div class="cd-prev-l">
+          <span class="ttl">Tender template preview</span>
+          <select id="cd-prev-sel" class="fin fin-sm" style="width:auto;min-width:220px"></select>
+        </div>
+        <span class="cd-prev-brand"><span class="ms">palette</span> Rendered in <strong id="cd-prev-brandname">this client</strong>’s brand kit</span>
+      </div>
+      <div class="tpl-stage cd-prev-stage"><div id="cd-preview"></div></div>
+    </div>
   </div>
 </div>
 <div class="modal-overlay" id="clientModal">
@@ -142,6 +173,13 @@
 </div>
 <script src="shell.js"></script>
 <script src="tenant-data.js"></script>
+<script src="blocks-data.js"></script>
+<script src="library-data.js"></script>
+<script src="primitives.js"></script>
+<script src="block-layouts.js"></script>
+<script src="document-content.js"></script>
+<script src="template-data.js"></script>
+<script src="template-preview.js"></script>
 <script src="brand-editor.js"></script>
 <script>
 function pageInit(){
@@ -245,6 +283,37 @@ function pageInit(){
     </div>`).join('');
 
   renderIdentity(); renderDetails(); renderBoard();
+
+  // ---- Template preview tab: this client's assigned templates, in their brand ----
+  const assignedTemplates = (typeof TEMPLATES!=='undefined') ? TEMPLATES.filter(x=>x.tenants && x.tenants.includes(t.id)) : [];
+  const prevSel = document.getElementById('cd-prev-sel');
+  const prevEl = document.getElementById('cd-preview');
+  document.getElementById('cd-prev-brandname').textContent = t.name;
+  let previewRendered = false;
+  function renderPreview(){
+    const tpl = assignedTemplates.find(x=>x.id===prevSel.value) || assignedTemplates[0];
+    if(!tpl){
+      prevEl.classList.remove('tpl-preview');
+      prevEl.innerHTML = `<div class="cd-prev-empty"><span class="ms">description</span>No tender templates are assigned to ${t.name} yet.<div style="margin-top:12px"><a class="btn btn-primary btn-sm" href="templates.html"><span class="ms" style="font-size:17px">add</span> Assign a template</a></div></div>`;
+      return;
+    }
+    renderTemplatePreview(prevEl, {name:tpl.name, docs:(typeof templateDocs==='function'?templateDocs(tpl):tpl.docs||[]), brand:b, version:tpl.version, category:tpl.category});
+  }
+  if(assignedTemplates.length){
+    prevSel.innerHTML = assignedTemplates.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+    prevSel.addEventListener('change', renderPreview);
+  } else {
+    prevSel.style.display = 'none';
+  }
+
+  // Tab switching (render the preview lazily the first time it's shown)
+  document.querySelectorAll('.cd-tabs .lst-tab').forEach(tab=>tab.addEventListener('click',()=>{
+    document.querySelectorAll('.cd-tabs .lst-tab').forEach(x=>x.classList.toggle('on', x===tab));
+    const which = tab.dataset.tab;
+    document.getElementById('tab-overview').style.display = which==='overview'?'':'none';
+    document.getElementById('tab-preview').style.display  = which==='preview' ?'':'none';
+    if(which==='preview' && !previewRendered){ renderPreview(); previewRendered = true; }
+  }));
 
   // ---- Popups: Edit client + Brand Kit (two separate dialogs) ----
   const closeM = idn => document.getElementById(idn).classList.remove('open');

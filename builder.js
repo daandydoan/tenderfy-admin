@@ -139,23 +139,15 @@ function pageInit(){
   // ---- Preview modal (sectioned, branded) ----
   document.getElementById('previewBtn').addEventListener('click', ()=>{
     if(!total()){ showToast('Add documents to preview'); return; }
-    const b= brandTenant ? tById[brandTenant].brand : {primary:'#38988A',secondary:'#FFBC4A',background:'#F7F9F8',font:'Outfit',bodyFont:'Outfit'};
-    const bname= brandTenant ? tById[brandTenant].name : 'Brand-neutral';
-    document.getElementById('pm-title').textContent=document.getElementById('tpl-name').value;
-    document.getElementById('pm-brand').textContent=bname;
-    const line=(w)=>`<div style="height:8px;border-radius:4px;background:#eef0f0;margin:7px 0;width:${w}"></div>`;
-    const body = SECTIONS.filter(s=>sections[s].length).map(sec=>`
-      <div style="margin-bottom:24px">
-        <div style="font-family:'${b.font}',sans-serif;font-weight:700;color:${b.primary};font-size:12px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">${sec}</div>
-        ${sections[sec].map(id=>{const c=byId[id];return `
-          <div style="margin-bottom:14px">
-            <div style="display:flex;align-items:center;gap:8px;font-family:'${b.font}',sans-serif;font-weight:700;color:${b.primary};font-size:14px;border-bottom:2px solid ${b.secondary};padding-bottom:5px;margin-bottom:9px"><span class="ms" style="font-size:16px">${c.icon}</span> ${c.name}</div>
-            ${line('96%')+line('86%')+line('70%')}
-          </div>`;}).join('')}
-      </div>`).join('');
-    document.getElementById('pm-paper').innerHTML=`
-      <div style="background:${b.primary};color:#fff;padding:30px 34px"><div style="font-family:'${b.font}',sans-serif;font-size:22px;font-weight:700">${document.getElementById('tpl-name').value}</div><div style="opacity:.85;font-size:12px;margin-top:4px">${bname} · Tender Response</div></div>
-      <div style="padding:26px 34px;background:${b.background};font-family:'${b.bodyFont}',sans-serif">${body}</div>`;
+    const t = brandTenant ? tById[brandTenant] : null;
+    const bname = t ? t.name : 'Brand-neutral';
+    const docs = SECTIONS.reduce((a,s)=>a.concat(sections[s]), []);
+    document.getElementById('pm-title').textContent = document.getElementById('tpl-name').value;
+    document.getElementById('pm-brand').textContent = bname;
+    renderTemplatePreview(document.getElementById('pm-paper'), {
+      name: document.getElementById('tpl-name').value,
+      docs, brand: t ? t.brand : null, category: 'Draft preview'
+    });
     document.getElementById('previewModal').classList.add('open');
   });
   document.querySelectorAll('[data-close-preview]').forEach(x=>x.addEventListener('click',()=>document.getElementById('previewModal').classList.remove('open')));

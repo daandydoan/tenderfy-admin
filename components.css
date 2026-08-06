@@ -98,6 +98,12 @@
 .ver-row .vd{color:var(--gray);flex:1}
 .ver-row .vt{color:var(--light);font-size:12px}
 
+/* ---- Shared branded A4 template preview (view, editor, client page) ---- */
+.tpl-preview{display:flex;flex-direction:column;gap:22px;align-items:center}
+.cd-a4{width:620px;min-height:877px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.16);overflow:hidden}
+.tpl-stage{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:26px;overflow:auto}
+.tpl-stage::-webkit-scrollbar{width:9px}.tpl-stage::-webkit-scrollbar-thumb{background:#c3ccc9;border-radius:9px}
+
 /* ---- Template builder — 3-pane ---- */
 .tb-wrap{display:grid;grid-template-columns:264px 1fr 300px;gap:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;height:calc(100vh - 184px);min-height:520px}
 .tb-col{display:flex;flex-direction:column;min-height:0}

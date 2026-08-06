@@ -14,9 +14,7 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
-  .cd-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:26px;overflow:auto;max-height:calc(100vh - 210px)}
-  .cd-canvas::-webkit-scrollbar{width:9px}.cd-canvas::-webkit-scrollbar-thumb{background:#c3ccc9;border-radius:9px}
-  .cd-a4{width:620px;min-height:877px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.16);overflow:hidden}
+  .cd-canvas{max-height:calc(100vh - 210px)}
   .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px;margin-right:6px}
   .hdr-brand .ms{font-size:17px;color:var(--teal)}
   .hdr-brand .fin-sm{min-width:180px;padding:7px 10px;font-size:12.5px;width:auto}
@@ -52,7 +50,7 @@
     <div class="row">
       <div class="grow">
         <div class="sa-sech"><span>Template preview</span><span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span></div>
-        <div class="cd-canvas"><div id="t-page" style="display:flex;flex-direction:column;gap:22px;align-items:center"></div></div>
+        <div class="tpl-stage cd-canvas"><div id="t-page"></div></div>
       </div>
       <div class="rail cd-side">
         <div class="card">
@@ -80,6 +78,7 @@
 <script src="block-layouts.js"></script>
 <script src="document-content.js"></script>
 <script src="template-data.js"></script>
+<script src="template-preview.js"></script>
 <script>
 function pageInit(){
   const byId = Object.fromEntries(TENANTS.map(t=>[t.id,t]));
@@ -112,24 +111,8 @@ function pageInit(){
   const BRANDS = [{name:'Default (brand-neutral)', brand:null}, ...TENANTS.map(x=>({name:x.name, brand:x.brand}))];
   const sel = document.getElementById('brandSel');
   sel.innerHTML = BRANDS.map((x,i)=>`<option value="${i}">${x.name}</option>`).join('');
-  function coverPage(b){
-    const H=`font-family:'${b.font}',sans-serif`, T=`font-family:'${b.bodyFont}',sans-serif`;
-    return `<div class="cd-a4">
-      <div style="${H};background:${b.primary};color:#fff;padding:44px 46px">
-        <div style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:${b.secondary};font-weight:600">Tender Template</div>
-        <div style="font-size:30px;font-weight:700;margin-top:12px;line-height:1.15">${t.name}</div>
-        <div style="width:56px;height:4px;background:${b.secondary};margin:20px 0"></div>
-        <div style="font-size:13px;opacity:.85">${docs.length} documents · v${t.version} · ${t.category}</div>
-      </div>
-      <div style="padding:32px 46px">
-        <div style="${H};font-size:16px;font-weight:700;color:${b.primary};border-bottom:2px solid ${b.secondary};padding-bottom:8px;margin-bottom:6px">Contents</div>
-        ${docs.map((id,i)=>{ const c=byComp[id]; return `<div style="${T};display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #EEF1F0;font-size:13.5px;color:#3A4442"><span style="${H};color:${b.secondary};font-weight:700;width:26px">${String(i+1).padStart(2,'0')}</span><span style="flex:1">${c?c.name:id}</span><span style="color:#9aa5a3;font-size:11px">${c?c.category:''}</span></div>`; }).join('')}
-      </div></div>`;
-  }
   function renderTemplate(){
-    const b = brand || (typeof DOC_BRAND_DEFAULT!=='undefined'?DOC_BRAND_DEFAULT:{primary:'#27535C',secondary:'#38988A',font:'Outfit',bodyFont:'Outfit'});
-    const pages = docs.map(id=>`<div class="cd-a4">${(typeof renderDocument==='function')?renderDocument(id, brand):''}</div>`).join('');
-    document.getElementById('t-page').innerHTML = coverPage(b) + pages;
+    renderTemplatePreview(document.getElementById('t-page'), {name:t.name, docs, brand, version:t.version, category:t.category});
   }
   sel.addEventListener('change', e=>{ brand = BRANDS[+e.target.value].brand; renderTemplate(); });
   renderTemplate();
