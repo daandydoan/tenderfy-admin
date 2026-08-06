@@ -139,7 +139,7 @@ table.req tbody td:last-child{overflow:visible}
 table.req .ccell{min-width:0}
 .ccell{display:flex;align-items:center;gap:8px}
 .ava{width:24px;height:24px;border-radius:50%;color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.badge{display:inline-flex;font-size:12px;font-weight:500;padding:4px 10px;border-radius:100px;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:4px 10px;border-radius:100px;white-space:nowrap}
 .b-opened{background:var(--st-grey-bg);color:var(--st-grey-tx)}
 .b-awaiting{background:var(--st-amber-bg);color:var(--st-amber-tx)}
 .b-willrespond{background:var(--st-green-bg);color:var(--st-green-tx)}
