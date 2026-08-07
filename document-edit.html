@@ -408,10 +408,18 @@ function pageInit(){
   const urlP=new URLSearchParams(location.search||location.hash.slice(1));
   const id=urlP.get('id');
   const doc=id?COMPONENTS.find(c=>c.id===id):null;
+  // Document type drives whether this is the Section builder or the lighter Page
+  // builder (Cover / Contents). Resume docs open resume-edit.html instead.
+  const docType = doc ? (doc.type||'section') : (urlP.get('type')||'section');
+  const isPage = docType==='page';
+  if(isPage){
+    document.querySelector('.pg-sub').innerHTML='<strong>Page builder</strong> — a cover or contents page. Set a background, drop a cover title or contents element, and preview on A4.';
+  }
   // Each block on the canvas is an INSTANCE with its own style + example content.
   let uid=0;
   function mkInst(ref, isEl){ return {k:++uid, bid:isEl?null:ref, pid:isEl?ref:null, el:!!isEl, style:{pad:0,gap:16,rad:0,bgOn:false,bg:'#ffffff',bcOn:false,bc:'#dbe3e0',hMode:'auto',hVal:120}, content:{}}; }
-  let items = doc ? ['heading','paragraph','imgtext','list','img2'].map(mkInst) : [];
+  let items = doc ? ['heading','paragraph','imgtext','list','img2'].map(mkInst)
+           : isPage ? [mkInst('cover',true)] : [];
   // Editor state
   let mode='layout', selK=null, curItem=null, brand=null;
   const topLayer={header:null, footer:null}; // page furniture (Top Layer)

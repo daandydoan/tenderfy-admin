@@ -18,6 +18,10 @@
   .stat-compact .stat-tile{display:flex;align-items:center;gap:13px;padding:13px 16px}
   .stat-compact .st-ic{margin-bottom:0;flex-shrink:0}
   .stat-compact .st-lbl{margin-top:2px}
+  .lst-type{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--teal);background:var(--teal-tint);border-radius:100px;padding:2px 9px}
+  .lst-type .ms{font-size:13px}
+  #newMenu .nm-hint{display:block;font-size:11px;color:var(--light);font-weight:400;margin-top:1px}
+  #newMenu a{align-items:flex-start}
 </style>
 </head>
 <body data-page="library" data-title="Documents">
@@ -29,8 +33,14 @@
         <div class="pg-sub">Reusable document sections, assembled from <a href="blocks.html" style="color:var(--teal)">blocks</a> and brand-applied when used.</div>
       </div>
       <div class="pg-acts">
-        <a class="btn btn-outline btn-sm" data-toast="Manage document types"><span class="ms" style="font-size:17px">category</span> Types</a>
-        <a class="btn btn-primary btn-sm" href="document-edit.html"><span class="ms" style="font-size:18px">add</span> New Document</a>
+        <div class="cd2-morewrap">
+          <button class="btn btn-primary btn-sm" id="newBtn" data-kebab><span class="ms" style="font-size:18px">add</span> New Document <span class="ms" style="font-size:17px">expand_more</span></button>
+          <div class="kebab-menu" id="newMenu" style="right:0;left:auto">
+            <a href="document-edit.html#type=section"><span class="ms">article</span> Section <span class="nm-hint">multi-block tender section</span></a>
+            <a href="document-edit.html#type=page"><span class="ms">wysiwyg</span> Page <span class="nm-hint">cover / contents page</span></a>
+            <a href="resume-edit.html"><span class="ms">badge</span> Resume <span class="nm-hint">CV from a base layout</span></a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -100,7 +110,7 @@ function pageInit(){
         </div>
         <div class="lst-prev">${preview(c)}</div>
         <div class="lst-desc">${c.desc}</div>
-        <div class="lst-foot"><span>${c.restricted?`<span style="color:var(--st-amber-tx)"><span class="ms" style="font-size:13px;vertical-align:-2px">lock</span> ${c.restricted} clients</span>`:c.category}</span><span>v${c.version}</span></div>
+        <div class="lst-foot"><span class="lst-type"><span class="ms">${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).icon}</span> ${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).label}</span><span>${c.restricted?`<span style="color:var(--st-amber-tx)"><span class="ms" style="font-size:13px;vertical-align:-2px">lock</span> ${c.restricted}</span>`:''} v${c.version}</span></div>
       </div>`).join('');
     document.getElementById('empty').style.display = list.length ? 'none':'block';
   }
@@ -116,7 +126,7 @@ function pageInit(){
     if(item){ e.preventDefault(); e.stopPropagation();
       const card=item.closest('.lst-card'), c=COMPONENTS.find(x=>x.id===card.dataset.id);
       item.closest('.kebab-menu').classList.remove('open');
-      if(item.dataset.act==='edit'){ location.href='document-edit.html#id='+c.id; }
+      if(item.dataset.act==='edit'){ location.href=docBuilderHref(c); }
       else if(item.dataset.act==='dup'){ showToast('Duplicated: '+c.name); }
       else if(item.dataset.act==='del'){ showToast('Deleted: '+c.name); }
       return; }
@@ -124,6 +134,9 @@ function pageInit(){
     if(card){ location.href='document-view.html#id='+card.dataset.id; }
   });
   document.getElementById('q').addEventListener('input', e=>{query=e.target.value.toLowerCase().trim();renderGrid();});
+
+  const nb=document.getElementById('newBtn'), nm=document.getElementById('newMenu');
+  nb.addEventListener('click',()=>{ if(typeof closePopovers==='function') closePopovers(nm); nm.classList.toggle('open'); });
 
   renderTabs(); renderStatusRow(); renderGrid();
   document.getElementById('s-total').textContent = COMPONENTS.length;

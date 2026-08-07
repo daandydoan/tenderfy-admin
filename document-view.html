@@ -98,7 +98,7 @@ function pageInit(){
   document.getElementById('a-upd').textContent = c.updated;
   document.getElementById('a-used').textContent = (typeof compUsage==='function'?compUsage(c.id):4) + ' templates';
   document.getElementById('vh-cur').textContent = 'v'+c.version;
-  document.getElementById('editBtn').setAttribute('href','document-edit.html#id='+c.id);
+  document.getElementById('editBtn').setAttribute('href', (typeof docBuilderHref==='function')?docBuilderHref(c):('document-edit.html#id='+c.id));
 
   // Status control (change status inline — consistent across view pages)
   (function(){
