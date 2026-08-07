@@ -39,7 +39,7 @@
 <script src="blocks-data.js"></script>
 <script>
 function pageInit(){
-  const cats=['All Blocks', ...BLOCK_CATS];
+  const cats=['All Blocks', ...BLOCK_LIB_CATS];
   let active='All Blocks', activeStatus='all', query='';
 
   function renderActs(){
@@ -56,13 +56,13 @@ function pageInit(){
     const inCat=b=>active==='All Blocks'||b.cat===active;
     const opts=[['all','All'],['active','Active'],['draft','Draft'],['inactive','Inactive']];
     document.getElementById('statusRow').innerHTML=opts.map(([k,l])=>{
-      const n=k==='all'?BLOCKS.filter(inCat).length:BLOCKS.filter(b=>inCat(b)&&blockStatus(b.id)===k).length;
+      const n=k==='all'?COMPOSED_BLOCKS.filter(inCat).length:COMPOSED_BLOCKS.filter(b=>inCat(b)&&blockStatus(b.id)===k).length;
       return `<span class="lst-pill ${k===activeStatus?'on':''}" data-st="${k}">${l} <span class="n">${n}</span></span>`;
     }).join('');
     document.querySelectorAll('#statusRow .lst-pill').forEach(c=>c.addEventListener('click',()=>{activeStatus=c.dataset.st;renderStatusRow();renderGrid();}));
   }
   function renderGrid(){
-    const list=BLOCKS.filter(b=>(active==='All Blocks'||b.cat===active)&&(activeStatus==='all'||blockStatus(b.id)===activeStatus)&&(!query||(b.label+' '+b.desc+' '+b.cat).toLowerCase().includes(query)));
+    const list=COMPOSED_BLOCKS.filter(b=>(active==='All Blocks'||b.cat===active)&&(activeStatus==='all'||blockStatus(b.id)===activeStatus)&&(!query||(b.label+' '+b.desc+' '+b.cat).toLowerCase().includes(query)));
     document.getElementById('grid').innerHTML=list.map(b=>{
       const on=blockStatus(b.id)!=='inactive';
       return `

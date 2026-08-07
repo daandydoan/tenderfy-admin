@@ -37,6 +37,16 @@ const BLOCKS = [
 ];
 const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text','Tables & Sign-off','Headers & Footers'];
 
+// Element vs Block. ELEMENTS are single atoms (one primitive) — they live inside
+// the builders (block editor + document editor) but are NOT listed as Blocks.
+// BLOCKS are composed, reusable sub-sections (≥2 elements or a specific layout)
+// and populate the Blocks library. See primitives.js for the element source.
+const BLOCK_ELEMENT_IDS = new Set(['heading','subheading','divider','paragraph','quote','list','callout','img1','table','signature']);
+BLOCKS.forEach(b=>{ b.kind = BLOCK_ELEMENT_IDS.has(b.id) ? 'element' : 'block'; });
+const COMPOSED_BLOCKS = BLOCKS.filter(b=>b.kind==='block');
+// Categories that actually contain composed blocks (for the Blocks library tabs).
+const BLOCK_LIB_CATS = BLOCK_CATS.filter(c=>COMPOSED_BLOCKS.some(b=>b.cat===c));
+
 // Schematic preview for a block layout key.
 function blockPreview(p){
   const bar=(w,h)=>`<div class="blk-bar${h?' h':''}" style="width:${w}"></div>`;
@@ -110,4 +120,4 @@ const BLOCK_STATUS_META = {
   inactive:{cls:'b-deprecated', label:'Inactive'},
 };
 function blockStatusBadge(id){ const m=BLOCK_STATUS_META[blockStatus(id)]||BLOCK_STATUS_META.active; return `<span class="badge ${m.cls}"><span class="b-dot"></span>${m.label}</span>`; }
-if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }
+if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.COMPOSED_BLOCKS=COMPOSED_BLOCKS; window.BLOCK_LIB_CATS=BLOCK_LIB_CATS; window.BLOCK_ELEMENT_IDS=BLOCK_ELEMENT_IDS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }

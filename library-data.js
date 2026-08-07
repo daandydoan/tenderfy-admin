@@ -27,6 +27,21 @@ const COMPONENTS = [
   {id:'licences',       name:'Licences & Accreditations',category:'Certifications',   status:'published', restricted:0, version:'1.9', updated:'3 weeks ago', thumb:'rows',  icon:'workspace_premium', desc:'Trade licences and accreditation register.'},
   {id:'referees',       name:'Referees',               category:'Others',             status:'draft',     restricted:0, version:'0.3', updated:'1 day ago',   thumb:'lines', icon:'contact_page', desc:'Client referee contacts for the submission.'},
 ];
+// Document TYPE drives which builder opens (see directive #4):
+//   page    — standalone cover / contents page (Page builder)
+//   resume  — CV / bio built from a base layout (Resume builder)
+//   section — a normal multi-block tender section (Document builder)
+const DOC_PAGE_CATS   = new Set(['Cover Pages','Table of Contents']);
+const DOC_RESUME_CATS = new Set(['Resumes']);
+COMPONENTS.forEach(c=>{ c.type = DOC_RESUME_CATS.has(c.category) ? 'resume' : DOC_PAGE_CATS.has(c.category) ? 'page' : 'section'; });
+const DOC_TYPE_META = {
+  page:   {label:'Page',    icon:'wysiwyg',   builder:'document-edit.html', mode:'page'},
+  section:{label:'Section', icon:'article',   builder:'document-edit.html', mode:'section'},
+  resume: {label:'Resume',  icon:'badge',     builder:'resume-edit.html',   mode:'resume'},
+};
+const DOC_TYPES = ['page','section','resume'];
+function docBuilderHref(c){ const m=DOC_TYPE_META[c.type]||DOC_TYPE_META.section; return m.builder+'#id='+c.id; }
+
 // Realistic "used in N tender templates" counts per document type.
 const COMP_USAGE = {
   cover:14, toc:12, 'exec-summary':11, insurance:11, 'policy-whs':10, 'cv-standard':9,
@@ -35,4 +50,4 @@ const COMP_USAGE = {
   'cv-exec':4, referees:4, 'env-row':4, 'proj-gallery':3, 'risk-block':3, 'policy-legacy':2,
 };
 function compUsage(id){ return (id in COMP_USAGE) ? COMP_USAGE[id] : 4; }
-if(typeof window!=='undefined'){ window.COMPONENTS = COMPONENTS; window.COMP_USAGE = COMP_USAGE; window.compUsage = compUsage; }
+if(typeof window!=='undefined'){ window.COMPONENTS = COMPONENTS; window.COMP_USAGE = COMP_USAGE; window.compUsage = compUsage; window.DOC_TYPE_META = DOC_TYPE_META; window.DOC_TYPES = DOC_TYPES; window.docBuilderHref = docBuilderHref; }

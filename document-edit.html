@@ -74,6 +74,9 @@
   .pal-prev .blk-imgs{gap:5px}
   .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
   .pal-tag:first-child{margin-top:0}
+  .pal-sect{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--teal);border-top:1px solid var(--border);margin:14px 0 2px;padding-top:12px}
+  .vb-el{justify-content:center}
+  .vb-el .el-ic{font-size:20px;color:var(--teal)}
   /* Document blocks on the canvas */
   .doc-empty{border:1.5px dashed #b3beba;border-radius:10px;padding:44px 20px;text-align:center;color:var(--gray);margin:auto;width:100%}
   .doc-empty .ms.big{font-size:32px;color:var(--light);display:block;margin-bottom:8px}
@@ -391,6 +394,14 @@
 <script>
 function pageInit(){
   const bById=Object.fromEntries(BLOCKS.map(b=>[b.id,b]));
+  const pById=Object.fromEntries((typeof PRIMITIVES!=='undefined'?PRIMITIVES:[]).map(p=>[p.id,p]));
+  // A canvas item is either a composed Block (bid) or a single Element (pid).
+  function instObj(it){ return it.el ? (pById[it.pid]||{}) : (bById[it.bid]||{}); }
+  function instLabel(it){ const o=instObj(it); return it.el ? (o.name||it.pid) : (o.label||it.bid); }
+  function instDesc(it){ return instObj(it).desc||''; }
+  function instSchematic(it){ return it.el ? renderPrimitive(it.pid, null) : blockPreview(instObj(it).p); }
+  function instComposed(it){ return it.el ? renderPrimitive(it.pid, brand) : ((typeof composeBlock==='function')?composeBlock(instObj(it), brand):blockPreview(instObj(it).p)); }
+  function instFromToken(tok){ return String(tok).startsWith('el:') ? mkInst(tok.slice(3), true) : mkInst(tok); }
   const TYPES=[...new Set(COMPONENTS.map(c=>c.category))];
   document.getElementById('d-type').innerHTML=TYPES.map(t=>`<option>${t}</option>`).join('');
 
@@ -399,7 +410,7 @@ function pageInit(){
   const doc=id?COMPONENTS.find(c=>c.id===id):null;
   // Each block on the canvas is an INSTANCE with its own style + example content.
   let uid=0;
-  function mkInst(bid){ return {k:++uid, bid, style:{pad:0,gap:16,rad:0,bgOn:false,bg:'#ffffff',bcOn:false,bc:'#dbe3e0',hMode:'auto',hVal:120}, content:{}}; }
+  function mkInst(ref, isEl){ return {k:++uid, bid:isEl?null:ref, pid:isEl?ref:null, el:!!isEl, style:{pad:0,gap:16,rad:0,bgOn:false,bg:'#ffffff',bcOn:false,bc:'#dbe3e0',hMode:'auto',hVal:120}, content:{}}; }
   let items = doc ? ['heading','paragraph','imgtext','list','img2'].map(mkInst) : [];
   // Editor state
   let mode='layout', selK=null, curItem=null, brand=null;
@@ -421,16 +432,28 @@ function pageInit(){
   // ---- Palette ----
   const palette=document.getElementById('palette'); let pq='';
   function renderPalette(){
-    // Body palette excludes Headers & Footers — those live in the Top Layer (Layers tab).
-    const avail=BLOCKS.filter(b=>b.cat!=='Headers & Footers' && (!pq||(b.name+' '+b.cat).toLowerCase().includes(pq)));
-    palette.innerHTML=BLOCK_CATS.filter(c=>c!=='Headers & Footers' && avail.some(b=>b.cat===c)).map(cat=>
-      `<div class="pal-tag">${cat}</div>`+avail.filter(b=>b.cat===cat).map(b=>
-        `<div class="vb-widget" draggable="true" data-id="${b.id}" title="${b.desc}"><div class="pal-prev blk-preview">${blockPreview(b.p)}</div><span class="pal-lbl">${b.label}</span></div>`).join('')
+    const hit=txt=>!pq||txt.toLowerCase().includes(pq);
+    // Composed Blocks (Headers & Footers live in the Top Layer, not the body palette).
+    const blocks=COMPOSED_BLOCKS.filter(b=>b.cat!=='Headers & Footers' && hit(b.name+' '+b.cat));
+    let html=BLOCK_LIB_CATS.filter(c=>c!=='Headers & Footers' && blocks.some(b=>b.cat===c)).map(cat=>
+      `<div class="pal-tag">${cat}</div>`+blocks.filter(b=>b.cat===cat).map(b=>
+        `<div class="vb-widget" draggable="true" data-id="${b.id}" data-kind="block" title="${b.desc}"><div class="pal-prev blk-preview">${blockPreview(b.p)}</div><span class="pal-lbl">${b.label}</span></div>`).join('')
     ).join('');
-    document.getElementById('pal-count').textContent=`(${avail.length})`;
+    // Elements (single primitives) — also placeable directly in a document.
+    const els=(typeof PRIMITIVES!=='undefined'?PRIMITIVES:[]).filter(p=>hit(p.name+' '+p.tag));
+    if(els.length){
+      html+=`<div class="pal-sect"><span class="ms" style="font-size:15px">category</span> Elements</div>`;
+      html+=PRIM_TAGS.filter(t=>els.some(p=>p.tag===t)).map(tag=>
+        `<div class="pal-tag">${tag}</div>`+els.filter(p=>p.tag===tag).map(p=>
+          `<div class="vb-widget vb-el" draggable="true" data-id="${p.id}" data-kind="element" title="${p.desc}"><span class="ms el-ic">${PRIM_ICON[p.id]||'widgets'}</span><span class="pal-lbl">${p.name}</span></div>`).join('')
+      ).join('');
+    }
+    palette.innerHTML=html;
+    document.getElementById('pal-count').textContent=`(${blocks.length+els.length})`;
     palette.querySelectorAll('.vb-widget').forEach(el=>{
-      el.addEventListener('click',()=>addItem(el.dataset.id));
-      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('add',el.dataset.id);el.classList.add('dragging');});
+      const tok=el.dataset.kind==='element'?('el:'+el.dataset.id):el.dataset.id;
+      el.addEventListener('click',()=>addItem(tok));
+      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('add',tok);el.classList.add('dragging');});
       el.addEventListener('dragend',()=>el.classList.remove('dragging'));
     });
   }
@@ -450,8 +473,8 @@ function pageInit(){
   function boxStyle(s){ let c=`padding:${s.pad}px;border-radius:${s.rad}px;`+heightCss(s); if(s.bgOn)c+=`background:${s.bg};`; if(s.bcOn)c+=`border:1px solid ${s.bc};`; return c; }
   // Render a block instance as a real, brand-styled document block (Preview mode).
   function renderBlockInstance(it){
-    const b=bById[it.bid], tmp=document.createElement('div');
-    tmp.innerHTML=(typeof composeBlock==='function')?composeBlock(b, brand):blockPreview(b.p);
+    const tmp=document.createElement('div');
+    tmp.innerHTML=instComposed(it);
     if(it.content.title){ const h=tmp.querySelector('h3,h4,h2'); if(h) h.textContent=it.content.title; }
     if(it.content.body){ const p=tmp.querySelector('p,li,blockquote'); if(p) p.textContent=it.content.body; }
     const s=it.style; let c=`box-sizing:border-box;padding:${s.pad}px;border-radius:${s.rad}px;margin-bottom:${s.gap}px;`+heightCss(s);
@@ -505,12 +528,12 @@ function pageInit(){
       if(!items.length){
         body=`<div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div>`;
       } else {
-        body=items.map((it,i)=>{const b=bById[it.bid];return `
+        body=items.map((it,i)=>{return `
         <div class="doc-blk blk-card ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}">
           <div class="doc-tools"><span class="tb grab" data-grip><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}"><span class="ms">delete</span></span></div>
-          <div class="blk-name">${b.label} ${b.bespoke?'<span class="blk-custom">Bespoke</span>':''}</div>
-          <div class="blk-box blk-preview" style="${boxStyle(it.style)}">${blockPreview(b.p)}</div>
-          <div style="font-size:12px;color:var(--gray);padding-top:11px">${b.desc}</div>
+          <div class="blk-name">${instLabel(it)} ${it.el?'<span class="blk-custom" style="background:#eef3f1;color:var(--teal)">Element</span>':''}</div>
+          <div class="blk-box blk-preview" style="${boxStyle(it.style)}">${instSchematic(it)}</div>
+          <div style="font-size:12px;color:var(--gray);padding-top:11px">${instDesc(it)}</div>
         </div>`;}).join('');
       }
       // Layout mode shows fixed letterhead/footer slots top & bottom (Top Layer).
@@ -534,12 +557,12 @@ function pageInit(){
       el.addEventListener('drop',e=>{
         e.preventDefault();e.stopPropagation();
         const mv=e.dataTransfer.getData('move'), add=e.dataTransfer.getData('add'), to=+el.dataset.i;
-        if(add){items.splice(to,0,mkInst(add));} else if(mv!==''){const [m]=items.splice(+mv,1);items.splice(to,0,m);}
+        if(add){items.splice(to,0,instFromToken(add));} else if(mv!==''){const [m]=items.splice(+mv,1);items.splice(to,0,m);}
         render();
       });
     });
   }
-  function addItem(bid){ const it=mkInst(bid); items.push(it); selK=(mode==='layout')?it.k:null; render(); renderInspector(); showToast('Added block: '+bById[bid].label); }
+  function addItem(tok){ const it=instFromToken(tok); items.push(it); selK=(mode==='layout')?it.k:null; render(); renderInspector(); showToast((it.el?'Added element: ':'Added block: ')+instLabel(it)); }
   wrap.addEventListener('dragover',e=>{ if(e.dataTransfer.types.includes('add')){ e.preventDefault(); drop.classList.add('over'); } });
   wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) drop.classList.remove('over'); });
   wrap.addEventListener('drop',e=>{ drop.classList.remove('over'); const add=e.dataTransfer.getData('add'); if(add && !e.target.closest('.doc-blk')){ e.preventDefault(); addItem(add); } });
@@ -767,15 +790,15 @@ function pageInit(){
     if(show) fillInspector(it);
   }
   function fillInspector(it){
-    curItem=it; const b=bById[it.bid];
-    document.getElementById('bi-name').textContent=b.label;
-    document.getElementById('bi-desc').textContent=b.desc;
+    curItem=it; const b=instObj(it);
+    document.getElementById('bi-name').textContent=instLabel(it);
+    document.getElementById('bi-desc').textContent=instDesc(it);
     const s=it.style, setv=(r,n,v)=>{document.getElementById(r).value=v;document.getElementById(n).value=v;};
     setv('bs-pad','bs-padN',s.pad); setv('bs-gap','bs-gapN',s.gap); setv('bs-rad','bs-radN',s.rad);
     const hm=s.hMode||'auto'; document.getElementById('bs-hmode').value=hm; document.getElementById('bs-hval').value=s.hVal||120; document.getElementById('bs-hval').disabled=(hm==='auto'||hm==='hug');
     document.getElementById('bs-bgOn').checked=s.bgOn; document.getElementById('bs-bg').value=s.bg; document.getElementById('bs-bgH').value=s.bg.toUpperCase();
     document.getElementById('bs-bcOn').checked=s.bcOn; document.getElementById('bs-bc').value=s.bc; document.getElementById('bs-bcH').value=s.bc.toUpperCase();
-    const els=(typeof blockElements==='function')?blockElements(b):[];
+    const els=it.el ? [it.pid] : ((typeof blockElements==='function')?blockElements(b):[]);
     const hasTitle=els.some(e=>['heading','subheading','cover'].includes(e));
     const hasBody=els.some(e=>['paragraph','list','quote','callout'].includes(e));
     document.getElementById('bi-content-lbl').style.display=(hasTitle||hasBody)?'':'none';

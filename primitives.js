@@ -21,6 +21,10 @@ const PRIMITIVES = [
   {id:'toc',        name:'Contents',      tag:'Data',    desc:'A table of contents list.'},
   {id:'pagebreak',  name:'Page break',    tag:'Layout',  desc:'Forces a new page in the PDF.'},
 ];
+// Element categories, in palette order.
+const PRIM_TAGS = ['Text','Media','Data','Sign-off','Layout'];
+// Icon per element — shared by the block editor and the document editor palettes.
+const PRIM_ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height',field:'data_object',callout:'campaign',stat:'trending_up',button:'smart_button',cover:'title',toc:'toc',pagebreak:'insert_page_break'};
 
 // Render a primitive with real sample content, styled by the brand tokens.
 // b = { primary, secondary, background, font, bodyFont }
@@ -74,4 +78,4 @@ function renderPrimitive(id, b){
       return '';
   }
 }
-if(typeof window!=='undefined'){ window.PRIMITIVES=PRIMITIVES; window.renderPrimitive=renderPrimitive; }
+if(typeof window!=='undefined'){ window.PRIMITIVES=PRIMITIVES; window.PRIM_TAGS=PRIM_TAGS; window.PRIM_ICON=PRIM_ICON; window.renderPrimitive=renderPrimitive; }
