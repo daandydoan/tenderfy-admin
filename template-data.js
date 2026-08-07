@@ -9,6 +9,7 @@ const TEMPLATES = [
   {id:'t4', name:'HVAC Maintenance Tender',        desc:'Facilities / maintenance scope',     category:'Facilities',   tenants:['civic'],                    version:2, status:'inreview', updated:'5 hours ago', docs:['cover','toc','exec-summary','methodology','rate-table','program','policy-whs','insurance']},
   {id:'t5', name:'Trades Prequalification',        desc:'Subcontractor prequal pack',         category:'Trades',       tenants:[],                           version:1, status:'draft',    updated:'Yesterday',   docs:['cover','toc','exec-summary','cv-standard','licences']},
   {id:'t6', name:'Government Supplier Panel',       desc:'Compliance-heavy panel submission',  category:'Government',   tenants:['taylor','cpm-civil'],       version:4, status:'inreview', updated:'1 day ago',   docs:['cover','toc','exec-summary','compliance-tbl','methodology','cv-standard','policy-whs','policy-quality','policy-env','insurance','licences','referees']},
+  {id:'t7', name:'Construction — Design & Construct',desc:'D&C variant with design management',  category:'Construction', tenants:['taylor'],                   version:1, status:'draft',    updated:'Today',       docs:['cover','toc','exec-summary','methodology','rate-table','cv-standard','proj-profile','policy-whs','policy-quality']},
 ];
 TEMPLATES.forEach(t=>t.comps=t.docs.length);
 const TEMPLATE_CATS = ['Construction','Civil','Engineering','Facilities','Trades','Government'];

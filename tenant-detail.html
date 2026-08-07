@@ -67,6 +67,16 @@
   .cd-prev-stage{max-height:calc(100vh - 250px)}
   .cd-prev-empty{border:1px dashed var(--border);border-radius:12px;padding:52px 24px;text-align:center;color:var(--gray)}
   .cd-prev-empty .ms{font-size:34px;color:var(--light);display:block;margin-bottom:10px}
+  /* Assigned packs grid */
+  #assigned{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+  .pack-card{border:1px solid var(--border);border-radius:12px;background:#fff;overflow:hidden;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+  .pack-card:hover{border-color:var(--teal);box-shadow:0 4px 16px rgba(20,45,38,.08)}
+  .pack-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 13px 8px}
+  .pack-name{font-weight:700;font-size:13.5px;line-height:1.25}
+  .pack-band{padding:16px 13px;color:#fff;display:flex;flex-direction:column;gap:3px}
+  .pack-band .pack-cat{font-size:10.5px;opacity:.9;text-transform:uppercase;letter-spacing:.4px}
+  .pack-meta{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;font-size:12px;color:var(--gray)}
+  .pack-prev{margin:0 11px 12px}
 </style>
 </head>
 <body data-page="tenants" data-title="Clients">
@@ -254,34 +264,6 @@ function pageInit(){
   document.getElementById('cd-tu-v').textContent=t.topup?t.topup+'% left':'None';
   meterFill(document.getElementById('cd-tu-m'),t.topup);
 
-  // Assigned templates by document type
-  const has=t.templates>0;
-  const DOCS=[
-    {type:'Resume Templates', band:'RESUME', items:has?['CV — Site Manager','CV — Project Engineer']:[]},
-    {type:'Case Studies Templates', band:'PROJECT PROFILE', items:has?['Flagship Project Profile']:[]},
-    {type:'Policies Templates', band:'POLICY', items:has?['WHS Policy','Quality & Environmental']:[]},
-    {type:'Other Document Templates', band:'DOCUMENT', items:has?['Capability Statement']:[]},
-  ];
-  document.getElementById('asg-total').textContent = (has?DOCS.reduce((n,d)=>n+d.items.length,0):0)+' assigned';
-  const line=(w)=>`<i style="width:${w}"></i>`;
-  const card=(name,band)=>`
-    <div class="atmpl">
-      <div class="atmpl-name">${name}</div>
-      <div class="atmpl-thumb">
-        <div class="atmpl-band" style="background:${b.primary};border-bottom:3px solid ${b.secondary}"><div class="bt" style="font-family:'${b.font}',sans-serif">${t.name}</div><div class="bs">${band}</div></div>
-        <div class="atmpl-lines">${line('96%')+line('88%')+line('66%')}</div>
-      </div>
-    </div>`;
-  document.getElementById('assigned').innerHTML = DOCS.map(d=>`
-    <div class="asec ${d.open&&d.items.length?'':'collapsed'}">
-      <div class="asec-head" onclick="this.closest('.asec').classList.toggle('collapsed')">
-        <span class="nm">${d.type}</span>
-        <span class="cnt">${d.items.length}/30</span>
-        <span class="ms chev">expand_more</span>
-      </div>
-      <div class="asec-body">${d.items.length ? d.items.map(n=>card(n,d.band)).join('') : '<span class="asec-empty">No '+d.type.toLowerCase().replace(' templates','')+' templates assigned yet.</span>'}</div>
-    </div>`).join('');
-
   renderIdentity(); renderDetails(); renderBoard();
 
   // ---- Template preview tab: this client's assigned templates, in their brand ----
@@ -307,13 +289,39 @@ function pageInit(){
   }
 
   // Tab switching (render the preview lazily the first time it's shown)
-  document.querySelectorAll('.cd-tabs .lst-tab').forEach(tab=>tab.addEventListener('click',()=>{
-    document.querySelectorAll('.cd-tabs .lst-tab').forEach(x=>x.classList.toggle('on', x===tab));
-    const which = tab.dataset.tab;
+  function showTab(which){
+    document.querySelectorAll('.cd-tabs .lst-tab').forEach(x=>x.classList.toggle('on', x.dataset.tab===which));
     document.getElementById('tab-overview').style.display = which==='overview'?'':'none';
     document.getElementById('tab-preview').style.display  = which==='preview' ?'':'none';
     if(which==='preview' && !previewRendered){ renderPreview(); previewRendered = true; }
-  }));
+  }
+  document.querySelectorAll('.cd-tabs .lst-tab').forEach(tab=>tab.addEventListener('click',()=>showTab(tab.dataset.tab)));
+  function goPreview(pid){ if(pid){ prevSel.value=pid; renderPreview(); previewRendered=true; } showTab('preview'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  // ---- Assigned packs (real TEMPLATES assigned to this client; a client can
+  // hold several packs — same-category packs read as variations). ----
+  function renderAssignedPacks(){
+    const el=document.getElementById('assigned');
+    document.getElementById('asg-total').textContent = assignedTemplates.length+' pack'+(assignedTemplates.length===1?'':'s')+' assigned';
+    if(!assignedTemplates.length){
+      el.innerHTML=`<div class="cd-prev-empty" style="grid-column:1/-1"><span class="ms">inventory_2</span>No tender packs assigned to ${t.name} yet.<div style="margin-top:12px"><a class="btn btn-primary btn-sm" href="templates.html"><span class="ms" style="font-size:17px">add</span> Assign a pack</a></div></div>`;
+      return;
+    }
+    const byCat={}; assignedTemplates.forEach(x=>{ (byCat[x.category]=byCat[x.category]||[]).push(x); });
+    el.innerHTML=assignedTemplates.map(x=>{
+      const variation=byCat[x.category].length>1;
+      const docs=(typeof templateDocs==='function'?templateDocs(x):x.docs||[]);
+      return `<div class="pack-card" data-id="${x.id}">
+        <div class="pack-top"><span class="pack-name">${x.name}</span>${(typeof templateBadge==='function')?templateBadge(x.status):''}</div>
+        <div class="pack-band" style="background:${b.primary};border-bottom:3px solid ${b.secondary}"><span style="font-family:'${b.font}',sans-serif;font-weight:700">${t.name}</span><span class="pack-cat">${x.category}${variation?' · Variation':''}</span></div>
+        <div class="pack-meta"><span><span class="ms" style="font-size:14px;vertical-align:-2px">description</span> ${docs.length} docs</span><span>v${x.version}</span></div>
+        <a class="btn btn-outline btn-block btn-sm pack-prev" data-id="${x.id}"><span class="ms" style="font-size:16px">visibility</span> Preview in brand</a>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.pack-prev').forEach(bp=>bp.addEventListener('click',e=>{ e.stopPropagation(); goPreview(bp.dataset.id); }));
+    el.querySelectorAll('.pack-card').forEach(c=>c.addEventListener('click',()=>goPreview(c.dataset.id)));
+  }
+  renderAssignedPacks();
 
   // ---- Popups: Edit client + Brand Kit (two separate dialogs) ----
   const closeM = idn => document.getElementById(idn).classList.remove('open');
