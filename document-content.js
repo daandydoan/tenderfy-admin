@@ -160,6 +160,11 @@ function renderDocument(id, brand){
     const cfg = c.resume || {};
     return renderResume({layout:cfg.layout, brand:b, sections:cfg.sections});
   }
+  // Section/page documents render from their saved block/element composition —
+  // the same items the Document builder assembles (see document-render.js).
+  if(c && Array.isArray(c.blocks) && typeof renderComposedDoc==='function' && typeof docBlocksToItems==='function'){
+    return renderComposedDoc(docBlocksToItems(c.blocks), b);
+  }
   if(DOC_CONTENT[id]) return DOC_CONTENT[id](b);
   // Fallback: a plausible page assembled from primitives, keyed off the doc's
   // thumbnail style so rows-docs get a table, icon-docs get imagery, etc.

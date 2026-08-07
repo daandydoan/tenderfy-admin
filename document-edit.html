@@ -391,6 +391,7 @@
 <script src="tenant-data.js"></script>
 <script src="primitives.js"></script>
 <script src="block-layouts.js"></script>
+<script src="document-render.js"></script>
 <script>
 function pageInit(){
   const bById=Object.fromEntries(BLOCKS.map(b=>[b.id,b]));
@@ -418,8 +419,12 @@ function pageInit(){
   // Each block on the canvas is an INSTANCE with its own style + example content.
   let uid=0;
   function mkInst(ref, isEl){ return {k:++uid, bid:isEl?null:ref, pid:isEl?ref:null, el:!!isEl, style:{pad:0,gap:16,rad:0,bgOn:false,bg:'#ffffff',bcOn:false,bc:'#dbe3e0',hMode:'auto',hVal:120}, content:{}}; }
-  let items = doc ? ['heading','paragraph','imgtext','list','img2'].map(mkInst)
-           : isPage ? [mkInst('cover',true)] : [];
+  // Seed the canvas from the document's SAVED composition, so the builder shows
+  // exactly what the view/pack renders (see document-render.js).
+  let items = (doc && Array.isArray(doc.blocks))
+    ? doc.blocks.map(bl=>{ const it=mkInst(bl.id, bl.t==='element'); if(bl.content) it.content=Object.assign({}, bl.content); if(bl.style) it.style=Object.assign({}, it.style, bl.style); return it; })
+    : doc ? ['heading','paragraph','imgtext','list','img2'].map(mkInst)
+    : isPage ? [mkInst('cover',true)] : [];
   // Editor state
   let mode='layout', selK=null, curItem=null, brand=null;
   const topLayer={header:null, footer:null}; // page furniture (Top Layer)
@@ -480,14 +485,12 @@ function pageInit(){
   }
   function boxStyle(s){ let c=`padding:${s.pad}px;border-radius:${s.rad}px;`+heightCss(s); if(s.bgOn)c+=`background:${s.bg};`; if(s.bcOn)c+=`border:1px solid ${s.bc};`; return c; }
   // Render a block instance as a real, brand-styled document block (Preview mode).
+  // Delegate to the shared renderer so the builder preview and the view/pack are
+  // byte-identical. (docItemHtml handles element vs block, content + style.)
   function renderBlockInstance(it){
-    const tmp=document.createElement('div');
-    tmp.innerHTML=instComposed(it);
-    if(it.content.title){ const h=tmp.querySelector('h3,h4,h2'); if(h) h.textContent=it.content.title; }
-    if(it.content.body){ const p=tmp.querySelector('p,li,blockquote'); if(p) p.textContent=it.content.body; }
-    const s=it.style; let c=`box-sizing:border-box;padding:${s.pad}px;border-radius:${s.rad}px;margin-bottom:${s.gap}px;`+heightCss(s);
-    if(s.bgOn)c+=`background:${s.bg};`; if(s.bcOn)c+=`border:1px solid ${s.bc};`;
-    return `<div class="pv-blk" style="${c}">${tmp.innerHTML}</div>`;
+    return (typeof docItemHtml==='function')
+      ? docItemHtml(it, brand, 'pv-blk')
+      : `<div class="pv-blk">${instComposed(it)}</div>`;
   }
   const A4H=877; // A4 page height at 620px wide
   // Fixed Top-Layer slots drawn in Layout mode (independent of the main body).

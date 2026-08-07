@@ -41,6 +41,40 @@ const RESUME_CONFIG = {
   'cv-exec':     {layout:'minimal',    sections:['summary','experience','accreditations']},
 };
 COMPONENTS.forEach(c=>{ if(RESUME_CONFIG[c.id]) c.resume = RESUME_CONFIG[c.id]; });
+
+// Block/element composition per section & page document — the "what you build"
+// that the Document builder assembles and the view/pack preview renders (via
+// document-render.js → renderComposedDoc). Resume docs are excluded (they use
+// the resume renderer). Keeps build == render across the whole flow.
+const DOC_BLOCKS = (function(){
+  const H = t => ({t:'element', id:'heading', content:{title:t}});
+  const P = () => ({t:'element', id:'paragraph'});
+  const E = id => ({t:'element', id});
+  const B = id => ({t:'block',   id});
+  return {
+    cover:            [E('cover')],
+    toc:              [E('toc')],
+    'exec-summary':   [H('Executive Summary'), P(), P()],
+    methodology:      [H('Methodology'), P(), E('list')],
+    'rate-table':     [H('Schedule of Rates'), P(), E('table')],
+    'compliance-tbl': [H('Compliance Matrix'), P(), E('table')],
+    'env-row':        [H('Environmental Management'), P(), E('table')],
+    program:          [H('Delivery Programme'), P(), E('table')],
+    'risk-block':     [H('Risk Assessment'), P(), E('table')],
+    'policy-whs':     [H('Work Health & Safety Policy'), P(), E('list')],
+    'policy-quality': [H('Quality Policy'), P(), E('list')],
+    'policy-env':     [H('Environmental Policy'), P(), E('list')],
+    'policy-legacy':  [H('HSE Policy'), P()],
+    'proj-profile':   [H('Project Profile'), B('feature'), P()],
+    'case-study':     [H('Case Study'), P(), B('imgtext'), P()],
+    'proj-gallery':   [H('Project Gallery'), B('imggrid')],
+    'org-chart':      [H('Organisation Chart'), E('image')],
+    insurance:        [H('Insurance Certificates'), P(), E('table')],
+    licences:         [H('Licences & Accreditations'), E('table')],
+    referees:         [H('Referees'), E('keyvalue')],
+  };
+})();
+COMPONENTS.forEach(c=>{ if(DOC_BLOCKS[c.id]) c.blocks = DOC_BLOCKS[c.id]; });
 const DOC_TYPE_META = {
   page:   {label:'Page',    icon:'wysiwyg',   builder:'document-edit.html', mode:'page'},
   section:{label:'Section', icon:'article',   builder:'document-edit.html', mode:'section'},
