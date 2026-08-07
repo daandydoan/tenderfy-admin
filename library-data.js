@@ -34,6 +34,13 @@ const COMPONENTS = [
 const DOC_PAGE_CATS   = new Set(['Cover Pages','Table of Contents']);
 const DOC_RESUME_CATS = new Set(['Resumes']);
 COMPONENTS.forEach(c=>{ c.type = DOC_RESUME_CATS.has(c.category) ? 'resume' : DOC_PAGE_CATS.has(c.category) ? 'page' : 'section'; });
+// Resume documents carry the base-layout config the Resume builder saved, so the
+// document/pack preview renders the very same CV (see resume-render.js).
+const RESUME_CONFIG = {
+  'cv-standard': {layout:'left-panel', sections:['summary','experience','skills','accreditations']},
+  'cv-exec':     {layout:'minimal',    sections:['summary','experience','accreditations']},
+};
+COMPONENTS.forEach(c=>{ if(RESUME_CONFIG[c.id]) c.resume = RESUME_CONFIG[c.id]; });
 const DOC_TYPE_META = {
   page:   {label:'Page',    icon:'wysiwyg',   builder:'document-edit.html', mode:'page'},
   section:{label:'Section', icon:'article',   builder:'document-edit.html', mode:'section'},

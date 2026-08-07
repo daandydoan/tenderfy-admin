@@ -34,37 +34,8 @@ const DOC_CONTENT = {
     </div>`;
   },
 
-  // ---------- CV / Resume ----------
-  'cv-standard'(b){
-    const H=`font-family:'${b.font}',sans-serif`, T=`font-family:'${b.bodyFont}',sans-serif`, soft='#3A4442';
-    const exp=[
-      ['Project Director','Meridian Civil','2019 – Present','Leads delivery of $10M+ road and drainage packages across South-East QLD; accountable for programme, safety and client relationships.'],
-      ['Senior Project Engineer','Hartwell Constructions','2014 – 2019','Managed bulk earthworks and structures on the Gateway Motorway upgrade; coordinated 40+ subcontractors.'],
-      ['Site Engineer','Coastal Infrastructure','2010 – 2014','Set-out, quality and subcontractor supervision on regional bridge works.'],
-    ];
-    return `<div style="padding:46px 50px">
-      <div style="display:flex;gap:20px;align-items:flex-start;border-bottom:2px solid ${b.secondary};padding-bottom:18px">
-        <div style="width:74px;height:74px;border-radius:12px;background:${b.secondary}22;border:1px solid ${b.secondary}55;display:flex;align-items:center;justify-content:center;color:${b.secondary};flex-shrink:0"><span class="ms" style="font-size:38px">person</span></div>
-        <div>
-          <div style="${H};font-size:26px;font-weight:700;color:${b.primary}">Kenzie May</div>
-          <div style="${T};font-size:15px;color:${b.secondary};font-weight:600;margin-top:2px">Project Director — Civil Infrastructure</div>
-          <div style="${T};font-size:12.5px;color:#7A8583;margin-top:8px">18 years' experience · RPEQ #12894 · Brisbane, QLD</div>
-        </div>
-      </div>
-      <div style="${T};margin-top:20px;color:${soft};font-size:13px;line-height:1.6">Chartered civil engineer with a track record delivering complex road, drainage and structures packages on live transport corridors. Known for disciplined programme control and a zero-harm safety culture.</div>
-
-      <div style="${H};font-size:14px;font-weight:700;color:${b.primary};margin:24px 0 12px;text-transform:uppercase;letter-spacing:.4px">Experience</div>
-      ${exp.map(e=>`<div style="${T};display:grid;grid-template-columns:120px 1fr;gap:16px;padding:12px 0;border-top:1px solid #EEF1F0">
-        <div style="font-size:12px;color:#7A8583">${e[2]}</div>
-        <div><div style="font-weight:700;color:${soft};font-size:13.5px">${e[0]}</div><div style="color:${b.secondary};font-size:12.5px;font-weight:600;margin:1px 0 5px">${e[1]}</div><div style="color:${soft};font-size:12.5px;line-height:1.55">${e[3]}</div></div>
-      </div>`).join('')}
-
-      <div style="${H};font-size:14px;font-weight:700;color:${b.primary};margin:24px 0 12px;text-transform:uppercase;letter-spacing:.4px">Accreditations</div>
-      <div style="${T};display:flex;flex-wrap:wrap;gap:8px">
-        ${['RPEQ Registered Engineer','White Card','First Aid','Cert IV WHS','Traffic Management'].map(a=>`<span style="background:${b.secondary}1a;color:${b.primary};border:1px solid ${b.secondary}44;border-radius:100px;padding:5px 12px;font-size:12px;font-weight:600">${a}</span>`).join('')}
-      </div>
-    </div>`;
-  },
+  // CV / Resume documents render via the shared renderResume() (resume-render.js),
+  // driven by each doc's saved layout config — see renderDocument() below.
 
   // ---------- Schedule of Rates ----------
   'rate-table'(b){
@@ -182,10 +153,16 @@ const DOC_MOCKED = Object.keys(DOC_CONTENT);
 // primitives.js for renderPrimitive).
 function renderDocument(id, brand){
   const b = brand || DOC_BRAND_DEFAULT;
+  const c = (typeof COMPONENTS!=='undefined') ? COMPONENTS.find(x=>x.id===id) : null;
+  // Resume documents render through the SHARED resume renderer, so a pack shows
+  // the exact CV built in the Resume builder (same layout + sections).
+  if(c && c.type==='resume' && typeof renderResume==='function'){
+    const cfg = c.resume || {};
+    return renderResume({layout:cfg.layout, brand:b, sections:cfg.sections});
+  }
   if(DOC_CONTENT[id]) return DOC_CONTENT[id](b);
   // Fallback: a plausible page assembled from primitives, keyed off the doc's
   // thumbnail style so rows-docs get a table, icon-docs get imagery, etc.
-  const c = (typeof COMPONENTS!=='undefined') ? COMPONENTS.find(x=>x.id===id) : null;
   const name = c ? c.name : 'Document';
   const H=`font-family:'${b.font}',sans-serif`;
   const rp = (typeof renderPrimitive==='function') ? renderPrimitive : ()=>'';

@@ -30,13 +30,15 @@ function pageInit(){
 
   document.getElementById('tpl-name').addEventListener('input', e=>{ const cr=document.getElementById('cr-name'); if(cr) cr.textContent = e.target.value || 'Untitled Tender Template'; });
 
-  // ---- Palette: available documents grouped by type ----
+  // ---- Palette: available documents grouped by category, tagged by type ----
+  const tmeta = c => (typeof DOC_TYPE_META!=='undefined' && DOC_TYPE_META[c.type]) || {label:'Section', icon:'article'};
+  const typeChip = c => { const m=tmeta(c); return `<span class="tb-type type-${c.type||'section'}"><span class="ms">${m.icon}</span>${m.label}</span>`; };
   const palette=document.getElementById('palette'); let pq='';
   function renderPalette(){
     const avail=COMPONENTS.filter(c=>c.status!=='deprecated' && (!pq || (c.name+' '+c.category).toLowerCase().includes(pq)));
     const cats=[...new Set(avail.map(c=>c.category))];
     palette.innerHTML = cats.map(cat=>`<div class="tb-cat">${cat}</div>${avail.filter(c=>c.category===cat).map(c=>`
-      <div class="tb-comp" draggable="true" data-id="${c.id}"><span class="ci"><span class="ms">${c.icon}</span></span><span class="cn">${c.name}</span><span class="ms cadd">add_circle</span></div>`).join('')}`).join('');
+      <div class="tb-comp" draggable="true" data-id="${c.id}"><span class="ci"><span class="ms">${c.icon}</span></span><span class="cn">${c.name}${typeChip(c)}</span><span class="ms cadd">add_circle</span></div>`).join('')}`).join('');
     document.getElementById('pal-count').textContent=`(${avail.length})`;
     palette.querySelectorAll('.tb-comp').forEach(el=>{
       el.addEventListener('click', ()=>addDoc(el.dataset.id));
@@ -64,7 +66,7 @@ function pageInit(){
           <div class="ts-entry" draggable="true" data-sec="${sec}" data-i="${i}">
             <span class="ms grip">drag_indicator</span>
             <span class="ei"><span class="ms">${c.icon}</span></span>
-            <span class="en">${c.name}</span><span class="etag">v${c.version}</span>
+            <span class="en">${c.name}</span>${typeChip(c)}<span class="etag">v${c.version}</span>
             <span class="ms ekebab" data-rm="${sec}|${i}" title="Remove from tender">more_vert</span>
           </div>`;}).join('') || '<div class="ts-empty">No documents yet</div>'}
         <div class="ts-add" data-add="${sec}"><span class="ms">add</span> ${ADDLBL[sec]}</div>

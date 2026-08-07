@@ -47,6 +47,13 @@
   .tb-wrap.l-off.r-off{grid-template-columns:1fr}
   .tb-wrap.l-off .palette{display:none}
   .tb-wrap.r-off .props{display:none}
+  /* Document type chips in the pack palette + canvas */
+  .tb-type{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;letter-spacing:.2px;text-transform:uppercase;border-radius:100px;padding:1px 7px;margin-left:7px;vertical-align:1px}
+  .tb-type .ms{font-size:11px}
+  .tb-type.type-page{background:#eef2fb;color:#2f5bd0}
+  .tb-type.type-section{background:#eef3f1;color:#2f7a6a}
+  .tb-type.type-resume{background:#f3eefb;color:#7145c9}
+  .ts-entry .tb-type{margin-left:8px}
 </style>
 </head>
 <body data-page="templates" data-title="Tender Templates">
@@ -162,6 +169,7 @@
 <script src="library-data.js"></script>
 <script src="primitives.js"></script>
 <script src="block-layouts.js"></script>
+<script src="resume-render.js"></script>
 <script src="document-content.js"></script>
 <script src="template-data.js"></script>
 <script src="template-preview.js"></script>
