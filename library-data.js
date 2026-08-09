@@ -91,4 +91,10 @@ const COMP_USAGE = {
   'cv-exec':4, referees:4, 'env-row':4, 'proj-gallery':3, 'risk-block':3, 'policy-legacy':2,
 };
 function compUsage(id){ return (id in COMP_USAGE) ? COMP_USAGE[id] : 4; }
-if(typeof window!=='undefined'){ window.COMPONENTS = COMPONENTS; window.COMP_USAGE = COMP_USAGE; window.compUsage = compUsage; window.DOC_TYPE_META = DOC_TYPE_META; window.DOC_TYPES = DOC_TYPES; window.docBuilderHref = docBuilderHref; }
+
+// ---- Flow connections (Blocks ↔ Documents ↔ Packs), backed by real data ----
+// Documents whose composition includes a given block/element id.
+function docsUsingBlock(blockId){ return COMPONENTS.filter(c=>Array.isArray(c.blocks) && c.blocks.some(bl=>bl.id===blockId)); }
+// The block/element composition entries of a document (for "Built from").
+function docComposition(c){ return (c && Array.isArray(c.blocks)) ? c.blocks : []; }
+if(typeof window!=='undefined'){ window.COMPONENTS = COMPONENTS; window.COMP_USAGE = COMP_USAGE; window.compUsage = compUsage; window.DOC_TYPE_META = DOC_TYPE_META; window.DOC_TYPES = DOC_TYPES; window.docBuilderHref = docBuilderHref; window.docsUsingBlock = docsUsingBlock; window.docComposition = docComposition; }

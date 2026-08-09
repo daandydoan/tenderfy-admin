@@ -15,8 +15,10 @@ TEMPLATES.forEach(t=>t.comps=t.docs.length);
 const TEMPLATE_CATS = ['Construction','Civil','Engineering','Facilities','Trades','Government'];
 
 function templateDocs(t){ return t.docs || []; }
+// Packs (templates) whose document list includes a given document id.
+function packsUsingDoc(docId){ return TEMPLATES.filter(t=>Array.isArray(t.docs) && t.docs.includes(docId)); }
 
 const TEMPLATE_STATUS = {live:'Live', approved:'Approved', inreview:'In review', draft:'Draft'};
 function templateBadge(s){ return `<span class="badge b-${s}"><span class="b-dot"></span>${TEMPLATE_STATUS[s]||s}</span>`; }
 
-if(typeof window!=='undefined'){ window.TEMPLATES=TEMPLATES; window.TEMPLATE_CATS=TEMPLATE_CATS; window.templateDocs=templateDocs; window.TEMPLATE_STATUS=TEMPLATE_STATUS; window.templateBadge=templateBadge; }
+if(typeof window!=='undefined'){ window.TEMPLATES=TEMPLATES; window.TEMPLATE_CATS=TEMPLATE_CATS; window.templateDocs=templateDocs; window.packsUsingDoc=packsUsingDoc; window.TEMPLATE_STATUS=TEMPLATE_STATUS; window.templateBadge=templateBadge; }

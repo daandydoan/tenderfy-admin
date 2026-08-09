@@ -30,6 +30,11 @@
   .cd-back .ms{font-size:20px}
   .btn.btn-icon{padding:0;width:34px;height:34px;justify-content:center}
   .btn.btn-icon .ms{font-size:18px;margin:0}
+  /* "Built from" chips — blocks link to their view, elements are static */
+  .bf-chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--ink);background:#f3f6f5;border:1px solid var(--border);border-radius:100px;padding:4px 10px}
+  .bf-chip .ms{font-size:13px}
+  a.bf-lnk{color:var(--teal);background:var(--teal-tint);border-color:#bfe0d9;text-decoration:none}
+  a.bf-lnk:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
 </style>
 </head>
 <body data-page="library" data-title="Documents">
@@ -64,7 +69,11 @@
           <div class="cd-attr"><span class="k">Status</span><span class="v" id="a-status">—</span></div>
           <div class="cd-attr"><span class="k">Current version</span><span class="v" id="a-ver">—</span></div>
           <div class="cd-attr"><span class="k">Last updated</span><span class="v" id="a-upd">—</span></div>
-          <div class="cd-attr"><span class="k">Used in templates</span><span class="v" id="a-used">—</span></div>
+          <div class="cd-attr" style="align-items:flex-start"><span class="k">Used in packs</span><span class="v" id="a-used" style="text-align:right">—</span></div>
+        </div>
+        <div class="card">
+          <div class="sa-sech" style="justify-content:flex-start;font-size:15px">Built from</div>
+          <div id="a-builtfrom" style="display:flex;flex-wrap:wrap;gap:7px"></div>
         </div>
         <div class="card">
           <div class="sa-sech" style="justify-content:flex-start;font-size:15px">Client availability</div>
@@ -83,6 +92,7 @@
 </div>
 <script src="shell.js"></script>
 <script src="library-data.js"></script>
+<script src="template-data.js"></script>
 <script src="tenant-data.js"></script>
 <script src="primitives.js"></script>
 <script src="resume-render.js"></script>
@@ -100,7 +110,29 @@ function pageInit(){
   document.getElementById('a-cat').textContent = c.category;
   document.getElementById('a-ver').textContent = 'v'+c.version;
   document.getElementById('a-upd').textContent = c.updated;
-  document.getElementById('a-used').textContent = (typeof compUsage==='function'?compUsage(c.id):4) + ' templates';
+  // Used in packs — link to the real templates that include this document.
+  (function(){
+    const el=document.getElementById('a-used');
+    const packs=(typeof packsUsingDoc==='function')?packsUsingDoc(c.id):[];
+    if(packs.length){
+      el.innerHTML=`<div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">${packs.map(t=>`<a href="template-view.html#id=${t.id}" style="color:var(--teal);text-decoration:none;font-size:13px">${t.name} <span class="ms" style="font-size:13px;vertical-align:-2px">north_east</span></a>`).join('')}</div>`;
+    } else { el.textContent=(typeof compUsage==='function'?compUsage(c.id):0)+' packs'; }
+  })();
+  // Built from — the document's composition: blocks link to their view, elements are chips.
+  (function(){
+    const el=document.getElementById('a-builtfrom');
+    const pName=id=>{ const p=(typeof PRIMITIVES!=='undefined')?PRIMITIVES.find(x=>x.id===id):null; return p?p.name:id; };
+    const bName=id=>{ const b=(typeof BLOCKS!=='undefined')?BLOCKS.find(x=>x.id===id):null; return b?b.label:id; };
+    if(c.type==='resume'){
+      el.innerHTML=`<span class="bf-chip">Layout · ${(c.resume&&c.resume.layout)||'—'}</span><a class="bf-chip bf-lnk" href="resume-edit.html#id=${c.id}">Resume builder <span class="ms">north_east</span></a>`;
+      return;
+    }
+    const comp=(typeof docComposition==='function')?docComposition(c):[];
+    if(!comp.length){ el.innerHTML='<span class="muted" style="font-size:12.5px">Custom document</span>'; return; }
+    el.innerHTML=comp.map(bl=> bl.t==='block'
+      ? `<a class="bf-chip bf-lnk" href="block-view.html#id=${bl.id}" title="Open block">${bName(bl.id)} <span class="ms">north_east</span></a>`
+      : `<span class="bf-chip">${pName(bl.id)}</span>`).join('');
+  })();
   document.getElementById('vh-cur').textContent = 'v'+c.version;
   document.getElementById('editBtn').setAttribute('href', (typeof docBuilderHref==='function')?docBuilderHref(c):('document-edit.html#id='+c.id));
 

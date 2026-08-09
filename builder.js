@@ -67,6 +67,7 @@ function pageInit(){
             <span class="ms grip">drag_indicator</span>
             <span class="ei"><span class="ms">${c.icon}</span></span>
             <span class="en">${c.name}</span>${typeChip(c)}<span class="etag">v${c.version}</span>
+            <a class="ms eopen" href="document-view.html#id=${id}" title="Open document" style="color:var(--light);text-decoration:none;font-size:16px">north_east</a>
             <span class="ms ekebab" data-rm="${sec}|${i}" title="Remove from tender">more_vert</span>
           </div>`;}).join('') || '<div class="ts-empty">No documents yet</div>'}
         <div class="ts-add" data-add="${sec}"><span class="ms">add</span> ${ADDLBL[sec]}</div>

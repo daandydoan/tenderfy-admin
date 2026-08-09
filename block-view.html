@@ -84,6 +84,7 @@
 </div>
 <script src="shell.js"></script>
 <script src="blocks-data.js"></script>
+<script src="library-data.js"></script>
 <script src="tenant-data.js"></script>
 <script src="primitives.js"></script>
 <script src="block-layouts.js"></script>
@@ -109,8 +110,17 @@ function pageInit(){
   })();
   document.getElementById('bl-desc2').textContent=block.desc;
   document.getElementById('bl-elems').innerHTML=blockElements(block).map(pid=>`<span class="bv-chip"><span class="ms">${ICON[pid]||'widgets'}</span>${ELEMS[pid]||pid}</span>`).join('') || '<span class="muted" style="font-size:12.5px">Custom code block</span>';
-  const n=(typeof blockUsage==='function')?blockUsage(block.id):0;
-  document.getElementById('bl-usage').textContent = n ? `${n} document${n>1?'s':''}` : 'Not used yet';
+  // "Used in" — link to the real documents whose composition includes this block.
+  (function(){
+    const el=document.getElementById('bl-usage');
+    const docs=(typeof docsUsingBlock==='function')?docsUsingBlock(block.id):[];
+    if(docs.length){
+      el.innerHTML=`<div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">${docs.slice(0,6).map(c=>`<a href="document-view.html#id=${c.id}" style="color:var(--teal);text-decoration:none;font-size:13px">${c.name} <span class="ms" style="font-size:13px;vertical-align:-2px">north_east</span></a>`).join('')}${docs.length>6?`<span class="muted" style="font-size:12px">+${docs.length-6} more</span>`:''}</div>`;
+    } else {
+      const n=(typeof blockUsage==='function')?blockUsage(block.id):0;
+      el.textContent = n ? `${n} document${n>1?'s':''}` : 'Not used yet';
+    }
+  })();
 
   // Preview-style dropdown (brand-neutral + each client)
   const BRANDS=[{id:'default',name:'Default (brand-neutral)',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand}))];
