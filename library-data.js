@@ -47,31 +47,99 @@ COMPONENTS.forEach(c=>{ if(RESUME_CONFIG[c.id]) c.resume = RESUME_CONFIG[c.id]; 
 // document-render.js → renderComposedDoc). Resume docs are excluded (they use
 // the resume renderer). Keeps build == render across the whole flow.
 const DOC_BLOCKS = (function(){
-  const H = t => ({t:'element', id:'heading', content:{title:t}});
-  const P = () => ({t:'element', id:'paragraph'});
+  const H = title => ({t:'element', id:'heading', content:{title}});
+  const P = body => ({t:'element', id:'paragraph', content:body?{body}:{}});
+  const L = items => ({t:'element', id:'list', content:{items}});
+  const TBL = (headers,rows) => ({t:'element', id:'table', content:{headers,rows}});
+  const KV = pairs => ({t:'element', id:'keyvalue', content:{pairs}});
+  const COVER = o => ({t:'element', id:'cover', content:o});
+  const TOC = rows => ({t:'element', id:'toc', content:{rows}});
   const E = id => ({t:'element', id});
   const B = id => ({t:'block',   id});
   return {
-    cover:            [E('cover')],
-    toc:              [E('toc')],
-    'exec-summary':   [H('Executive Summary'), P(), P()],
-    methodology:      [H('Methodology'), P(), E('list')],
-    'rate-table':     [H('Schedule of Rates'), P(), E('table')],
-    'compliance-tbl': [H('Compliance Matrix'), P(), E('table')],
-    'env-row':        [H('Environmental Management'), P(), E('table')],
-    program:          [H('Delivery Programme'), P(), E('table')],
-    'risk-block':     [H('Risk Assessment'), P(), E('table')],
-    'policy-whs':     [H('Work Health & Safety Policy'), P(), E('list')],
-    'policy-quality': [H('Quality Policy'), P(), E('list')],
-    'policy-env':     [H('Environmental Policy'), P(), E('list')],
-    'policy-legacy':  [H('HSE Policy'), P()],
-    'proj-profile':   [H('Project Profile'), B('feature'), P()],
-    'case-study':     [H('Case Study'), P(), B('imgtext'), P()],
-    'proj-gallery':   [H('Project Gallery'), B('imggrid')],
-    'org-chart':      [H('Organisation Chart'), E('image')],
-    insurance:        [H('Insurance Certificates'), P(), E('table')],
-    licences:         [H('Licences & Accreditations'), E('table')],
-    referees:         [H('Referees'), E('keyvalue')],
+    cover: [COVER({kicker:'Tender Response', title:'Kingsford Smith Drive Upgrade', meta:'Prepared for the Department of Transport · RFT-2026-0418 · 14 August 2026'})],
+    toc: [TOC([['1. Executive Summary','2'],['2. Company Profile','4'],['3. Methodology','7'],['4. Schedule of Rates','12'],['5. Compliance & Insurances','16'],['6. Referees','19']])],
+    'exec-summary': [
+      H('Executive Summary'),
+      P('We are pleased to submit our response for the Kingsford Smith Drive intersection upgrade. With 18 years delivering complex road and drainage packages on live transport corridors, our team is well placed to deliver this project safely, on time and on budget.'),
+      P('Our proposal combines a disciplined staged methodology, a proven local supply chain and a zero-harm safety culture to minimise disruption to road users and adjacent businesses.'),
+    ],
+    methodology: [
+      H('Methodology'),
+      P('We deliver the works in four controlled stages, each with defined hold points, quality checks and a return-to-service plan.'),
+      L(['Mobilisation, site establishment and traffic management','Bulk earthworks, service relocation and drainage','Pavement, structures and reinstatement','Testing, commissioning and handover']),
+    ],
+    'rate-table': [
+      H('Schedule of Rates'),
+      P('All rates are fixed for the tender period and inclusive of plant, labour and supervision.'),
+      TBL(['Item','Qty','Unit rate','Amount'], [['Traffic management','16 wks','$525/wk','$8,400'],['Bulk earthworks','320 m³','$46/m³','$14,720'],['Stormwater drainage','1 item','$21,750','$21,750'],['Pavement & reinstatement','1 item','$9,900','$9,900']]),
+    ],
+    'compliance-tbl': [
+      H('Compliance Matrix'),
+      P('Requirement-by-requirement conformance against the specification.'),
+      TBL(['Requirement','Clause','Status'], [['WHS management system','3.1','Full compliance'],['Environmental controls','3.4','Full compliance'],['Insurances current','5.2','Full compliance'],['Quality (ITP) regime','6.1','Full compliance']]),
+    ],
+    'env-row': [
+      H('Environmental Management'),
+      P('Environmental controls are integrated into every stage and managed to the project CEMP.'),
+      L(['Erosion and sediment controls','Dust and air-quality monitoring','Spill response and waste tracking','Weekly environmental inspections']),
+    ],
+    program: [
+      H('Delivery Programme'),
+      P('A 16-week programme with staged possessions to keep two lanes open at all times.'),
+      TBL(['Stage','Duration','Milestone'], [['Establishment','2 wks','Site setup complete'],['Earthworks & drainage','7 wks','Drainage proof-tested'],['Pavement & structures','5 wks','Base course accepted'],['Handover','2 wks','Practical completion']]),
+    ],
+    'risk-block': [
+      H('Risk Assessment'),
+      P('Key project risks with likelihood and the controls we apply.'),
+      TBL(['Risk','Likelihood','Control'], [['Service strike','Medium','DBYD + potholing'],['Wet weather','Medium','Float + staged works'],['Traffic incident','Low','Approved TMP + spotters']]),
+    ],
+    'policy-whs': [
+      H('Work Health & Safety Policy'),
+      P('We are committed to a zero-harm workplace. Safety is a line-management responsibility on every site.'),
+      L(['Zero-harm safety culture','JSAs and SWMS for all activities','Daily pre-starts and toolbox talks','Incident reporting and investigation','Regular audits and corrective actions']),
+    ],
+    'policy-quality': [
+      H('Quality Policy'),
+      P('We deliver to specification through documented inspection and test plans and independent verification at each hold point.'),
+      L(['ISO 9001-aligned quality system','ITPs for every work lot','Hold and witness points','Non-conformance tracking to closure']),
+    ],
+    'policy-env': [
+      H('Environmental Policy'),
+      P('We protect the environment through planning, control and monitoring under a project-specific CEMP.'),
+      L(['Project CEMP for every site','Sediment and erosion controls','Waste minimisation and recycling','Environmental incident reporting']),
+    ],
+    'policy-legacy': [
+      H('Health, Safety & Environment Policy'),
+      P('This combined legacy HSE policy is retained for two long-standing clients and is superseded by the current WHS, Quality and Environmental policies.'),
+    ],
+    'proj-profile': [
+      H('Project Profile'),
+      KV([['Client','Department of Transport'],['Contract value','$4.2M'],['Sector','Civil / Roads'],['Duration','22 weeks'],['Completed','March 2025']]),
+      P('Full reconstruction of a signalised intersection including drainage, pavement and traffic signals, delivered under live traffic with zero lost-time injuries.'),
+      E('image'),
+    ],
+    'case-study': [
+      H('Case Study'),
+      P('Challenge — deliver a major intersection upgrade on a live arterial with strict night-work windows and heritage drainage constraints.'),
+      B('imgtext'),
+      P('Outcome — completed six weeks early and 6% under budget, with a road-user satisfaction score of 94%.'),
+    ],
+    'proj-gallery': [ H('Project Gallery'), B('imggrid') ],
+    'org-chart': [ H('Organisation Chart'), P('Project delivery structure and reporting lines for the contract.'), E('image') ],
+    insurance: [
+      H('Insurance Certificates'),
+      P('Currency of insurances held; certificates available on request.'),
+      TBL(['Policy','Sum insured','Expiry'], [['Public & product liability','$20,000,000','30/06/2027'],['Workers compensation','Statutory','30/06/2027'],['Professional indemnity','$10,000,000','30/06/2027'],['Plant & equipment','$2,500,000','30/06/2027']]),
+    ],
+    licences: [
+      H('Licences & Accreditations'),
+      TBL(['Licence / accreditation','Reference','Expiry'], [['Builder licence (QBCC)','BLD-12894','31/03/2027'],['RPEQ registered engineer','12894','—'],['ISO 9001 Quality','QMS-4471','2028'],['ISO 45001 Safety','OHS-2210','2028']]),
+    ],
+    referees: [
+      H('Referees'),
+      KV([['Dept of Transport — J. Okafor','(07) 3000 1200'],['City Council — R. Delacroix','(07) 3400 8800'],['Harbour Water — S. Nguyen','(07) 3900 5500']]),
+    ],
   };
 })();
 COMPONENTS.forEach(c=>{ if(DOC_BLOCKS[c.id]) c.blocks = DOC_BLOCKS[c.id]; });

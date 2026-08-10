@@ -23,18 +23,21 @@ function docHeightCss(s){
 // per-item content overrides + style box. Identical logic to the editor's
 // renderBlockInstance so build and preview match exactly.
 function docItemHtml(it, brand, cls){
+  const content = it.content || {};
   let inner='';
-  if(it.el){ inner = (typeof renderPrimitive==='function') ? renderPrimitive(it.pid, brand) : ''; }
-  else {
+  if(it.el){
+    // Elements take content directly, so each document renders distinct text/rows.
+    inner = (typeof renderPrimitive==='function') ? renderPrimitive(it.pid, brand, content) : '';
+  } else {
     const b = (typeof BLOCKS!=='undefined') ? BLOCKS.find(x=>x.id===it.bid) : null;
     inner = b ? ((typeof composeBlock==='function') ? composeBlock(b, brand) : '') : '';
-  }
-  const content = it.content || {};
-  if(content.title || content.body){
-    const tmp=document.createElement('div'); tmp.innerHTML=inner;
-    if(content.title){ const h=tmp.querySelector('h1,h2,h3,h4'); if(h) h.textContent=content.title; }
-    if(content.body){ const p=tmp.querySelector('p,li,blockquote'); if(p) p.textContent=content.body; }
-    inner=tmp.innerHTML;
+    // Blocks compose several primitives — override the first heading/body if given.
+    if(content.title || content.body){
+      const tmp=document.createElement('div'); tmp.innerHTML=inner;
+      if(content.title){ const h=tmp.querySelector('h1,h2,h3,h4'); if(h) h.textContent=content.title; }
+      if(content.body){ const p=tmp.querySelector('p,li,blockquote'); if(p) p.textContent=content.body; }
+      inner=tmp.innerHTML;
+    }
   }
   const s=it.style||DOC_ITEM_STYLE_DEFAULT;
   let c=`box-sizing:border-box;padding:${s.pad||0}px;border-radius:${s.rad||0}px;margin-bottom:${s.gap!=null?s.gap:16}px;`+docHeightCss(s);
