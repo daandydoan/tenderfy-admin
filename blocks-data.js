@@ -118,8 +118,10 @@ const BLOCK_STATUS = {
   parahead:'inactive', img3:'inactive',
 };
 function blockStatus(id){ return BLOCK_STATUS[id] || 'active'; }
+// Live blocks read as "Published" to match Documents (and the meeting's
+// "save as draft or publish"); the value stays 'active' internally.
 const BLOCK_STATUS_META = {
-  active:{cls:'b-published', label:'Active'},
+  active:{cls:'b-published', label:'Published'},
   draft:{cls:'b-draft', label:'Draft'},
   inactive:{cls:'b-deprecated', label:'Inactive'},
 };

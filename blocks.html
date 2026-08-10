@@ -55,7 +55,7 @@ function pageInit(){
   }
   function renderStatusRow(){
     const inCat=b=>active==='All Blocks'||b.cat===active;
-    const opts=[['all','All'],['active','Active'],['draft','Draft'],['inactive','Inactive']];
+    const opts=[['all','All'],['active','Published'],['draft','Draft'],['inactive','Inactive']];
     document.getElementById('statusRow').innerHTML=opts.map(([k,l])=>{
       const n=k==='all'?COMPOSED_BLOCKS.filter(inCat).length:COMPOSED_BLOCKS.filter(b=>inCat(b)&&blockStatus(b.id)===k).length;
       return `<span class="lst-pill ${k===activeStatus?'on':''}" data-st="${k}">${l} <span class="n">${n}</span></span>`;

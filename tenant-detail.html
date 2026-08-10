@@ -77,6 +77,22 @@
   .pack-band .pack-cat{font-size:10.5px;opacity:.9;text-transform:uppercase;letter-spacing:.4px}
   .pack-meta{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;font-size:12px;color:var(--gray)}
   .pack-prev{margin:0 11px 12px}
+  /* Assigned-documents breakdown */
+  .ad-group{margin-bottom:18px}
+  .ad-gh{display:flex;align-items:center;gap:7px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:0 0 9px}
+  .ad-gh .ms{font-size:15px;color:var(--teal)}
+  .ad-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1px solid var(--border);border-radius:10px;background:#fff;margin-bottom:8px}
+  .ad-row .ad-nm{font-weight:600;font-size:13.5px;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ad-src{font-size:12px;color:var(--gray);white-space:nowrap}
+  .ad-cnt{font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-tint);border-radius:100px;padding:2px 10px;flex-shrink:0}
+  .ad-direct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:#7145c9;background:#f3eefb;border-radius:100px;padding:2px 8px}
+  .ad-x{border:none;background:transparent;color:var(--light);cursor:pointer;font-size:18px;line-height:1;flex-shrink:0}
+  .ad-x:hover{color:#c0392b}
+  .adl-row{display:flex;align-items:center;gap:11px;padding:9px 2px;border-bottom:1px solid var(--row);font-size:13px}
+  .adl-row:last-child{border-bottom:none}
+  .adl-row .nm{flex:1}
+  .adl-tag{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--gray);background:#eef3f1;border-radius:100px;padding:2px 8px}
+  .adl-from{font-size:11px;color:var(--light)}
 </style>
 </head>
 <body data-page="tenants" data-title="Clients">
@@ -107,7 +123,7 @@
     <!-- Tabs -->
     <div class="cd-tabs">
       <div class="lst-tab on" data-tab="overview">Overview</div>
-      <div class="lst-tab" data-tab="preview">Template preview</div>
+      <div class="lst-tab" data-tab="preview">Documents</div>
     </div>
 
     <!-- Overview tab -->
@@ -157,16 +173,17 @@
     </div>
     </div><!-- /tab-overview -->
 
-    <!-- Template preview tab -->
+    <!-- Documents tab: per-document breakdown across assigned packs + direct assignments -->
     <div id="tab-preview" style="display:none">
       <div class="cd-prev-head">
         <div class="cd-prev-l">
-          <span class="ttl">Tender template preview</span>
-          <select id="cd-prev-sel" class="fin fin-sm" style="width:auto;min-width:220px"></select>
+          <span class="ttl">Assigned documents</span>
+          <span class="muted" id="ad-total" style="font-size:13px"></span>
         </div>
-        <span class="cd-prev-brand"><span class="ms">palette</span> Rendered in <strong id="cd-prev-brandname">this client</strong>’s brand kit</span>
+        <button class="btn btn-primary btn-sm" id="assignDocBtn"><span class="ms" style="font-size:17px">add</span> Assign documents</button>
       </div>
-      <div class="tpl-stage cd-prev-stage"><div id="cd-preview"></div></div>
+      <div class="cd-prev-brand" style="margin-bottom:14px"><span class="ms">palette</span> Counts are how many assigned packs include each document; previews render in <strong id="cd-prev-brandname">this client</strong>’s brand.</div>
+      <div id="ad-list"></div>
     </div>
   </div>
 </div>
@@ -179,6 +196,22 @@
     <div class="fld"><label for="e-email">Email</label><input class="fin" id="e-email"></div>
     <div class="fld"><label for="e-phone">Phone</label><input class="fin" id="e-phone"></div>
     <div class="cfm-acts"><a class="btn btn-outline" data-close="clientModal">Cancel</a><a class="btn btn-primary" id="clientSave"><span class="ms" style="font-size:17px">save</span> Save</a></div>
+  </div>
+</div>
+<!-- Single-document preview (branded) -->
+<div class="modal-overlay" id="docPrevModal">
+  <div class="preview-modal">
+    <div class="pm-head"><div class="hstack"><strong id="dp-title">Document</strong> <span class="badge b-published" id="dp-type"></span></div><span class="ms" style="cursor:pointer" data-close="docPrevModal">close</span></div>
+    <div class="pm-body"><div id="dp-paper"></div></div>
+  </div>
+</div>
+<!-- Assign individual documents -->
+<div class="modal-overlay" id="assignDocModal">
+  <div class="rmodal" style="max-width:560px;height:auto">
+    <div class="rmhead"><h2>Assign documents</h2><span class="ms" data-close="assignDocModal">close</span></div>
+    <div style="padding:8px 24px 0"><div class="muted" style="font-size:13px">Assign individual documents to <strong id="ad-cli">this client</strong>, on top of any whole packs. Documents already provided by an assigned pack are marked.</div></div>
+    <div style="padding:12px 24px;max-height:52vh;overflow:auto"><div id="assignDocList"></div></div>
+    <div class="rmfoot"><a class="btn btn-primary" data-close="assignDocModal">Done</a></div>
   </div>
 </div>
 <script src="shell.js"></script>
@@ -268,40 +301,81 @@ function pageInit(){
 
   renderIdentity(); renderDetails(); renderBoard();
 
-  // ---- Template preview tab: this client's assigned templates, in their brand ----
+  // ---- Documents tab: per-document breakdown across assigned packs + direct docs ----
   const assignedTemplates = (typeof TEMPLATES!=='undefined') ? TEMPLATES.filter(x=>x.tenants && x.tenants.includes(t.id)) : [];
-  const prevSel = document.getElementById('cd-prev-sel');
-  const prevEl = document.getElementById('cd-preview');
+  const byComp = Object.fromEntries((typeof COMPONENTS!=='undefined'?COMPONENTS:[]).map(c=>[c.id,c]));
   document.getElementById('cd-prev-brandname').textContent = t.name;
-  let previewRendered = false;
-  function renderPreview(){
-    const tpl = assignedTemplates.find(x=>x.id===prevSel.value) || assignedTemplates[0];
-    if(!tpl){
-      prevEl.classList.remove('tpl-preview');
-      prevEl.innerHTML = `<div class="cd-prev-empty"><span class="ms">description</span>No tender templates are assigned to ${t.name} yet.<div style="margin-top:12px"><a class="btn btn-primary btn-sm" href="templates.html"><span class="ms" style="font-size:17px">add</span> Assign a template</a></div></div>`;
-      return;
-    }
-    renderTemplatePreview(prevEl, {name:tpl.name, docs:(typeof templateDocs==='function'?templateDocs(tpl):tpl.docs||[]), brand:b, version:tpl.version, category:tpl.category});
-  }
-  if(assignedTemplates.length){
-    prevSel.innerHTML = assignedTemplates.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
-    prevSel.addEventListener('change', renderPreview);
-  } else {
-    prevSel.style.display = 'none';
+  document.getElementById('ad-cli').textContent = t.name;
+  // Direct (per-document) assignments — seeded for the demo, editable in the modal.
+  const DIRECT_SEED = { taylor:['org-chart','proj-gallery'], 'cpm-civil':['risk-block'], velocity:['case-study'] };
+  const directDocs = new Set(DIRECT_SEED[t.id]||[]);
+  const TYPE_GROUPS = [['page','Pages','wysiwyg'],['section','Sections','article'],['resume','Resumes','badge']];
+
+  // Aggregate: each unique document + how many assigned packs include it (+ direct).
+  function assignedDocsList(){
+    const map=new Map();
+    assignedTemplates.forEach(tpl=>{ (typeof templateDocs==='function'?templateDocs(tpl):tpl.docs||[]).forEach(id=>{
+      const e=map.get(id)||{id,packs:[],direct:false}; if(!e.packs.includes(tpl.name)) e.packs.push(tpl.name); map.set(id,e);
+    }); });
+    directDocs.forEach(id=>{ const e=map.get(id)||{id,packs:[],direct:false}; e.direct=true; map.set(id,e); });
+    return [...map.values()].map(e=>{ const c=byComp[e.id]; return Object.assign({}, e, {name:c?c.name:e.id, type:c?c.type:'section'}); });
   }
 
-  // Tab switching (render the preview lazily the first time it's shown)
+  function renderBreakdown(){
+    const docs=assignedDocsList(), el=document.getElementById('ad-list');
+    document.getElementById('ad-total').textContent = docs.length+' document'+(docs.length===1?'':'s')+' · from '+assignedTemplates.length+' pack'+(assignedTemplates.length===1?'':'s')+(directDocs.size?' + '+directDocs.size+' direct':'');
+    if(!docs.length){ el.innerHTML=`<div class="cd-prev-empty"><span class="ms">description</span>No documents assigned to ${t.name} yet.<div style="margin-top:12px"><button class="btn btn-primary btn-sm" id="adEmptyAssign"><span class="ms" style="font-size:17px">add</span> Assign documents</button></div></div>`; const eb=document.getElementById('adEmptyAssign'); if(eb) eb.addEventListener('click',openAssignDocs); return; }
+    el.innerHTML = TYPE_GROUPS.map(([ty,lbl,ic])=>{
+      const list=docs.filter(d=>d.type===ty); if(!list.length) return '';
+      return `<div class="ad-group"><div class="ad-gh"><span class="ms">${ic}</span> ${lbl} <span style="color:var(--light)">· ${list.length}</span></div>${list.map(d=>{
+        const cnt=d.packs.length, src=cnt?('in '+cnt+' pack'+(cnt>1?'s':'')):'';
+        return `<div class="ad-row"><span class="ad-nm">${d.name}</span>${d.direct?'<span class="ad-direct">Direct</span>':''}${src?`<span class="ad-src">${src}</span>`:''}<span class="ad-cnt">×${cnt+(d.direct?1:0)}</span><button class="btn btn-outline btn-sm ad-prev" data-id="${d.id}"><span class="ms" style="font-size:15px">visibility</span> Preview</button>${(d.direct&&!cnt)?`<span class="ms ad-x" data-rm="${d.id}" title="Unassign document">close</span>`:''}</div>`;
+      }).join('')}</div>`;
+    }).join('');
+    el.querySelectorAll('.ad-prev').forEach(bp=>bp.addEventListener('click',()=>openDocPreview(bp.dataset.id)));
+    el.querySelectorAll('.ad-x').forEach(x=>x.addEventListener('click',()=>{ directDocs.delete(x.dataset.rm); renderBreakdown(); showToast('Document unassigned'); }));
+  }
+
+  // Single-document branded preview
+  function openDocPreview(id){
+    const c=byComp[id]; if(!c) return;
+    document.getElementById('dp-title').textContent=c.name;
+    document.getElementById('dp-type').textContent=((typeof DOC_TYPE_META!=='undefined'&&DOC_TYPE_META[c.type])||{label:'Section'}).label;
+    const paper=document.getElementById('dp-paper'); paper.className='tpl-preview';
+    paper.innerHTML=`<div class="cd-a4">${(typeof renderDocument==='function')?renderDocument(id, b):''}</div>`;
+    document.getElementById('docPrevModal').classList.add('open');
+  }
+
+  // Assign individual documents
+  function openAssignDocs(){
+    const packDocs=new Set(); assignedTemplates.forEach(tpl=>(typeof templateDocs==='function'?templateDocs(tpl):tpl.docs||[]).forEach(id=>packDocs.add(id)));
+    document.getElementById('assignDocList').innerHTML = TYPE_GROUPS.map(([ty,lbl])=>{
+      const list=(typeof COMPONENTS!=='undefined'?COMPONENTS:[]).filter(c=>c.type===ty && c.status!=='deprecated');
+      if(!list.length) return '';
+      return `<div><div class="ad-gh" style="margin-top:8px">${lbl}</div>${list.map(c=>{
+        const inPack=packDocs.has(c.id), checked=inPack||directDocs.has(c.id);
+        return `<label class="adl-row"><input type="checkbox" data-id="${c.id}" ${checked?'checked':''} ${inPack?'disabled':''}><span class="nm">${c.name}</span>${inPack?'<span class="adl-from">from a pack</span>':''}<span class="adl-tag">${((typeof DOC_TYPE_META!=='undefined'&&DOC_TYPE_META[c.type])||{label:''}).label}</span></label>`;
+      }).join('')}</div>`;
+    }).join('');
+    document.getElementById('assignDocList').querySelectorAll('input[type=checkbox]:not([disabled])').forEach(cb=>cb.addEventListener('change',()=>{
+      if(cb.checked) directDocs.add(cb.dataset.id); else directDocs.delete(cb.dataset.id);
+      renderBreakdown();
+    }));
+    document.getElementById('assignDocModal').classList.add('open');
+  }
+  document.getElementById('assignDocBtn').addEventListener('click',openAssignDocs);
+
+  // Tabs
   function showTab(which){
     document.querySelectorAll('.cd-tabs .lst-tab').forEach(x=>x.classList.toggle('on', x.dataset.tab===which));
     document.getElementById('tab-overview').style.display = which==='overview'?'':'none';
     document.getElementById('tab-preview').style.display  = which==='preview' ?'':'none';
-    if(which==='preview' && !previewRendered){ renderPreview(); previewRendered = true; }
+    if(which==='preview') renderBreakdown();
   }
   document.querySelectorAll('.cd-tabs .lst-tab').forEach(tab=>tab.addEventListener('click',()=>showTab(tab.dataset.tab)));
-  function goPreview(pid){ if(pid){ prevSel.value=pid; renderPreview(); previewRendered=true; } showTab('preview'); window.scrollTo({top:0,behavior:'smooth'}); }
+  const goDocuments=()=>{ showTab('preview'); window.scrollTo({top:0,behavior:'smooth'}); };
 
-  // ---- Assigned packs (real TEMPLATES assigned to this client; a client can
-  // hold several packs — same-category packs read as variations). ----
+  // ---- Assigned packs (Overview): the whole packs assigned; cards open the Documents tab. ----
   function renderAssignedPacks(){
     const el=document.getElementById('assigned');
     document.getElementById('asg-total').textContent = assignedTemplates.length+' pack'+(assignedTemplates.length===1?'':'s')+' assigned';
@@ -317,18 +391,17 @@ function pageInit(){
         <div class="pack-top"><span class="pack-name">${x.name}</span>${(typeof templateBadge==='function')?templateBadge(x.status):''}</div>
         <div class="pack-band" style="background:${b.primary};border-bottom:3px solid ${b.secondary}"><span style="font-family:'${b.font}',sans-serif;font-weight:700">${t.name}</span><span class="pack-cat">${x.category}${variation?' · Variation':''}</span></div>
         <div class="pack-meta"><span><span class="ms" style="font-size:14px;vertical-align:-2px">description</span> ${docs.length} docs</span><span>v${x.version}</span></div>
-        <a class="btn btn-outline btn-block btn-sm pack-prev" data-id="${x.id}"><span class="ms" style="font-size:16px">visibility</span> Preview in brand</a>
+        <a class="btn btn-outline btn-block btn-sm pack-prev"><span class="ms" style="font-size:16px">list</span> View documents</a>
       </div>`;
     }).join('');
-    el.querySelectorAll('.pack-prev').forEach(bp=>bp.addEventListener('click',e=>{ e.stopPropagation(); goPreview(bp.dataset.id); }));
-    el.querySelectorAll('.pack-card').forEach(c=>c.addEventListener('click',()=>goPreview(c.dataset.id)));
+    el.querySelectorAll('.pack-card').forEach(c=>c.addEventListener('click',goDocuments));
   }
   renderAssignedPacks();
 
   // ---- Popups: Edit client + Brand Kit (two separate dialogs) ----
   const closeM = idn => document.getElementById(idn).classList.remove('open');
   document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click',()=>closeM(x.dataset.close)));
-  ['clientModal','brandModal'].forEach(idn=>document.getElementById(idn).addEventListener('click',e=>{ if(e.target.id===idn) closeM(idn); }));
+  ['clientModal','brandModal','docPrevModal','assignDocModal'].forEach(idn=>{ const m=document.getElementById(idn); if(m) m.addEventListener('click',e=>{ if(e.target.id===idn) closeM(idn); }); });
 
   function openClient(){
     document.getElementById('e-name').value=t.name;
