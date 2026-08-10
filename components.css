@@ -422,6 +422,14 @@
 .lst-pill:hover{border-color:var(--teal);color:var(--teal)}
 .lst-pill.on{background:var(--teal);border-color:var(--teal);color:#fff}
 .lst-pill .n{font-size:11px;opacity:.75}
+/* Filters button + revealable filter row — shared listing pattern (tabs left, Filters right) */
+.lst-filterbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;border-radius:9px;padding:7px 13px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);cursor:pointer;flex-shrink:0;align-self:center;margin-bottom:8px}
+.lst-filterbtn:hover{border-color:var(--teal);color:var(--teal)}
+.lst-filterbtn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
+.lst-filterbtn .ms{font-size:17px}
+.lst-fcount{background:var(--teal);color:#fff;border-radius:100px;font-size:10.5px;font-weight:700;padding:1px 7px;min-width:16px;text-align:center}
+.lst-filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;background:#fafbfb;border:1px solid var(--border);border-radius:12px;margin-bottom:20px}
+.lst-filters[hidden]{display:none}
 
 .lst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
 .lst-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px 16px 16px;cursor:pointer;display:flex;flex-direction:column;transition:box-shadow .15s ease,border-color .15s ease}
@@ -469,6 +477,9 @@
 .blk-list-row{display:flex;align-items:center;gap:9px}
 .blk-list-row .dot{width:6px;height:6px;border-radius:50%;background:#9FB5B0;flex-shrink:0}
 .blk-list-row .blk-bar{flex:1}
+/* Pricing schematics (Item Pricing / Total Pricing): label left, amount right */
+.blk-pr{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.blk-pr .blk-amt{width:36px;flex-shrink:0}
 
 /* ============================================================================
    Tender Template canvas — the sectioned tender structure the client sees

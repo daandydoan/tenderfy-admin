@@ -53,10 +53,11 @@
 
     <div class="lst-bar">
       <div class="lst-tabs" id="tabs"></div>
-      <div class="lst-tools">
-        <span class="lst-search"><span class="ms">search</span><input id="q" placeholder="Search documents…"></span>
-        <div class="lst-pills" id="statusRow"></div>
-      </div>
+      <button class="lst-filterbtn" id="filterToggle"><span class="ms">tune</span> Filters <span class="lst-fcount" id="fcount" style="display:none"></span></button>
+    </div>
+    <div class="lst-filters" id="filterRow" hidden>
+      <span class="lst-search"><span class="ms">search</span><input id="q" placeholder="Search documents…"></span>
+      <div class="lst-pills" id="statusRow"></div>
     </div>
     <div class="lst-grid" id="grid"></div>
     <div id="empty" style="display:none;text-align:center;color:var(--light);padding:50px 0"><span class="ms" style="font-size:40px">search_off</span><p class="mt16">No documents match.</p></div>
@@ -88,7 +89,7 @@ function pageInit(){
       const n=k==='all'?COMPONENTS.filter(inCat).length:COMPONENTS.filter(c=>inCat(c)&&c.status===k).length;
       return `<span class="lst-pill ${k===activeStatus?'on':''}" data-st="${k}">${l} <span class="n">${n}</span></span>`;
     }).join('');
-    document.querySelectorAll('#statusRow .lst-pill').forEach(p=>p.addEventListener('click',()=>{activeStatus=p.dataset.st;renderStatusRow();renderGrid();}));
+    document.querySelectorAll('#statusRow .lst-pill').forEach(p=>p.addEventListener('click',()=>{activeStatus=p.dataset.st;renderStatusRow();renderGrid();updateFcount();}));
   }
   function renderGrid(){
     const list = COMPONENTS.filter(c=>
@@ -133,12 +134,21 @@ function pageInit(){
     const card=e.target.closest('.lst-card');
     if(card){ location.href='document-view.html#id='+card.dataset.id; }
   });
-  document.getElementById('q').addEventListener('input', e=>{query=e.target.value.toLowerCase().trim();renderGrid();});
+  document.getElementById('q').addEventListener('input', e=>{query=e.target.value.toLowerCase().trim();renderGrid();updateFcount();});
+
+  // Filters button reveals the search + status pills (shared listing pattern).
+  let filtersOpen=false;
+  function updateFcount(){
+    const n=(activeStatus!=='all'?1:0)+(query?1:0);
+    const fc=document.getElementById('fcount'); fc.style.display=n?'':'none'; fc.textContent=n;
+    document.getElementById('filterToggle').classList.toggle('on', filtersOpen||n>0);
+  }
+  document.getElementById('filterToggle').addEventListener('click',()=>{ filtersOpen=!filtersOpen; document.getElementById('filterRow').hidden=!filtersOpen; updateFcount(); });
 
   const nb=document.getElementById('newBtn'), nm=document.getElementById('newMenu');
   nb.addEventListener('click',()=>{ if(typeof closePopovers==='function') closePopovers(nm); nm.classList.toggle('open'); });
 
-  renderTabs(); renderStatusRow(); renderGrid();
+  renderTabs(); renderStatusRow(); renderGrid(); updateFcount();
   document.getElementById('s-total').textContent = COMPONENTS.length;
   document.getElementById('s-pub').textContent = COMPONENTS.filter(c=>c.status==='published').length;
   document.getElementById('s-draft').textContent = COMPONENTS.filter(c=>c.status==='draft').length;

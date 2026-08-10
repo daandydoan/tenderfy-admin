@@ -88,27 +88,9 @@
 
 <script src="blocks-data.js"></script>
 <script>
-  // Pricing blocks (Cost Breakdown pair, from the 30 Jul meeting) — added to this mock.
-  BLOCKS.push(
-    {id:'itemprice',  name:'Item Pricing',  cat:'Table & Data', p:'itemprice'},
-    {id:'totalprice', name:'Total Pricing', cat:'Table & Data', p:'totalprice'}
-  );
-  // Reclassify: Signature -> Text Blocks; rename "Tables & Sign-off" -> "Table & Data".
-  BLOCKS.forEach(b=>{ if(b.id==='signature') b.cat='Text Blocks'; else if(b.cat==='Tables & Sign-off') b.cat='Table & Data'; });
-  // Local preview that handles the pricing schematics, else falls back to the shared one.
-  function preview(p){
-    if(p==='itemprice'){
-      return '<div class="blk-bar h" style="width:44%"></div>'
-        + [0,1,2].map(()=>'<div class="pr"><span class="blk-bar" style="flex:1;max-width:58%"></span><span class="blk-bar amt"></span></div>').join('');
-    }
-    if(p==='totalprice'){
-      return '<div class="pr"><span class="blk-bar" style="width:34%"></span><span class="blk-bar amt"></span></div>'
-        + '<div class="pr"><span class="blk-bar" style="width:26%"></span><span class="blk-bar amt"></span></div>'
-        + '<div style="height:1px;background:#9FB5B0;margin:3px 0"></div>'
-        + '<div class="pr"><span class="blk-bar h" style="width:42%"></span><span class="blk-bar amt h"></span></div>';
-    }
-    return blockPreview(p);
-  }
+  // Blocks (incl. Item/Total Pricing) + the Table & Data category now live in
+  // blocks-data.js, so this dialog and the Blocks listing stay in sync.
+  const preview = p => blockPreview(p);
 
   const CAT_ICON = {'All Blocks':'grid_view','Title Blocks':'title','Text Blocks':'notes','Images':'image','Image & Text':'article','Table & Data':'table_chart'};
   const cats = ['All Blocks','Title Blocks','Text Blocks','Images','Image & Text','Table & Data'];

@@ -12,6 +12,7 @@ const P2DOC={
   imggrid:[{cols:[['image'],['image']]},{cols:[['image'],['image']]}], imgtext:[{cols:[['image'],['paragraph']]}],
   textimg:[{cols:[['paragraph'],['image']]}], imgcap:[{cols:[['image','subheading']]}],
   feature:[{cols:[['image'],['heading','paragraph']]}], table:[{cols:[['table']]}],
+  itemprice:[{cols:[['subheading'],['table']]}], totalprice:[{cols:[['keyvalue']]}],
   signature:[{cols:[['signature']]}], catalogue:[{cols:[['image'],['subheading','paragraph']]}],
   // Headers & Footers default to a 2-column band (edited in the block editor).
   'lh-brand':[{cols:[['image','heading'],['paragraph']]}], 'lh-contact':[{cols:[['heading'],['paragraph']]}],

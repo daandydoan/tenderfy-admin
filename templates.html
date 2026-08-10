@@ -18,12 +18,6 @@
   .stat-compact .st-ic{margin-bottom:0;flex-shrink:0}
   .stat-compact .st-lbl{margin-top:2px}
   /* Filters toggle + reveal row */
-  .tpl-filterbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;border-radius:9px;padding:7px 13px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);cursor:pointer;flex-shrink:0;align-self:center;margin-bottom:8px}
-  .tpl-filterbtn:hover{border-color:var(--teal);color:var(--teal)}
-  .tpl-filterbtn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
-  .tpl-filterbtn .ms{font-size:17px}
-  .tpl-fcount{background:var(--teal);color:#fff;border-radius:100px;font-size:10px;padding:1px 6px;font-weight:700}
-  .tpl-filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;background:#fafbfb;border:1px solid var(--border);border-radius:12px;margin-bottom:20px}
   /* Template packs — no preview; show pack facts */
   .tpl-facts{display:flex;flex-wrap:wrap;gap:8px 16px;padding:12px 0 2px}
   .tpl-fact{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);font-weight:500}
@@ -53,9 +47,9 @@
 
     <div class="lst-bar">
       <div class="lst-tabs" id="tabs"></div>
-      <button class="tpl-filterbtn" id="filterToggle"><span class="ms">tune</span> Filters <span class="tpl-fcount" id="fcount" style="display:none"></span></button>
+      <button class="lst-filterbtn" id="filterToggle"><span class="ms">tune</span> Filters <span class="lst-fcount" id="fcount" style="display:none"></span></button>
     </div>
-    <div class="tpl-filters" id="filterRow" hidden>
+    <div class="lst-filters" id="filterRow" hidden>
       <span class="lst-search"><span class="ms">search</span><input id="q" placeholder="Search templates…"></span>
       <div class="lst-pills" id="statusRow"></div>
     </div>

@@ -24,8 +24,10 @@ const BLOCKS = [
   {id:'textimg',    name:'Text & Image',        label:'Text with image',    desc:'Text on the left, an image on the right.',             cat:'Image & Text', p:'textimg'},
   {id:'imgcap',     name:'Image + Caption',     label:'Image with caption', desc:'An image with a caption underneath.',                  cat:'Image & Text', p:'imgcap'},
   {id:'feature',    name:'Two-Column Feature',  label:'Feature panel',      desc:'An image beside a headline and supporting text.',      cat:'Image & Text', p:'feature'},
-  {id:'table',      name:'Table',               label:'Table',              desc:'Rows and columns for rates, schedules or comparisons.',cat:'Tables & Sign-off', p:'table'},
-  {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',            cat:'Tables & Sign-off', p:'signature'},
+  {id:'table',      name:'Table',               label:'Table',              desc:'Rows and columns for rates, schedules or comparisons.',cat:'Table & Data', p:'table'},
+  {id:'itemprice',  name:'Item Pricing',        label:'Item pricing',       desc:'A list of priced line items — description with a unit amount.',  cat:'Table & Data', p:'itemprice'},
+  {id:'totalprice', name:'Total Pricing',       label:'Total pricing',      desc:'A subtotal / total summary with a highlighted grand total.',     cat:'Table & Data', p:'totalprice'},
+  {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',            cat:'Text Blocks', p:'signature'},
   {id:'catalogue',  name:'Catalogue',           label:'Catalogue',          desc:'A list of items with an image, title and details.',    cat:'Image & Text',      p:'catalogue'},
   // Headers & Footers — page furniture for the document's Top Layer (repeats on every page).
   {id:'lh-brand',   name:'Branded Letterhead',  label:'Branded letterhead', desc:'Logo, company name and a brand rule across the top of every page.', cat:'Headers & Footers', p:'lh-brand',   slot:'header'},
@@ -35,7 +37,7 @@ const BLOCKS = [
   {id:'lf-legal',   name:'Legal Footer',        label:'Legal footer',       desc:'A confidentiality or disclaimer line across the bottom.',           cat:'Headers & Footers', p:'lf-legal',   slot:'footer'},
   {id:'lf-contact', name:'Contact Footer',      label:'Contact footer',     desc:'Address, phone and web in a bottom strip.',                         cat:'Headers & Footers', p:'lf-contact', slot:'footer'},
 ];
-const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text','Tables & Sign-off','Headers & Footers'];
+const BLOCK_CATS = ['Title Blocks','Text Blocks','Images','Image & Text','Table & Data','Headers & Footers'];
 
 // Element vs Block. ELEMENTS are single atoms (one primitive) — they live inside
 // the builders (block editor + document editor) but are NOT listed as Blocks.
@@ -72,6 +74,8 @@ function blockPreview(p){
     case 'imgcap':    return `${img()}${bar('50%')}`;
     case 'feature':   return `<div class="blk-row">${img()}<div class="blk-txt">${bar('70%',1)+bar('92%')+bar('80%')}</div></div>`;
     case 'table':     return `<div class="blk-table">${['h','','',''].map(r=>`<div class="tr ${r}"><span></span><span></span><span></span></div>`).join('')}</div>`;
+    case 'itemprice': return bar('44%',1)+[0,1,2].map(()=>`<div class="blk-pr">${bar('56%')}<div class="blk-bar blk-amt"></div></div>`).join('');
+    case 'totalprice':return `<div class="blk-pr">${bar('34%')}<div class="blk-bar blk-amt"></div></div><div class="blk-pr">${bar('26%')}<div class="blk-bar blk-amt"></div></div><div style="height:1px;background:#9FB5B0;margin:3px 0"></div><div class="blk-pr">${bar('42%',1)}<div class="blk-bar blk-amt h"></div></div>`;
     case 'signature': return `${bar('55%')}<div style="height:1px;background:#9FB5B0;margin:14px 0 7px"></div>${bar('40%',1)}${bar('30%')}`;
     case 'catalogue': return `<div class="blk-row" style="min-height:0">${img()}<div class="blk-txt">${bar('80%',1)+bar('62%')}</div></div><div class="blk-row" style="min-height:0;margin-top:8px">${img()}<div class="blk-txt">${bar('80%',1)+bar('62%')}</div></div>`;
     case 'docdetails':{ const cell='<div class="doc-cell"><span class="blk-bar h" style="width:75%"></span><span class="blk-bar" style="width:100%"></span><span class="blk-bar" style="width:82%"></span></div>'; return `<div class="doc-row"><div class="doc-title"></div><div class="doc-grid">${cell+cell+cell+cell}</div></div>`; }
