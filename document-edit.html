@@ -217,6 +217,15 @@
   .ray-cap{font-size:10.5px;color:var(--gray);padding:5px 9px}
   .btn-ray{background:#5b46b8;color:#fff;border:none}
   .btn-ray:hover{background:#4c3aa0}
+  /* Ray block suggestions (pick which to add) */
+  .ray-sugg{margin:0 0 10px;border:1px solid #d9d0f2;border-radius:10px;overflow:hidden;background:#fff}
+  .ray-sugg-head{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:#faf9ff;border-bottom:1px solid #eee;font-size:11.5px;color:var(--gray)}
+  .ray-sugg-head a{color:#5b46b8;cursor:pointer;font-weight:700}
+  .ray-sugg-row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-bottom:1px solid var(--row);font-size:12.5px}
+  .ray-sugg-row:last-child{border-bottom:none}
+  .ray-sugg-row .ci .ms{font-size:16px;color:var(--teal)}
+  .ray-sugg-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+  .ray-sugg-row .add{width:26px;height:26px;border-radius:7px;border:1px solid var(--teal);background:var(--teal-tint);color:var(--teal);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 </style>
 </head>
 <body data-page="library" data-title="Documents">
@@ -246,6 +255,8 @@
         <div id="paneBlocks">
           <div class="card">
             <h3 class="ed-h" style="display:flex;align-items:center;gap:8px">Blocks <span class="muted" style="font-weight:400;font-size:12px" id="pal-count"></span><a href="block-edit.html" title="Create a new block" style="margin-left:auto;font-size:12px;color:var(--teal);text-decoration:none;font-weight:600"><span class="ms" style="font-size:14px;vertical-align:-2px">add</span> New block</a></h3>
+            <button type="button" class="btn btn-ray btn-sm btn-block" id="raySuggestBlocksBtn" style="margin-bottom:8px"><span class="ms" style="font-size:15px">auto_awesome</span> Suggest blocks with Ray</button>
+            <div id="rayBlockSuggestions"></div>
             <div class="d-search"><span class="ms">search</span><input id="pq" placeholder="Search blocks…"></div>
             <div class="vb-pal" id="palette"></div>
           </div>
@@ -644,22 +655,34 @@ function pageInit(){
   document.getElementById('editDetailsBtn').addEventListener('click',openDocDialog);
   ['d-type','d-status'].forEach(id=>document.getElementById(id).addEventListener('change',updateDocSummary));
 
-  // ---- Ray: draft a document (block sequence) from a description / type ----
-  function rayDraftDoc(desc){
+  // ---- Ray: which blocks suit this document (keyword → block sequence) ----
+  function raySeqFor(desc){
     const s=((desc||'')+' '+document.getElementById('d-type').value).toLowerCase();
-    let seq;
-    if(/case stud|project profile|reference/.test(s)) seq=['heading','doc-details','headpara','img2','doc-para','quote'];
-    else if(/policy|policies|whs|quality|environmental|hse/.test(s)) seq=['heading','paragraph','list','callout','signature'];
-    else if(/cv|resume|bio|personnel|staff/.test(s)) seq=['headpara','list','doc-details','signature'];
-    else if(/rate|pricing|schedule of rates|cost|quote/.test(s)) seq=['heading','paragraph','table','callout'];
-    else if(/cover/.test(s)) seq=['feature','doc-details'];
-    else if(/methodology|method|approach/.test(s)) seq=['heading','doc-para','list','doc-dblpara'];
-    else if(/capability|company profile|about/.test(s)) seq=['heading','paragraph','img2','doc-details','quote'];
-    else seq=['heading','paragraph','imgtext','list','doc-details'];
-    items = seq.filter(id=>bById[id]).map(mkInst);
+    if(/case stud|project profile|reference/.test(s)) return ['heading','doc-details','headpara','img2','doc-para','quote'];
+    if(/policy|policies|whs|quality|environmental|hse/.test(s)) return ['heading','paragraph','list','callout','signature'];
+    if(/cv|resume|bio|personnel|staff/.test(s)) return ['headpara','list','doc-details','signature'];
+    if(/rate|pricing|schedule of rates|cost|quote/.test(s)) return ['heading','paragraph','itemprice','totalprice','callout'];
+    if(/cover/.test(s)) return ['feature','doc-details'];
+    if(/methodology|method|approach/.test(s)) return ['heading','doc-para','list','doc-dblpara'];
+    if(/capability|company profile|about/.test(s)) return ['heading','paragraph','img2','doc-details','quote'];
+    return ['heading','paragraph','imgtext','list','doc-details'];
+  }
+  function rayDraftDoc(desc){
+    items = raySeqFor(desc).filter(id=>bById[id]).map(mkInst);
     selK=null; render(); renderInspector();
     return items.length;
   }
+  // Ray SUGGESTS blocks for this document — the user adds the ones they want
+  // (mirrors the pack builder's tender-pack suggester).
+  function renderBlockSuggestions(){
+    const dd=document.getElementById('d-desc');
+    const seq=raySeqFor((document.getElementById('d-name').value||'')+' '+(dd?dd.value:'')).filter(id=>bById[id]);
+    const wrap=document.getElementById('rayBlockSuggestions');
+    wrap.innerHTML=`<div class="ray-sugg"><div class="ray-sugg-head"><span>Suggested blocks · ${seq.length}</span> <a data-addall>Add all</a></div>${seq.map(id=>{const bb=bById[id];return `<div class="ray-sugg-row" data-id="${id}"><span class="ci"><span class="ms">widgets</span></span><span class="nm">${bb.label||bb.name}</span><button class="add" title="Add block"><span class="ms" style="font-size:15px">add</span></button></div>`;}).join('')}</div>`;
+    wrap.querySelectorAll('.ray-sugg-row .add').forEach(bt=>bt.addEventListener('click',()=>{ const id=bt.closest('.ray-sugg-row').dataset.id; addItem(id); }));
+    wrap.querySelector('[data-addall]').addEventListener('click',()=>{ seq.forEach(id=>addItem(id)); showToast('Added '+seq.length+' blocks'); });
+  }
+  document.getElementById('raySuggestBlocksBtn').addEventListener('click',renderBlockSuggestions);
   // Client-document reference drop zone (mock — Ray "matches" the uploaded doc)
   let rayDocHasImg=false;
   (function bindRayImg(){
