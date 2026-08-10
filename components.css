@@ -102,6 +102,16 @@
 .tpl-preview{display:flex;flex-direction:column;gap:22px;align-items:center}
 .cd-a4{width:620px;min-height:877px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.16);overflow:hidden}
 .tpl-stage{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:26px;overflow:auto}
+/* Digital view — continuous web layout instead of fixed A4 pages */
+.cd-a4.digital{min-height:0}
+.tpl-preview.digital{gap:0}
+.tpl-preview.digital .cd-a4{min-height:0;box-shadow:none;border-radius:0;width:min(760px,100%)}
+.tpl-preview.digital .cd-a4 + .cd-a4{border-top:1px solid #e6ebe9}
+/* A4 / Digital segmented toggle */
+.view-seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
+.view-seg button{border:none;background:transparent;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--gray);padding:6px 11px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.view-seg button.on{background:var(--teal);color:#fff}
+.view-seg button .ms{font-size:15px}
 .tpl-stage::-webkit-scrollbar{width:9px}.tpl-stage::-webkit-scrollbar-thumb{background:#c3ccc9;border-radius:9px}
 
 /* ---- Template builder — 3-pane ---- */

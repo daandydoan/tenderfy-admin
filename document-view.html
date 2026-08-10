@@ -57,7 +57,7 @@
 
     <div class="row">
       <div class="grow">
-        <div class="sa-sech"><span style="display:flex;align-items:center">Document preview <span class="cd-mockchip" id="mockchip" style="display:none"><span class="ms">check_circle</span> Sample content</span></span><span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span></div>
+        <div class="sa-sech"><span style="display:flex;align-items:center">Document preview <span class="cd-mockchip" id="mockchip" style="display:none"><span class="ms">check_circle</span> Sample content</span></span><span style="display:flex;align-items:center;gap:12px"><span class="view-seg" id="viewSeg"><button data-v="a4" class="on"><span class="ms">description</span> A4</button><button data-v="digital"><span class="ms">devices</span> Digital</button></span><span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select></span></span></div>
         <div class="cd-canvas">
           <div class="cd-a4" id="d-page"></div>
         </div>
@@ -148,8 +148,10 @@ function pageInit(){
   const BRANDS = [{name:'Default (brand-neutral)', brand:null}, ...TENANTS.map(t=>({name:t.name, brand:t.brand}))];
   const sel = document.getElementById('brandSel');
   sel.innerHTML = BRANDS.map((x,i)=>`<option value="${i}">${x.name}</option>`).join('');
-  function renderDoc(){ document.getElementById('d-page').innerHTML = renderDocument(c.id, BRANDS[+sel.value].brand); }
+  let viewMode='a4';
+  function renderDoc(){ const el=document.getElementById('d-page'); el.innerHTML = renderDocument(c.id, BRANDS[+sel.value].brand); el.classList.toggle('digital', viewMode==='digital'); }
   sel.addEventListener('change', renderDoc);
+  document.querySelectorAll('#viewSeg button').forEach(b=>b.addEventListener('click',()=>{ viewMode=b.dataset.v; document.querySelectorAll('#viewSeg button').forEach(x=>x.classList.toggle('on',x===b)); renderDoc(); }));
   renderDoc();
 
   // availability
