@@ -29,6 +29,8 @@ const BLOCKS = [
   {id:'totalprice', name:'Total Pricing',       label:'Total pricing',      desc:'A subtotal / total summary with a highlighted grand total.',     cat:'Table & Data', p:'totalprice'},
   {id:'signature',  name:'Signature Block',     label:'Signature',          desc:'A sign-off area with name, role and date.',            cat:'Text Blocks', p:'signature'},
   {id:'catalogue',  name:'Catalogue',           label:'Catalogue',          desc:'A list of items with an image, title and details.',    cat:'Image & Text',      p:'catalogue'},
+  {id:'tcircimgs',  name:'Text & Circular Images',label:'Text with circular images',desc:'Two circular images beside a block of text.',       cat:'Image & Text',      p:'tcircimgs'},
+  {id:'tcircimg',   name:'Text & Circular Image', label:'Text with a circular image',desc:'A block of text beside a single circular image.',    cat:'Image & Text',      p:'tcircimg'},
   // Headers & Footers — page furniture for the document's Top Layer (repeats on every page).
   {id:'lh-brand',   name:'Branded Letterhead',  label:'Branded letterhead', desc:'Logo, company name and a brand rule across the top of every page.', cat:'Headers & Footers', p:'lh-brand',   slot:'header'},
   {id:'lh-contact', name:'Contact Letterhead',  label:'Contact letterhead', desc:'Company name with contact details in a top bar.',                   cat:'Headers & Footers', p:'lh-contact', slot:'header'},
@@ -73,6 +75,8 @@ function blockPreview(p){
     case 'textimg':   return `<div class="blk-row"><div class="blk-txt">${bar('92%')+bar('84%')+bar('66%')}</div>${img()}</div>`;
     case 'imgcap':    return `${img()}${bar('50%')}`;
     case 'feature':   return `<div class="blk-row">${img()}<div class="blk-txt">${bar('70%',1)+bar('92%')+bar('80%')}</div></div>`;
+    case 'tcircimgs': return `<div class="blk-row" style="align-items:center"><div style="position:relative;flex:none;width:66px;height:58px"><div style="position:absolute;right:2px;top:0;width:50px;height:50px;border-radius:50%;background:#7FC1B4;display:flex;align-items:center;justify-content:center;color:#fff"><span class="ms" style="font-size:19px">image</span></div><div style="position:absolute;left:0;bottom:0;width:27px;height:27px;border-radius:50%;background:var(--teal);border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff"><span class="ms" style="font-size:12px">image</span></div></div><div class="blk-txt">${bar('94%')+bar('80%')}</div></div>`;
+    case 'tcircimg':  return `<div class="blk-row" style="align-items:center"><div class="blk-txt">${bar('92%')+bar('84%')+bar('66%')}</div><div style="flex:none;width:54px;height:54px;border-radius:50%;background:#7FC1B4;display:flex;align-items:center;justify-content:center;color:#fff"><span class="ms" style="font-size:21px">image</span></div></div>`;
     case 'table':     return `<div class="blk-table">${['h','','',''].map(r=>`<div class="tr ${r}"><span></span><span></span><span></span></div>`).join('')}</div>`;
     case 'itemprice': return bar('44%',1)+[0,1,2].map(()=>`<div class="blk-pr">${bar('56%')}<div class="blk-bar blk-amt"></div></div>`).join('');
     case 'totalprice':return `<div class="blk-pr">${bar('34%')}<div class="blk-bar blk-amt"></div></div><div class="blk-pr">${bar('26%')}<div class="blk-bar blk-amt"></div></div><div style="height:1px;background:#9FB5B0;margin:3px 0"></div><div class="blk-pr">${bar('42%',1)}<div class="blk-bar blk-amt h"></div></div>`;
