@@ -37,8 +37,8 @@ COMPONENTS.forEach(c=>{ c.type = DOC_RESUME_CATS.has(c.category) ? 'resume' : DO
 // Resume documents carry the base-layout config the Resume builder saved, so the
 // document/pack preview renders the very same CV (see resume-render.js).
 const RESUME_CONFIG = {
-  'cv-standard': {layout:'left-panel', sections:['summary','experience','skills','accreditations']},
-  'cv-exec':     {layout:'minimal',    sections:['summary','experience','accreditations']},
+  'cv-standard': {layout:'left-panel', placement:{sidebar:['profile','contact','skills'], main:['summary','experience','accreditations']}},
+  'cv-exec':     {layout:'minimal',    placement:{body:['profile','contact','summary','experience','accreditations']}},
 };
 COMPONENTS.forEach(c=>{ if(RESUME_CONFIG[c.id]) c.resume = RESUME_CONFIG[c.id]; });
 

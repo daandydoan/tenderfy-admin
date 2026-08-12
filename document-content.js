@@ -25,7 +25,7 @@ function renderDocument(id, brand){
   // the exact CV built in the Resume builder (same layout + sections).
   if(c && c.type==='resume' && typeof renderResume==='function'){
     const cfg = c.resume || {};
-    return renderResume({layout:cfg.layout, brand:b, sections:cfg.sections});
+    return renderResume({layout:cfg.layout, brand:b, placement:cfg.placement, sections:cfg.sections});
   }
   // Section/page documents render from their saved block/element composition —
   // the same items the Document builder assembles (see document-render.js).

@@ -14,43 +14,65 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
-  /* Resume builder — a base-layout picker, unlike the block-based Document builder.
-     Left: layout gallery · Middle: A4 preview · Right: customise (brand + sections). */
-  .rb-wrap{display:grid;grid-template-columns:230px 1fr 296px;gap:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;height:calc(100vh - 184px);min-height:520px}
+  /* Resume builder — same 3-pane shape as the Page builder. Instead of blocks you
+     place resume SECTIONS into the base layout's REGIONS. */
+  .rb-wrap{display:grid;grid-template-columns:236px 1fr 288px;gap:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;height:calc(100vh - 184px);min-height:520px}
   .rb-col{display:flex;flex-direction:column;min-height:0}
-  .rb-col.gallery{border-right:1px solid var(--border);background:#fcfdfd}
+  .rb-col.pal{border-right:1px solid var(--border);background:#fcfdfd}
   .rb-col.props{border-left:1px solid var(--border);background:#fcfdfd}
   .rb-head{padding:13px 15px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--gray);flex-shrink:0}
   .rb-body{padding:12px;overflow:auto;flex:1}
-  .rb-lay{border:1.5px solid var(--border);border-radius:10px;background:#fff;padding:9px;margin-bottom:10px;cursor:pointer;transition:border-color .12s,box-shadow .12s}
-  .rb-lay:hover{border-color:var(--teal)}
-  .rb-lay.on{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
-  .rb-lay .thumb{height:88px;border-radius:6px;overflow:hidden;display:flex;gap:3px;background:#eef2f1;padding:5px}
-  .rb-lay .nm{font-size:12.5px;font-weight:600;margin-top:7px}
-  .rb-lay .ds{font-size:11px;color:var(--gray);line-height:1.3;margin-top:1px}
-  /* schematic bits */
-  .sk{background:#cbd6d2;border-radius:2px}
-  .sk.d{background:#9fb2ac}
-  .rb-canvas{background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;flex:1;overflow:auto;padding:26px;display:flex;justify-content:center}
+  .rb-hint{font-size:11.5px;color:var(--light);margin:2px 4px 10px;line-height:1.4}
+  /* Section palette chips */
+  .rb-pal-sec{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid var(--border);border-radius:9px;background:#fff;margin-bottom:8px;cursor:grab;font-size:13px}
+  .rb-pal-sec:hover{border-color:var(--teal);background:var(--teal-tint)}
+  .rb-pal-sec.placed{opacity:.45;cursor:default}
+  .rb-pal-sec .ms{font-size:18px;color:var(--teal)}
+  .rb-pal-sec .nm{flex:1;min-width:0}
+  .rb-pal-sec .add{color:var(--light);font-size:17px}
+  /* Middle: toolbar + canvas */
+  .rb-mid{display:flex;flex-direction:column;min-width:0;background:#fff}
+  .rb-toolbar{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+  .rb-brandsel{display:inline-flex;align-items:center;gap:6px;margin-left:auto;color:var(--gray);font-size:12.5px}
+  .rb-brandsel .ms{font-size:16px;color:var(--teal)}
+  .rb-canvas{flex:1;overflow:auto;padding:22px;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px}
   .rb-canvas::-webkit-scrollbar{width:9px}.rb-canvas::-webkit-scrollbar-thumb{background:#c3ccc9;border-radius:9px}
-  .a4{width:620px;min-height:877px;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.16);overflow:hidden;align-self:flex-start}
+  .a4{width:620px;min-height:877px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.16);overflow:hidden}
+  /* Arrange mode: regions with section cards */
+  .rb-arrange{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+  .rb-region{border:1px solid var(--border);border-radius:12px;background:#fff;overflow:hidden}
+  .rb-region-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray);padding:10px 13px;background:#fafbfb;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+  .rb-region-h .ms{font-size:15px;color:var(--teal)}
+  .rb-region-h .rc{margin-left:auto;color:var(--light);font-weight:600}
+  .rb-region-body{padding:11px;min-height:52px;display:flex;flex-direction:column;gap:8px}
+  .rb-region.over{outline:2px solid var(--teal);outline-offset:-2px}
+  .rb-region.over .rb-region-body{background:var(--teal-tint)}
+  .rb-sec{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:#fff;cursor:grab;font-size:13px}
+  .rb-sec:hover{border-color:var(--teal)}
+  .rb-sec.dragging{opacity:.4}
+  .rb-sec .grip{color:var(--light);font-size:18px}
+  .rb-sec .sic{color:var(--teal);font-size:17px}
+  .rb-sec .nm{flex:1;font-weight:500}
+  .rb-sec .rm{color:var(--light);cursor:pointer;font-size:17px}
+  .rb-sec .rm:hover{color:#c0392b}
+  .rb-region-empty{color:var(--light);font-size:12px;text-align:center;padding:9px;border:1.5px dashed var(--border);border-radius:8px}
+  /* Right: design panel */
   .ps{padding:16px;border-bottom:1px solid var(--border)}
   .ps h4{font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--gray);margin-bottom:11px}
   .ps .lbl{font-size:12px;color:var(--gray);margin:11px 0 5px;font-weight:500}
   .fin{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 9px;font-family:inherit;font-size:13px;background:#fff}
+  .lay-card{display:flex;gap:10px;align-items:center;border:1.5px solid var(--border);border-radius:10px;padding:8px;margin-bottom:8px;cursor:pointer}
+  .lay-card:hover{border-color:var(--teal)}
+  .lay-card.on{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
+  .lay-card .thumb{width:56px;height:44px;border-radius:5px;overflow:hidden;display:flex;gap:2px;background:#eef2f1;padding:4px;flex-shrink:0}
+  .lay-card .nm{font-size:12.5px;font-weight:600}
+  .lay-card .ds{font-size:10.5px;color:var(--gray);line-height:1.3}
+  .sk{background:#cbd6d2;border-radius:2px}.sk.d{background:#9fb2ac}
   .swatches{display:flex;gap:7px;flex-wrap:wrap;margin-top:2px}
   .sw{width:26px;height:26px;border-radius:7px;cursor:pointer;border:2px solid transparent}
   .sw.on{border-color:var(--ink)}
-  .sec-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--row);font-size:13px}
-  .sec-row:last-child{border-bottom:none}
-  .sec-row .ms.grip{color:var(--light);cursor:grab;font-size:18px}
-  .sec-row .nm{flex:1}
-  .sw-toggle{position:relative;width:34px;height:20px;border-radius:100px;background:#cfd8d5;cursor:pointer;flex-shrink:0;transition:background .15s}
-  .sw-toggle.on{background:var(--teal)}
-  .sw-toggle i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
-  .sw-toggle.on i{left:16px}
   .rb-foot{padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0}
-  @media(max-width:1000px){ .rb-wrap{grid-template-columns:1fr} .rb-col.gallery,.rb-col.props{display:none} }
+  @media(max-width:1000px){ .rb-wrap{grid-template-columns:1fr} .rb-col.pal,.rb-col.props{display:none} }
 </style>
 </head>
 <body data-page="library" data-title="Documents">
@@ -61,7 +83,7 @@
         <a class="dt-back" href="library.html" title="Back to Documents"><span class="ms">arrow_back</span></a>
         <div>
           <input id="r-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:300px" value="Untitled Resume">
-          <div class="pg-sub">Pick a <strong>base layout</strong>, then tailor the brand and sections — a data-driven CV, not a block stack.</div>
+          <div class="pg-sub">Pick a <strong>base layout</strong>, then place each section where it should sit — a data-driven CV, built like a page.</div>
         </div>
       </div>
       <div class="pg-acts">
@@ -72,32 +94,40 @@
     </div>
 
     <div class="rb-wrap">
-      <!-- Left: base layout gallery -->
-      <div class="rb-col gallery">
-        <div class="rb-head">Base layouts</div>
-        <div class="rb-body" id="gallery"></div>
+      <!-- LEFT: sections palette -->
+      <div class="rb-col pal">
+        <div class="rb-head">Sections</div>
+        <div class="rb-body">
+          <div class="rb-hint">Drag a section into a region, or click to add it.</div>
+          <div id="sectionPalette"></div>
+        </div>
       </div>
-      <!-- Middle: A4 preview -->
-      <div class="rb-canvas"><div class="a4" id="paper"></div></div>
-      <!-- Right: customise -->
+
+      <!-- MIDDLE: arrange / preview -->
+      <div class="rb-mid">
+        <div class="rb-toolbar">
+          <span class="view-seg" id="modeSeg"><button data-m="layout" class="on"><span class="ms">dashboard_customize</span> Arrange</button><button data-m="preview"><span class="ms">visibility</span> Preview</button></span>
+          <span class="rb-brandsel"><span class="ms">palette</span> Preview as <select id="brandSel" class="fin" style="width:auto;padding:5px 8px"></select></span>
+        </div>
+        <div class="rb-canvas"><div id="stage"></div></div>
+      </div>
+
+      <!-- RIGHT: base layout + brand -->
       <div class="rb-col props">
-        <div class="rb-head">Customise</div>
+        <div class="rb-head">Design</div>
         <div style="overflow:auto;flex:1">
           <div class="ps">
+            <h4>Base layout</h4>
+            <div id="layoutList"></div>
+          </div>
+          <div class="ps">
             <h4>Brand</h4>
-            <div class="lbl" style="margin-top:0">Preview / assign as client</div>
-            <select id="brandSel" class="fin"></select>
-            <div class="lbl">Accent colour</div>
+            <div class="lbl" style="margin-top:0">Accent colour</div>
             <div class="swatches" id="accents"></div>
             <div class="lbl">Heading font</div>
             <select id="headFont" class="fin"></select>
             <div class="lbl">Body font</div>
             <select id="bodyFont" class="fin"></select>
-            <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;cursor:pointer"><input type="checkbox" id="logoOn" checked> Show client logo</label>
-          </div>
-          <div class="ps">
-            <h4>Sections <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">— map data in</span></h4>
-            <div id="sections"></div>
           </div>
         </div>
         <div class="rb-foot">
@@ -114,79 +144,144 @@
 <script src="resume-render.js"></script>
 <script>
 function pageInit(){
-  // Layouts, sample data and the section list all come from the shared renderer
-  // (resume-render.js), so this builder and the pack/document preview are identical.
-  const LAYOUTS=RESUME_LAYOUTS, DATA=RESUME_DATA, SECTIONS=RESUME_SECTIONS;
-
   // ---- State ----
   const BRANDS=[{id:'',name:'Brand-neutral',brand:{primary:'#27535C',secondary:'#38988A',background:'#F7F9F8',font:'Outfit',bodyFont:'Outfit'}},
     ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand,tenant:t}))];
   const FONTS=['Outfit','Inter','Poppins','Lora','Roboto'];
   const ACCENTS=['#38988A','#1D9E75','#2F6DF6','#B4530A','#8A46B8','#C0392B','#0E7C86'];
-  let layout='left-panel', brandId='', accent='#38988A', headFont='Outfit', bodyFont='Outfit', showLogo=true;
-  const secOn=Object.fromEntries(SECTIONS.map(s=>[s.id, RESUME_SECTION_DEFAULT.includes(s.id)]));
+  let mode='layout', layout='left-panel', brandId='', accent='#38988A', headFont='Outfit', bodyFont='Outfit';
+  // placement = { regionId: [sectionId, …] } — deep copy the layout's defaults to start.
+  const layDef = id => RESUME_LAYOUTS.find(l=>l.id===id) || RESUME_LAYOUTS[0];
+  let placement = clonePlacement(layDef(layout).defaults);
+  function clonePlacement(p){ const o={}; Object.keys(p).forEach(k=>o[k]=p[k].slice()); return o; }
+  const allPlaced = () => Object.values(placement).flat();
+  const regionOf = id => Object.keys(placement).find(r=>placement[r].includes(id));
 
-  function curBrand(){ const b=BRANDS.find(x=>x.id===brandId)||BRANDS[0]; return {...b.brand, secondary:accent, font:headFont, bodyFont:bodyFont, tenant:b.tenant, name:b.name}; }
+  function curBrand(){ const bb=BRANDS.find(x=>x.id===brandId)||BRANDS[0]; return Object.assign({}, bb.brand, {secondary:accent, font:headFont, bodyFont:bodyFont, tenant:bb.tenant, name:bb.name}); }
+  function logoInitials(){ const bb=BRANDS.find(x=>x.id===brandId); return bb&&bb.tenant?bb.tenant.initials:undefined; }
 
-  // ---- Resume rendering — delegates to the shared renderer (single source) ----
-  function renderResumePaper(){
-    const b=curBrand();
-    const enabled=SECTIONS.filter(s=>secOn[s.id]).map(s=>s.id);
-    const tenant=(BRANDS.find(x=>x.id===brandId)||{}).tenant;
-    document.getElementById('paper').innerHTML=renderResume({layout, brand:b, sections:enabled, showLogo, logoInitials:tenant?tenant.initials:undefined});
-  }
-
-  // ---- Gallery ----
-  function renderGallery(){
-    document.getElementById('gallery').innerHTML=LAYOUTS.map(l=>`
-      <div class="rb-lay ${l.id===layout?'on':''}" data-lay="${l.id}">
-        <div class="thumb">${l.thumb}</div>
-        <div class="nm">${l.name}</div><div class="ds">${l.desc}</div>
+  // ---- Section palette ----
+  function renderSectionPalette(){
+    const placed=new Set(allPlaced());
+    document.getElementById('sectionPalette').innerHTML = RESUME_SECTIONS.map(s=>`
+      <div class="rb-pal-sec ${placed.has(s.id)?'placed':''}" draggable="${placed.has(s.id)?'false':'true'}" data-id="${s.id}">
+        <span class="ms">${s.icon}</span><span class="nm">${s.name}</span>${placed.has(s.id)?'<span class="ms" style="font-size:16px;color:#2E7D32">check</span>':'<span class="ms add">add</span>'}
       </div>`).join('');
-    document.querySelectorAll('.rb-lay').forEach(el=>el.addEventListener('click',()=>{ layout=el.dataset.lay; renderGallery(); renderResumePaper(); showToast('Layout: '+LAYOUTS.find(l=>l.id===layout).name); }));
+    document.querySelectorAll('#sectionPalette .rb-pal-sec').forEach(el=>{
+      if(el.classList.contains('placed')) return;
+      el.addEventListener('click',()=>addSection(el.dataset.id));
+      el.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text','add:'+el.dataset.id); });
+    });
+  }
+  function firstRegion(){ return layDef(layout).regions[0].id; }
+  function addSection(id, region, index){
+    if(regionOf(id)) return;
+    const r = region || firstRegion();
+    if(typeof index==='number') placement[r].splice(index,0,id); else placement[r].push(id);
+    renderAll(); showToast('Added: '+RESUME_SECTION_NAME[id]);
+  }
+  function removeSection(id){ const r=regionOf(id); if(r){ placement[r]=placement[r].filter(x=>x!==id); renderAll(); } }
+  function moveSection(id, toRegion, index){
+    const from=regionOf(id); if(!from) return;
+    placement[from]=placement[from].filter(x=>x!==id);
+    if(typeof index==='number') placement[toRegion].splice(index,0,id); else placement[toRegion].push(id);
+    renderAll();
   }
 
-  // ---- Customise controls ----
+  // ---- Arrange canvas (regions + section cards) ----
+  function renderArrange(){
+    const lay=layDef(layout);
+    document.getElementById('stage').innerHTML = `<div class="rb-arrange">${lay.regions.map(rg=>`
+      <div class="rb-region" data-region="${rg.id}">
+        <div class="rb-region-h"><span class="ms">view_column</span> ${rg.name} <span class="rc">${(placement[rg.id]||[]).length}</span></div>
+        <div class="rb-region-body">${(placement[rg.id]||[]).length ? placement[rg.id].map((id,i)=>`
+          <div class="rb-sec" draggable="true" data-id="${id}" data-i="${i}">
+            <span class="ms grip">drag_indicator</span><span class="ms sic">${RESUME_SECTION_ICON[id]||'article'}</span><span class="nm">${RESUME_SECTION_NAME[id]||id}</span><span class="ms rm" data-rm="${id}" title="Remove">close</span>
+          </div>`).join('') : '<div class="rb-region-empty">Drop a section here</div>'}
+        </div>
+      </div>`).join('')}</div>`;
+    wireArrange();
+  }
+  function wireArrange(){
+    const stage=document.getElementById('stage');
+    stage.querySelectorAll('.rb-sec .rm').forEach(x=>x.addEventListener('click',e=>{ e.stopPropagation(); removeSection(x.dataset.rm); }));
+    stage.querySelectorAll('.rb-sec').forEach(card=>{
+      card.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text','move:'+card.dataset.id); card.classList.add('dragging'); });
+      card.addEventListener('dragend',()=>card.classList.remove('dragging'));
+      card.addEventListener('dragover',e=>e.preventDefault());
+      card.addEventListener('drop',e=>{ e.preventDefault(); e.stopPropagation(); const tok=e.dataTransfer.getData('text'); const rg=card.closest('.rb-region').dataset.region; const idx=+card.dataset.i; handleDrop(tok, rg, idx); });
+    });
+    stage.querySelectorAll('.rb-region').forEach(rg=>{
+      rg.addEventListener('dragover',e=>{ e.preventDefault(); rg.classList.add('over'); });
+      rg.addEventListener('dragleave',e=>{ if(!rg.contains(e.relatedTarget)) rg.classList.remove('over'); });
+      rg.addEventListener('drop',e=>{ e.preventDefault(); rg.classList.remove('over'); handleDrop(e.dataTransfer.getData('text'), rg.dataset.region); });
+    });
+  }
+  function handleDrop(tok, region, index){
+    if(!tok) return;
+    if(tok.startsWith('add:')) addSection(tok.slice(4), region, index);
+    else if(tok.startsWith('move:')) moveSection(tok.slice(5), region, index);
+  }
+
+  // ---- Preview ----
+  function renderPreview(){
+    document.getElementById('stage').innerHTML = `<div class="a4">${renderResume({layout, brand:curBrand(), placement, logoInitials:logoInitials()})}</div>`;
+  }
+  function renderStage(){ mode==='layout' ? renderArrange() : renderPreview(); }
+  function renderAll(){ renderSectionPalette(); renderStage(); }
+
+  // ---- Base layout list ----
+  function renderLayoutList(){
+    document.getElementById('layoutList').innerHTML = RESUME_LAYOUTS.map(l=>`
+      <div class="lay-card ${l.id===layout?'on':''}" data-lay="${l.id}">
+        <div class="thumb">${l.thumb}</div><div><div class="nm">${l.name}</div><div class="ds">${l.desc}</div></div>
+      </div>`).join('');
+    document.querySelectorAll('#layoutList .lay-card').forEach(el=>el.addEventListener('click',()=>changeLayout(el.dataset.lay)));
+  }
+  function changeLayout(id){
+    if(id===layout) return;
+    const placed=allPlaced();                 // keep the sections the user has chosen
+    layout=id;
+    const def=layDef(id).defaults, np={};
+    Object.keys(def).forEach(r=>{ np[r]=def[r].filter(s=>placed.includes(s)); });
+    const first=layDef(id).regions[0].id, seen=new Set(Object.values(np).flat());
+    placed.forEach(s=>{ if(!seen.has(s)) np[first].push(s); });   // re-home any that don't fit the defaults
+    placement=np;
+    renderLayoutList(); renderAll(); showToast('Layout: '+layDef(id).name);
+  }
+
+  // ---- Brand controls ----
   function ensureFont(name){ if(!name||FONTS.includes(name))return; const id='gf-'+name.replace(/\s+/g,'-'); if(document.getElementById(id))return; const l=document.createElement('link'); l.id=id; l.rel='stylesheet'; l.href='https://fonts.googleapis.com/css2?family='+name.replace(/\s+/g,'+')+':wght@400;500;600;700&display=swap'; document.head.appendChild(l); }
   const brandSel=document.getElementById('brandSel');
   brandSel.innerHTML=BRANDS.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
-  brandSel.addEventListener('change',()=>{ brandId=brandSel.value; const b=BRANDS.find(x=>x.id===brandId); if(b&&b.tenant){ accent=b.brand.secondary; headFont=b.brand.font; bodyFont=b.brand.bodyFont; syncControls(); } renderResumePaper(); });
+  brandSel.addEventListener('change',()=>{ brandId=brandSel.value; const b=BRANDS.find(x=>x.id===brandId); if(b&&b.tenant){ accent=b.brand.secondary; headFont=b.brand.font; bodyFont=b.brand.bodyFont; syncControls(); } renderStage(); });
   const headSel=document.getElementById('headFont'), bodySel=document.getElementById('bodyFont');
   headSel.innerHTML=bodySel.innerHTML=FONTS.map(f=>`<option>${f}</option>`).join('');
-  headSel.addEventListener('change',()=>{ headFont=headSel.value; ensureFont(headFont); renderResumePaper(); });
-  bodySel.addEventListener('change',()=>{ bodyFont=bodySel.value; ensureFont(bodyFont); renderResumePaper(); });
-  document.getElementById('logoOn').addEventListener('change',e=>{ showLogo=e.target.checked; renderResumePaper(); });
+  headSel.addEventListener('change',()=>{ headFont=headSel.value; ensureFont(headFont); renderStage(); });
+  bodySel.addEventListener('change',()=>{ bodyFont=bodySel.value; ensureFont(bodyFont); renderStage(); });
   function renderAccents(){ document.getElementById('accents').innerHTML=ACCENTS.map(c=>`<span class="sw ${c===accent?'on':''}" style="background:${c}" data-c="${c}"></span>`).join('');
-    document.querySelectorAll('#accents .sw').forEach(s=>s.addEventListener('click',()=>{ accent=s.dataset.c; renderAccents(); renderResumePaper(); })); }
+    document.querySelectorAll('#accents .sw').forEach(s=>s.addEventListener('click',()=>{ accent=s.dataset.c; renderAccents(); renderStage(); })); }
   function syncControls(){ headSel.value=headFont; bodySel.value=bodyFont; renderAccents(); }
 
-  // ---- Sections ----
-  function renderSections(){
-    document.getElementById('sections').innerHTML=SECTIONS.map(s=>`
-      <div class="sec-row" data-id="${s.id}">
-        <span class="ms grip">drag_indicator</span>
-        <span class="nm">${s.name}</span>
-        <span class="sw-toggle ${secOn[s.id]?'on':''}" data-id="${s.id}"><i></i></span>
-      </div>`).join('');
-    document.querySelectorAll('.sw-toggle').forEach(t=>t.addEventListener('click',()=>{ const id=t.dataset.id; secOn[id]=!secOn[id]; t.classList.toggle('on',secOn[id]); renderResumePaper(); }));
-  }
+  // ---- Mode toggle ----
+  document.querySelectorAll('#modeSeg button').forEach(b=>b.addEventListener('click',()=>{
+    mode=b.dataset.m; document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x===b)); renderStage();
+  }));
 
   // ---- Header actions ----
-  document.getElementById('r-name').addEventListener('input',()=>{});
   document.getElementById('saveBtn').addEventListener('click',()=>showToast('Saved resume layout — Draft'));
   document.getElementById('dupBtn').addEventListener('click',()=>showToast('Duplicated resume as a new layout'));
   document.getElementById('newLayoutBtn').addEventListener('click',()=>showToast('Saved as a new base layout — available when creating resumes'));
 
-  // Deep-link: editing an existing resume document — load its saved layout +
-  // sections so the builder matches exactly what the pack/document preview renders.
+  // Deep-link: editing an existing resume document loads its layout + placement.
   const id=new URLSearchParams(location.search||location.hash.slice(1)).get('id');
   if(id && typeof COMPONENTS!=='undefined'){ const c=(window.COMPONENTS||[]).find(x=>x.id===id); if(c){
     document.getElementById('r-name').value=c.name;
     if(c.status){ const sb=document.getElementById('r-status'); sb.className='badge b-'+c.status; sb.innerHTML='<span class="b-dot"></span>'+c.status[0].toUpperCase()+c.status.slice(1); }
-    if(c.resume){ if(c.resume.layout) layout=c.resume.layout; if(c.resume.sections){ SECTIONS.forEach(s=>{ secOn[s.id]=c.resume.sections.includes(s.id); }); } }
+    if(c.resume){ if(c.resume.layout) layout=c.resume.layout; placement = c.resume.placement ? clonePlacement(c.resume.placement) : clonePlacement(layDef(layout).defaults); }
   } }
 
-  renderGallery(); renderAccents(); renderSections(); renderResumePaper();
+  renderLayoutList(); renderAccents(); renderAll();
 }
 </script>
 </body>
