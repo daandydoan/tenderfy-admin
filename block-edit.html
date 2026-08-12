@@ -351,7 +351,7 @@
           </div>
           <div class="insp-sec" data-sec="border">
             <div class="insp-h">Border</div>
-            <div class="insp-row" data-field="rad"><label>Radius</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-rad" min="0" max="40"><input type="number" class="insp-num" id="s-radN"><span class="insp-unit">px</span></div></div>
+            <div class="insp-row" data-field="rad"><label>Radius</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-rad" min="0" max="200"><input type="number" class="insp-num" id="s-radN"><span class="insp-unit">px</span></div></div>
             <div class="insp-row" data-field="bwstyle"><label>Width</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-bw"><span class="insp-unit">px</span><select class="insp-sel" id="s-bstyle" style="flex:1"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div></div>
             <div class="insp-row tall" data-field="bcolor"><label>Colour</label><div class="insp-ctl col">
               <select class="insp-sel" id="s-bcolorBind">
@@ -694,13 +694,13 @@ function pageInit(){
     w.style.width = bs.wmode==='fixed' ? bs.wpx+'px' : '100%'; w.style.maxWidth='100%';
     w.style.marginLeft = bs.wmode==='fixed'?'auto':''; w.style.marginRight = bs.wmode==='fixed'?'auto':'';
     w.style.padding = bs.pad?bs.pad+'px':''; w.style.gap = bs.sp+'px';
-    w.style.background = resolveFill(bs)||''; w.style.borderRadius = bs.rad?bs.rad+'px':'';
+    w.style.background = resolveFill(bs)||''; w.style.borderRadius = bs.rad?bs.rad+'px':''; w.style.overflow = bs.rad>0?'hidden':'';
     w.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+resolveBColor(bs)):'none';
   }
   function applyElStyle(node, st){
     if(!node) return;
     node.style.padding = st.pad?st.pad+'px':''; node.style.background = resolveFill(st)||'';
-    node.style.borderRadius = st.rad?st.rad+'px':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+resolveBColor(st)):'';
+    node.style.borderRadius = st.rad?st.rad+'px':''; node.style.overflow = st.rad>0?'hidden':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+resolveBColor(st)):'';
     node.style.textAlign = st.align||'';
     const typo={};
     if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;

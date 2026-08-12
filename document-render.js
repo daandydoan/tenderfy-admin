@@ -41,6 +41,7 @@ function docItemHtml(it, brand, cls){
   }
   const s=it.style||DOC_ITEM_STYLE_DEFAULT;
   let c=`box-sizing:border-box;padding:${s.pad||0}px;border-radius:${s.rad||0}px;margin-bottom:${s.gap!=null?s.gap:16}px;`+docHeightCss(s);
+  if(s.rad>0) c+='overflow:hidden;';   // clip content so a high radius rounds the image (up to a full circle)
   if(s.bgOn) c+=`background:${s.bg};`;
   if(s.bcOn) c+=`border:1px solid ${s.bc};`;
   return `<div class="${cls||'doc-blk-r'}" style="${c}">${inner}</div>`;
