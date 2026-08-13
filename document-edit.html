@@ -48,6 +48,7 @@
   .d-search .ms{font-size:17px;color:var(--light)}
   .d-search input{border:none;outline:none;font-family:inherit;font-size:12.5px;width:100%;background:transparent}
   .vb-canvas{flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
+  .vb-canvas.drag-over{outline:2px dashed var(--teal);outline-offset:-6px}
   .vb-bar{display:flex;align-items:center;gap:9px;width:620px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
   /* Stage holds one A4 page (Layout) or many (multi-page Preview) */
   .vb-stage{display:flex;flex-direction:column;align-items:center;gap:22px;min-height:100%}
@@ -342,7 +343,6 @@
             </div>
           </div>
           <div class="vb-stage" id="canvas"></div>
-          <div class="vb-tail" id="drop"><span class="ms">add</span> Drag a block here, or click one on the left</div>
         </div>
       </div>
 
@@ -508,7 +508,7 @@ function pageInit(){
   document.getElementById('pq').addEventListener('input',e=>{pq=e.target.value.toLowerCase().trim();renderPalette();});
 
   // ---- Canvas ----
-  const wrap=document.getElementById('cvWrap'), canvas=document.getElementById('canvas'), drop=document.getElementById('drop');
+  const wrap=document.getElementById('cvWrap'), canvas=document.getElementById('canvas');
   // Per-block height mode: auto / hug / fixed / min / max.
   function heightCss(s){
     const m=s.hMode||'auto', v=Math.max(0,s.hVal||0);
@@ -592,7 +592,7 @@ function pageInit(){
     canvas.style.setProperty('--teal', brand?brand.secondary:'');
     let pageCount=1;
     if(mode==='preview' && items.length){
-      pageCount=renderPreview(); drop.style.display='none';
+      pageCount=renderPreview();
     } else {
       if(!items.length){
         canvas.innerHTML=`<div class="vb-page"><div class="doc-bg">${renderDocBg(0)}</div><div class="doc-body"><div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div></div></div>`;
@@ -614,7 +614,6 @@ function pageInit(){
         }).join('');
         canvas.innerHTML=`<div class="vb-page"><div class="doc-bg">${renderDocBg(0)}</div><div class="doc-body">${furnSlot('header')}${rows}${furnSlot('footer',true)}</div></div>`;
       }
-      drop.style.display='';
     }
     const lc=document.getElementById('lyr-count'); if(lc) lc.textContent=items.length;
     document.getElementById('doc-count').textContent=items.length?`· ${items.length} block${items.length>1?'s':''} · ${pageCount} A4 page${pageCount>1?'s':''}`:'';
@@ -638,9 +637,9 @@ function pageInit(){
     });
   }
   function addItem(tok){ const it=instFromToken(tok); items.push(it); selK=(mode==='layout')?it.k:null; render(); renderInspector(); showToast((it.el?'Added element: ':'Added block: ')+instLabel(it)); }
-  wrap.addEventListener('dragover',e=>{ if(e.dataTransfer.types.includes('add')){ e.preventDefault(); drop.classList.add('over'); } });
-  wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) drop.classList.remove('over'); });
-  wrap.addEventListener('drop',e=>{ drop.classList.remove('over'); const add=e.dataTransfer.getData('add'); if(add && !e.target.closest('.doc-blk')){ e.preventDefault(); addItem(add); } });
+  wrap.addEventListener('dragover',e=>{ if(e.dataTransfer.types.includes('add')){ e.preventDefault(); wrap.classList.add('drag-over'); } });
+  wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over'); });
+  wrap.addEventListener('drop',e=>{ wrap.classList.remove('drag-over'); const add=e.dataTransfer.getData('add'); if(add && !e.target.closest('.doc-blk')){ e.preventDefault(); addItem(add); } });
 
   document.getElementById('saveBtn').addEventListener('click',()=>{
     const n=document.getElementById('d-name').value.trim();
