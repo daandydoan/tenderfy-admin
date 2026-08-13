@@ -65,6 +65,19 @@
   .pg-brk{display:flex;align-items:center;gap:10px;margin:10px 2px 16px;color:#8a99a4;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;user-select:none}
   .pg-brk::before,.pg-brk::after{content:'';flex:1;border-top:1.5px dashed #c2ccc9}
   .pg-brk span{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+  /* Compact block row — Layout view outline (full render is in Preview) */
+  .doc-compact{display:flex;align-items:center;gap:11px;padding:9px 11px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:grab}
+  .doc-compact:last-child{margin-bottom:0}
+  .doc-compact:hover{border-color:var(--teal)}
+  .doc-compact.sel{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-tint)}
+  .doc-compact .cmp-grip{color:var(--light);font-size:19px;flex-shrink:0}
+  .doc-compact .cmp-ic{width:30px;height:30px;border-radius:7px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .doc-compact .cmp-ic .ms{font-size:17px}
+  .doc-compact .cmp-name{flex:1;min-width:0;font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .doc-compact .cmp-tag{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--gray);background:#eef3f1;border-radius:100px;padding:2px 8px;flex-shrink:0}
+  .doc-compact .cmp-tag.el{color:var(--teal);background:var(--teal-tint)}
+  .doc-compact .cmp-rm{color:var(--light);cursor:pointer;font-size:18px;flex-shrink:0}
+  .doc-compact .cmp-rm:hover{color:#c0392b}
   .vb-tail{width:620px;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:12px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
   .vb-tail.over{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .vb-tail .ms{font-size:17px}
@@ -421,6 +434,7 @@ function pageInit(){
   function instObj(it){ return it.el ? (pById[it.pid]||{}) : (bById[it.bid]||{}); }
   function instLabel(it){ const o=instObj(it); return it.el ? (o.name||it.pid) : (o.label||it.bid); }
   function instDesc(it){ return instObj(it).desc||''; }
+  function instIcon(it){ if(it.el) return (typeof PRIM_ICON!=='undefined'&&PRIM_ICON[it.pid])||'widgets'; const p=(instObj(it).p)||''; return /^l[hf]-/.test(p)?'flip_to_front':'grid_view'; }
   function instSchematic(it){ return it.el ? renderPrimitive(it.pid, null) : blockPreview(instObj(it).p); }
   function instComposed(it){ return it.el ? renderPrimitive(it.pid, brand) : ((typeof composeBlock==='function')?composeBlock(instObj(it), brand):blockPreview(instObj(it).p)); }
   function instFromToken(tok){ return String(tok).startsWith('el:') ? mkInst(tok.slice(3), true) : mkInst(tok); }
@@ -586,12 +600,14 @@ function pageInit(){
         // Group the blocks into A4 pages (measured from the real content) so Layout view
         // paginates like Preview — you can compare each block per page across the two views.
         const {count, pageOf}=measurePages(); pageCount=count;
+        // Compact row — the full render lives in Preview; Layout is a tight, paginated outline.
         const card=(it,i)=>`
-          <div class="doc-blk blk-card ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}">
-            <div class="doc-tools"><span class="tb grab" data-grip><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}"><span class="ms">delete</span></span></div>
-            <div class="blk-name">${instLabel(it)} ${it.el?'<span class="blk-custom" style="background:#eef3f1;color:var(--teal)">Element</span>':''}</div>
-            <div class="blk-box blk-preview" style="${boxStyle(it.style)}">${instSchematic(it)}</div>
-            <div style="font-size:12px;color:var(--gray);padding-top:11px">${instDesc(it)}</div>
+          <div class="doc-blk doc-compact ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}" title="${instDesc(it)}">
+            <span class="ms cmp-grip" data-grip>drag_indicator</span>
+            <span class="cmp-ic"><span class="ms">${instIcon(it)}</span></span>
+            <span class="cmp-name">${instLabel(it)}</span>
+            <span class="cmp-tag ${it.el?'el':''}">${it.el?'Element':'Block'}</span>
+            <span class="ms cmp-rm" data-rm="${i}" title="Remove">close</span>
           </div>`;
         const groups=[]; items.forEach((it,i)=>{ (groups[pageOf[i]]=groups[pageOf[i]]||[]).push(i); });
         canvas.innerHTML=groups.map((idxs,pi)=>{
