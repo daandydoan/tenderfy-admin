@@ -597,10 +597,9 @@ function pageInit(){
       if(!items.length){
         canvas.innerHTML=`<div class="vb-page"><div class="doc-bg">${renderDocBg(0)}</div><div class="doc-body"><div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div></div></div>`;
       } else {
-        // Group the blocks into A4 pages (measured from the real content) so Layout view
-        // paginates like Preview — you can compare each block per page across the two views.
+        // Layout = one A4-min-height page of compact rows; drop in a page-break divider
+        // wherever the real content overflows onto the next A4 page.
         const {count, pageOf}=measurePages(); pageCount=count;
-        // Compact row — the full render lives in Preview; Layout is a tight, paginated outline.
         const card=(it,i)=>`
           <div class="doc-blk doc-compact ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}" title="${instDesc(it)}">
             <span class="ms cmp-grip" data-grip>drag_indicator</span>
@@ -609,12 +608,11 @@ function pageInit(){
             <span class="cmp-tag ${it.el?'el':''}">${it.el?'Element':'Block'}</span>
             <span class="ms cmp-rm" data-rm="${i}" title="Remove">close</span>
           </div>`;
-        const groups=[]; items.forEach((it,i)=>{ (groups[pageOf[i]]=groups[pageOf[i]]||[]).push(i); });
-        canvas.innerHTML=groups.map((idxs,pi)=>{
-          const head = pi===0 ? furnSlot('header') : '';
-          const foot = pi===groups.length-1 ? furnSlot('footer',true) : '';
-          return `<div class="vb-page lay-page"><div class="lay-tag">Page ${pi+1} <span>of ${count}</span></div><div class="doc-bg">${renderDocBg(pi)}</div><div class="doc-body">${head}${idxs.map(i=>card(items[i],i)).join('')}${foot}</div></div>`;
+        const rows=items.map((it,i)=>{
+          const brk=(i>0 && pageOf[i]!==pageOf[i-1]) ? `<div class="pg-brk"><span><span class="ms" style="font-size:14px;vertical-align:-2px">insert_page_break</span> Page ${pageOf[i]+1}</span></div>` : '';
+          return brk+card(it,i);
         }).join('');
+        canvas.innerHTML=`<div class="vb-page"><div class="doc-bg">${renderDocBg(0)}</div><div class="doc-body">${furnSlot('header')}${rows}${furnSlot('footer',true)}</div></div>`;
       }
       drop.style.display='';
     }
