@@ -55,7 +55,11 @@
   .vb-page{position:relative;width:620px;min-height:877px;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);display:flex;flex-direction:column;overflow:hidden}
   .doc-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
   .doc-body{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;padding:36px;min-height:0}
-  .pg-num{position:absolute;bottom:8px;right:12px;font-size:10px;color:var(--light);z-index:2}
+  .pg-num{position:absolute;bottom:8px;right:12px;font-size:10.5px;font-weight:600;color:var(--gray);background:#eef3f1;border-radius:100px;padding:2px 9px;z-index:2}
+  /* A4 page-break marker in the builder (Layout mode) */
+  .pg-brk{display:flex;align-items:center;gap:10px;margin:10px 2px 16px;color:#8a99a4;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;user-select:none}
+  .pg-brk::before,.pg-brk::after{content:'';flex:1;border-top:1.5px dashed #c2ccc9}
+  .pg-brk span{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
   .vb-tail{width:620px;margin:12px auto 0;border:1.5px dashed #b3beba;border-radius:9px;padding:12px;text-align:center;color:var(--gray);font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px}
   .vb-tail.over{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .vb-tail .ms{font-size:17px}
@@ -540,18 +544,46 @@ function pageInit(){
       if(cur.length||!pages.length) pages.push(cur);
     }catch(e){ pages=[blocks]; }
     const n=pages.length;
-    canvas.innerHTML=pages.map((pg,pi)=>`<div class="vb-page"><div class="doc-bg">${renderDocBg(pi)}</div><div class="doc-body">${head}${pg.join('')}${foot}</div>${n>1?`<span class="pg-num">${pi+1} / ${n}</span>`:''}</div>`).join('');
+    canvas.innerHTML=pages.map((pg,pi)=>`<div class="vb-page"><div class="doc-bg">${renderDocBg(pi)}</div><div class="doc-body">${head}${pg.join('')}${foot}</div><span class="pg-num">Page ${pi+1} / ${n}</span></div>`).join('');
+    return n;
+  }
+  // Measure the REAL rendered content into A4 pages → which page each block lands on,
+  // so the builder can show where pages break (the client "does it fit on A4?" pain point).
+  function measurePages(){
+    const {head,foot}=furnHTML(), blocks=items.map(renderBlockInstance);
+    let pageOf=[], count=1;
+    try{
+      const meas=document.createElement('div');
+      meas.style.cssText=`position:absolute;left:-9999px;top:0;width:620px;box-sizing:border-box;padding:${docStyle.pad}px;visibility:hidden`;
+      meas.innerHTML=head+blocks.join('')+foot; cvWrap.appendChild(meas);
+      const kids=[...meas.children];
+      const headH=head?kids[0].getBoundingClientRect().height+22:0;
+      const footH=foot?kids[kids.length-1].getBoundingClientRect().height+16:0;
+      const bEls=kids.slice(head?1:0, foot?kids.length-1:kids.length);
+      const hts=bEls.map(el=>{const cs=getComputedStyle(el);return el.getBoundingClientRect().height+(parseFloat(cs.marginBottom)||0);});
+      meas.remove();
+      const usable=Math.max(120, A4H-2*docStyle.pad-headH-footH);
+      let pg=0, acc=0;
+      for(let i=0;i<blocks.length;i++){ const h=hts[i]||0; if(i>0 && acc+h>usable){ pg++; acc=0; } pageOf[i]=pg; acc+=h; }
+      count=pg+1;
+    }catch(e){ pageOf=items.map(()=>0); count=1; }
+    return {count, pageOf};
   }
   function render(){
     canvas.style.setProperty('--teal', brand?brand.secondary:'');
+    let pageCount=1;
     if(mode==='preview' && items.length){
-      renderPreview(); drop.style.display='none';
+      pageCount=renderPreview(); drop.style.display='none';
     } else {
       let body;
       if(!items.length){
         body=`<div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div>`;
       } else {
-        body=items.map((it,i)=>{return `
+        // Where do A4 page breaks fall? Insert a break marker before each block that starts a new page.
+        const {count, pageOf}=measurePages(); pageCount=count;
+        body=items.map((it,i)=>{
+          const brk=(i>0 && pageOf[i]!==pageOf[i-1]) ? `<div class="pg-brk"><span><span class="ms" style="font-size:14px;vertical-align:-2px">insert_page_break</span> Page ${pageOf[i]+1}</span></div>` : '';
+          return brk+`
         <div class="doc-blk blk-card ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}">
           <div class="doc-tools"><span class="tb grab" data-grip><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}"><span class="ms">delete</span></span></div>
           <div class="blk-name">${instLabel(it)} ${it.el?'<span class="blk-custom" style="background:#eef3f1;color:var(--teal)">Element</span>':''}</div>
@@ -565,7 +597,7 @@ function pageInit(){
       drop.style.display = mode==='preview'?'none':'';
     }
     const lc=document.getElementById('lyr-count'); if(lc) lc.textContent=items.length;
-    document.getElementById('doc-count').textContent=items.length?`· ${items.length} block${items.length>1?'s':''}`:'';
+    document.getElementById('doc-count').textContent=items.length?`· ${items.length} block${items.length>1?'s':''} · ${pageCount} A4 page${pageCount>1?'s':''}`:'';
     applyDocStyle();
     wire();
   }
