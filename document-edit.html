@@ -53,6 +53,11 @@
   .vb-stage{display:flex;flex-direction:column;align-items:center;gap:22px;min-height:100%}
   /* A4-sized document page by default (grows with content) */
   .vb-page{position:relative;width:620px;min-height:877px;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);display:flex;flex-direction:column;overflow:hidden}
+  /* Layout view grouped into A4 pages (fits its cards; mirrors Preview page-for-page) */
+  .lay-page{min-height:0}
+  .lay-page + .lay-page{margin-top:32px}
+  .lay-tag{position:absolute;top:-11px;left:16px;background:var(--teal,#38988a);color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 11px;border-radius:100px;z-index:4;box-shadow:0 2px 6px rgba(20,45,38,.2)}
+  .lay-tag span{opacity:.75;font-weight:600}
   .doc-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
   .doc-body{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;padding:36px;min-height:0}
   .pg-num{position:absolute;bottom:8px;right:12px;font-size:10.5px;font-weight:600;color:var(--gray);background:#eef3f1;border-radius:100px;padding:2px 9px;z-index:2}
@@ -575,26 +580,27 @@ function pageInit(){
     if(mode==='preview' && items.length){
       pageCount=renderPreview(); drop.style.display='none';
     } else {
-      let body;
       if(!items.length){
-        body=`<div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div>`;
+        canvas.innerHTML=`<div class="vb-page"><div class="doc-bg">${renderDocBg(0)}</div><div class="doc-body"><div class="doc-empty"><span class="ms big">library_add</span>Empty document<div class="fhint" style="margin-top:6px">Drag a block from the left, or click one to add it.</div></div></div></div>`;
       } else {
-        // Where do A4 page breaks fall? Insert a break marker before each block that starts a new page.
+        // Group the blocks into A4 pages (measured from the real content) so Layout view
+        // paginates like Preview — you can compare each block per page across the two views.
         const {count, pageOf}=measurePages(); pageCount=count;
-        body=items.map((it,i)=>{
-          const brk=(i>0 && pageOf[i]!==pageOf[i-1]) ? `<div class="pg-brk"><span><span class="ms" style="font-size:14px;vertical-align:-2px">insert_page_break</span> Page ${pageOf[i]+1}</span></div>` : '';
-          return brk+`
-        <div class="doc-blk blk-card ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}">
-          <div class="doc-tools"><span class="tb grab" data-grip><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}"><span class="ms">delete</span></span></div>
-          <div class="blk-name">${instLabel(it)} ${it.el?'<span class="blk-custom" style="background:#eef3f1;color:var(--teal)">Element</span>':''}</div>
-          <div class="blk-box blk-preview" style="${boxStyle(it.style)}">${instSchematic(it)}</div>
-          <div style="font-size:12px;color:var(--gray);padding-top:11px">${instDesc(it)}</div>
-        </div>`;}).join('');
+        const card=(it,i)=>`
+          <div class="doc-blk blk-card ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}">
+            <div class="doc-tools"><span class="tb grab" data-grip><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}"><span class="ms">delete</span></span></div>
+            <div class="blk-name">${instLabel(it)} ${it.el?'<span class="blk-custom" style="background:#eef3f1;color:var(--teal)">Element</span>':''}</div>
+            <div class="blk-box blk-preview" style="${boxStyle(it.style)}">${instSchematic(it)}</div>
+            <div style="font-size:12px;color:var(--gray);padding-top:11px">${instDesc(it)}</div>
+          </div>`;
+        const groups=[]; items.forEach((it,i)=>{ (groups[pageOf[i]]=groups[pageOf[i]]||[]).push(i); });
+        canvas.innerHTML=groups.map((idxs,pi)=>{
+          const head = pi===0 ? furnSlot('header') : '';
+          const foot = pi===groups.length-1 ? furnSlot('footer',true) : '';
+          return `<div class="vb-page lay-page"><div class="lay-tag">Page ${pi+1} <span>of ${count}</span></div><div class="doc-bg">${renderDocBg(pi)}</div><div class="doc-body">${head}${idxs.map(i=>card(items[i],i)).join('')}${foot}</div></div>`;
+        }).join('');
       }
-      // Layout mode shows fixed letterhead/footer slots top & bottom (Top Layer).
-      const inner = (mode==='layout') ? furnSlot('header')+body+furnSlot('footer',true) : body;
-      canvas.innerHTML=`<div class="vb-page"><div class="doc-bg">${renderDocBg(0)}</div><div class="doc-body">${inner}</div></div>`;
-      drop.style.display = mode==='preview'?'none':'';
+      drop.style.display='';
     }
     const lc=document.getElementById('lyr-count'); if(lc) lc.textContent=items.length;
     document.getElementById('doc-count').textContent=items.length?`· ${items.length} block${items.length>1?'s':''} · ${pageCount} A4 page${pageCount>1?'s':''}`:'';
