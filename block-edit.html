@@ -794,6 +794,8 @@ function pageInit(){
     const HM={left:'flex-start',center:'center',right:'flex-end'}, VM={top:'flex-start',middle:'center',bottom:'flex-end'};
     w.style.alignItems = HM[bs.alH||'left']; w.style.justifyContent = VM[bs.alV||'top'];
     w.style.padding = boxCss(bs,'pad'); w.style.gap = bs.sp+'px';
+    // In Fill mode the W field mirrors the live rendered width (Figma-style), not a fixed number.
+    if(wm==='fill'){ const f=document.getElementById('s-wpx'); if(f && document.activeElement!==f) f.value=Math.round(w.getBoundingClientRect().width); }
     // Vertical margin only on the block wrap — left/right stay auto for centering.
     const mV = (bs.marV!=null)?bs.marV:(bs.mar||0);
     w.style.marginTop = (bs.marSides?(bs.marT||0):mV)+'px'; w.style.marginBottom = (bs.marSides?(bs.marB||0):mV)+'px';
@@ -959,7 +961,9 @@ function pageInit(){
     document.getElementById('s-color').value=t.color||'#333333'; document.getElementById('s-colorH').value=t.color||'';
     document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.al===(t.align||'')));
     document.getElementById('s-wmode').value=blockStyle.wmode;
-    document.getElementById('s-wpx').value=blockStyle.wpx; document.getElementById('s-wpx').disabled=(blockStyle.wmode==='fill');
+    const wpxEl=document.getElementById('s-wpx');
+    if(blockStyle.wmode==='fill'){ const bw=document.getElementById('blockWrap'); wpxEl.value=bw?Math.round(bw.getBoundingClientRect().width):blockStyle.wpx; wpxEl.disabled=true; }
+    else { wpxEl.value=blockStyle.wpx; wpxEl.disabled=false; }
     document.getElementById('s-hmode').value=blockStyle.hmode||'fill';
     document.getElementById('s-hpx').value=blockStyle.hpx||0; document.getElementById('s-hpx').disabled=((blockStyle.hmode||'fill')==='fill');
     document.querySelectorAll('#s-align3 button').forEach(b=>b.classList.toggle('on', b.dataset.h===(blockStyle.alH||'left') && b.dataset.v===(blockStyle.alV||'top')));
@@ -989,7 +993,10 @@ function pageInit(){
     document.getElementById('s-bcolorBind').addEventListener('change',e=>{ target().bcolorBind=e.target.value; applyActive(); syncInspector(); commitStyle(); });
     wirePaintB('bg'); wirePaintB('bcolor');
     document.getElementById('s-align').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ target().align=b.dataset.al; document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
-    document.getElementById('s-wmode').addEventListener('change',e=>{ blockStyle.wmode=e.target.value; document.getElementById('s-wpx').disabled=(blockStyle.wmode==='fill'); applyActive(); commitStyle(); });
+    document.getElementById('s-wmode').addEventListener('change',e=>{ const prev=blockStyle.wmode; blockStyle.wmode=e.target.value;
+      // Switching away from Fill adopts the current rendered width, not the stale default.
+      if(prev==='fill' && e.target.value!=='fill'){ const bw=document.getElementById('blockWrap'); if(bw) blockStyle.wpx=Math.round(bw.getBoundingClientRect().width); }
+      applyActive(); syncInspector(); commitStyle(); });
     document.getElementById('s-wpx').addEventListener('input',e=>{ blockStyle.wpx=+e.target.value||0; applyActive(); commitStyle(); });
     document.getElementById('s-hmode').addEventListener('change',e=>{ blockStyle.hmode=e.target.value; document.getElementById('s-hpx').disabled=(blockStyle.hmode==='fill'); applyActive(); commitStyle(); });
     document.getElementById('s-hpx').addEventListener('input',e=>{ blockStyle.hpx=+e.target.value||0; applyActive(); commitStyle(); });
