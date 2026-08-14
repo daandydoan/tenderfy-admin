@@ -98,6 +98,25 @@ function blockPreview(p){
     default:          return bar('80%');
   }
 }
+// ---- Auto-generated block thumbnails ------------------------------------
+// Instead of a hand-authored schematic per pattern (which falls back to a lone
+// grey bar for any custom block), render the block's REAL composition at a fixed
+// source width in neutral brand tokens, then CSS-scale it to fit the tile. Any
+// block — including bespoke ones — gets a truthful preview with zero authoring.
+const THUMB_BRAND = {primary:'#5a6b66', secondary:'#a7bcb5', background:'#ffffff', font:'Outfit', bodyFont:'Outfit'};
+const THUMB_SRC = 480;   // px the block is rendered at before scaling down
+function blockThumb(block){
+  const inner = (typeof composeBlock==='function') ? composeBlock(block, THUMB_BRAND) : blockPreview(block.p);
+  return `<div class="blk-stage" style="width:${THUMB_SRC}px;transform-origin:top left;pointer-events:none">${inner}</div>`;
+}
+// Scale every .blk-stage inside `root` so its rendered width matches its box.
+function fitThumbs(root){
+  (root||document).querySelectorAll('.blk-stage').forEach(st=>{
+    const box=st.parentElement; if(!box) return;
+    const w=box.clientWidth; if(w>0) st.style.transform='scale('+(w/THUMB_SRC)+')';
+  });
+}
+
 // Shared block actions — kept in one place so the block view and the block
 // editor share identical wording and behaviour.
 function deleteBlock(label){
@@ -134,4 +153,4 @@ const BLOCK_STATUS_META = {
   inactive:{cls:'b-deprecated', label:'Inactive'},
 };
 function blockStatusBadge(id){ const m=BLOCK_STATUS_META[blockStatus(id)]||BLOCK_STATUS_META.active; return `<span class="badge ${m.cls}"><span class="b-dot"></span>${m.label}</span>`; }
-if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.COMPOSED_BLOCKS=COMPOSED_BLOCKS; window.BLOCK_LIB_CATS=BLOCK_LIB_CATS; window.BLOCK_ELEMENT_IDS=BLOCK_ELEMENT_IDS; window.blockPreview=blockPreview; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }
+if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.COMPOSED_BLOCKS=COMPOSED_BLOCKS; window.BLOCK_LIB_CATS=BLOCK_LIB_CATS; window.BLOCK_ELEMENT_IDS=BLOCK_ELEMENT_IDS; window.blockPreview=blockPreview; window.blockThumb=blockThumb; window.fitThumbs=fitThumbs; window.THUMB_BRAND=THUMB_BRAND; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }

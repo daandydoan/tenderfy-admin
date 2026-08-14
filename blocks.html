@@ -37,6 +37,8 @@
   </div>
 </div>
 <script src="shell.js"></script>
+<script src="primitives.js"></script>
+<script src="block-layouts.js"></script>
 <script src="blocks-data.js"></script>
 <script>
 function pageInit(){
@@ -79,10 +81,11 @@ function pageInit(){
             </div>
           </span>
         </div>
-        <div class="lst-prev">${blockPreview(b.p)}</div>
+        <div class="lst-prev blk-thumb">${blockThumb(b)}</div>
         <div class="lst-desc">${b.desc}</div>
         <div class="lst-foot"><span>${b.cat}</span><span><span class="ms" style="font-size:13px;vertical-align:-2px">description</span> ${blockUsage(b.id)}</span></div>
       </div>`;}).join('');
+    if(typeof fitThumbs==='function') fitThumbs(document.getElementById('grid'));   // scale real-render thumbnails
     document.getElementById('empty').style.display=list.length?'none':'block';
   }
 
@@ -123,6 +126,7 @@ function pageInit(){
   document.getElementById('filterToggle').addEventListener('click',()=>{ filtersOpen=!filtersOpen; document.getElementById('filterRow').hidden=!filtersOpen; updateFcount(); });
 
   renderActs(); renderTabs(); renderStatusRow(); renderGrid(); updateFcount();
+  let fitT; window.addEventListener('resize',()=>{ clearTimeout(fitT); fitT=setTimeout(()=>{ if(typeof fitThumbs==='function') fitThumbs(document.getElementById('grid')); },120); });
 }
 </script>
 </body>

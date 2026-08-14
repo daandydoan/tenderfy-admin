@@ -95,6 +95,9 @@
   .vb-widget:hover .pal-prev{border-color:var(--teal-bright)}
   .pal-prev .blk-img{min-height:0;height:30px}
   .pal-prev .blk-imgs{gap:5px}
+  /* Auto-generated block thumbnail — real render, scaled to fit the tile */
+  .pal-prev.blk-thumb{justify-content:flex-start;align-items:flex-start;padding:7px}
+  .blk-stage{transform-origin:top left}
   .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
   .pal-tag:first-child{margin-top:0}
   .pal-sect{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--teal);border-top:1px solid var(--border);margin:14px 0 2px;padding-top:12px}
@@ -559,7 +562,7 @@ function pageInit(){
     const blocks=COMPOSED_BLOCKS.filter(b=>b.cat!=='Headers & Footers' && hit(b.name+' '+b.cat));
     let html=BLOCK_LIB_CATS.filter(c=>c!=='Headers & Footers' && blocks.some(b=>b.cat===c)).map(cat=>
       `<div class="pal-tag">${cat}</div>`+blocks.filter(b=>b.cat===cat).map(b=>
-        `<div class="vb-widget" draggable="true" data-id="${b.id}" data-kind="block" title="${b.desc}"><div class="pal-prev blk-preview">${blockPreview(b.p)}</div><span class="pal-lbl">${b.label}</span></div>`).join('')
+        `<div class="vb-widget" draggable="true" data-id="${b.id}" data-kind="block" title="${b.desc}"><div class="pal-prev blk-thumb">${blockThumb(b)}</div><span class="pal-lbl">${b.label}</span></div>`).join('')
     ).join('');
     // Elements (single primitives) — also placeable directly in a document.
     const els=(typeof PRIMITIVES!=='undefined'?PRIMITIVES:[]).filter(p=>hit(p.name+' '+p.tag));
@@ -571,6 +574,7 @@ function pageInit(){
       ).join('');
     }
     palette.innerHTML=html;
+    if(typeof fitThumbs==='function') fitThumbs(palette);   // scale the real-render block thumbnails to fit
     document.getElementById('pal-count').textContent=`(${blocks.length+els.length})`;
     palette.querySelectorAll('.vb-widget').forEach(el=>{
       const tok=el.dataset.kind==='element'?('el:'+el.dataset.id):el.dataset.id;
@@ -580,6 +584,7 @@ function pageInit(){
     });
   }
   document.getElementById('pq').addEventListener('input',e=>{pq=e.target.value.toLowerCase().trim();renderPalette();});
+  let fitT; window.addEventListener('resize',()=>{ clearTimeout(fitT); fitT=setTimeout(()=>{ if(typeof fitThumbs==='function') fitThumbs(palette); },120); });
 
   // ---- Canvas ----
   const wrap=document.getElementById('cvWrap'), canvas=document.getElementById('canvas');
