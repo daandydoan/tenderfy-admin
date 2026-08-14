@@ -181,6 +181,16 @@
   .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
   .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .fig-bind{margin-top:7px}
+  /* Figma-style Resizing (W/H) + Alignment + Gap */
+  .fig-label{font-size:11.5px;color:var(--gray);font-weight:500}
+  .fig-resize{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;align-items:center}
+  .fig-resize .insp-sel{height:32px;padding:0 8px}
+  .fig-align{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:66px;height:52px;background:#f2f5f4;border-radius:7px;padding:3px}
+  .fig-align button{border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border-radius:5px}
+  .fig-align button::before{content:'';width:5px;height:5px;border-radius:50%;background:#aeb9b5;transition:all .1s}
+  .fig-align button:hover::before{background:#7d8b87}
+  .fig-align button.on{background:var(--teal-tint)}
+  .fig-align button.on::before{background:var(--teal);width:12px;height:3px;border-radius:2px}
   .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
   .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
@@ -364,10 +374,27 @@
 
           <div class="insp-sec" data-sec="layout">
             <div class="insp-h">Layout</div>
-            <div class="insp-row" data-field="width"><label>Width</label><div class="insp-ctl">
-              <div class="seg" id="s-wmode"><button data-w="fill">Fill</button><button data-w="fixed">Fixed</button></div>
-              <input type="number" class="insp-num" id="s-wpx"><span class="insp-unit">px</span>
-            </div></div>
+            <div class="fig-label" style="margin-bottom:6px">Resizing</div>
+            <div class="fig-resize">
+              <span class="fig-wt" title="Width"><span class="ms">swap_horiz</span><input type="number" id="s-wpx" min="0"></span>
+              <select class="insp-sel" id="s-wmode"><option value="fill">Fill container</option><option value="fixed">Fixed width</option><option value="min">Min width</option><option value="max">Max width</option></select>
+            </div>
+            <div class="fig-resize" style="margin-top:6px">
+              <span class="fig-wt" title="Height"><span class="ms">swap_vert</span><input type="number" id="s-hpx" min="0"></span>
+              <select class="insp-sel" id="s-hmode"><option value="fill">Fill height</option><option value="fixed">Fixed height</option><option value="max">Max height</option></select>
+            </div>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:14px;margin-top:12px;align-items:start">
+              <div><div class="fig-label" style="margin-bottom:5px">Alignment</div>
+                <div class="fig-align" id="s-align3">
+                  <button type="button" data-h="left" data-v="top" title="Top left"></button><button type="button" data-h="center" data-v="top" title="Top"></button><button type="button" data-h="right" data-v="top" title="Top right"></button>
+                  <button type="button" data-h="left" data-v="middle" title="Left"></button><button type="button" data-h="center" data-v="middle" title="Centre"></button><button type="button" data-h="right" data-v="middle" title="Right"></button>
+                  <button type="button" data-h="left" data-v="bottom" title="Bottom left"></button><button type="button" data-h="center" data-v="bottom" title="Bottom"></button><button type="button" data-h="right" data-v="bottom" title="Bottom right"></button>
+                </div>
+              </div>
+              <div><div class="fig-label" style="margin-bottom:5px">Gap</div>
+                <span class="fig-wt"><span class="ms">width_normal</span><input type="number" id="s-sp" min="0" max="200"></span>
+              </div>
+            </div>
           </div>
           <div class="insp-sec" data-sec="dim">
             <div class="insp-h">Dimension</div>
@@ -381,7 +408,6 @@
               <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="s-marH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="s-marV" min="0" max="200"></span></div>
               <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="s-marT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="s-marR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="s-marB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="s-marL" placeholder="0"></span></div>
             </div>
-            <div class="insp-row" data-field="sp"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
           </div>
           <div class="insp-sec fig-sec" data-sec="fill" data-paint="bg">
             <div class="fig-sec-h"><span class="fig-sec-t">Fill</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add fill"><span class="ms">add</span></button></span></div>
@@ -561,7 +587,7 @@ function pageInit(){
   function rebuildBrands(){ BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand,tenant:t})), ...customStyles.map(s=>({id:s.id,name:s.name,brand:s.brand,tenant:s}))]; }
   rebuildBrands();
   const NEUTRAL={primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
-  const blockStyle={wmode:'fill', wpx:520, padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', bgA:100, bgVis:true, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:'', bcolorA:100, bcolorVis:true, bpos:'inside'};
+  const blockStyle={wmode:'fill', wpx:520, hmode:'fill', hpx:200, alH:'left', alV:'top', padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', bgA:100, bgVis:true, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:'', bcolorA:100, bcolorVis:true, bpos:'inside'};
   // Padding / margin CSS — one number (overall) or four (per side).
   function boxCss(s,key){ if(!s)return '0px'; if(s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; const h=(s[key+'H']!=null)?s[key+'H']:(s[key]||0), v=(s[key+'V']!=null)?s[key+'V']:(s[key]||0); return `${v}px ${h}px`; }
   function radCss(s){ if(s&&s.radSides) return `${s.radTL||0}px ${s.radTR||0}px ${s.radBR||0}px ${s.radBL||0}px`; return `${(s&&s.rad)||0}px`; }
@@ -754,8 +780,19 @@ function pageInit(){
   function resolveBColor(st){ const bd=st.bcolorBind; if(!bd) return st.bcolor; return roleValue(brand, bd); }
   function applyBlockStyle(){
     const w=document.getElementById('blockWrap'); if(!w) return; const bs=blockStyle;
-    w.style.width = bs.wmode==='fixed' ? bs.wpx+'px' : '100%'; w.style.maxWidth='100%';
-    w.style.marginLeft = bs.wmode==='fixed'?'auto':''; w.style.marginRight = bs.wmode==='fixed'?'auto':'';
+    // Resizing — width mode (Fill / Fixed / Min / Max)
+    const wm=bs.wmode;
+    w.style.width = wm==='fixed' ? bs.wpx+'px' : '100%';
+    w.style.minWidth = wm==='min' ? bs.wpx+'px' : '';
+    w.style.maxWidth = wm==='max' ? bs.wpx+'px' : '100%';
+    w.style.marginLeft = (wm==='fixed'||wm==='max')?'auto':''; w.style.marginRight = (wm==='fixed'||wm==='max')?'auto':'';
+    // Resizing — height mode (Fill / Fixed / Max — no Hug, no Min)
+    const hm=bs.hmode||'fill';
+    w.style.height = hm==='fixed' ? bs.hpx+'px' : '';
+    w.style.maxHeight = hm==='max' ? bs.hpx+'px' : '';
+    // Alignment (block is a flex column: H → align-items, V → justify-content)
+    const HM={left:'flex-start',center:'center',right:'flex-end'}, VM={top:'flex-start',middle:'center',bottom:'flex-end'};
+    w.style.alignItems = HM[bs.alH||'left']; w.style.justifyContent = VM[bs.alV||'top'];
     w.style.padding = boxCss(bs,'pad'); w.style.gap = bs.sp+'px';
     // Vertical margin only on the block wrap — left/right stay auto for centering.
     const mV = (bs.marV!=null)?bs.marV:(bs.mar||0);
@@ -764,6 +801,7 @@ function pageInit(){
     w.style.borderRadius = radAny(bs)?radCss(bs):''; w.style.overflow = radAny(bs)?'hidden':'';
     w.style.border='none'; w.style.boxShadow='';
     if(paintVisible(bs,'bcolor') && bs.bw>0){ const col=paintCss(resolveBColor(bs), bs.bcolorA); if(bs.bpos==='inside') w.style.boxShadow=`inset 0 0 0 ${bs.bw}px ${col}`; else w.style.border=`${bs.bw}px ${bs.bstyle} ${col}`; }
+    if((bs.hmode||'fill')==='max') w.style.overflowY='auto';   // after the radius `overflow` shorthand so it isn't clobbered
   }
   function applyElStyle(node, st){
     if(!node) return;
@@ -910,14 +948,17 @@ function pageInit(){
   function syncInspector(){
     const t=target();
     const setR=(rId,nId,k)=>{ document.getElementById(rId).value=t[k]||0; document.getElementById(nId).value=t[k]||0; };
-    fillBoxB('pad'); fillBoxB('mar'); fillRadB(); setR('s-sp','s-spN','sp');
+    fillBoxB('pad'); fillBoxB('mar'); fillRadB(); document.getElementById('s-sp').value=blockStyle.sp||0;
     document.getElementById('s-size').value=t.size||''; document.getElementById('s-lh').value=t.lh||''; document.getElementById('s-bw').value=t.bw||0;
     document.getElementById('s-font').value=t.font||''; document.getElementById('s-weight').value=t.weight||''; document.getElementById('s-bstyle').value=t.bstyle||'solid';
     syncColor('bg'); syncColor('bcolor');
     document.getElementById('s-color').value=t.color||'#333333'; document.getElementById('s-colorH').value=t.color||'';
     document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.al===(t.align||'')));
-    document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x.dataset.w===blockStyle.wmode));
-    document.getElementById('s-wpx').value=blockStyle.wpx; document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed';
+    document.getElementById('s-wmode').value=blockStyle.wmode;
+    document.getElementById('s-wpx').value=blockStyle.wpx; document.getElementById('s-wpx').disabled=(blockStyle.wmode==='fill');
+    document.getElementById('s-hmode').value=blockStyle.hmode||'fill';
+    document.getElementById('s-hpx').value=blockStyle.hpx||0; document.getElementById('s-hpx').disabled=((blockStyle.hmode||'fill')==='fill');
+    document.querySelectorAll('#s-align3 button').forEach(b=>b.classList.toggle('on', b.dataset.h===(blockStyle.alH||'left') && b.dataset.v===(blockStyle.alV||'top')));
     const e=selEl();
     if(e){ if(e.id==='field') document.getElementById('s-field').value=e.field;
       document.querySelectorAll('#s-imgsrc button').forEach(b=>b.classList.toggle('on',b.dataset.src===(e.src||'placeholder')));
@@ -935,7 +976,8 @@ function pageInit(){
     const colOpts=COLOUR_ROLES.map(r=>`<option value="${r.key}">Brand · ${r.label}</option>`).join('');
     document.getElementById('s-bgBind').innerHTML=`<option value="">Custom colour</option>${colOpts}<option value="none">None (transparent)</option>`;
     document.getElementById('s-bcolorBind').innerHTML=`<option value="">Custom colour</option>${colOpts}`;
-    wireBoxB('pad'); wireBoxB('mar'); wireRadB(); bindRange('s-sp','s-spN','sp');
+    wireBoxB('pad'); wireBoxB('mar'); wireRadB();
+    document.getElementById('s-sp').addEventListener('input',e=>{ blockStyle.sp=Math.max(0,Math.min(200,Math.round(+e.target.value||0))); applyActive(); commitStyle(); });
     bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
     bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
     bindColor('s-bg','s-bgH','bg'); bindColor('s-color','s-colorH','color'); bindColor('s-bcolor','s-bcolorH','bcolor');
@@ -943,8 +985,11 @@ function pageInit(){
     document.getElementById('s-bcolorBind').addEventListener('change',e=>{ target().bcolorBind=e.target.value; applyActive(); syncInspector(); commitStyle(); });
     wirePaintB('bg'); wirePaintB('bcolor');
     document.getElementById('s-align').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ target().align=b.dataset.al; document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
-    document.querySelectorAll('#s-wmode button').forEach(b=>b.addEventListener('click',()=>{ blockStyle.wmode=b.dataset.w; document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x===b)); document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed'; applyActive(); commitStyle(); }));
+    document.getElementById('s-wmode').addEventListener('change',e=>{ blockStyle.wmode=e.target.value; document.getElementById('s-wpx').disabled=(blockStyle.wmode==='fill'); applyActive(); commitStyle(); });
     document.getElementById('s-wpx').addEventListener('input',e=>{ blockStyle.wpx=+e.target.value||0; applyActive(); commitStyle(); });
+    document.getElementById('s-hmode').addEventListener('change',e=>{ blockStyle.hmode=e.target.value; document.getElementById('s-hpx').disabled=(blockStyle.hmode==='fill'); applyActive(); commitStyle(); });
+    document.getElementById('s-hpx').addEventListener('input',e=>{ blockStyle.hpx=+e.target.value||0; applyActive(); commitStyle(); });
+    document.querySelectorAll('#s-align3 button').forEach(b=>b.addEventListener('click',()=>{ blockStyle.alH=b.dataset.h; blockStyle.alV=b.dataset.v; document.querySelectorAll('#s-align3 button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
     // field / image-source / permission
     document.getElementById('s-field').addEventListener('change',e=>{ if(selEl()){ selEl().field=e.target.value; render(); commit(); } });
     document.querySelectorAll('#s-imgsrc button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().src=b.dataset.src; render(); commit(); } }));
@@ -953,7 +998,7 @@ function pageInit(){
     document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); if('bg' in p.st) target().bgBind=''; if('bcolor' in p.st) target().bcolorBind=''; applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
     document.getElementById('s-copy').addEventListener('click',()=>{ styleClip=clone(target()); document.getElementById('s-paste').disabled=false; showToast('Style copied'); });
     document.getElementById('s-paste').addEventListener('click',()=>{ if(!styleClip) return; Object.assign(target(), clone(styleClip)); applyActive(); syncInspector(); commit(); showToast('Style pasted'); });
-    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',bgA:100,bgVis:true,rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'}); } applyActive(); render(); commit(); showToast('Style reset'); });
+    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,hmode:'fill',hpx:200,alH:'left',alV:'top',padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',bgA:100,bgVis:true,rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'}); } applyActive(); render(); commit(); showToast('Style reset'); });
     syncInspector();
   }
 
