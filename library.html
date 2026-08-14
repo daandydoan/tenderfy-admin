@@ -19,6 +19,9 @@
   .stat-compact .st-ic{margin-bottom:0;flex-shrink:0}
   .stat-compact .st-lbl{margin-top:2px}
   .lst-type{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--teal);background:var(--teal-tint);border-radius:100px;padding:2px 9px}
+  .lst-type.type-page{color:#2f5bd0;background:#eef2fb}
+  .lst-type.type-section{color:#2f7a6a;background:#eef3f1}
+  .lst-type.type-resume{color:#7145c9;background:#f3eefb}
   .lst-type .ms{font-size:13px}
   #newMenu .nm-hint{display:block;font-size:11px;color:var(--light);font-weight:400;margin-top:1px}
   #newMenu a{align-items:flex-start}
@@ -111,7 +114,7 @@ function pageInit(){
         </div>
         <div class="lst-prev">${preview(c)}</div>
         <div class="lst-desc">${c.desc}</div>
-        <div class="lst-foot"><span class="lst-type"><span class="ms">${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).icon}</span> ${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).label}</span><span>${c.restricted?`<span style="color:var(--st-amber-tx)"><span class="ms" style="font-size:13px;vertical-align:-2px">lock</span> ${c.restricted}</span>`:''} v${c.version}</span></div>
+        <div class="lst-foot"><span class="lst-type type-${c.type||'section'}"><span class="ms">${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).icon}</span> ${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).label}</span><span>${c.restricted?`<span style="color:var(--st-amber-tx)"><span class="ms" style="font-size:13px;vertical-align:-2px">lock</span> ${c.restricted}</span>`:''} v${c.version}</span></div>
       </div>`).join('');
     document.getElementById('empty').style.display = list.length ? 'none':'block';
   }

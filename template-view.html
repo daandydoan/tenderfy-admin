@@ -29,6 +29,9 @@
   .tpl-doc:hover{background:var(--teal-tint);color:var(--teal)}
   .tpl-doc .n{width:22px;height:22px;border-radius:6px;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
   .tpl-dt{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--gray);background:#eef3f1;border-radius:100px;padding:1px 7px}
+  .tpl-dt.type-page{color:#2f5bd0;background:#eef2fb}
+  .tpl-dt.type-section{color:#2f7a6a;background:#eef3f1}
+  .tpl-dt.type-resume{color:#7145c9;background:#f3eefb}
 </style>
 </head>
 <body data-page="templates" data-title="Tender Templates">
@@ -109,7 +112,7 @@ function pageInit(){
 
   const byComp = Object.fromEntries(COMPONENTS.map(c=>[c.id,c]));
   const docs = templateDocs(t);
-  document.getElementById('a-doclist').innerHTML = docs.map((id,i)=>{ const c=byComp[id]; const tm=(typeof DOC_TYPE_META!=='undefined'&&c&&DOC_TYPE_META[c.type])||null; return `<a class="tpl-doc" href="document-view.html#id=${id}" title="Open document"><span class="n">${i+1}</span><span style="flex:1">${c?c.name:id}</span>${tm?`<span class="tpl-dt">${tm.label}</span>`:''}<span class="ms" style="font-size:15px;color:var(--light)">north_east</span></a>`; }).join('');
+  document.getElementById('a-doclist').innerHTML = docs.map((id,i)=>{ const c=byComp[id]; const tm=(typeof DOC_TYPE_META!=='undefined'&&c&&DOC_TYPE_META[c.type])||null; return `<a class="tpl-doc" href="document-view.html#id=${id}" title="Open document"><span class="n">${i+1}</span><span style="flex:1">${c?c.name:id}</span>${tm?`<span class="tpl-dt type-${c.type||'section'}">${tm.label}</span>`:''}<span class="ms" style="font-size:15px;color:var(--light)">north_east</span></a>`; }).join('');
 
   // Brand-aware A4 preview — cover page + every document rendered in the pack
   const BRANDS = [{name:'Default (brand-neutral)', brand:null}, ...TENANTS.map(x=>({name:x.name, brand:x.brand}))];

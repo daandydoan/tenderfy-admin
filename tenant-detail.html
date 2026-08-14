@@ -100,6 +100,9 @@
   .adl-row:last-child{border-bottom:none}
   .adl-row .nm{flex:1}
   .adl-tag{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--gray);background:#eef3f1;border-radius:100px;padding:2px 8px}
+  .adl-tag.type-page{color:#2f5bd0;background:#eef2fb}
+  .adl-tag.type-section{color:#2f7a6a;background:#eef3f1}
+  .adl-tag.type-resume{color:#7145c9;background:#f3eefb}
   .adl-from{font-size:11px;color:var(--light)}
 </style>
 </head>
@@ -385,7 +388,7 @@ function pageInit(){
       if(!list.length) return '';
       return `<div><div class="ad-gh" style="margin-top:8px">${lbl}</div>${list.map(c=>{
         const inPack=packDocs.has(c.id), checked=inPack||directDocs.has(c.id);
-        return `<label class="adl-row"><input type="checkbox" data-id="${c.id}" ${checked?'checked':''} ${inPack?'disabled':''}><span class="nm">${c.name}</span>${inPack?'<span class="adl-from">from a pack</span>':''}<span class="adl-tag">${((typeof DOC_TYPE_META!=='undefined'&&DOC_TYPE_META[c.type])||{label:''}).label}</span></label>`;
+        return `<label class="adl-row"><input type="checkbox" data-id="${c.id}" ${checked?'checked':''} ${inPack?'disabled':''}><span class="nm">${c.name}</span>${inPack?'<span class="adl-from">from a pack</span>':''}<span class="adl-tag type-${c.type||'section'}">${((typeof DOC_TYPE_META!=='undefined'&&DOC_TYPE_META[c.type])||{label:''}).label}</span></label>`;
       }).join('')}</div>`;
     }).join('');
     document.getElementById('assignDocList').querySelectorAll('input[type=checkbox]:not([disabled])').forEach(cb=>cb.addEventListener('change',()=>{
