@@ -154,6 +154,33 @@
   .fig-corners .cn-bl{transform:rotate(270deg)}
   .fig-cross{display:grid;grid-template-columns:1fr 1fr;gap:6px}
   .fig-cross .fig-field input{text-align:center}
+  /* Figma-style Fill / Stroke paint sections */
+  .fig-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .fig-sec-t{font-size:12px;font-weight:600;color:var(--ink)}
+  .fig-acts{display:flex;gap:2px}
+  .fig-a{width:24px;height:24px;border:none;background:transparent;border-radius:6px;color:var(--light);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  .fig-a:hover{background:#eef3f1;color:var(--gray)}
+  .fig-a.on{background:var(--teal-tint);color:var(--teal)}
+  .fig-a .ms{font-size:16px}
+  .fig-paint{display:flex;align-items:center;gap:6px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;padding:0 4px 0 6px;height:32px}
+  .fig-paint:hover{background:#eaf0ee}
+  .fig-paint.off .fig-sw,.fig-paint.off .fig-hexin,.fig-paint.off .fig-op{opacity:.4}
+  .fig-sw{position:relative;width:20px;height:20px;border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.14);flex-shrink:0}
+  .fig-sw input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;padding:0;margin:0;cursor:pointer;background:none}
+  .fig-hexin{flex:1;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;text-transform:uppercase}
+  .fig-op{display:flex;align-items:center;gap:1px;flex-shrink:0;border-left:1px solid #d7e0dd;padding-left:6px}
+  .fig-op input{width:30px;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;text-align:right;-moz-appearance:textfield}
+  .fig-op input::-webkit-outer-spin-button,.fig-op input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .fig-op-u{font-size:11px;color:var(--light)}
+  .fig-paint .fig-a{width:22px;height:22px}
+  .fig-strokerow{display:grid;grid-template-columns:1fr 92px;gap:8px;margin-top:8px}
+  .fig-strokerow label{display:block;font-size:10.5px;color:var(--gray);margin-bottom:4px}
+  .fig-wt{display:flex;align-items:center;gap:5px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;height:32px;padding:0 8px}
+  .fig-wt:focus-within{background:#fff;border-color:var(--teal)}
+  .fig-wt .ms{font-size:15px;color:#9aa5a3}
+  .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
+  .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .fig-bind{margin-top:7px}
   .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
   .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
@@ -355,18 +382,12 @@
               <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="s-marT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="s-marR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="s-marB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="s-marL" placeholder="0"></span></div>
             </div>
             <div class="insp-row" data-field="sp"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
-            <div class="insp-row tall" data-field="bg"><label>Fill</label><div class="insp-ctl col">
-              <select class="insp-sel" id="s-bgBind">
-                <option value="">Custom colour</option>
-                <option value="primary">Brand · Primary</option>
-                <option value="secondary">Brand · Secondary</option>
-                <option value="tint">Brand · Tint</option>
-                <option value="background">Brand · Background</option>
-                <option value="none">None (transparent)</option>
-              </select>
-              <div class="insp-ctl" id="s-bgLit"><input type="color" class="insp-color" id="s-bg"><input type="text" class="insp-hex" id="s-bgH" placeholder="#hex"></div>
-              <div class="bind-note" id="s-bgNote" style="display:none"></div>
-            </div></div>
+          </div>
+          <div class="insp-sec fig-sec" data-sec="fill" data-paint="bg">
+            <div class="fig-sec-h"><span class="fig-sec-t">Fill</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add fill"><span class="ms">add</span></button></span></div>
+            <div class="fig-paint" id="s-bgLit" data-paint="bg"><span class="fig-sw"><input type="color" class="insp-color" id="s-bg"></span><input class="fig-hexin insp-hex" id="s-bgH" placeholder="FFFFFF"><span class="fig-op"><input type="number" id="s-bgA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
+            <div class="bind-note" id="s-bgNote" style="display:none"></div>
+            <select class="insp-sel fig-bind" id="s-bgBind"></select>
           </div>
           <div class="insp-sec" data-sec="typo">
             <div class="insp-h">Typography</div>
@@ -383,24 +404,20 @@
             <div class="fhint" style="margin:2px 0 0">Blank fields inherit the client’s brand &amp; styling.</div>
           </div>
           <div class="insp-sec" data-sec="border">
-            <div class="insp-h">Border</div>
+            <div class="insp-h">Appearance</div>
             <div class="fig-box" data-box="rad" data-field="rad">
               <div class="fig-box-head"><span class="fig-label">Corner radius</span><button type="button" class="fig-toggle" data-toggle title="Edit corners individually"><span class="ms">rounded_corner</span></button></div>
               <div class="fig-solo"><span class="fig-field"><span class="ms fig-ic" data-scrub>rounded_corner</span><input type="number" id="s-rad" min="0" max="400"></span></div>
               <div class="fig-corners" hidden><span class="fig-field"><span class="ms fig-ic cn cn-tl">rounded_corner</span><input type="number" id="s-radTL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-tr">rounded_corner</span><input type="number" id="s-radTR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-bl">rounded_corner</span><input type="number" id="s-radBL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-br">rounded_corner</span><input type="number" id="s-radBR" placeholder="0"></span></div>
             </div>
-            <div class="insp-row" data-field="bwstyle"><label>Width</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-bw"><span class="insp-unit">px</span><select class="insp-sel" id="s-bstyle" style="flex:1"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div></div>
-            <div class="insp-row tall" data-field="bcolor"><label>Colour</label><div class="insp-ctl col">
-              <select class="insp-sel" id="s-bcolorBind">
-                <option value="">Custom colour</option>
-                <option value="primary">Brand · Primary</option>
-                <option value="secondary">Brand · Secondary</option>
-                <option value="tint">Brand · Tint</option>
-                <option value="background">Brand · Background</option>
-              </select>
-              <div class="insp-ctl" id="s-bcolorLit"><input type="color" class="insp-color" id="s-bcolor"><input type="text" class="insp-hex" id="s-bcolorH" placeholder="#hex"></div>
+            <div class="fig-sec" data-sec="stroke" data-paint="bcolor" style="margin-top:14px">
+              <div class="fig-sec-h"><span class="fig-sec-t">Stroke</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add stroke"><span class="ms">add</span></button></span></div>
+              <div class="fig-paint" id="s-bcolorLit" data-paint="bcolor"><span class="fig-sw"><input type="color" class="insp-color" id="s-bcolor"></span><input class="fig-hexin insp-hex" id="s-bcolorH" placeholder="EAEDEC"><span class="fig-op"><input type="number" id="s-bcolorA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
               <div class="bind-note" id="s-bcolorNote" style="display:none"></div>
-            </div></div>
+              <select class="insp-sel fig-bind" id="s-bcolorBind"></select>
+              <div class="fig-strokerow"><div><label>Position</label><select class="insp-sel" id="s-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><label>Weight</label><span class="fig-wt"><span class="ms">line_weight</span><input type="number" id="s-bw" min="0" max="40"></span></div></div>
+              <div class="insp-row" data-field="bstyle" style="margin-top:8px"><label>Style</label><select class="insp-sel" id="s-bstyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
+            </div>
           </div>
         </div>
       </div>
@@ -529,7 +546,7 @@ function pageInit(){
   const wantSlot=_params.get('slot'); // 'header' | 'footer' — deep-link to create page furniture
   const existing=id?BLOCKS.find(b=>b.id===id):null;
 
-  const elDef=()=>({padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:''});
+  const elDef=()=>({padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',bgA:100,bgVis:true,font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'});
   const mkEl=pid=>{ const e={id:pid, st:elDef()}; if(pid==='field') e.field='client.name'; if(pid==='image') e.src='placeholder'; return e; };
   const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
@@ -544,11 +561,16 @@ function pageInit(){
   function rebuildBrands(){ BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand,tenant:t})), ...customStyles.map(s=>({id:s.id,name:s.name,brand:s.brand,tenant:s}))]; }
   rebuildBrands();
   const NEUTRAL={primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
-  const blockStyle={wmode:'fill', wpx:520, padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:''};
+  const blockStyle={wmode:'fill', wpx:520, padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', bgA:100, bgVis:true, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:'', bcolorA:100, bcolorVis:true, bpos:'inside'};
   // Padding / margin CSS — one number (overall) or four (per side).
   function boxCss(s,key){ if(!s)return '0px'; if(s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; const h=(s[key+'H']!=null)?s[key+'H']:(s[key]||0), v=(s[key+'V']!=null)?s[key+'V']:(s[key]||0); return `${v}px ${h}px`; }
   function radCss(s){ if(s&&s.radSides) return `${s.radTL||0}px ${s.radTR||0}px ${s.radBR||0}px ${s.radBL||0}px`; return `${(s&&s.rad)||0}px`; }
   const radAny=s=>!!s&&(s.radSides?(s.radTL||s.radTR||s.radBR||s.radBL):s.rad>0);
+  // A paint (fill/stroke) colour with optional opacity → hex or rgba().
+  function paintCss(hex,a){ if(a==null||a>=100||!hex) return hex||''; a=Math.max(0,Math.min(100,a))/100; let h=String(hex).replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); if(isNaN(n)) return hex; return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`; }
+  // A paint exists if it has a colour or a non-'none' brand bind; visible unless the eye is off.
+  const paintOn=(t,key)=> !!(t[key]&&t[key]!=='') || !!(t[key+'Bind']&&t[key+'Bind']!=='none');
+  const paintVisible=(t,key)=> paintOn(t,key) && t[key+'Vis']!==false;
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
   const selEl=()=> sel ? doc[sel.r].cols[sel.c][sel.k] : null;
   // Real "used in N documents" (shared with the block view) for the synced-block story.
@@ -738,13 +760,18 @@ function pageInit(){
     // Vertical margin only on the block wrap — left/right stay auto for centering.
     const mV = (bs.marV!=null)?bs.marV:(bs.mar||0);
     w.style.marginTop = (bs.marSides?(bs.marT||0):mV)+'px'; w.style.marginBottom = (bs.marSides?(bs.marB||0):mV)+'px';
-    w.style.background = resolveFill(bs)||''; w.style.borderRadius = radAny(bs)?radCss(bs):''; w.style.overflow = radAny(bs)?'hidden':'';
-    w.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+resolveBColor(bs)):'none';
+    w.style.background = paintVisible(bs,'bg') ? (paintCss(resolveFill(bs), bs.bgA)||'') : '';
+    w.style.borderRadius = radAny(bs)?radCss(bs):''; w.style.overflow = radAny(bs)?'hidden':'';
+    w.style.border='none'; w.style.boxShadow='';
+    if(paintVisible(bs,'bcolor') && bs.bw>0){ const col=paintCss(resolveBColor(bs), bs.bcolorA); if(bs.bpos==='inside') w.style.boxShadow=`inset 0 0 0 ${bs.bw}px ${col}`; else w.style.border=`${bs.bw}px ${bs.bstyle} ${col}`; }
   }
   function applyElStyle(node, st){
     if(!node) return;
-    node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar'); node.style.background = resolveFill(st)||'';
-    node.style.borderRadius = radAny(st)?radCss(st):''; node.style.overflow = radAny(st)?'hidden':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+resolveBColor(st)):'';
+    node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar');
+    node.style.background = paintVisible(st,'bg') ? (paintCss(resolveFill(st), st.bgA)||'') : '';
+    node.style.borderRadius = radAny(st)?radCss(st):''; node.style.overflow = radAny(st)?'hidden':'';
+    node.style.border=''; node.style.boxShadow='';
+    if(paintVisible(st,'bcolor') && st.bw>0){ const col=paintCss(resolveBColor(st), st.bcolorA); if(st.bpos==='inside') node.style.boxShadow=`inset 0 0 0 ${st.bw}px ${col}`; else node.style.border=`${st.bw}px ${st.bstyle} ${col}`; }
     node.style.textAlign = st.align||'';
     const typo={};
     if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
@@ -846,22 +873,39 @@ function pageInit(){
   function bindSel(id,key){ const el=document.getElementById(id); el.addEventListener('change',()=>{ target()[key]=el.value; applyActive(); commitStyle(); }); }
   function bindColor(colId,hexId,key){
     const c=document.getElementById(colId), h=document.getElementById(hexId);
-    c.addEventListener('input',()=>{ target()[key]=c.value; h.value=c.value; applyActive(); commitStyle(); });
-    h.addEventListener('change',()=>{ const v=h.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ target()[key]=v; c.value=v; applyActive(); commitStyle(); } });
+    const hasBind=()=>(key==='bg'||key==='bcolor');
+    c.addEventListener('input',()=>{ const t=target(); t[key]=c.value; if(hasBind())t[key+'Bind']=''; syncColor2(key); applyActive(); commitStyle(); });
+    h.addEventListener('input',()=>{ const v=h.value.trim().replace(/^#/,''); if(/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ const t=target(); t[key]='#'+v; if(hasBind())t[key+'Bind']=''; c.value='#'+v; applyActive(); commitStyle(); } });
   }
+  const syncColor2=key=>{ if(key==='bg'||key==='bcolor') syncColor(key); };  // typography 'color' has no paint section
   function syncColor(key){
-    const t=target(), bind=t[key+'Bind']||'';
+    const t=target(), sec=document.querySelector(`.fig-sec[data-paint="${key}"]`), bind=t[key+'Bind']||'';
     document.getElementById('s-'+key+'Bind').value=bind;
     const lit=document.getElementById('s-'+key+'Lit'), note=document.getElementById('s-'+key+'Note');
-    if(bind){
-      lit.style.display='none'; note.style.display='';
+    const on=paintOn(t,key), vis=t[key+'Vis']!==false;
+    if(sec){ const add=sec.querySelector('[data-add]'); if(add) add.style.display=on?'none':''; }
+    if(bind && bind!=='none'){
+      lit.style.display='none'; note.style.display=on?'':'none';
       const col = key==='bg'?resolveFill(t):resolveBColor(t);
       note.innerHTML=`<span style="display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.12);background:${col||'transparent'}"></span> Follows the client’s brand${brand?'':' (Default preview)'}`;
     } else {
-      lit.style.display=''; note.style.display='none';
+      lit.style.display=on?'':'none'; note.style.display='none';
       document.getElementById('s-'+key).value=t[key]||(key==='bg'?'#ffffff':'#38988a');
-      document.getElementById('s-'+key+'H').value=t[key]||'';
+      document.getElementById('s-'+key+'H').value=(t[key]||'').replace('#','').toUpperCase();
     }
+    const A=document.getElementById('s-'+key+'A'); if(A) A.value=(t[key+'A']!=null?t[key+'A']:100);
+    if(lit){ lit.classList.toggle('off',!vis); const eye=lit.querySelector('[data-eye] .ms'); if(eye) eye.textContent=vis?'visibility':'visibility_off'; }
+    if(key==='bcolor'){ const bp=document.getElementById('s-bpos'); if(bp) bp.value=t.bpos||'inside'; }
+  }
+  // Opacity / eye / remove / add / position for a paint section (key: 'bg' | 'bcolor').
+  function wirePaintB(key){
+    const sec=document.querySelector(`.fig-sec[data-paint="${key}"]`); if(!sec) return;
+    const A=document.getElementById('s-'+key+'A'), lit=document.getElementById('s-'+key+'Lit');
+    if(A) A.addEventListener('input',()=>{ target()[key+'A']=Math.max(0,Math.min(100,Math.round(+A.value||0))); applyActive(); commitStyle(); });
+    const eye=lit&&lit.querySelector('[data-eye]'); if(eye) eye.addEventListener('click',()=>{ const t=target(); t[key+'Vis']=!(t[key+'Vis']!==false); syncColor(key); applyActive(); commitStyle(); });
+    const rm=lit&&lit.querySelector('[data-rm]'); if(rm) rm.addEventListener('click',()=>{ const t=target(); t[key]=''; t[key+'Bind']=''; syncColor(key); applyActive(); commitStyle(); });
+    const add=sec.querySelector('[data-add]'); if(add) add.addEventListener('click',()=>{ const t=target(); if(!t[key]) t[key]=(key==='bg'?'#ffffff':'#38988a'); t[key+'Bind']=''; t[key+'Vis']=true; if(key==='bcolor'&&!(t.bw>0)) t.bw=1; syncInspector(); applyActive(); commitStyle(); });
+    if(key==='bcolor'){ const bp=document.getElementById('s-bpos'); if(bp) bp.addEventListener('change',e=>{ target().bpos=e.target.value; applyActive(); commitStyle(); }); }
   }
   function syncInspector(){
     const t=target();
@@ -897,6 +941,7 @@ function pageInit(){
     bindColor('s-bg','s-bgH','bg'); bindColor('s-color','s-colorH','color'); bindColor('s-bcolor','s-bcolorH','bcolor');
     document.getElementById('s-bgBind').addEventListener('change',e=>{ target().bgBind=e.target.value; applyActive(); syncInspector(); commitStyle(); });
     document.getElementById('s-bcolorBind').addEventListener('change',e=>{ target().bcolorBind=e.target.value; applyActive(); syncInspector(); commitStyle(); });
+    wirePaintB('bg'); wirePaintB('bcolor');
     document.getElementById('s-align').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ target().align=b.dataset.al; document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
     document.querySelectorAll('#s-wmode button').forEach(b=>b.addEventListener('click',()=>{ blockStyle.wmode=b.dataset.w; document.querySelectorAll('#s-wmode button').forEach(x=>x.classList.toggle('on',x===b)); document.getElementById('s-wpx').disabled=blockStyle.wmode!=='fixed'; applyActive(); commitStyle(); }));
     document.getElementById('s-wpx').addEventListener('input',e=>{ blockStyle.wpx=+e.target.value||0; applyActive(); commitStyle(); });
@@ -908,7 +953,7 @@ function pageInit(){
     document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); if('bg' in p.st) target().bgBind=''; if('bcolor' in p.st) target().bcolorBind=''; applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
     document.getElementById('s-copy').addEventListener('click',()=>{ styleClip=clone(target()); document.getElementById('s-paste').disabled=false; showToast('Style copied'); });
     document.getElementById('s-paste').addEventListener('click',()=>{ if(!styleClip) return; Object.assign(target(), clone(styleClip)); applyActive(); syncInspector(); commit(); showToast('Style pasted'); });
-    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:''}); } applyActive(); render(); commit(); showToast('Style reset'); });
+    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',bgA:100,bgVis:true,rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'}); } applyActive(); render(); commit(); showToast('Style reset'); });
     syncInspector();
   }
 
