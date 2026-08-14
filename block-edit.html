@@ -130,6 +130,19 @@
   .insp-num{width:50px;padding:6px 7px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink);text-align:center}
   .insp-num:disabled{background:#f2f5f4;color:var(--light)}
   .insp-unit{font-size:10.5px;color:var(--light);flex-shrink:0}
+  /* Box-model control — Padding / Margin, overall or per-side */
+  .box-ctl{margin-bottom:11px}
+  .box-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .box-head>label{font-size:12px;color:var(--gray)}
+  .box-mode{display:inline-flex;border:1px solid var(--border);border-radius:7px;overflow:hidden}
+  .box-mode button{border:none;background:#fff;font-family:inherit;font-size:10px;font-weight:700;color:var(--gray);padding:3px 9px;cursor:pointer;letter-spacing:.2px}
+  .box-mode button+button{border-left:1px solid var(--border)}
+  .box-mode button.on{background:var(--teal);color:#fff}
+  .box-all[hidden],.box-sides[hidden]{display:none}
+  .box-sides{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .box-side{display:flex;align-items:center;gap:6px;background:#f1f5f3;border:1px solid var(--border);border-radius:7px;padding:3px 8px}
+  .box-side .sl{font-size:9.5px;font-weight:700;color:var(--gray);width:11px;flex-shrink:0}
+  .box-side input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);text-align:center;outline:none}
   .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
   .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
@@ -320,7 +333,16 @@
           </div>
           <div class="insp-sec" data-sec="dim">
             <div class="insp-h">Dimension</div>
-            <div class="insp-row" data-field="pad"><label>Padding</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-pad" min="0" max="120"><input type="number" class="insp-num" id="s-padN"><span class="insp-unit">px</span></div></div>
+            <div class="box-ctl" data-box="pad">
+              <div class="box-head"><label>Padding</label><span class="box-mode"><button type="button" data-m="all" class="on">All</button><button type="button" data-m="sides">Sides</button></span></div>
+              <div class="insp-ctl box-all"><input type="range" class="insp-range" id="s-pad" min="0" max="200"><input type="number" class="insp-num" id="s-padN"><span class="insp-unit">px</span></div>
+              <div class="box-sides" hidden><div class="box-side"><span class="sl">T</span><input type="number" id="s-padT"></div><div class="box-side"><span class="sl">R</span><input type="number" id="s-padR"></div><div class="box-side"><span class="sl">B</span><input type="number" id="s-padB"></div><div class="box-side"><span class="sl">L</span><input type="number" id="s-padL"></div></div>
+            </div>
+            <div class="box-ctl" data-box="mar">
+              <div class="box-head"><label>Margin</label><span class="box-mode"><button type="button" data-m="all" class="on">All</button><button type="button" data-m="sides">Sides</button></span></div>
+              <div class="insp-ctl box-all"><input type="range" class="insp-range" id="s-mar" min="0" max="200"><input type="number" class="insp-num" id="s-marN"><span class="insp-unit">px</span></div>
+              <div class="box-sides" hidden><div class="box-side"><span class="sl">T</span><input type="number" id="s-marT"></div><div class="box-side"><span class="sl">R</span><input type="number" id="s-marR"></div><div class="box-side"><span class="sl">B</span><input type="number" id="s-marB"></div><div class="box-side"><span class="sl">L</span><input type="number" id="s-marL"></div></div>
+            </div>
             <div class="insp-row" data-field="sp"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
             <div class="insp-row tall" data-field="bg"><label>Fill</label><div class="insp-ctl col">
               <select class="insp-sel" id="s-bgBind">
@@ -507,7 +529,9 @@ function pageInit(){
   function rebuildBrands(){ BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand,tenant:t})), ...customStyles.map(s=>({id:s.id,name:s.name,brand:s.brand,tenant:s}))]; }
   rebuildBrands();
   const NEUTRAL={primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
-  const blockStyle={wmode:'fill', wpx:520, pad:0, sp:8, bg:'', bgBind:'', rad:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:''};
+  const blockStyle={wmode:'fill', wpx:520, pad:0, padSides:false, padT:0, padR:0, padB:0, padL:0, mar:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', rad:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:''};
+  // Padding / margin CSS — one number (overall) or four (per side).
+  function boxCss(s,key){ if(s&&s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; return `${(s&&s[key])||0}px`; }
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
   const selEl=()=> sel ? doc[sel.r].cols[sel.c][sel.k] : null;
   // Real "used in N documents" (shared with the block view) for the synced-block story.
@@ -693,13 +717,15 @@ function pageInit(){
     const w=document.getElementById('blockWrap'); if(!w) return; const bs=blockStyle;
     w.style.width = bs.wmode==='fixed' ? bs.wpx+'px' : '100%'; w.style.maxWidth='100%';
     w.style.marginLeft = bs.wmode==='fixed'?'auto':''; w.style.marginRight = bs.wmode==='fixed'?'auto':'';
-    w.style.padding = bs.pad?bs.pad+'px':''; w.style.gap = bs.sp+'px';
+    w.style.padding = boxCss(bs,'pad'); w.style.gap = bs.sp+'px';
+    // Vertical margin only on the block wrap — left/right stay auto for centering.
+    w.style.marginTop = (bs.marSides?(bs.marT||0):(bs.mar||0))+'px'; w.style.marginBottom = (bs.marSides?(bs.marB||0):(bs.mar||0))+'px';
     w.style.background = resolveFill(bs)||''; w.style.borderRadius = bs.rad?bs.rad+'px':''; w.style.overflow = bs.rad>0?'hidden':'';
     w.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+resolveBColor(bs)):'none';
   }
   function applyElStyle(node, st){
     if(!node) return;
-    node.style.padding = st.pad?st.pad+'px':''; node.style.background = resolveFill(st)||'';
+    node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar'); node.style.background = resolveFill(st)||'';
     node.style.borderRadius = st.rad?st.rad+'px':''; node.style.overflow = st.rad>0?'hidden':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+resolveBColor(st)):'';
     node.style.textAlign = st.align||'';
     const typo={};
@@ -741,6 +767,24 @@ function pageInit(){
     r.addEventListener('input',()=>set(r.value)); n.addEventListener('input',()=>set(n.value));
   }
   function bindNum(numId,key){ const n=document.getElementById(numId); n.addEventListener('input',()=>{ target()[key]=+n.value||0; applyActive(); commitStyle(); }); }
+  // Box-model control (Padding / Margin) — overall or four per-side values, on target().
+  const BOX_SIDES=['T','R','B','L'];
+  function fillBoxB(prop){
+    const t=target(), ctl=document.querySelector(`.box-ctl[data-box="${prop}"]`); if(!ctl)return;
+    const sm=!!t[prop+'Sides'];
+    ctl.querySelectorAll('.box-mode button').forEach(b=>b.classList.toggle('on',(b.dataset.m==='sides')===sm));
+    ctl.querySelector('.box-all').hidden=sm; ctl.querySelector('.box-sides').hidden=!sm;
+    document.getElementById('s-'+prop).value=t[prop]||0; document.getElementById('s-'+prop+'N').value=t[prop]||0;
+    BOX_SIDES.forEach(x=>{ const el=document.getElementById('s-'+prop+x); if(el) el.value=t[prop+x]||0; });
+  }
+  function wireBoxB(prop){
+    const ctl=document.querySelector(`.box-ctl[data-box="${prop}"]`); if(!ctl)return;
+    const R=document.getElementById('s-'+prop), N=document.getElementById('s-'+prop+'N');
+    const setAll=v=>{ v=Math.max(0,Math.min(200,Math.round(+v||0))); target()[prop]=v; R.value=v; N.value=v; applyActive(); commitStyle(); };
+    R.addEventListener('input',()=>setAll(R.value)); N.addEventListener('input',()=>setAll(N.value));
+    BOX_SIDES.forEach(x=>{ const inp=document.getElementById('s-'+prop+x); if(!inp)return; inp.addEventListener('input',()=>{ const v=Math.max(0,Math.min(200,Math.round(+inp.value||0))); target()[prop+x]=v; inp.value=v; applyActive(); commitStyle(); }); });
+    ctl.querySelectorAll('.box-mode button').forEach(btn=>btn.addEventListener('click',()=>{ const sm=btn.dataset.m==='sides'; target()[prop+'Sides']=sm; if(sm) BOX_SIDES.forEach(x=>{ if(!target()[prop+x]) target()[prop+x]=target()[prop]||0; }); fillBoxB(prop); applyActive(); commitStyle(); }));
+  }
   function bindSel(id,key){ const el=document.getElementById(id); el.addEventListener('change',()=>{ target()[key]=el.value; applyActive(); commitStyle(); }); }
   function bindColor(colId,hexId,key){
     const c=document.getElementById(colId), h=document.getElementById(hexId);
@@ -764,7 +808,7 @@ function pageInit(){
   function syncInspector(){
     const t=target();
     const setR=(rId,nId,k)=>{ document.getElementById(rId).value=t[k]||0; document.getElementById(nId).value=t[k]||0; };
-    setR('s-pad','s-padN','pad'); setR('s-sp','s-spN','sp'); setR('s-rad','s-radN','rad');
+    fillBoxB('pad'); fillBoxB('mar'); setR('s-sp','s-spN','sp'); setR('s-rad','s-radN','rad');
     document.getElementById('s-size').value=t.size||''; document.getElementById('s-lh').value=t.lh||''; document.getElementById('s-bw').value=t.bw||0;
     document.getElementById('s-font').value=t.font||''; document.getElementById('s-weight').value=t.weight||''; document.getElementById('s-bstyle').value=t.bstyle||'solid';
     syncColor('bg'); syncColor('bcolor');
@@ -789,7 +833,7 @@ function pageInit(){
     const colOpts=COLOUR_ROLES.map(r=>`<option value="${r.key}">Brand · ${r.label}</option>`).join('');
     document.getElementById('s-bgBind').innerHTML=`<option value="">Custom colour</option>${colOpts}<option value="none">None (transparent)</option>`;
     document.getElementById('s-bcolorBind').innerHTML=`<option value="">Custom colour</option>${colOpts}`;
-    bindRange('s-pad','s-padN','pad'); bindRange('s-sp','s-spN','sp'); bindRange('s-rad','s-radN','rad');
+    wireBoxB('pad'); wireBoxB('mar'); bindRange('s-sp','s-spN','sp'); bindRange('s-rad','s-radN','rad');
     bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
     bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
     bindColor('s-bg','s-bgH','bg'); bindColor('s-color','s-colorH','color'); bindColor('s-bcolor','s-bcolorH','bcolor');
