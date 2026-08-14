@@ -8,13 +8,22 @@
 // id, content?, style?}. renderComposedDoc() turns the instantiated items into an
 // A4 page; docBlocksToItems() inflates stored composition into render items.
 
-const DOC_ITEM_STYLE_DEFAULT = {pad:0, padSides:false, padT:0, padR:0, padB:0, padL:0, mar:0, marSides:false, marT:0, marR:0, marB:0, marL:0, rad:0, bgOn:false, bg:'#ffffff', bcOn:false, bc:'#dbe3e0', hMode:'auto', hVal:120};
+const DOC_ITEM_STYLE_DEFAULT = {padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bgOn:false, bg:'#ffffff', bcOn:false, bc:'#dbe3e0', hMode:'auto', hVal:120};
 
-// Padding / margin as a CSS value — one number (overall) or four (per side).
+// Padding / margin as a CSS value — Horizontal+Vertical (Figma default) or four per side.
 function boxCss(s, key){
-  if(s && s[key+'Sides']) return `${(s[key+'T']||0)}px ${(s[key+'R']||0)}px ${(s[key+'B']||0)}px ${(s[key+'L']||0)}px`;
-  return `${(s&&s[key])||0}px`;
+  if(!s) return '0px';
+  if(s[key+'Sides']) return `${(s[key+'T']||0)}px ${(s[key+'R']||0)}px ${(s[key+'B']||0)}px ${(s[key+'L']||0)}px`;
+  const h = (s[key+'H']!=null) ? s[key+'H'] : (s[key]||0);   // fall back to legacy overall
+  const v = (s[key+'V']!=null) ? s[key+'V'] : (s[key]||0);
+  return `${v}px ${h}px`;
 }
+// Corner radius — one value (all) or four corners (TL TR BR BL, the CSS order).
+function radCss(s){
+  if(s && s.radSides) return `${(s.radTL||0)}px ${(s.radTR||0)}px ${(s.radBR||0)}px ${(s.radBL||0)}px`;
+  return `${(s&&s.rad)||0}px`;
+}
+function radAny(s){ return !!s && (s.radSides ? (s.radTL||s.radTR||s.radBR||s.radBL) : s.rad>0); }
 
 function docHeightCss(s){
   const m=(s&&s.hMode)||'auto', v=Math.max(0,(s&&s.hVal)||0);
@@ -47,9 +56,9 @@ function docItemHtml(it, brand, cls){
   }
   const s=it.style||DOC_ITEM_STYLE_DEFAULT;
   // Margin: user value if set, else a default 16px bottom rhythm between blocks.
-  const marUsed = s.marSides || s.mar>0 || s.marT || s.marR || s.marB || s.marL;
-  let c=`box-sizing:border-box;padding:${boxCss(s,'pad')};margin:${marUsed?boxCss(s,'mar'):'0 0 16px'};border-radius:${s.rad||0}px;`+docHeightCss(s);
-  if(s.rad>0) c+='overflow:hidden;';   // clip content so a high radius rounds the image (up to a full circle)
+  const marUsed = s.marSides || s.marH || s.marV || s.mar>0 || s.marT || s.marR || s.marB || s.marL;
+  let c=`box-sizing:border-box;padding:${boxCss(s,'pad')};margin:${marUsed?boxCss(s,'mar'):'0 0 16px'};border-radius:${radCss(s)};`+docHeightCss(s);
+  if(radAny(s)) c+='overflow:hidden;';   // clip content so a high radius rounds the image (up to a full circle)
   if(s.bgOn) c+=`background:${s.bg};`;
   if(s.bcOn) c+=`border:1px solid ${s.bc};`;
   return `<div class="${cls||'doc-blk-r'}" style="${c}">${inner}</div>`;
@@ -74,7 +83,7 @@ function docBlocksToItems(blocks){
 }
 
 if(typeof window!=='undefined'){
-  window.DOC_ITEM_STYLE_DEFAULT=DOC_ITEM_STYLE_DEFAULT; window.boxCss=boxCss;
+  window.DOC_ITEM_STYLE_DEFAULT=DOC_ITEM_STYLE_DEFAULT; window.boxCss=boxCss; window.radCss=radCss; window.radAny=radAny;
   window.docHeightCss=docHeightCss; window.docItemHtml=docItemHtml;
   window.renderComposedDoc=renderComposedDoc; window.docBlocksToItems=docBlocksToItems;
 }

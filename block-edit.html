@@ -145,7 +145,13 @@
   .fig-field:focus-within .fig-ic{color:var(--teal)}
   .fig-field input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
   .fig-field input::-webkit-outer-spin-button,.fig-field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .fig-all[hidden],.fig-cross[hidden]{display:none}
+  .fig-hv{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .fig-hv[hidden],.fig-cross[hidden],.fig-solo[hidden],.fig-corners[hidden]{display:none}
+  .fig-corners{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .fig-corners .fig-field input{text-align:center}
+  .fig-corners .cn-tr{transform:rotate(90deg)}
+  .fig-corners .cn-br{transform:rotate(180deg)}
+  .fig-corners .cn-bl{transform:rotate(270deg)}
   .fig-cross{display:grid;grid-template-columns:1fr auto 1fr;grid-template-rows:repeat(3,auto);gap:6px;align-items:center;max-width:210px;margin:2px auto 0}
   .fig-cross .top{grid-area:1/1/2/4;justify-self:center;width:60px}
   .fig-cross .left{grid-area:2/1/3/2}
@@ -346,12 +352,12 @@
             <div class="insp-h">Dimension</div>
             <div class="fig-box" data-box="pad">
               <div class="fig-box-head"><span class="fig-label">Padding</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
-              <div class="fig-all"><span class="fig-field"><span class="ms fig-ic" data-scrub>padding</span><input type="number" id="s-pad" min="0" max="200"></span></div>
+              <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="s-padH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="s-padV" min="0" max="200"></span></div>
               <div class="fig-cross" hidden><span class="fig-field top"><input type="number" id="s-padT" placeholder="0"></span><span class="fig-field left"><input type="number" id="s-padL" placeholder="0"></span><span class="fig-diag diag"></span><span class="fig-field right"><input type="number" id="s-padR" placeholder="0"></span><span class="fig-field bottom"><input type="number" id="s-padB" placeholder="0"></span></div>
             </div>
             <div class="fig-box" data-box="mar">
               <div class="fig-box-head"><span class="fig-label">Margin</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
-              <div class="fig-all"><span class="fig-field"><span class="ms fig-ic" data-scrub>crop_free</span><input type="number" id="s-mar" min="0" max="200"></span></div>
+              <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="s-marH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="s-marV" min="0" max="200"></span></div>
               <div class="fig-cross" hidden><span class="fig-field top"><input type="number" id="s-marT" placeholder="0"></span><span class="fig-field left"><input type="number" id="s-marL" placeholder="0"></span><span class="fig-diag diag"></span><span class="fig-field right"><input type="number" id="s-marR" placeholder="0"></span><span class="fig-field bottom"><input type="number" id="s-marB" placeholder="0"></span></div>
             </div>
             <div class="insp-row" data-field="sp"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
@@ -384,7 +390,11 @@
           </div>
           <div class="insp-sec" data-sec="border">
             <div class="insp-h">Border</div>
-            <div class="insp-row" data-field="rad"><label>Radius</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-rad" min="0" max="200"><input type="number" class="insp-num" id="s-radN"><span class="insp-unit">px</span></div></div>
+            <div class="fig-box" data-box="rad" data-field="rad">
+              <div class="fig-box-head"><span class="fig-label">Corner radius</span><button type="button" class="fig-toggle" data-toggle title="Edit corners individually"><span class="ms">rounded_corner</span></button></div>
+              <div class="fig-solo"><span class="fig-field"><span class="ms fig-ic" data-scrub>rounded_corner</span><input type="number" id="s-rad" min="0" max="400"></span></div>
+              <div class="fig-corners" hidden><span class="fig-field"><span class="ms fig-ic cn cn-tl">rounded_corner</span><input type="number" id="s-radTL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-tr">rounded_corner</span><input type="number" id="s-radTR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-bl">rounded_corner</span><input type="number" id="s-radBL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-br">rounded_corner</span><input type="number" id="s-radBR" placeholder="0"></span></div>
+            </div>
             <div class="insp-row" data-field="bwstyle"><label>Width</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-bw"><span class="insp-unit">px</span><select class="insp-sel" id="s-bstyle" style="flex:1"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div></div>
             <div class="insp-row tall" data-field="bcolor"><label>Colour</label><div class="insp-ctl col">
               <select class="insp-sel" id="s-bcolorBind">
@@ -525,7 +535,7 @@ function pageInit(){
   const wantSlot=_params.get('slot'); // 'header' | 'footer' — deep-link to create page furniture
   const existing=id?BLOCKS.find(b=>b.id===id):null;
 
-  const elDef=()=>({pad:0,bg:'',bgBind:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:''});
+  const elDef=()=>({padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:''});
   const mkEl=pid=>{ const e={id:pid, st:elDef()}; if(pid==='field') e.field='client.name'; if(pid==='image') e.src='placeholder'; return e; };
   const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
@@ -540,9 +550,11 @@ function pageInit(){
   function rebuildBrands(){ BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand,tenant:t})), ...customStyles.map(s=>({id:s.id,name:s.name,brand:s.brand,tenant:s}))]; }
   rebuildBrands();
   const NEUTRAL={primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
-  const blockStyle={wmode:'fill', wpx:520, pad:0, padSides:false, padT:0, padR:0, padB:0, padL:0, mar:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', rad:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:''};
+  const blockStyle={wmode:'fill', wpx:520, padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:''};
   // Padding / margin CSS — one number (overall) or four (per side).
-  function boxCss(s,key){ if(s&&s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; return `${(s&&s[key])||0}px`; }
+  function boxCss(s,key){ if(!s)return '0px'; if(s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; const h=(s[key+'H']!=null)?s[key+'H']:(s[key]||0), v=(s[key+'V']!=null)?s[key+'V']:(s[key]||0); return `${v}px ${h}px`; }
+  function radCss(s){ if(s&&s.radSides) return `${s.radTL||0}px ${s.radTR||0}px ${s.radBR||0}px ${s.radBL||0}px`; return `${(s&&s.rad)||0}px`; }
+  const radAny=s=>!!s&&(s.radSides?(s.radTL||s.radTR||s.radBR||s.radBL):s.rad>0);
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
   const selEl=()=> sel ? doc[sel.r].cols[sel.c][sel.k] : null;
   // Real "used in N documents" (shared with the block view) for the synced-block story.
@@ -730,14 +742,15 @@ function pageInit(){
     w.style.marginLeft = bs.wmode==='fixed'?'auto':''; w.style.marginRight = bs.wmode==='fixed'?'auto':'';
     w.style.padding = boxCss(bs,'pad'); w.style.gap = bs.sp+'px';
     // Vertical margin only on the block wrap — left/right stay auto for centering.
-    w.style.marginTop = (bs.marSides?(bs.marT||0):(bs.mar||0))+'px'; w.style.marginBottom = (bs.marSides?(bs.marB||0):(bs.mar||0))+'px';
-    w.style.background = resolveFill(bs)||''; w.style.borderRadius = bs.rad?bs.rad+'px':''; w.style.overflow = bs.rad>0?'hidden':'';
+    const mV = (bs.marV!=null)?bs.marV:(bs.mar||0);
+    w.style.marginTop = (bs.marSides?(bs.marT||0):mV)+'px'; w.style.marginBottom = (bs.marSides?(bs.marB||0):mV)+'px';
+    w.style.background = resolveFill(bs)||''; w.style.borderRadius = radAny(bs)?radCss(bs):''; w.style.overflow = radAny(bs)?'hidden':'';
     w.style.border = bs.bw>0?(bs.bw+'px '+bs.bstyle+' '+resolveBColor(bs)):'none';
   }
   function applyElStyle(node, st){
     if(!node) return;
     node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar'); node.style.background = resolveFill(st)||'';
-    node.style.borderRadius = st.rad?st.rad+'px':''; node.style.overflow = st.rad>0?'hidden':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+resolveBColor(st)):'';
+    node.style.borderRadius = radAny(st)?radCss(st):''; node.style.overflow = radAny(st)?'hidden':''; node.style.border = st.bw>0?(st.bw+'px '+st.bstyle+' '+resolveBColor(st)):'';
     node.style.textAlign = st.align||'';
     const typo={};
     if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
@@ -779,8 +792,9 @@ function pageInit(){
   }
   function bindNum(numId,key){ const n=document.getElementById(numId); n.addEventListener('input',()=>{ target()[key]=+n.value||0; applyActive(); commitStyle(); }); }
   // Figma-style box-model control (Padding / Margin) — unified or four per-side, on target().
-  const BOX_SIDES=['T','R','B','L'];
+  const BOX_SIDES=['T','R','B','L'], BOX_AXES=['H','V'];
   const boxClamp=v=>Math.max(0,Math.min(200,Math.round(+v||0)));
+  const boxGet=(s,k)=> s[k]!=null ? s[k] : (s[k.slice(0,3)]||0);  // H/V fall back to legacy overall
   function figScrub(el, get, set){
     el.addEventListener('pointerdown',e=>{ e.preventDefault(); const x0=e.clientX, v0=+get()||0; try{el.setPointerCapture(e.pointerId);}catch(_){}
       const mv=ev=>set(v0+Math.round((ev.clientX-x0)/2)); const up=()=>{ el.removeEventListener('pointermove',mv); el.removeEventListener('pointerup',up); };
@@ -790,17 +804,47 @@ function pageInit(){
     const t=target(), ctl=document.querySelector(`.fig-box[data-box="${prop}"]`); if(!ctl)return;
     const sm=!!t[prop+'Sides'];
     ctl.querySelector('[data-toggle]').classList.toggle('on', sm);
-    ctl.querySelector('.fig-all').hidden=sm; ctl.querySelector('.fig-cross').hidden=!sm;
-    document.getElementById('s-'+prop).value=t[prop]||0;
+    ctl.querySelector('.fig-hv').hidden=sm; ctl.querySelector('.fig-cross').hidden=!sm;
+    BOX_AXES.forEach(a=>{ const el=document.getElementById('s-'+prop+a); if(el) el.value=boxGet(t,prop+a); });
     BOX_SIDES.forEach(x=>{ const el=document.getElementById('s-'+prop+x); if(el) el.value=t[prop+x]||0; });
   }
   function wireBoxB(prop){
     const ctl=document.querySelector(`.fig-box[data-box="${prop}"]`); if(!ctl)return;
-    const uni=document.getElementById('s-'+prop);
-    uni.addEventListener('input',()=>{ target()[prop]=boxClamp(uni.value); applyActive(); commitStyle(); });
+    BOX_AXES.forEach(a=>{ const inp=document.getElementById('s-'+prop+a); if(!inp)return;
+      inp.addEventListener('input',()=>{ target()[prop+a]=boxClamp(inp.value); applyActive(); commitStyle(); });
+      const ic=inp.parentElement.querySelector('.fig-ic'); if(ic) figScrub(ic, ()=>boxGet(target(),prop+a), v=>{ target()[prop+a]=boxClamp(v); inp.value=target()[prop+a]; applyActive(); commitStyle(); });
+    });
     BOX_SIDES.forEach(x=>{ const inp=document.getElementById('s-'+prop+x); if(!inp)return; inp.addEventListener('input',()=>{ target()[prop+x]=boxClamp(inp.value); applyActive(); commitStyle(); }); });
-    ctl.querySelector('[data-toggle]').addEventListener('click',()=>{ const sm=!target()[prop+'Sides']; target()[prop+'Sides']=sm; if(sm) BOX_SIDES.forEach(x=>{ if(!target()[prop+x]) target()[prop+x]=target()[prop]||0; }); fillBoxB(prop); applyActive(); commitStyle(); });
-    const ic=ctl.querySelector('.fig-ic'); if(ic) figScrub(ic, ()=>target()[prop]||0, v=>{ target()[prop]=boxClamp(v); uni.value=target()[prop]; applyActive(); commitStyle(); });
+    ctl.querySelector('[data-toggle]').addEventListener('click',()=>{
+      const t=target(), sm=!t[prop+'Sides']; t[prop+'Sides']=sm;
+      if(sm){ const h=boxGet(t,prop+'H'), v=boxGet(t,prop+'V'); if(!t[prop+'T'])t[prop+'T']=v; if(!t[prop+'B'])t[prop+'B']=v; if(!t[prop+'L'])t[prop+'L']=h; if(!t[prop+'R'])t[prop+'R']=h; }
+      else { t[prop+'H']=t[prop+'L']||t[prop+'R']||0; t[prop+'V']=t[prop+'T']||t[prop+'B']||0; }
+      fillBoxB(prop); applyActive(); commitStyle();
+    });
+  }
+  // Corner-radius control — one value (all) or four corners (TL TR BR BL).
+  const BOX_CORNERS=['TL','TR','BR','BL'];
+  const radClamp=v=>Math.max(0,Math.min(400,Math.round(+v||0)));
+  function fillRadB(){
+    const t=target(), ctl=document.querySelector('.fig-box[data-box="rad"]'); if(!ctl)return;
+    const sm=!!t.radSides;
+    ctl.querySelector('[data-toggle]').classList.toggle('on', sm);
+    ctl.querySelector('.fig-solo').hidden=sm; ctl.querySelector('.fig-corners').hidden=!sm;
+    document.getElementById('s-rad').value=t.rad||0;
+    BOX_CORNERS.forEach(c=>{ const el=document.getElementById('s-rad'+c); if(el) el.value=t['rad'+c]||0; });
+  }
+  function wireRadB(){
+    const ctl=document.querySelector('.fig-box[data-box="rad"]'); if(!ctl)return;
+    const uni=document.getElementById('s-rad');
+    uni.addEventListener('input',()=>{ target().rad=radClamp(uni.value); applyActive(); commitStyle(); });
+    BOX_CORNERS.forEach(c=>{ const inp=document.getElementById('s-rad'+c); if(!inp)return; inp.addEventListener('input',()=>{ target()['rad'+c]=radClamp(inp.value); applyActive(); commitStyle(); }); });
+    ctl.querySelector('[data-toggle]').addEventListener('click',()=>{
+      const t=target(), sm=!t.radSides; t.radSides=sm;
+      if(sm) BOX_CORNERS.forEach(c=>{ if(!t['rad'+c]) t['rad'+c]=t.rad||0; });
+      else t.rad=Math.max(t.radTL||0,t.radTR||0,t.radBR||0,t.radBL||0);
+      fillRadB(); applyActive(); commitStyle();
+    });
+    const ic=ctl.querySelector('.fig-solo .fig-ic'); if(ic) figScrub(ic, ()=>target().rad||0, v=>{ target().rad=radClamp(v); uni.value=target().rad; applyActive(); commitStyle(); });
   }
   function bindSel(id,key){ const el=document.getElementById(id); el.addEventListener('change',()=>{ target()[key]=el.value; applyActive(); commitStyle(); }); }
   function bindColor(colId,hexId,key){
@@ -825,7 +869,7 @@ function pageInit(){
   function syncInspector(){
     const t=target();
     const setR=(rId,nId,k)=>{ document.getElementById(rId).value=t[k]||0; document.getElementById(nId).value=t[k]||0; };
-    fillBoxB('pad'); fillBoxB('mar'); setR('s-sp','s-spN','sp'); setR('s-rad','s-radN','rad');
+    fillBoxB('pad'); fillBoxB('mar'); fillRadB(); setR('s-sp','s-spN','sp');
     document.getElementById('s-size').value=t.size||''; document.getElementById('s-lh').value=t.lh||''; document.getElementById('s-bw').value=t.bw||0;
     document.getElementById('s-font').value=t.font||''; document.getElementById('s-weight').value=t.weight||''; document.getElementById('s-bstyle').value=t.bstyle||'solid';
     syncColor('bg'); syncColor('bcolor');
@@ -850,7 +894,7 @@ function pageInit(){
     const colOpts=COLOUR_ROLES.map(r=>`<option value="${r.key}">Brand · ${r.label}</option>`).join('');
     document.getElementById('s-bgBind').innerHTML=`<option value="">Custom colour</option>${colOpts}<option value="none">None (transparent)</option>`;
     document.getElementById('s-bcolorBind').innerHTML=`<option value="">Custom colour</option>${colOpts}`;
-    wireBoxB('pad'); wireBoxB('mar'); bindRange('s-sp','s-spN','sp'); bindRange('s-rad','s-radN','rad');
+    wireBoxB('pad'); wireBoxB('mar'); wireRadB(); bindRange('s-sp','s-spN','sp');
     bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
     bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
     bindColor('s-bg','s-bgH','bg'); bindColor('s-color','s-colorH','color'); bindColor('s-bcolor','s-bcolorH','bcolor');
@@ -867,7 +911,7 @@ function pageInit(){
     document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); if('bg' in p.st) target().bgBind=''; if('bcolor' in p.st) target().bcolorBind=''; applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
     document.getElementById('s-copy').addEventListener('click',()=>{ styleClip=clone(target()); document.getElementById('s-paste').disabled=false; showToast('Style copied'); });
     document.getElementById('s-paste').addEventListener('click',()=>{ if(!styleClip) return; Object.assign(target(), clone(styleClip)); applyActive(); syncInspector(); commit(); showToast('Style pasted'); });
-    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,pad:0,sp:8,bg:'',bgBind:'',rad:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:''}); } applyActive(); render(); commit(); showToast('Style reset'); });
+    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:''}); } applyActive(); render(); commit(); showToast('Style reset'); });
     syncInspector();
   }
 
