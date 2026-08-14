@@ -8,7 +8,13 @@
 // id, content?, style?}. renderComposedDoc() turns the instantiated items into an
 // A4 page; docBlocksToItems() inflates stored composition into render items.
 
-const DOC_ITEM_STYLE_DEFAULT = {pad:0, gap:16, rad:0, bgOn:false, bg:'#ffffff', bcOn:false, bc:'#dbe3e0', hMode:'auto', hVal:120};
+const DOC_ITEM_STYLE_DEFAULT = {pad:0, padSides:false, padT:0, padR:0, padB:0, padL:0, mar:0, marSides:false, marT:0, marR:0, marB:0, marL:0, rad:0, bgOn:false, bg:'#ffffff', bcOn:false, bc:'#dbe3e0', hMode:'auto', hVal:120};
+
+// Padding / margin as a CSS value — one number (overall) or four (per side).
+function boxCss(s, key){
+  if(s && s[key+'Sides']) return `${(s[key+'T']||0)}px ${(s[key+'R']||0)}px ${(s[key+'B']||0)}px ${(s[key+'L']||0)}px`;
+  return `${(s&&s[key])||0}px`;
+}
 
 function docHeightCss(s){
   const m=(s&&s.hMode)||'auto', v=Math.max(0,(s&&s.hVal)||0);
@@ -40,7 +46,9 @@ function docItemHtml(it, brand, cls){
     }
   }
   const s=it.style||DOC_ITEM_STYLE_DEFAULT;
-  let c=`box-sizing:border-box;padding:${s.pad||0}px;border-radius:${s.rad||0}px;margin-bottom:${s.gap!=null?s.gap:16}px;`+docHeightCss(s);
+  // Margin: user value if set, else a default 16px bottom rhythm between blocks.
+  const marUsed = s.marSides || s.mar>0 || s.marT || s.marR || s.marB || s.marL;
+  let c=`box-sizing:border-box;padding:${boxCss(s,'pad')};margin:${marUsed?boxCss(s,'mar'):'0 0 16px'};border-radius:${s.rad||0}px;`+docHeightCss(s);
   if(s.rad>0) c+='overflow:hidden;';   // clip content so a high radius rounds the image (up to a full circle)
   if(s.bgOn) c+=`background:${s.bg};`;
   if(s.bcOn) c+=`border:1px solid ${s.bc};`;
@@ -66,7 +74,7 @@ function docBlocksToItems(blocks){
 }
 
 if(typeof window!=='undefined'){
-  window.DOC_ITEM_STYLE_DEFAULT=DOC_ITEM_STYLE_DEFAULT;
+  window.DOC_ITEM_STYLE_DEFAULT=DOC_ITEM_STYLE_DEFAULT; window.boxCss=boxCss;
   window.docHeightCss=docHeightCss; window.docItemHtml=docItemHtml;
   window.renderComposedDoc=renderComposedDoc; window.docBlocksToItems=docBlocksToItems;
 }

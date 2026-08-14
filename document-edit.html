@@ -116,6 +116,19 @@
   .ds-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
   .ds-ctl input[type=color]{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .ds-u{font-size:10.5px;color:var(--light);flex-shrink:0}
+  /* Box-model control — Padding / Margin, overall or per-side */
+  .box-ctl{margin-bottom:11px}
+  .box-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .box-head label{font-size:12px;color:var(--gray)}
+  .box-mode{display:inline-flex;border:1px solid var(--border);border-radius:7px;overflow:hidden}
+  .box-mode button{border:none;background:#fff;font-family:inherit;font-size:10px;font-weight:700;color:var(--gray);padding:3px 9px;cursor:pointer;letter-spacing:.2px}
+  .box-mode button+button{border-left:1px solid var(--border)}
+  .box-mode button.on{background:var(--teal);color:#fff}
+  .box-all[hidden],.box-sides[hidden]{display:none}
+  .box-sides{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .box-side{display:flex;align-items:center;gap:6px;background:#f1f5f3;border:1px solid var(--border);border-radius:7px;padding:3px 8px}
+  .box-side .sl{font-size:9.5px;font-weight:700;color:var(--gray);width:11px;flex-shrink:0}
+  .box-side input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);text-align:center;outline:none}
   .doc-blk:hover .doc-tools{opacity:1}
   .doc-tools .tb{width:24px;height:24px;border-radius:6px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.3)}
   .doc-tools .tb.grab{cursor:grab}
@@ -359,8 +372,16 @@
             <div id="bi-content"></div>
 
             <div class="ds-lbl">Block style</div>
-            <div class="ds-row"><label>Padding</label><div class="ds-ctl"><input type="range" id="bs-pad" min="0" max="48"><input type="number" class="ds-num" id="bs-padN"><span class="ds-u">px</span></div></div>
-            <div class="ds-row"><label>Spacing</label><div class="ds-ctl"><input type="range" id="bs-gap" min="0" max="60"><input type="number" class="ds-num" id="bs-gapN"><span class="ds-u">px</span></div></div>
+            <div class="box-ctl" data-box="pad">
+              <div class="box-head"><label>Padding</label><span class="box-mode"><button type="button" data-m="all" class="on">All</button><button type="button" data-m="sides">Sides</button></span></div>
+              <div class="ds-ctl box-all"><input type="range" id="bs-pad" min="0" max="120"><input type="number" class="ds-num" id="bs-padN"><span class="ds-u">px</span></div>
+              <div class="box-sides" hidden><div class="box-side"><span class="sl">T</span><input type="number" id="bs-padT"></div><div class="box-side"><span class="sl">R</span><input type="number" id="bs-padR"></div><div class="box-side"><span class="sl">B</span><input type="number" id="bs-padB"></div><div class="box-side"><span class="sl">L</span><input type="number" id="bs-padL"></div></div>
+            </div>
+            <div class="box-ctl" data-box="mar">
+              <div class="box-head"><label>Margin</label><span class="box-mode"><button type="button" data-m="all" class="on">All</button><button type="button" data-m="sides">Sides</button></span></div>
+              <div class="ds-ctl box-all"><input type="range" id="bs-mar" min="0" max="120"><input type="number" class="ds-num" id="bs-marN"><span class="ds-u">px</span></div>
+              <div class="box-sides" hidden><div class="box-side"><span class="sl">T</span><input type="number" id="bs-marT"></div><div class="box-side"><span class="sl">R</span><input type="number" id="bs-marR"></div><div class="box-side"><span class="sl">B</span><input type="number" id="bs-marB"></div><div class="box-side"><span class="sl">L</span><input type="number" id="bs-marL"></div></div>
+            </div>
             <div class="ds-row"><label>Radius</label><div class="ds-ctl"><input type="range" id="bs-rad" min="0" max="200"><input type="number" class="ds-num" id="bs-radN"><span class="ds-u">px</span></div></div>
             <div class="ds-row"><label>Height</label><div class="ds-ctl"><select class="ds-sel" id="bs-hmode"><option value="auto">Auto</option><option value="hug">Hug</option><option value="fixed">Fixed</option><option value="min">Min</option><option value="max">Max</option></select><input type="number" class="ds-num" id="bs-hval"><span class="ds-u">px</span></div></div>
             <div class="ds-row"><label class="bi-tog"><input type="checkbox" id="bs-bgOn">Fill</label><div class="ds-ctl"><input type="color" id="bs-bg"><input class="ds-hex" id="bs-bgH"></div></div>
@@ -453,7 +474,7 @@ function pageInit(){
   }
   // Each block on the canvas is an INSTANCE with its own style + example content.
   let uid=0;
-  function mkInst(ref, isEl){ return {k:++uid, bid:isEl?null:ref, pid:isEl?ref:null, el:!!isEl, style:{pad:0,gap:16,rad:0,bgOn:false,bg:'#ffffff',bcOn:false,bc:'#dbe3e0',hMode:'auto',hVal:120}, content:{}}; }
+  function mkInst(ref, isEl){ return {k:++uid, bid:isEl?null:ref, pid:isEl?ref:null, el:!!isEl, style:{pad:0,padSides:false,padT:0,padR:0,padB:0,padL:0, mar:0,marSides:false,marT:0,marR:0,marB:0,marL:0, rad:0,bgOn:false,bg:'#ffffff',bcOn:false,bc:'#dbe3e0',hMode:'auto',hVal:120}, content:{}}; }
   // Seed the canvas from the document's SAVED composition, so the builder shows
   // exactly what the view/pack renders (see document-render.js).
   let items = (doc && Array.isArray(doc.blocks))
@@ -880,7 +901,7 @@ function pageInit(){
     document.getElementById('bi-name').textContent=instLabel(it);
     document.getElementById('bi-desc').textContent=instDesc(it);
     const s=it.style, setv=(r,n,v)=>{document.getElementById(r).value=v;document.getElementById(n).value=v;};
-    setv('bs-pad','bs-padN',s.pad); setv('bs-gap','bs-gapN',s.gap); setv('bs-rad','bs-radN',s.rad);
+    fillBox(it,'pad'); fillBox(it,'mar'); setv('bs-rad','bs-radN',s.rad);
     const hm=s.hMode||'auto'; document.getElementById('bs-hmode').value=hm; document.getElementById('bs-hval').value=s.hVal||120; document.getElementById('bs-hval').disabled=(hm==='auto'||hm==='hug');
     document.getElementById('bs-bgOn').checked=s.bgOn; document.getElementById('bs-bg').value=s.bg; document.getElementById('bs-bgH').value=s.bg.toUpperCase();
     document.getElementById('bs-bcOn').checked=s.bcOn; document.getElementById('bs-bc').value=s.bc; document.getElementById('bs-bcH').value=s.bc.toUpperCase();
@@ -907,7 +928,29 @@ function pageInit(){
     const set=v=>{ if(!curItem)return; v=Math.max(+R.min,Math.min(+R.max,Math.round(+v||0))); curItem.style[key]=v; R.value=v; N.value=v; render(); };
     R.addEventListener('input',()=>set(R.value)); N.addEventListener('input',()=>set(N.value));
   }
-  biNum('bs-pad','bs-padN','pad'); biNum('bs-gap','bs-gapN','gap'); biNum('bs-rad','bs-radN','rad');
+  // Box-model control (Padding / Margin) — overall value or four per-side values.
+  const SIDES=['T','R','B','L'];
+  function fillBox(it, prop){
+    const s=it.style, ctl=document.querySelector(`.box-ctl[data-box="${prop}"]`); if(!ctl) return;
+    const sidesMode=!!s[prop+'Sides'];
+    ctl.querySelectorAll('.box-mode button').forEach(b=>b.classList.toggle('on',(b.dataset.m==='sides')===sidesMode));
+    ctl.querySelector('.box-all').hidden=sidesMode; ctl.querySelector('.box-sides').hidden=!sidesMode;
+    document.getElementById('bs-'+prop).value=s[prop]||0; document.getElementById('bs-'+prop+'N').value=s[prop]||0;
+    SIDES.forEach(x=>{ const el=document.getElementById('bs-'+prop+x); if(el) el.value=s[prop+x]||0; });
+  }
+  function wireBox(prop){
+    const ctl=document.querySelector(`.box-ctl[data-box="${prop}"]`); if(!ctl) return;
+    const R=document.getElementById('bs-'+prop), N=document.getElementById('bs-'+prop+'N');
+    const setAll=v=>{ if(!curItem)return; v=Math.max(0,Math.min(200,Math.round(+v||0))); curItem.style[prop]=v; R.value=v; N.value=v; render(); };
+    R.addEventListener('input',()=>setAll(R.value)); N.addEventListener('input',()=>setAll(N.value));
+    SIDES.forEach(x=>{ const inp=document.getElementById('bs-'+prop+x); if(!inp) return; inp.addEventListener('input',()=>{ if(!curItem)return; const v=Math.max(0,Math.min(200,Math.round(+inp.value||0))); curItem.style[prop+x]=v; inp.value=v; render(); }); });
+    ctl.querySelectorAll('.box-mode button').forEach(btn=>btn.addEventListener('click',()=>{
+      if(!curItem)return; const sidesMode=btn.dataset.m==='sides'; curItem.style[prop+'Sides']=sidesMode;
+      if(sidesMode) SIDES.forEach(x=>{ if(!curItem.style[prop+x]) curItem.style[prop+x]=curItem.style[prop]||0; });
+      fillBox(curItem, prop); render();
+    }));
+  }
+  wireBox('pad'); wireBox('mar'); biNum('bs-rad','bs-radN','rad');
   (function(){ // Height mode (auto/hug/fixed/min/max) + value
     const M=document.getElementById('bs-hmode'), V=document.getElementById('bs-hval');
     const upd=()=>{ if(!curItem)return; curItem.style.hMode=M.value; V.disabled=(M.value==='auto'||M.value==='hug'); curItem.style.hVal=Math.max(0,Math.round(+V.value||0)); render(); };
