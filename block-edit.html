@@ -152,14 +152,8 @@
   .fig-corners .cn-tr{transform:rotate(90deg)}
   .fig-corners .cn-br{transform:rotate(180deg)}
   .fig-corners .cn-bl{transform:rotate(270deg)}
-  .fig-cross{display:grid;grid-template-columns:1fr auto 1fr;grid-template-rows:repeat(3,auto);gap:6px;align-items:center;max-width:210px;margin:2px auto 0}
-  .fig-cross .top{grid-area:1/1/2/4;justify-self:center;width:60px}
-  .fig-cross .left{grid-area:2/1/3/2}
-  .fig-cross .diag{grid-area:2/2/3/3;justify-self:center}
-  .fig-cross .right{grid-area:2/3/3/4}
-  .fig-cross .bottom{grid-area:3/1/4/4;justify-self:center;width:60px}
+  .fig-cross{display:grid;grid-template-columns:1fr 1fr;gap:6px}
   .fig-cross .fig-field input{text-align:center}
-  .fig-diag{width:28px;height:24px;border:1.5px solid #c6d2cd;border-radius:5px}
   .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
   .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
@@ -353,12 +347,12 @@
             <div class="fig-box" data-box="pad">
               <div class="fig-box-head"><span class="fig-label">Padding</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
               <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="s-padH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="s-padV" min="0" max="200"></span></div>
-              <div class="fig-cross" hidden><span class="fig-field top"><input type="number" id="s-padT" placeholder="0"></span><span class="fig-field left"><input type="number" id="s-padL" placeholder="0"></span><span class="fig-diag diag"></span><span class="fig-field right"><input type="number" id="s-padR" placeholder="0"></span><span class="fig-field bottom"><input type="number" id="s-padB" placeholder="0"></span></div>
+              <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="s-padT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="s-padR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="s-padB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="s-padL" placeholder="0"></span></div>
             </div>
             <div class="fig-box" data-box="mar">
               <div class="fig-box-head"><span class="fig-label">Margin</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
               <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="s-marH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="s-marV" min="0" max="200"></span></div>
-              <div class="fig-cross" hidden><span class="fig-field top"><input type="number" id="s-marT" placeholder="0"></span><span class="fig-field left"><input type="number" id="s-marL" placeholder="0"></span><span class="fig-diag diag"></span><span class="fig-field right"><input type="number" id="s-marR" placeholder="0"></span><span class="fig-field bottom"><input type="number" id="s-marB" placeholder="0"></span></div>
+              <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="s-marT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="s-marR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="s-marB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="s-marL" placeholder="0"></span></div>
             </div>
             <div class="insp-row" data-field="sp"><label>Spacing</label><div class="insp-ctl"><input type="range" class="insp-range" id="s-sp" min="0" max="48"><input type="number" class="insp-num" id="s-spN"><span class="insp-unit">px</span></div></div>
             <div class="insp-row tall" data-field="bg"><label>Fill</label><div class="insp-ctl col">
@@ -814,7 +808,10 @@ function pageInit(){
       inp.addEventListener('input',()=>{ target()[prop+a]=boxClamp(inp.value); applyActive(); commitStyle(); });
       const ic=inp.parentElement.querySelector('.fig-ic'); if(ic) figScrub(ic, ()=>boxGet(target(),prop+a), v=>{ target()[prop+a]=boxClamp(v); inp.value=target()[prop+a]; applyActive(); commitStyle(); });
     });
-    BOX_SIDES.forEach(x=>{ const inp=document.getElementById('s-'+prop+x); if(!inp)return; inp.addEventListener('input',()=>{ target()[prop+x]=boxClamp(inp.value); applyActive(); commitStyle(); }); });
+    BOX_SIDES.forEach(x=>{ const inp=document.getElementById('s-'+prop+x); if(!inp)return;
+      inp.addEventListener('input',()=>{ target()[prop+x]=boxClamp(inp.value); applyActive(); commitStyle(); });
+      const ic=inp.parentElement.querySelector('.fig-ic'); if(ic) figScrub(ic, ()=>target()[prop+x]||0, v=>{ target()[prop+x]=boxClamp(v); inp.value=target()[prop+x]; applyActive(); commitStyle(); });
+    });
     ctl.querySelector('[data-toggle]').addEventListener('click',()=>{
       const t=target(), sm=!t[prop+'Sides']; t[prop+'Sides']=sm;
       if(sm){ const h=boxGet(t,prop+'H'), v=boxGet(t,prop+'V'); if(!t[prop+'T'])t[prop+'T']=v; if(!t[prop+'B'])t[prop+'B']=v; if(!t[prop+'L'])t[prop+'L']=h; if(!t[prop+'R'])t[prop+'R']=h; }
