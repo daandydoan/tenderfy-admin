@@ -180,6 +180,10 @@
   /* Selected block + per-block style box */
   .doc-blk{border-radius:12px}
   .doc-blk.sel{outline:2px solid var(--teal);outline-offset:3px}
+  /* Preview blocks are selectable too */
+  .pv-blk[data-k]{cursor:pointer}
+  .pv-blk[data-k]:hover{outline:1.5px solid var(--teal);outline-offset:2px}
+  .pv-blk.sel{outline:2px solid var(--teal);outline-offset:2px}
   .doc-blk .blk-box{transition:padding .1s,background .1s,border-color .1s,border-radius .1s}
   /* Block inspector */
   .bi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -592,9 +596,10 @@ function pageInit(){
   // Delegate to the shared renderer so the builder preview and the view/pack are
   // byte-identical. (docItemHtml handles element vs block, content + style.)
   function renderBlockInstance(it){
-    return (typeof docItemHtml==='function')
-      ? docItemHtml(it, brand, 'pv-blk')
-      : `<div class="pv-blk">${instComposed(it)}</div>`;
+    const html = (typeof docItemHtml==='function')
+      ? docItemHtml(it, brand, 'pv-blk'+(it.k===selK?' sel':''))
+      : `<div class="pv-blk${it.k===selK?' sel':''}">${instComposed(it)}</div>`;
+    return html.replace('<div class="pv-blk', `<div data-k="${it.k}" class="pv-blk`);   // selectable in Preview
   }
   const A4H=877; // A4 page height at 620px wide
   // Fixed Top-Layer slots drawn in Layout mode (independent of the main body).
@@ -690,6 +695,10 @@ function pageInit(){
     wire();
   }
   function wire(){
+    // Preview mode: click a rendered block to select it (mirrors Layout selection).
+    canvas.querySelectorAll('.pv-blk[data-k]').forEach(el=>{
+      el.addEventListener('click',e=>{ e.stopPropagation(); selK=+el.dataset.k; render(); renderInspector(); });
+    });
     canvas.querySelectorAll('.doc-furn').forEach(el=>el.addEventListener('click',e=>{ e.stopPropagation(); selK=null; renderInspector(); showLeftTab('layers'); }));
     canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();const [rm]=items.splice(+x.dataset.rm,1);if(rm&&rm.k===selK)selK=null;render();renderInspector();}));
     canvas.querySelectorAll('.doc-blk').forEach(el=>{
@@ -923,8 +932,7 @@ function pageInit(){
   function setMode(m){
     mode=m;
     document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x.dataset.mode===m));
-    if(m==='preview') selK=null;
-    applyDocStyle(); renderInspector(); render();
+    applyDocStyle(); renderInspector(); render();   // selection persists across Layout ⇄ Preview
   }
   document.querySelectorAll('#modeSeg button').forEach(x=>x.addEventListener('click',()=>setMode(x.dataset.mode)));
 
@@ -939,7 +947,7 @@ function pageInit(){
   ];
   // ---- Block inspector (per-block content + style) ----
   function renderInspector(){
-    const it=items.find(x=>x.k===selK), show=it&&mode==='layout';
+    const it=items.find(x=>x.k===selK), show=!!it;   // selectable in Layout AND Preview
     document.getElementById('blockInspector').style.display=show?'':'none';
     document.getElementById('docSettings').style.display=show?'none':'';
     if(show) fillInspector(it);
@@ -1072,7 +1080,7 @@ function pageInit(){
   }
   wirePaint('bg'); wirePaint('bc');
   document.getElementById('bi-close').addEventListener('click',()=>{ selK=null; renderInspector(); render(); });
-  canvas.addEventListener('click',e=>{ if(mode==='layout' && !e.target.closest('.doc-blk')){ selK=null; renderInspector(); render(); } });
+  canvas.addEventListener('click',e=>{ if(!e.target.closest('.doc-blk') && !e.target.closest('.pv-blk[data-k]')){ selK=null; renderInspector(); render(); } });
 
   // ---- Responsive panels (Properties collapsible / drawers on small screens) ----
   const ed3=document.querySelector('.ed3');
