@@ -372,7 +372,7 @@
             </div></div>
           </div>
 
-          <div class="insp-sec" data-sec="layout">
+          <div class="insp-sec" data-sec="layout" data-need="width">
             <div class="insp-h">Layout</div>
             <div class="fig-label" style="margin-bottom:6px">Resizing</div>
             <div class="fig-resize">
@@ -396,7 +396,7 @@
               </div>
             </div>
           </div>
-          <div class="insp-sec" data-sec="dim">
+          <div class="insp-sec" data-sec="dim" data-need="pad">
             <div class="insp-h">Dimension</div>
             <div class="fig-box" data-box="pad">
               <div class="fig-box-head"><span class="fig-label">Padding</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
@@ -409,7 +409,7 @@
               <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="s-marT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="s-marR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="s-marB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="s-marL" placeholder="0"></span></div>
             </div>
           </div>
-          <div class="insp-sec fig-sec" data-sec="fill" data-paint="bg">
+          <div class="insp-sec fig-sec" data-sec="fill" data-paint="bg" data-need="bg">
             <div class="fig-sec-h"><span class="fig-sec-t">Fill</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add fill"><span class="ms">add</span></button></span></div>
             <div class="fig-paint" id="s-bgLit" data-paint="bg"><span class="fig-sw"><input type="color" class="insp-color" id="s-bg"></span><input class="fig-hexin insp-hex" id="s-bgH" placeholder="FFFFFF"><span class="fig-op"><input type="number" id="s-bgA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
             <div class="bind-note" id="s-bgNote" style="display:none"></div>
@@ -429,7 +429,7 @@
             </div></div>
             <div class="fhint" style="margin:2px 0 0">Blank fields inherit the client’s brand &amp; styling.</div>
           </div>
-          <div class="insp-sec" data-sec="border">
+          <div class="insp-sec" data-sec="border" data-need="rad,bcolor,bwstyle">
             <div class="insp-h">Appearance</div>
             <div class="fig-box" data-box="rad" data-field="rad">
               <div class="fig-box-head"><span class="fig-label">Corner radius</span><button type="button" class="fig-toggle" data-toggle title="Edit corners individually"><span class="ms">rounded_corner</span></button></div>
@@ -442,7 +442,7 @@
               <div class="bind-note" id="s-bcolorNote" style="display:none"></div>
               <select class="insp-sel fig-bind" id="s-bcolorBind"></select>
               <div class="fig-strokerow"><div><label>Position</label><select class="insp-sel" id="s-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><label>Weight</label><span class="fig-wt"><span class="ms">line_weight</span><input type="number" id="s-bw" min="0" max="40"></span></div></div>
-              <div class="insp-row" data-field="bstyle" style="margin-top:8px"><label>Style</label><select class="insp-sel" id="s-bstyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
+              <div class="insp-row" data-field="bwstyle" style="margin-top:8px"><label>Style</label><select class="insp-sel" id="s-bstyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
             </div>
           </div>
         </div>
@@ -833,9 +833,13 @@ function pageInit(){
   function renderInspector(){
     const allowed=fieldsFor();
     document.querySelectorAll('#styleCard .insp-sec[data-sec]').forEach(sec=>{
-      let any=false;
-      sec.querySelectorAll('.insp-row').forEach(row=>{ const show=allowed.has(row.dataset.field); row.style.display=show?'':'none'; if(show)any=true; });
-      sec.style.display=any?'':'none';
+      // Gate individual labelled rows (typography, style, etc.) by their field.
+      let anyRow=false;
+      sec.querySelectorAll('.insp-row[data-field]').forEach(row=>{ const show=allowed.has(row.dataset.field); row.style.display=show?'':'none'; if(show)anyRow=true; });
+      // Sections built from fig-* controls declare which field(s) unlock them.
+      const need=(sec.dataset.need||'').split(',').filter(Boolean);
+      const needMet = need.length ? need.some(f=>allowed.has(f)) : false;
+      sec.style.display=(anyRow||needMet)?'':'none';
     });
     const id = sel?selEl().id:null;
     document.getElementById('sec-perm').style.display = sel?'':'none';
