@@ -99,30 +99,55 @@ function blockPreview(p){
   }
 }
 // ---- Auto-generated block thumbnails ------------------------------------
-// Instead of a hand-authored schematic per pattern (which falls back to a lone
-// grey bar for any custom block), render the block's REAL composition at a fixed
-// source width in neutral brand tokens, then CSS-scale it to fit the tile. Any
-// block — including bespoke ones — gets a truthful preview with zero authoring.
-const THUMB_BRAND = {primary:'#5a6b66', secondary:'#a7bcb5', background:'#ffffff', font:'Outfit', bodyFont:'Outfit'};
-const THUMB_SRC = 480;   // px the block is rendered at before scaling down
+// A thumbnail is a SIMPLIFIED, data-free schematic of the block — derived from
+// its real composition (the P2DOC layout) so any block, including bespoke ones,
+// gets a truthful preview without hand-authoring or fake sample text. Each
+// primitive renders as a placeholder shape (bars, image box, table grid…).
+function primSchematic(id){
+  const bar=(w,h)=>`<div class="blk-bar${h?' h':''}" style="width:${w}"></div>`;
+  const img=()=>`<div class="blk-img"><span class="ms">image</span></div>`;
+  switch(id){
+    case 'heading':    return bar('60%',1);
+    case 'subheading': return bar('72%',1);
+    case 'cover':      return bar('66%',1);
+    case 'paragraph':  return bar('94%')+bar('88%')+bar('70%');
+    case 'list':       return ['82%','74%','66%'].map(w=>`<div class="blk-list-row"><span class="dot"></span>${bar(w)}</div>`).join('');
+    case 'quote':      return `<div class="blk-quote">${bar('88%')+bar('64%')}</div>`;
+    case 'image':      return img();
+    case 'table':      return `<div class="blk-table">${['h','','',''].map(r=>`<div class="tr ${r}"><span></span><span></span><span></span></div>`).join('')}</div>`;
+    case 'keyvalue':   return [0,1,2].map(()=>`<div class="blk-pr">${bar('42%')}<div class="blk-bar blk-amt"></div></div>`).join('');
+    case 'signature':  return `${bar('48%')}<div style="height:1px;background:#B4C6C1;margin:10px 0 6px"></div>${bar('36%',1)}`;
+    case 'divider':    return `<div style="height:2px;background:#B4C6C1;border-radius:2px;margin:2px 0"></div>`;
+    case 'callout':    return `<div style="background:var(--teal-tint);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:7px">${bar('66%',1)+bar('84%')}</div>`;
+    case 'stat':       return `<div class="blk-bar h" style="width:34%;height:16px"></div>${bar('58%')}`;
+    case 'button':     return `<div style="width:44%;height:16px;background:var(--teal);opacity:.75;border-radius:5px"></div>`;
+    case 'toc':        return [0,1,2].map(()=>`<div class="blk-pr">${bar('62%')}<div class="blk-bar" style="width:9%"></div></div>`).join('');
+    case 'field':      return bar('46%');
+    case 'spacer':     return `<div style="height:12px"></div>`;
+    default:           return bar('72%');
+  }
+}
+// Compose the schematic from the block's real row/column layout (P2DOC).
+function blockSchematic(block){
+  if(typeof P2DOC==='undefined') return blockPreview(block.p);
+  if(/^l[hf]-/.test(block.p||'')) return blockPreview(block.p);   // letterhead / footer bands keep their bespoke schematic
+  const doc = P2DOC[block.p] || [{cols:[[block.p]]}];
+  return doc.map(row => row.cols.length>1
+    ? `<div class="blk-cols">${row.cols.map(col=>`<div>${col.map(primSchematic).join('')}</div>`).join('')}</div>`
+    : row.cols[0].map(primSchematic).join('')
+  ).join('');
+}
 // Art-direction override — an optional custom image a user sets in the block
 // editor. Persisted per block id so palettes/listings pick it up. Falls back to
-// the auto-render when absent.
+// the auto-schematic when absent.
 function blockThumbOverride(id){ try{ return (id && localStorage.getItem('tf_bthumb_'+id)) || ''; }catch(e){ return ''; } }
 function setBlockThumbOverride(id, url){ try{ if(!id) return; if(url) localStorage.setItem('tf_bthumb_'+id, url); else localStorage.removeItem('tf_bthumb_'+id); }catch(e){} }
 function blockThumb(block){
   const ovr = (block && (block.thumb || blockThumbOverride(block.id)));
   if(ovr) return `<img class="blk-thumb-img" src="${ovr}" alt="">`;   // custom graphic, sized to fit inside the tile
-  const inner = (typeof composeBlock==='function') ? composeBlock(block, THUMB_BRAND) : blockPreview(block.p);
-  return `<div class="blk-stage" style="width:${THUMB_SRC}px;transform-origin:top left;pointer-events:none">${inner}</div>`;
+  return blockSchematic(block);
 }
-// Scale every .blk-stage inside `root` so its rendered width matches its box.
-function fitThumbs(root){
-  (root||document).querySelectorAll('.blk-stage').forEach(st=>{
-    const box=st.parentElement; if(!box) return;
-    const w=box.clientWidth; if(w>0) st.style.transform='scale('+(w/THUMB_SRC)+')';
-  });
-}
+function fitThumbs(){}   // no-op: schematic thumbnails are %-based and need no scaling
 
 // Shared block actions — kept in one place so the block view and the block
 // editor share identical wording and behaviour.
@@ -160,4 +185,4 @@ const BLOCK_STATUS_META = {
   inactive:{cls:'b-deprecated', label:'Inactive'},
 };
 function blockStatusBadge(id){ const m=BLOCK_STATUS_META[blockStatus(id)]||BLOCK_STATUS_META.active; return `<span class="badge ${m.cls}"><span class="b-dot"></span>${m.label}</span>`; }
-if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.COMPOSED_BLOCKS=COMPOSED_BLOCKS; window.BLOCK_LIB_CATS=BLOCK_LIB_CATS; window.BLOCK_ELEMENT_IDS=BLOCK_ELEMENT_IDS; window.blockPreview=blockPreview; window.blockThumb=blockThumb; window.fitThumbs=fitThumbs; window.THUMB_BRAND=THUMB_BRAND; window.blockThumbOverride=blockThumbOverride; window.setBlockThumbOverride=setBlockThumbOverride; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }
+if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.COMPOSED_BLOCKS=COMPOSED_BLOCKS; window.BLOCK_LIB_CATS=BLOCK_LIB_CATS; window.BLOCK_ELEMENT_IDS=BLOCK_ELEMENT_IDS; window.blockPreview=blockPreview; window.blockThumb=blockThumb; window.blockSchematic=blockSchematic; window.fitThumbs=fitThumbs; window.blockThumbOverride=blockThumbOverride; window.setBlockThumbOverride=setBlockThumbOverride; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }

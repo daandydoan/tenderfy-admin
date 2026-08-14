@@ -95,9 +95,7 @@
   .vb-widget:hover .pal-prev{border-color:var(--teal-bright)}
   .pal-prev .blk-img{min-height:0;height:30px}
   .pal-prev .blk-imgs{gap:5px}
-  /* Auto-generated block thumbnail — real render, scaled to fit the tile */
-  .pal-prev.blk-thumb{justify-content:flex-start;align-items:flex-start;padding:7px}
-  .blk-stage{transform-origin:top left}
+  /* Auto-generated block thumbnail — simplified schematic of the composition */
   /* Art-direction override image — contained inside the tile */
   .blk-thumb-img{max-width:100%;max-height:100%;width:auto;height:auto;margin:auto;object-fit:contain;border-radius:4px;display:block}
   .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
@@ -564,7 +562,7 @@ function pageInit(){
     const blocks=COMPOSED_BLOCKS.filter(b=>b.cat!=='Headers & Footers' && hit(b.name+' '+b.cat));
     let html=BLOCK_LIB_CATS.filter(c=>c!=='Headers & Footers' && blocks.some(b=>b.cat===c)).map(cat=>
       `<div class="pal-tag">${cat}</div>`+blocks.filter(b=>b.cat===cat).map(b=>
-        `<div class="vb-widget" draggable="true" data-id="${b.id}" data-kind="block" title="${b.desc}"><div class="pal-prev blk-thumb">${blockThumb(b)}</div><span class="pal-lbl">${b.label}</span></div>`).join('')
+        `<div class="vb-widget" draggable="true" data-id="${b.id}" data-kind="block" title="${b.desc}"><div class="pal-prev blk-preview">${blockThumb(b)}</div><span class="pal-lbl">${b.label}</span></div>`).join('')
     ).join('');
     // Elements (single primitives) — also placeable directly in a document.
     const els=(typeof PRIMITIVES!=='undefined'?PRIMITIVES:[]).filter(p=>hit(p.name+' '+p.tag));
