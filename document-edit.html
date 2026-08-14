@@ -138,6 +138,33 @@
   .fig-corners .cn-tr{transform:rotate(90deg)}
   .fig-corners .cn-br{transform:rotate(180deg)}
   .fig-corners .cn-bl{transform:rotate(270deg)}
+  /* Figma-style Fill / Stroke paint sections */
+  .fig-sec{border-top:1px solid var(--border);padding:12px 0 2px;margin-top:10px}
+  .fig-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .fig-sec-t{font-size:12px;font-weight:600;color:var(--ink)}
+  .fig-acts{display:flex;gap:2px}
+  .fig-a{width:24px;height:24px;border:none;background:transparent;border-radius:6px;color:var(--light);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  .fig-a:hover{background:#eef3f1;color:var(--gray)}
+  .fig-a .ms{font-size:16px}
+  .fig-paint{display:flex;align-items:center;gap:6px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;padding:0 4px 0 6px;height:32px}
+  .fig-paint:hover{background:#eaf0ee}
+  .fig-paint.off .fig-sw,.fig-paint.off .fig-hexin,.fig-paint.off .fig-op{opacity:.4}
+  .fig-sw{position:relative;width:20px;height:20px;border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.14);flex-shrink:0}
+  .fig-sw input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;padding:0;margin:0;cursor:pointer;background:none}
+  .fig-hexin{flex:1;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;text-transform:uppercase}
+  .fig-op{display:flex;align-items:center;gap:1px;flex-shrink:0;border-left:1px solid #d7e0dd;padding-left:6px}
+  .fig-op input{width:30px;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;text-align:right;-moz-appearance:textfield}
+  .fig-op input::-webkit-outer-spin-button,.fig-op input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .fig-op-u{font-size:11px;color:var(--light)}
+  .fig-paint .fig-a{width:22px;height:22px}
+  .fig-strokerow{display:grid;grid-template-columns:1fr 92px;gap:8px;margin-top:8px}
+  .fig-strokerow label{display:block;font-size:10.5px;color:var(--gray);margin-bottom:4px}
+  .fig-strokesel{width:100%;box-sizing:border-box;height:30px;border:1px solid var(--border);border-radius:7px;background:#fff;font-family:inherit;font-size:12px;color:var(--ink);padding:0 6px;cursor:pointer}
+  .fig-wt{display:flex;align-items:center;gap:5px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;height:30px;padding:0 8px}
+  .fig-wt:focus-within{background:#fff;border-color:var(--teal)}
+  .fig-wt .ms{font-size:15px;color:#9aa5a3}
+  .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
+  .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .fig-cross{display:grid;grid-template-columns:1fr 1fr;gap:6px}
   .fig-cross .fig-field input{text-align:center}
   .doc-blk:hover .doc-tools{opacity:1}
@@ -399,8 +426,15 @@
               <div class="fig-corners" hidden><span class="fig-field"><span class="ms fig-ic cn cn-tl">rounded_corner</span><input type="number" id="bs-radTL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-tr">rounded_corner</span><input type="number" id="bs-radTR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-bl">rounded_corner</span><input type="number" id="bs-radBL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-br">rounded_corner</span><input type="number" id="bs-radBR" placeholder="0"></span></div>
             </div>
             <div class="ds-row"><label>Height</label><div class="ds-ctl"><select class="ds-sel" id="bs-hmode"><option value="auto">Auto</option><option value="hug">Hug</option><option value="fixed">Fixed</option><option value="min">Min</option><option value="max">Max</option></select><input type="number" class="ds-num" id="bs-hval"><span class="ds-u">px</span></div></div>
-            <div class="ds-row"><label class="bi-tog"><input type="checkbox" id="bs-bgOn">Fill</label><div class="ds-ctl"><input type="color" id="bs-bg"><input class="ds-hex" id="bs-bgH"></div></div>
-            <div class="ds-row"><label class="bi-tog"><input type="checkbox" id="bs-bcOn">Border</label><div class="ds-ctl"><input type="color" id="bs-bc"><input class="ds-hex" id="bs-bcH"></div></div>
+            <div class="fig-sec" data-paint="bg">
+              <div class="fig-sec-h"><span class="fig-sec-t">Fill</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add fill"><span class="ms">add</span></button></span></div>
+              <div class="fig-paint" id="bs-bgPaint"><span class="fig-sw"><input type="color" id="bs-bg"></span><input class="fig-hexin" id="bs-bgH" placeholder="FFFFFF"><span class="fig-op"><input type="number" id="bs-bgA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
+            </div>
+            <div class="fig-sec" data-paint="bc">
+              <div class="fig-sec-h"><span class="fig-sec-t">Stroke</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add stroke"><span class="ms">add</span></button></span></div>
+              <div class="fig-paint" id="bs-bcPaint"><span class="fig-sw"><input type="color" id="bs-bc"></span><input class="fig-hexin" id="bs-bcH" placeholder="EAEDEC"><span class="fig-op"><input type="number" id="bs-bcA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
+              <div class="fig-strokerow" id="bs-strokeMeta"><div><label>Position</label><select class="fig-strokesel" id="bs-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><label>Weight</label><span class="fig-wt"><span class="ms">line_weight</span><input type="number" id="bs-bw" min="0" max="40"></span></div></div>
+            </div>
           </div>
         </div>
 
@@ -489,7 +523,7 @@ function pageInit(){
   }
   // Each block on the canvas is an INSTANCE with its own style + example content.
   let uid=0;
-  function mkInst(ref, isEl){ return {k:++uid, bid:isEl?null:ref, pid:isEl?ref:null, el:!!isEl, style:{padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0, marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0, rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bgOn:false,bg:'#ffffff',bcOn:false,bc:'#dbe3e0',hMode:'auto',hVal:120}, content:{}}; }
+  function mkInst(ref, isEl){ return {k:++uid, bid:isEl?null:ref, pid:isEl?ref:null, el:!!isEl, style:{padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0, marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0, rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bgOn:false,bg:'#ffffff',bgA:100,bgVis:true,bcOn:false,bc:'#dbe3e0',bcA:100,bcVis:true,bw:1,bpos:'inside',hMode:'auto',hVal:120}, content:{}}; }
   // Seed the canvas from the document's SAVED composition, so the builder shows
   // exactly what the view/pack renders (see document-render.js).
   let items = (doc && Array.isArray(doc.blocks))
@@ -917,8 +951,7 @@ function pageInit(){
     const s=it.style, setv=(r,n,v)=>{document.getElementById(r).value=v;document.getElementById(n).value=v;};
     fillBox(it,'pad'); fillBox(it,'mar'); fillRad(it);
     const hm=s.hMode||'auto'; document.getElementById('bs-hmode').value=hm; document.getElementById('bs-hval').value=s.hVal||120; document.getElementById('bs-hval').disabled=(hm==='auto'||hm==='hug');
-    document.getElementById('bs-bgOn').checked=s.bgOn; document.getElementById('bs-bg').value=s.bg; document.getElementById('bs-bgH').value=s.bg.toUpperCase();
-    document.getElementById('bs-bcOn').checked=s.bcOn; document.getElementById('bs-bc').value=s.bc; document.getElementById('bs-bcH').value=s.bc.toUpperCase();
+    fillPaint('bg'); fillPaint('bc');
     const els=it.el ? [it.pid] : ((typeof blockElements==='function')?blockElements(b):[]);
     const hasTitle=els.some(e=>['heading','subheading','cover'].includes(e));
     const hasBody=els.some(e=>['paragraph','list','quote','callout'].includes(e));
@@ -1006,14 +1039,38 @@ function pageInit(){
     const upd=()=>{ if(!curItem)return; curItem.style.hMode=M.value; V.disabled=(M.value==='auto'||M.value==='hug'); curItem.style.hVal=Math.max(0,Math.round(+V.value||0)); render(); };
     M.addEventListener('change',upd); V.addEventListener('input',upd);
   })();
-  function biColor(togId,colId,hexId,onKey,valKey){
-    const T=document.getElementById(togId),C=document.getElementById(colId),H=document.getElementById(hexId);
-    const push=()=>{ if(!curItem)return; curItem.style[onKey]=T.checked; curItem.style[valKey]=C.value; H.value=C.value.toUpperCase(); render(); };
-    T.addEventListener('change',push);
-    C.addEventListener('input',()=>{ if(!T.checked)T.checked=true; push(); });
-    H.addEventListener('input',()=>{ if(!curItem)return; const v=H.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ C.value=v; if(!T.checked)T.checked=true; push(); } });
+  // Figma-style Fill / Stroke paint sections. key = 'bg' (fill) or 'bc' (stroke).
+  const clampA=v=>Math.max(0,Math.min(100,Math.round(+v||0)));
+  function fillPaint(key){
+    if(!curItem) return; const s=curItem.style;
+    const sec=document.querySelector(`.fig-sec[data-paint="${key}"]`); if(!sec) return;
+    const paint=document.getElementById('bs-'+key+'Paint');
+    document.getElementById('bs-'+key).value=s[key]||'#000000';
+    document.getElementById('bs-'+key+'H').value=(s[key]||'').replace('#','').toUpperCase();
+    document.getElementById('bs-'+key+'A').value=(s[key+'A']!=null?s[key+'A']:100);
+    const on=!!s[key+'On'], vis=s[key+'Vis']!==false;
+    paint.style.display=on?'':'none';
+    sec.querySelector('[data-add]').style.display=on?'none':'';
+    paint.classList.toggle('off',!vis);
+    sec.querySelector('[data-eye] .ms').textContent=vis?'visibility':'visibility_off';
+    if(key==='bc'){ document.getElementById('bs-bpos').value=s.bpos||'inside'; document.getElementById('bs-bw').value=(s.bw!=null?s.bw:1); document.getElementById('bs-strokeMeta').style.display=on?'':'none'; }
   }
-  biColor('bs-bgOn','bs-bg','bs-bgH','bgOn','bg'); biColor('bs-bcOn','bs-bc','bs-bcH','bcOn','bc');
+  function wirePaint(key){
+    const sec=document.querySelector(`.fig-sec[data-paint="${key}"]`); if(!sec) return;
+    const C=document.getElementById('bs-'+key), H=document.getElementById('bs-'+key+'H'), A=document.getElementById('bs-'+key+'A');
+    const ensureOn=()=>{ if(!curItem.style[key+'On']){ curItem.style[key+'On']=true; curItem.style[key+'Vis']=true; } };
+    C.addEventListener('input',()=>{ if(!curItem)return; curItem.style[key]=C.value; ensureOn(); fillPaint(key); render(); });
+    H.addEventListener('input',()=>{ if(!curItem)return; const v=H.value.trim().replace(/^#/,''); if(/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ curItem.style[key]='#'+v; ensureOn(); fillPaint(key); render(); } });
+    A.addEventListener('input',()=>{ if(!curItem)return; curItem.style[key+'A']=clampA(A.value); render(); });
+    sec.querySelector('[data-eye]').addEventListener('click',()=>{ if(!curItem)return; curItem.style[key+'Vis']=!(curItem.style[key+'Vis']!==false); fillPaint(key); render(); });
+    sec.querySelector('[data-rm]').addEventListener('click',()=>{ if(!curItem)return; curItem.style[key+'On']=false; fillPaint(key); render(); });
+    sec.querySelector('[data-add]').addEventListener('click',()=>{ if(!curItem)return; curItem.style[key+'On']=true; curItem.style[key+'Vis']=true; fillPaint(key); render(); });
+    if(key==='bc'){
+      document.getElementById('bs-bpos').addEventListener('change',e=>{ if(!curItem)return; curItem.style.bpos=e.target.value; render(); });
+      document.getElementById('bs-bw').addEventListener('input',e=>{ if(!curItem)return; curItem.style.bw=Math.max(0,Math.min(40,Math.round(+e.target.value||0))); render(); });
+    }
+  }
+  wirePaint('bg'); wirePaint('bc');
   document.getElementById('bi-close').addEventListener('click',()=>{ selK=null; renderInspector(); render(); });
   canvas.addEventListener('click',e=>{ if(mode==='layout' && !e.target.closest('.doc-blk')){ selK=null; renderInspector(); render(); } });
 

@@ -8,7 +8,7 @@
 // id, content?, style?}. renderComposedDoc() turns the instantiated items into an
 // A4 page; docBlocksToItems() inflates stored composition into render items.
 
-const DOC_ITEM_STYLE_DEFAULT = {padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bgOn:false, bg:'#ffffff', bcOn:false, bc:'#dbe3e0', hMode:'auto', hVal:120};
+const DOC_ITEM_STYLE_DEFAULT = {padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bgOn:false, bg:'#ffffff', bgA:100, bgVis:true, bcOn:false, bc:'#dbe3e0', bcA:100, bcVis:true, bw:1, bpos:'inside', hMode:'auto', hVal:120};
 
 // Padding / margin as a CSS value — Horizontal+Vertical (Figma default) or four per side.
 function boxCss(s, key){
@@ -24,6 +24,14 @@ function radCss(s){
   return `${(s&&s.rad)||0}px`;
 }
 function radAny(s){ return !!s && (s.radSides ? (s.radTL||s.radTR||s.radBR||s.radBL) : s.rad>0); }
+// A paint (fill/stroke) colour with optional opacity → hex or rgba().
+function paintCss(hex, a){
+  if(a==null || a>=100 || !hex) return hex||'';
+  a=Math.max(0,Math.min(100,a))/100;
+  let h=String(hex).replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join('');
+  const n=parseInt(h,16); if(isNaN(n)) return hex;
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
 
 function docHeightCss(s){
   const m=(s&&s.hMode)||'auto', v=Math.max(0,(s&&s.hVal)||0);
@@ -59,8 +67,11 @@ function docItemHtml(it, brand, cls){
   const marUsed = s.marSides || s.marH || s.marV || s.mar>0 || s.marT || s.marR || s.marB || s.marL;
   let c=`box-sizing:border-box;padding:${boxCss(s,'pad')};margin:${marUsed?boxCss(s,'mar'):'0 0 16px'};border-radius:${radCss(s)};`+docHeightCss(s);
   if(radAny(s)) c+='overflow:hidden;';   // clip content so a high radius rounds the image (up to a full circle)
-  if(s.bgOn) c+=`background:${s.bg};`;
-  if(s.bcOn) c+=`border:1px solid ${s.bc};`;
+  if(s.bgOn && s.bgVis!==false) c+=`background:${paintCss(s.bg, s.bgA)};`;
+  if(s.bcOn && s.bcVis!==false){
+    const w=(s.bw!=null?s.bw:1), col=paintCss(s.bc, s.bcA);
+    c += s.bpos==='inside' ? `box-shadow:inset 0 0 0 ${w}px ${col};` : `border:${w}px solid ${col};`;
+  }
   return `<div class="${cls||'doc-blk-r'}" style="${c}">${inner}</div>`;
 }
 
@@ -83,7 +94,7 @@ function docBlocksToItems(blocks){
 }
 
 if(typeof window!=='undefined'){
-  window.DOC_ITEM_STYLE_DEFAULT=DOC_ITEM_STYLE_DEFAULT; window.boxCss=boxCss; window.radCss=radCss; window.radAny=radAny;
+  window.DOC_ITEM_STYLE_DEFAULT=DOC_ITEM_STYLE_DEFAULT; window.boxCss=boxCss; window.radCss=radCss; window.radAny=radAny; window.paintCss=paintCss;
   window.docHeightCss=docHeightCss; window.docItemHtml=docItemHtml;
   window.renderComposedDoc=renderComposedDoc; window.docBlocksToItems=docBlocksToItems;
 }
