@@ -86,11 +86,11 @@
   </div>
   <div class="bs-toast" id="toast"></div>
 
+<script src="block-layouts.js"></script>
 <script src="blocks-data.js"></script>
 <script>
   // Blocks (incl. Item/Total Pricing) + the Table & Data category now live in
   // blocks-data.js, so this dialog and the Blocks listing stay in sync.
-  const preview = p => blockPreview(p);
 
   const CAT_ICON = {'All Blocks':'grid_view','Title Blocks':'title','Text Blocks':'notes','Images':'image','Image & Text':'article','Table & Data':'table_chart'};
   const cats = ['All Blocks','Title Blocks','Text Blocks','Images','Image & Text','Table & Data'];
@@ -111,7 +111,7 @@
     g.innerHTML = list.length ? list.map(b=>`
       <div class="bs-item ${selected===b.id?'sel':''}" data-id="${b.id}">
         <div class="nm">${b.name}</div>
-        <div class="bs-prev">${preview(b.p)}</div>
+        <div class="bs-prev">${blockThumb(b)}</div>
       </div>`).join('') : '<div class="bs-empty">No blocks match your search.</div>';
     g.querySelectorAll('.bs-item').forEach(el=>el.addEventListener('click',()=>{
       selected = selected===el.dataset.id ? null : el.dataset.id;

@@ -446,7 +446,6 @@
 .lst-card:hover{box-shadow:0 10px 26px rgba(12,12,13,.1);border-color:var(--lighter)}
 .lst-name{display:flex;align-items:center;gap:6px;margin-bottom:11px}
 .lst-lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--teal);font-weight:600;font-size:14px}
-.lst-name .badge{flex-shrink:0}
 .lst-prev{height:132px;min-height:132px;border:1px solid var(--border);border-radius:8px;background:#fcfdfd;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:9px;padding:16px}
 .lst-prev .picon{margin:auto;color:var(--lighter);font-size:44px}
 /* Art-direction override image — always contained inside the preview box */

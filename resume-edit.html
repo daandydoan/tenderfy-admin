@@ -71,6 +71,9 @@
   .swatches{display:flex;gap:7px;flex-wrap:wrap;margin-top:2px}
   .sw{width:26px;height:26px;border-radius:7px;cursor:pointer;border:2px solid transparent}
   .sw.on{border-color:var(--ink)}
+  .rb-seg{display:flex;background:#eef2f0;border-radius:9px;padding:3px;gap:2px}
+  .rb-seg button{flex:1;border:none;background:transparent;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--gray);padding:7px 4px;border-radius:6px;cursor:pointer}
+  .rb-seg button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(20,45,38,.12)}
   .rb-foot{padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0}
   @media(max-width:1000px){ .rb-wrap{grid-template-columns:1fr} .rb-col.pal,.rb-col.props{display:none} }
 </style>
@@ -129,6 +132,14 @@
             <div class="lbl">Body font</div>
             <select id="bodyFont" class="fin"></select>
           </div>
+          <div class="ps">
+            <h4>Spacing</h4>
+            <div class="rb-seg" id="densitySeg">
+              <button type="button" data-d="0.72">Compact</button>
+              <button type="button" data-d="1" class="on">Comfortable</button>
+              <button type="button" data-d="1.3">Spacious</button>
+            </div>
+          </div>
         </div>
         <div class="rb-foot">
           <div class="muted" style="font-size:11.5px;margin-bottom:6px">Saved as a reusable resume layout. Duplicate to spin a new variation.</div>
@@ -149,7 +160,7 @@ function pageInit(){
     ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand,tenant:t}))];
   const FONTS=['Outfit','Inter','Poppins','Lora','Roboto'];
   const ACCENTS=['#38988A','#1D9E75','#2F6DF6','#B4530A','#8A46B8','#C0392B','#0E7C86'];
-  let mode='layout', layout='left-panel', brandId='', accent='#38988A', headFont='Outfit', bodyFont='Outfit';
+  let mode='layout', layout='left-panel', brandId='', accent='#38988A', headFont='Outfit', bodyFont='Outfit', density=1;
   // placement = { regionId: [sectionId, …] } — deep copy the layout's defaults to start.
   const layDef = id => RESUME_LAYOUTS.find(l=>l.id===id) || RESUME_LAYOUTS[0];
   let placement = clonePlacement(layDef(layout).defaults);
@@ -225,7 +236,7 @@ function pageInit(){
 
   // ---- Preview ----
   function renderPreview(){
-    document.getElementById('stage').innerHTML = `<div class="a4">${renderResume({layout, brand:curBrand(), placement, logoInitials:logoInitials()})}</div>`;
+    document.getElementById('stage').innerHTML = `<div class="a4">${renderResume({layout, brand:curBrand(), placement, logoInitials:logoInitials(), density})}</div>`;
   }
   function renderStage(){ mode==='layout' ? renderArrange() : renderPreview(); }
   function renderAll(){ renderSectionPalette(); renderStage(); }
@@ -261,6 +272,7 @@ function pageInit(){
   bodySel.addEventListener('change',()=>{ bodyFont=bodySel.value; ensureFont(bodyFont); renderStage(); });
   function renderAccents(){ document.getElementById('accents').innerHTML=ACCENTS.map(c=>`<span class="sw ${c===accent?'on':''}" style="background:${c}" data-c="${c}"></span>`).join('');
     document.querySelectorAll('#accents .sw').forEach(s=>s.addEventListener('click',()=>{ accent=s.dataset.c; renderAccents(); renderStage(); })); }
+  document.querySelectorAll('#densitySeg button').forEach(b=>b.addEventListener('click',()=>{ density=+b.dataset.d; document.querySelectorAll('#densitySeg button').forEach(x=>x.classList.toggle('on',x===b)); renderStage(); }));
   function syncControls(){ headSel.value=headFont; bodySel.value=bodyFont; renderAccents(); }
 
   // ---- Mode toggle ----

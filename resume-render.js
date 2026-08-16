@@ -68,13 +68,13 @@ function resumeInitials(name){ return (String(name||'').trim().split(/\s+/).map(
 // Render a single section, styled for a light column or a dark sidebar.
 function resumeSection(id, b, o){
   o = o || {};
-  const data = o.data || RESUME_DATA, dark = !!o.dark;
+  const data = o.data || RESUME_DATA, dark = !!o.dark, D = o.density || 1;
   const H = `font-family:'${b.font}',sans-serif`, T = `font-family:'${b.bodyFont}',sans-serif`;
   const body = dark ? 'rgba(255,255,255,.9)' : '#3A4442';
   const acc  = dark ? 'rgba(255,255,255,.85)' : b.secondary;
   const title = t => dark
-    ? `<div style="${H};color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.9;margin:16px 0 8px">${t}</div>`
-    : `<div style="${H};color:${b.primary};font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid ${b.secondary};padding-bottom:4px;margin:18px 0 9px">${t}</div>`;
+    ? `<div style="${H};color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.9;margin:${Math.round(16*D)}px 0 ${Math.round(8*D)}px">${t}</div>`
+    : `<div style="${H};color:${b.primary};font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid ${b.secondary};padding-bottom:4px;margin:${Math.round(18*D)}px 0 ${Math.round(9*D)}px">${t}</div>`;
   switch(id){
     case 'profile': {
       const ini = o.logoInitials || resumeInitials(data.name), sz = dark ? 66 : 92;
@@ -112,27 +112,32 @@ function renderResume(opts){
     placement = {}; const enabled = opts.sections || null;
     Object.keys(lay.defaults).forEach(r=>{ placement[r] = lay.defaults[r].filter(id=> !enabled || enabled.indexOf(id)!==-1); });
   }
-  const sec = (id, o)=> resumeSection(id, b, Object.assign({data, logoInitials:opts.logoInitials}, o||{}));
+  // Density — a single multiplier that scales page padding and section rhythm,
+  // so the resume can be Compact / Comfortable / Spacious (the resume builder's
+  // equivalent of the document builder's spacing controls).
+  const D = opts.density || 1;
+  const p = (...vals)=> vals.map(v=>Math.round(v*D)).join('px ')+'px';
+  const sec = (id, o)=> resumeSection(id, b, Object.assign({data, logoInitials:opts.logoInitials, density:D}, o||{}));
   const reg = (r, o)=> (placement[r]||[]).map(id=>sec(id, o)).join('');
 
   if(layoutId==='left-panel'){
     return `<div style="display:flex;${T}">
-      <div style="width:210px;background:${b.primary};color:#fff;padding:26px 20px;min-height:877px">
+      <div style="width:210px;background:${b.primary};color:#fff;padding:${p(26,20)};min-height:877px">
         <div style="${H};font-size:20px;font-weight:700;line-height:1.15">${data.name}</div>
         <div style="${T};font-size:12px;opacity:.9;margin-top:3px">${data.role}</div>
         ${reg('sidebar',{dark:true})}
       </div>
-      <div style="flex:1;padding:26px 26px 26px 24px">${reg('main')}</div>
+      <div style="flex:1;padding:${p(26,26,26,24)}">${reg('main')}</div>
     </div>`;
   }
   if(layoutId==='top-band'){
-    return `<div style="background:${b.primary};color:#fff;padding:26px 30px"><div style="${H};font-size:25px;font-weight:700">${data.name}</div><div style="${T};font-size:13px;opacity:.9;margin-top:2px">${data.role}</div></div>
-      <div style="display:flex;gap:18px;padding:24px 30px;${T}"><div style="flex:1">${reg('left')}</div><div style="width:210px;flex:none">${reg('right')}</div></div>`;
+    return `<div style="background:${b.primary};color:#fff;padding:${p(26,30)}"><div style="${H};font-size:25px;font-weight:700">${data.name}</div><div style="${T};font-size:13px;opacity:.9;margin-top:2px">${data.role}</div></div>
+      <div style="display:flex;gap:${p(18)};padding:${p(24,30)};${T}"><div style="flex:1">${reg('left')}</div><div style="width:210px;flex:none">${reg('right')}</div></div>`;
   }
   // Single column (timeline / minimal)
   const align = layoutId==='timeline' ? 'center' : 'left';
-  const rule  = align==='center' ? 'width:60px;margin:16px auto' : 'margin:16px 0';
-  return `<div style="padding:32px 42px;${T}">
+  const rule  = align==='center' ? `width:60px;margin:${p(16)} auto` : `margin:${p(16)} 0`;
+  return `<div style="padding:${p(32,42)};${T}">
     <div style="${H};text-align:${align}"><div style="font-size:26px;font-weight:700;color:${b.primary};line-height:1.1">${data.name}</div><div style="${T};font-size:13.5px;color:${b.secondary};font-weight:600;margin-top:3px">${data.role}</div></div>
     <div style="height:2px;background:${b.secondary};${rule}"></div>
     ${reg('body',{timeline:layoutId==='timeline'})}
