@@ -70,13 +70,12 @@ function pageInit(){
       const on=blockStatus(b.id)!=='inactive';
       return `
       <div class="lst-card" data-id="${b.id}">
-        <div class="lst-name"><span class="lst-lbl">${b.label}</span></div>
+        <div class="lst-name"><span class="lst-lbl">${b.label}</span><span class="lst-use"><span class="ms" style="font-size:13px;vertical-align:-2px">description</span> ${blockUsage(b.id)}</span></div>
         <div class="lst-prev">${blockThumb(b)}</div>
         <div class="lst-desc">${b.desc}</div>
         <div class="lst-foot">
           ${blockStatusBadge(b.id)}
           <span class="lst-cat">${b.cat}</span>
-          <span class="lst-use"><span class="ms" style="font-size:13px;vertical-align:-2px">description</span> ${blockUsage(b.id)}</span>
           <span class="lst-kebwrap">
             <button class="lst-kebab" data-kebab aria-label="Actions"><span class="ms">more_vert</span></button>
             <div class="kebab-menu kebab-up">

@@ -455,7 +455,8 @@
 .lst-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--light);padding-top:9px;margin-top:auto;border-top:1px solid var(--border)}
 .lst-foot .badge{flex-shrink:0}
 .lst-foot .lst-cat{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lst-foot .lst-use{margin-left:auto;display:inline-flex;align-items:center;gap:2px;flex-shrink:0}
+.lst-foot .lst-kebwrap{margin-left:auto}
+.lst-name .lst-use{margin-left:auto;display:inline-flex;align-items:center;gap:2px;flex-shrink:0;font-size:11px;font-weight:400;color:var(--light)}
 .kebab-menu.kebab-up{top:auto;bottom:calc(100% + 6px)}
 .lst-kebwrap{position:relative;flex-shrink:0;display:flex}
 .lst-kebab{border:none;background:transparent;color:var(--light);cursor:pointer;padding:2px;border-radius:6px;display:flex;line-height:0}
