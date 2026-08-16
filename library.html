@@ -101,10 +101,16 @@ function pageInit(){
       (!query || (c.name+' '+c.category+' '+c.desc).toLowerCase().includes(query)));
     document.getElementById('grid').innerHTML = list.map(c=>`
       <div class="lst-card" data-id="${c.id}">
-        <div class="lst-name"><span class="lst-lbl">${c.name}</span> ${badge(c.status)}
+        <div class="lst-name"><span class="lst-lbl">${c.name}</span><span class="lst-use">v${c.version}</span></div>
+        <div class="lst-prev">${preview(c)}</div>
+        <div class="lst-desc">${c.desc}</div>
+        <div class="lst-foot">
+          ${badge(c.status)}
+          <span class="lst-type type-${c.type||'section'}"><span class="ms">${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).icon}</span> ${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).label}</span>
+          ${c.restricted?`<span class="lst-restr"><span class="ms" style="font-size:13px;vertical-align:-2px">lock</span> ${c.restricted}</span>`:''}
           <span class="lst-kebwrap">
             <button class="lst-kebab" data-kebab aria-label="Actions"><span class="ms">more_vert</span></button>
-            <div class="kebab-menu">
+            <div class="kebab-menu kebab-up">
               <a data-act="edit"><span class="ms">edit</span> Edit structure</a>
               <a data-act="dup"><span class="ms">content_copy</span> Duplicate</a>
               <div class="kebab-sep"></div>
@@ -112,9 +118,6 @@ function pageInit(){
             </div>
           </span>
         </div>
-        <div class="lst-prev">${preview(c)}</div>
-        <div class="lst-desc">${c.desc}</div>
-        <div class="lst-foot"><span class="lst-type type-${c.type||'section'}"><span class="ms">${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).icon}</span> ${(DOC_TYPE_META[c.type]||DOC_TYPE_META.section).label}</span><span>${c.restricted?`<span style="color:var(--st-amber-tx)"><span class="ms" style="font-size:13px;vertical-align:-2px">lock</span> ${c.restricted}</span>`:''} v${c.version}</span></div>
       </div>`).join('');
     document.getElementById('empty').style.display = list.length ? 'none':'block';
   }

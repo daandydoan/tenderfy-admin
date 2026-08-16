@@ -92,10 +92,18 @@ function pageInit(){
       (!query||(t.name+' '+t.category+' '+t.desc).toLowerCase().includes(query)));
     document.getElementById('grid').innerHTML=list.map(t=>`
       <div class="lst-card" data-id="${t.id}">
-        <div class="lst-name"><span class="lst-lbl">${t.name}</span> ${templateBadge(t.status)}
+        <div class="lst-name"><span class="lst-lbl">${t.name}</span><span class="lst-use">v${t.version} · ${t.updated}</span></div>
+        <div class="lst-desc">${t.desc}</div>
+        <div class="tpl-facts">
+          <span class="tpl-fact"><span class="ms">description</span> ${t.comps} documents</span>
+          <span class="tpl-fact"><span class="ms">${t.tenants.length?'groups':'group_off'}</span> ${t.tenants.length?t.tenants.length+' client'+(t.tenants.length>1?'s':''):'Unassigned'}</span>
+        </div>
+        <div class="lst-foot">
+          ${templateBadge(t.status)}
+          <span class="lst-cat">${t.category}</span>
           <span class="lst-kebwrap">
             <button class="lst-kebab" data-kebab aria-label="Actions"><span class="ms">more_vert</span></button>
-            <div class="kebab-menu">
+            <div class="kebab-menu kebab-up">
               <a data-act="edit"><span class="ms">edit</span> Edit template</a>
               <a data-act="dup"><span class="ms">content_copy</span> Duplicate</a>
               <div class="kebab-sep"></div>
@@ -103,12 +111,6 @@ function pageInit(){
             </div>
           </span>
         </div>
-        <div class="lst-desc">${t.desc}</div>
-        <div class="tpl-facts">
-          <span class="tpl-fact"><span class="ms">description</span> ${t.comps} documents</span>
-          <span class="tpl-fact"><span class="ms">${t.tenants.length?'groups':'group_off'}</span> ${t.tenants.length?t.tenants.length+' client'+(t.tenants.length>1?'s':''):'Unassigned'}</span>
-        </div>
-        <div class="lst-foot"><span>${t.category}</span><span>v${t.version} · ${t.updated}</span></div>
       </div>`).join('');
     document.getElementById('empty').style.display=list.length?'none':'block';
   }
