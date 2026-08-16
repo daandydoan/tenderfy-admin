@@ -8,7 +8,7 @@
 // id, content?, style?}. renderComposedDoc() turns the instantiated items into an
 // A4 page; docBlocksToItems() inflates stored composition into render items.
 
-const DOC_ITEM_STYLE_DEFAULT = {padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bgOn:false, bg:'#ffffff', bgA:100, bgVis:true, bcOn:false, bc:'#dbe3e0', bcA:100, bcVis:true, bw:1, bpos:'inside', hMode:'auto', hVal:120};
+const DOC_ITEM_STYLE_DEFAULT = {padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bgOn:false, bg:'#ffffff', bgA:100, bgVis:true, bcOn:false, bc:'#dbe3e0', bcA:100, bcVis:true, bw:1, bpos:'inside', wMode:'fill', wPx:480, hMode:'auto', hVal:120};
 
 // Padding / margin as a CSS value — Horizontal+Vertical (Figma default) or four per side.
 function boxCss(s, key){
@@ -66,6 +66,7 @@ function docItemHtml(it, brand, cls){
   // Margin: user value if set, else a default 16px bottom rhythm between blocks.
   const marUsed = s.marSides || s.marH || s.marV || s.mar>0 || s.marT || s.marR || s.marB || s.marL;
   let c=`box-sizing:border-box;padding:${boxCss(s,'pad')};margin:${marUsed?boxCss(s,'mar'):'0 0 16px'};border-radius:${radCss(s)};`+docHeightCss(s);
+  if(s.wMode==='fixed' && s.wPx>0) c+=`width:${s.wPx}px;max-width:100%;margin-left:auto;margin-right:auto;`;   // Fixed width, centred on the page
   if(radAny(s)) c+='overflow:hidden;';   // clip content so a high radius rounds the image (up to a full circle)
   if(s.bgOn && s.bgVis!==false) c+=`background:${paintCss(s.bg, s.bgA)};`;
   if(s.bcOn && s.bcVis!==false){
