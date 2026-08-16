@@ -103,25 +103,28 @@ function blockPreview(p){
 // its real composition (the P2DOC layout) so any block, including bespoke ones,
 // gets a truthful preview without hand-authoring or fake sample text. Each
 // primitive renders as a placeholder shape (bars, image box, table grid…).
-function primSchematic(id){
+// A placeholder shape for one primitive. `compact` = fewer lines, for when the
+// primitive sits inside a multi-column row (keeps narrow columns from cramming).
+function primSchematic(id, compact){
   const bar=(w,h)=>`<div class="blk-bar${h?' h':''}" style="width:${w}"></div>`;
   const img=()=>`<div class="blk-img"><span class="ms">image</span></div>`;
+  const rows=compact?2:3;
   switch(id){
     case 'heading':    return bar('60%',1);
     case 'subheading': return bar('72%',1);
     case 'cover':      return bar('66%',1);
-    case 'paragraph':  return bar('94%')+bar('88%')+bar('70%');
-    case 'list':       return ['82%','74%','66%'].map(w=>`<div class="blk-list-row"><span class="dot"></span>${bar(w)}</div>`).join('');
+    case 'paragraph':  return compact ? bar('92%')+bar('74%') : bar('94%')+bar('88%')+bar('70%');
+    case 'list':       return ['82%','74%','66%'].slice(0,rows).map(w=>`<div class="blk-list-row"><span class="dot"></span>${bar(w)}</div>`).join('');
     case 'quote':      return `<div class="blk-quote">${bar('88%')+bar('64%')}</div>`;
     case 'image':      return img();
-    case 'table':      return `<div class="blk-table">${['h','','',''].map(r=>`<div class="tr ${r}"><span></span><span></span><span></span></div>`).join('')}</div>`;
-    case 'keyvalue':   return [0,1,2].map(()=>`<div class="blk-pr">${bar('42%')}<div class="blk-bar blk-amt"></div></div>`).join('');
+    case 'table':      return `<div class="blk-table">${['h','',''].concat(compact?[]:['']).map(r=>`<div class="tr ${r}"><span></span><span></span><span></span></div>`).join('')}</div>`;
+    case 'keyvalue':   return [0,1,2].slice(0,rows).map(()=>`<div class="blk-pr">${bar('42%')}<div class="blk-bar blk-amt"></div></div>`).join('');
     case 'signature':  return `${bar('48%')}<div style="height:1px;background:#B4C6C1;margin:10px 0 6px"></div>${bar('36%',1)}`;
     case 'divider':    return `<div style="height:2px;background:#B4C6C1;border-radius:2px;margin:2px 0"></div>`;
     case 'callout':    return `<div style="background:var(--teal-tint);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:7px">${bar('66%',1)+bar('84%')}</div>`;
     case 'stat':       return `<div class="blk-bar h" style="width:34%;height:16px"></div>${bar('58%')}`;
     case 'button':     return `<div style="width:44%;height:16px;background:var(--teal);opacity:.75;border-radius:5px"></div>`;
-    case 'toc':        return [0,1,2].map(()=>`<div class="blk-pr">${bar('62%')}<div class="blk-bar" style="width:9%"></div></div>`).join('');
+    case 'toc':        return [0,1,2].slice(0,rows).map(()=>`<div class="blk-pr">${bar('62%')}<div class="blk-bar" style="width:9%"></div></div>`).join('');
     case 'field':      return bar('46%');
     case 'spacer':     return `<div style="height:12px"></div>`;
     default:           return bar('72%');
@@ -133,8 +136,8 @@ function blockSchematic(block){
   if(/^l[hf]-/.test(block.p||'')) return blockPreview(block.p);   // letterhead / footer bands keep their bespoke schematic
   const doc = P2DOC[block.p] || [{cols:[[block.p]]}];
   return doc.map(row => row.cols.length>1
-    ? `<div class="blk-cols">${row.cols.map(col=>`<div>${col.map(primSchematic).join('')}</div>`).join('')}</div>`
-    : row.cols[0].map(primSchematic).join('')
+    ? `<div class="blk-cols">${row.cols.map(col=>`<div>${col.map(id=>primSchematic(id,true)).join('')}</div>`).join('')}</div>`
+    : row.cols[0].map(id=>primSchematic(id,false)).join('')
   ).join('');
 }
 // Art-direction override — an optional custom image a user sets in the block

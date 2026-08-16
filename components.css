@@ -484,8 +484,8 @@
 .blk-bar.h{height:12px;background:#B4C6C1}
 .blk-img{flex:1;background:#7FC1B4;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;min-height:44px}
 .blk-img .ms{font-size:22px}
-.blk-cols{display:flex;gap:14px}
-.blk-cols>div{flex:1;display:flex;flex-direction:column;gap:9px}
+.blk-cols{display:flex;gap:10px}
+.blk-cols>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 .blk-imgs{display:flex;gap:8px;align-items:stretch;min-height:74px}
 .blk-imgs .blk-img{min-height:0}
 .blk-row{display:flex;gap:12px;align-items:stretch;min-height:74px}
