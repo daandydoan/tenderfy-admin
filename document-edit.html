@@ -165,6 +165,8 @@
   .fig-strokesel{width:100%;box-sizing:border-box;height:30px;border:1px solid var(--border);border-radius:7px;background:#fff;font-family:inherit;font-size:12px;color:var(--ink);padding:0 6px;cursor:pointer}
   .fig-wt{display:flex;align-items:center;gap:5px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;height:30px;padding:0 8px}
   .fig-wt:focus-within{background:#fff;border-color:var(--teal)}
+  .fig-wt:has(input:disabled){opacity:.45}
+  .fig-wt input:disabled{cursor:not-allowed}
   .fig-wt .ms{font-size:15px;color:#9aa5a3}
   .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
   .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}

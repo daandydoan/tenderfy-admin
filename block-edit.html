@@ -54,7 +54,7 @@
   /* Letterhead / footer bands edit shorter, with tighter padding */
   .vb-page.band{min-height:96px;padding:22px 30px}
   .vb-block{display:flex;flex-direction:column;min-width:0}
-  .vb-row{position:relative;display:flex;gap:14px;padding:3px;border-radius:8px}
+  .vb-row{position:relative;display:flex;width:100%;gap:14px;padding:3px;border-radius:8px}
   .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.3)}
   .vb-row.row-ins-before::before{content:'';position:absolute;top:-3px;left:0;right:0;height:3px;background:var(--teal);border-radius:2px}
   .vb-rowtools{position:absolute;top:-12px;left:50%;transform:translateX(-50%);display:flex;gap:3px;opacity:0;transition:.1s;z-index:4}
@@ -177,6 +177,8 @@
   .fig-strokerow label{display:block;font-size:10.5px;color:var(--gray);margin-bottom:4px}
   .fig-wt{display:flex;align-items:center;gap:5px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;height:32px;padding:0 8px}
   .fig-wt:focus-within{background:#fff;border-color:var(--teal)}
+  .fig-wt:has(input:disabled){opacity:.45}
+  .fig-wt input:disabled{cursor:not-allowed}
   .fig-wt .ms{font-size:15px;color:#9aa5a3}
   .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
   .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
