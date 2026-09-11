@@ -208,12 +208,13 @@
   .seg button.on{background:var(--teal-tint);color:var(--teal)}
   .seg button .ms{font-size:16px}
   #saveModal .cfm,#verModal .cfm{text-align:left;max-width:460px;max-height:90vh;overflow-y:auto}
+  #saveModal .cfm{max-width:720px}
   #saveModal .cfm h3,#verModal .cfm h3{margin-bottom:2px}
   #saveModal .cfm .sub,#verModal .cfm .sub{color:var(--gray);font-size:12.5px;margin-bottom:14px}
-  .cfm-tabs{display:flex;gap:4px;background:#eef3f1;border-radius:9px;padding:3px;margin-bottom:15px}
-  .cfm-tab{flex:1;border:none;background:transparent;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);padding:8px 10px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
-  .cfm-tab.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(20,45,38,.12)}
-  .cfm-panel[hidden]{display:none}
+  .cfm-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  .cfm-col{min-width:0}
+  .cfm-col > .fld:last-child,.cfm-col > .ray-draft:last-child{margin-bottom:0}
+  @media(max-width:640px){ .cfm-cols{grid-template-columns:1fr;gap:0} }
   .fld-err{display:none;color:#d5493f;font-size:11.5px;margin-top:4px}
   .fld-err.show{display:block}
   .fin.err{border-color:#d5493f;background:#fdf3f2}
@@ -470,44 +471,41 @@
   <div class="cfm">
     <h3>Block details</h3>
     <div class="sub">Name it so it reads clearly in the Block Builder — you can tweak this any time.</div>
-    <div class="cfm-tabs" role="tablist">
-      <button type="button" class="cfm-tab on" data-tab="details">Details</button>
-      <button type="button" class="cfm-tab" data-tab="assist"><span class="ms" style="font-size:15px;vertical-align:-2px">auto_awesome</span> AI &amp; preview</button>
-    </div>
-
-    <div class="cfm-panel" data-panel="details">
-      <div class="sv-sync" id="svSync"></div>
-      <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"><span class="fld-err" id="b-name-err"></span></div>
-      <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"><span class="fld-err" id="b-label-err"></span></div>
-      <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text."></div>
-      <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
-      <div class="fld" id="slotFld" style="display:none"><label>Save as</label>
-        <div class="seg full" id="b-slot">
-          <button type="button" data-slot="header" class="on"><span class="ms" style="font-size:16px">flip_to_front</span> Letterhead</button>
-          <button type="button" data-slot="footer"><span class="ms" style="font-size:16px">flip_to_back</span> Footer</button>
+    <div class="cfm-cols">
+      <div class="cfm-col">
+        <div class="sv-sync" id="svSync"></div>
+        <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"><span class="fld-err" id="b-name-err"></span></div>
+        <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"><span class="fld-err" id="b-label-err"></span></div>
+        <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text."></div>
+        <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
+        <div class="fld" id="slotFld" style="display:none"><label>Save as</label>
+          <div class="seg full" id="b-slot">
+            <button type="button" data-slot="header" class="on"><span class="ms" style="font-size:16px">flip_to_front</span> Letterhead</button>
+            <button type="button" data-slot="footer"><span class="ms" style="font-size:16px">flip_to_back</span> Footer</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="cfm-panel" data-panel="assist" hidden>
-      <div class="ray-draft">
-        <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
-        <div class="ray-lbl">Reference image</div>
-        <div class="ray-ref" id="rayBlockRef">
-          <input type="file" accept="image/*" id="rayBlockImg" hidden>
-          <label for="rayBlockImg" class="ray-drop"><span class="ms">add_photo_alternate</span> Add a reference image</label>
+      <div class="cfm-col">
+        <div class="ray-draft">
+          <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
+          <div class="ray-lbl">Reference image</div>
+          <div class="ray-ref" id="rayBlockRef">
+            <input type="file" accept="image/*" id="rayBlockImg" hidden>
+            <label for="rayBlockImg" class="ray-drop"><span class="ms">add_photo_alternate</span> Add a reference image</label>
+          </div>
+          <div class="ray-lbl">Description</div>
+          <textarea id="rayBlockPrompt" class="fin" rows="2" placeholder="Describe the block — e.g. “a highlighted callout box for key terms”"></textarea>
+          <button type="button" class="btn btn-ray btn-sm" id="rayBlockBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
         </div>
-        <div class="ray-lbl">Description</div>
-        <textarea id="rayBlockPrompt" class="fin" rows="2" placeholder="Describe the block — e.g. “a highlighted callout box for key terms”"></textarea>
-        <button type="button" class="btn btn-ray btn-sm" id="rayBlockBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
-      </div>
-      <div class="fld"><label>Preview image <span class="fld-opt">· optional — overrides the auto-generated preview</span></label>
-        <div class="thumbovr">
-          <div class="thumbovr-box" id="thumbOvrBox"></div>
-          <div class="thumbovr-acts">
-            <label class="btn btn-outline btn-sm"><span class="ms" style="font-size:16px">image</span> Upload image<input type="file" id="thumbFile" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label>
-            <a class="btn btn-outline btn-sm" id="thumbAuto" style="display:none"><span class="ms" style="font-size:16px">auto_awesome</span> Use auto</a>
-            <span class="fld-opt">Fits inside the tile — no cropping.</span>
+        <div class="fld"><label>Preview image <span class="fld-opt">· optional — overrides the auto-generated preview</span></label>
+          <div class="thumbovr">
+            <div class="thumbovr-box" id="thumbOvrBox"></div>
+            <div class="thumbovr-acts">
+              <label class="btn btn-outline btn-sm"><span class="ms" style="font-size:16px">image</span> Upload image<input type="file" id="thumbFile" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label>
+              <a class="btn btn-outline btn-sm" id="thumbAuto" style="display:none"><span class="ms" style="font-size:16px">auto_awesome</span> Use auto</a>
+              <span class="fld-opt">Fits inside the tile — no cropping.</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1219,13 +1217,10 @@ function pageInit(){
 
   // ---- Block details are the step BEFORE editing; Save then saves directly ----
   const saveModal=document.getElementById('saveModal');
-  function svTab(name){ document.querySelectorAll('#saveModal .cfm-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===name)); document.querySelectorAll('#saveModal .cfm-panel').forEach(p=>p.hidden=p.dataset.panel!==name); }
-  document.querySelectorAll('#saveModal .cfm-tab').forEach(t=>t.addEventListener('click',()=>svTab(t.dataset.tab)));
   function fldErr(idn,msg){ document.getElementById(idn).classList.add('err'); const e=document.getElementById(idn+'-err'); e.textContent=msg; e.classList.add('show'); }
   function fldClear(idn){ document.getElementById(idn).classList.remove('err'); document.getElementById(idn+'-err').classList.remove('show'); }
   ['b-name','b-label'].forEach(idn=>document.getElementById(idn).addEventListener('input',()=>fldClear(idn)));
   function openDetails(){
-    svTab('details');
     document.getElementById('svSync').innerHTML = usage>0
       ? `<span class="ms">sync</span><div>This is a <strong>synced block</strong> used in ${usage} documents. Changes update them all when you save (clients keep any detached overrides).</div>`
       : `<span class="ms">library_add</span><div>New block — it becomes available in every client’s Block Builder, rendered in their brand.</div>`;
@@ -1254,7 +1249,7 @@ function pageInit(){
     let ok=true, first=null;
     if(!nm){ fldErr('b-name','Give the block an internal name.'); ok=false; first='b-name'; } else fldClear('b-name');
     if(!l){ fldErr('b-label','Add a customer-facing label so clients know what they’re inserting.'); ok=false; first=first||'b-label'; } else fldClear('b-label');
-    if(!ok){ svTab('details'); document.getElementById(first).focus(); }
+    if(!ok) document.getElementById(first).focus();
     return ok;
   }
   document.getElementById('svConfirm').addEventListener('click',()=>{ if(detailsValid()) closeDetails(); });
