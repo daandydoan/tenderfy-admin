@@ -208,7 +208,7 @@
   .seg button.on{background:var(--teal-tint);color:var(--teal)}
   .seg button .ms{font-size:16px}
   #saveModal .cfm,#verModal .cfm{text-align:left;max-width:460px;max-height:90vh;overflow-y:auto}
-  #saveModal .cfm{max-width:720px}
+  #saveModal .cfm{max-width:840px}
   #saveModal .cfm h3,#verModal .cfm h3{margin-bottom:2px}
   #saveModal .cfm .sub,#verModal .cfm .sub{color:var(--gray);font-size:12.5px;margin-bottom:14px}
   .cfm-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
@@ -223,9 +223,9 @@
   .sv-sync label{display:flex;gap:6px;align-items:center;margin-top:6px;font-weight:600;cursor:pointer}
   /* Art-direction: custom preview image override */
   .fld-opt{color:var(--light);font-weight:400;font-size:11px}
-  .thumbovr{display:flex;gap:12px;align-items:center}
+  .thumbovr{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .thumbovr-box{width:124px;height:88px;flex:none;border:1px solid var(--border);border-radius:8px;background:#fff;overflow:hidden;display:flex;align-items:flex-start;justify-content:flex-start;padding:8px}
-  .thumbovr-acts{display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+  .thumbovr-acts{display:flex;flex-direction:column;gap:7px;align-items:flex-start;flex:1;min-width:150px}
   .thumbovr-box .blk-thumb-img{max-width:100%;max-height:100%;width:auto;height:auto;margin:auto;object-fit:contain;border-radius:4px;display:block}
   /* Ray draft box (inside the block details dialog) */
   .ray-draft{background:linear-gradient(135deg,#eef7f4,#f3f0fb);border:1px solid #cfe6df;border-radius:11px;padding:12px;margin-bottom:16px}
