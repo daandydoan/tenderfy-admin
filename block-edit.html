@@ -499,7 +499,7 @@
           <textarea id="rayBlockPrompt" class="fin" rows="2" placeholder="Describe the block — e.g. “a highlighted callout box for key terms”"></textarea>
           <button type="button" class="btn btn-ray btn-sm" id="rayBlockBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
         </div>
-        <div class="fld"><label>Preview image <span class="fld-opt">· optional — overrides the auto-generated preview</span></label>
+        <div class="fld" id="previewFld" style="display:none"><label>Preview image <span class="fld-opt">· optional — overrides the auto-generated preview</span></label>
           <div class="thumbovr">
             <div class="thumbovr-box" id="thumbOvrBox"></div>
             <div class="thumbovr-acts">
@@ -697,6 +697,7 @@ function pageInit(){
     document.getElementById('pg-title').textContent='Edit — '+existing.label;
     document.getElementById('dupBtn').style.display='';
     document.getElementById('delBtn').style.display='';
+    document.getElementById('previewFld').style.display='';   // preview override only for a saved block
     document.getElementById('dupBtn').addEventListener('click',()=>duplicateBlock(existing.label));
   }
 
