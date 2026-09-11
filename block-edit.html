@@ -179,6 +179,8 @@
   .fig-wt:focus-within{background:#fff;border-color:var(--teal)}
   .fig-wt:has(input:disabled){opacity:.45}
   .fig-wt input:disabled{cursor:not-allowed}
+  .fig-wt .ms{cursor:ew-resize;user-select:none;touch-action:none}
+  .fig-wt:has(input:disabled) .ms{cursor:not-allowed}
   .fig-wt .ms{font-size:15px;color:#9aa5a3}
   .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
   .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
@@ -1030,6 +1032,9 @@ function pageInit(){
     document.getElementById('s-hmode').addEventListener('change',e=>{ target().hmode=e.target.value; document.getElementById('s-hpx').disabled=(e.target.value==='fill'); applyActive(); commitStyle(); });
     document.getElementById('s-hpx').addEventListener('input',e=>{ target().hpx=+e.target.value||0; applyActive(); commitStyle(); });
     document.querySelectorAll('#s-align3 button').forEach(b=>b.addEventListener('click',()=>{ blockStyle.alH=b.dataset.h; blockStyle.alV=b.dataset.v; document.querySelectorAll('#s-align3 button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
+    // Drag the icon to scrub the value (Width / Height / Gap / Weight), like the padding fields.
+    document.querySelectorAll('.fig-wt').forEach(wt=>{ const ic=wt.querySelector('.ms'), inp=wt.querySelector('input'); if(!ic||!inp) return;
+      figScrub(ic, ()=>+inp.value||0, v=>{ if(inp.disabled) return; const mn=+inp.min||0, mx=(inp.max!==''&&inp.max!=null)?+inp.max:1e5; inp.value=Math.max(mn,Math.min(mx,v)); inp.dispatchEvent(new Event('input',{bubbles:true})); }); });
     // field / image-source / permission
     document.getElementById('s-field').addEventListener('change',e=>{ if(selEl()){ selEl().field=e.target.value; render(); commit(); } });
     document.querySelectorAll('#s-imgsrc button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().src=b.dataset.src; render(); commit(); } }));

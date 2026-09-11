@@ -167,6 +167,8 @@
   .fig-wt:focus-within{background:#fff;border-color:var(--teal)}
   .fig-wt:has(input:disabled){opacity:.45}
   .fig-wt input:disabled{cursor:not-allowed}
+  .fig-wt .ms{cursor:ew-resize;user-select:none;touch-action:none}
+  .fig-wt:has(input:disabled) .ms{cursor:not-allowed}
   .fig-wt .ms{font-size:15px;color:#9aa5a3}
   .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
   .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
@@ -1072,6 +1074,9 @@ function pageInit(){
     const upd=()=>{ if(!curItem)return; curItem.style.hMode=M.value; V.disabled=(M.value==='auto'||M.value==='hug'); curItem.style.hVal=Math.max(0,Math.round(+V.value||0)); render(); };
     M.addEventListener('change',upd); V.addEventListener('input',upd);
   })();
+  // Drag the icon to scrub the value (Width / Height / Weight), like the padding fields.
+  document.querySelectorAll('.fig-wt').forEach(wt=>{ const ic=wt.querySelector('.ms'), inp=wt.querySelector('input'); if(!ic||!inp) return;
+    figScrub(ic, ()=>+inp.value||0, v=>{ if(inp.disabled) return; const mn=+inp.min||0, mx=(inp.max!==''&&inp.max!=null)?+inp.max:1e5; inp.value=Math.max(mn,Math.min(mx,v)); inp.dispatchEvent(new Event('input',{bubbles:true})); }); });
   // Figma-style Fill / Stroke paint sections. key = 'bg' (fill) or 'bc' (stroke).
   const clampA=v=>Math.max(0,Math.min(100,Math.round(+v||0)));
   function fillPaint(key){
