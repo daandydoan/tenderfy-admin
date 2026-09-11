@@ -391,7 +391,7 @@
               <span class="fig-wt" title="Height"><span class="ms">swap_vert</span><input type="number" id="s-hpx" min="0"></span>
               <select class="insp-sel" id="s-hmode"><option value="fill">Fill height</option><option value="fixed">Fixed height</option><option value="max">Max height</option></select>
             </div>
-            <div style="display:grid;grid-template-columns:auto 1fr;gap:14px;margin-top:12px;align-items:start">
+            <div id="s-blockLayout" style="display:grid;grid-template-columns:auto 1fr;gap:14px;margin-top:12px;align-items:start">
               <div><div class="fig-label" style="margin-bottom:5px">Alignment</div>
                 <div class="fig-align" id="s-align3">
                   <button type="button" data-h="left" data-v="top" title="Top left"></button><button type="button" data-h="center" data-v="top" title="Top"></button><button type="button" data-h="right" data-v="top" title="Top right"></button>
@@ -590,7 +590,7 @@ function pageInit(){
   const wantSlot=_params.get('slot'); // 'header' | 'footer' — deep-link to create page furniture
   const existing=id?BLOCKS.find(b=>b.id===id):null;
 
-  const elDef=()=>({padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',bgA:100,bgVis:true,font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'});
+  const elDef=()=>({wmode:'fill',wpx:200,hmode:'fill',hpx:120,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',bgA:100,bgVis:true,font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'});
   const mkEl=pid=>{ const e={id:pid, st:elDef()}; if(pid==='field') e.field='client.name'; if(pid==='image') e.src='placeholder'; return e; };
   const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
@@ -813,7 +813,7 @@ function pageInit(){
     w.style.alignItems = HM[bs.alH||'left']; w.style.justifyContent = VM[bs.alV||'top'];
     w.style.padding = boxCss(bs,'pad'); w.style.gap = bs.sp+'px';
     // In Fill mode the W field mirrors the live rendered width (Figma-style), not a fixed number.
-    if(wm==='fill'){ const f=document.getElementById('s-wpx'); if(f && document.activeElement!==f) f.value=Math.round(w.getBoundingClientRect().width); }
+    if(wm==='fill' && !sel){ const f=document.getElementById('s-wpx'); if(f && document.activeElement!==f) f.value=Math.round(w.getBoundingClientRect().width); }
     // Vertical margin only on the block wrap — left/right stay auto for centering.
     const mV = (bs.marV!=null)?bs.marV:(bs.mar||0);
     w.style.marginTop = (bs.marSides?(bs.marT||0):mV)+'px'; w.style.marginBottom = (bs.marSides?(bs.marB||0):mV)+'px';
@@ -825,11 +825,20 @@ function pageInit(){
   }
   function applyElStyle(node, st){
     if(!node) return;
+    // Per-element resizing (width Fill/Fixed/Min/Max, height Fill/Fixed/Max)
+    const ewm=st.wmode||'fill';
+    node.style.width = ewm==='fixed' ? (st.wpx||0)+'px' : (ewm==='fill'?'':'100%');
+    node.style.minWidth = ewm==='min' ? (st.wpx||0)+'px' : '';
+    node.style.maxWidth = ewm==='max' ? (st.wpx||0)+'px' : '';
+    const ehm=st.hmode||'fill';
+    node.style.height = ehm==='fixed' ? (st.hpx||0)+'px' : '';
+    node.style.maxHeight = ehm==='max' ? (st.hpx||0)+'px' : '';
     node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar');
     node.style.background = paintVisible(st,'bg') ? (paintCss(resolveFill(st), st.bgA)||'') : '';
     node.style.borderRadius = radAny(st)?radCss(st):''; node.style.overflow = radAny(st)?'hidden':'';
     node.style.border=''; node.style.boxShadow='';
     if(paintVisible(st,'bcolor') && st.bw>0){ const col=paintCss(resolveBColor(st), st.bcolorA); if(st.bpos==='inside') node.style.boxShadow=`inset 0 0 0 ${st.bw}px ${col}`; else node.style.border=`${st.bw}px ${st.bstyle} ${col}`; }
+    if((st.hmode||'fill')==='max') node.style.overflowY='auto';   // after the radius overflow so it isn't clobbered
     node.style.textAlign = st.align||'';
     const typo={};
     if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
@@ -841,13 +850,14 @@ function pageInit(){
   function applyActive(){ if(sel){ applyElStyle(elNode(sel.r,sel.c,sel.k), target()); } else { applyBlockStyle(); } }
 
   function fieldsFor(){
+    // 'width' unlocks the Layout section (Resizing) — available on the block AND every element.
     if(!sel) return new Set(['width','pad','sp','bg','rad','bwstyle','bcolor']);
     switch(kindOf(selEl().id)){
-      case 'image':   return new Set(['pad','bg','rad','bwstyle','bcolor']);
-      case 'table':   return new Set(['sizelh','color','pad','bg','rad','bwstyle','bcolor']);
-      case 'divider': return new Set(['pad','bg']);
-      case 'spacer':  return new Set(['pad']);
-      default:        return new Set(['font','weight','sizelh','color','align','pad','bg','rad','bwstyle','bcolor']);
+      case 'image':   return new Set(['width','pad','bg','rad','bwstyle','bcolor']);
+      case 'table':   return new Set(['width','sizelh','color','pad','bg','rad','bwstyle','bcolor']);
+      case 'divider': return new Set(['width','pad','bg']);
+      case 'spacer':  return new Set(['width','pad']);
+      default:        return new Set(['width','font','weight','sizelh','color','align','pad','bg','rad','bwstyle','bcolor']);
     }
   }
   function renderInspector(){
@@ -862,6 +872,7 @@ function pageInit(){
       sec.style.display=(anyRow||needMet)?'':'none';
     });
     const id = sel?selEl().id:null;
+    document.getElementById('s-blockLayout').style.display = sel?'none':'';   // Alignment + Gap are block-only; Resizing stays for elements
     document.getElementById('sec-perm').style.display = sel?'':'none';
     document.getElementById('sec-field').style.display = id==='field'?'':'none';
     document.getElementById('sec-imgsrc').style.display = id==='image'?'':'none';
@@ -978,12 +989,12 @@ function pageInit(){
     syncColor('bg'); syncColor('bcolor');
     document.getElementById('s-color').value=t.color||'#333333'; document.getElementById('s-colorH').value=t.color||'';
     document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.al===(t.align||'')));
-    document.getElementById('s-wmode').value=blockStyle.wmode;
+    document.getElementById('s-wmode').value=t.wmode||'fill';
     const wpxEl=document.getElementById('s-wpx');
-    if(blockStyle.wmode==='fill'){ const bw=document.getElementById('blockWrap'); wpxEl.value=bw?Math.round(bw.getBoundingClientRect().width):blockStyle.wpx; wpxEl.disabled=true; }
-    else { wpxEl.value=blockStyle.wpx; wpxEl.disabled=false; }
-    document.getElementById('s-hmode').value=blockStyle.hmode||'fill';
-    document.getElementById('s-hpx').value=blockStyle.hpx||0; document.getElementById('s-hpx').disabled=((blockStyle.hmode||'fill')==='fill');
+    if((t.wmode||'fill')==='fill'){ const node = sel ? elNode(sel.r,sel.c,sel.k) : document.getElementById('blockWrap'); wpxEl.value=node?Math.round(node.getBoundingClientRect().width):(t.wpx||0); wpxEl.disabled=true; }
+    else { wpxEl.value=t.wpx||0; wpxEl.disabled=false; }
+    document.getElementById('s-hmode').value=t.hmode||'fill';
+    document.getElementById('s-hpx').value=t.hpx||0; document.getElementById('s-hpx').disabled=((t.hmode||'fill')==='fill');
     document.querySelectorAll('#s-align3 button').forEach(b=>b.classList.toggle('on', b.dataset.h===(blockStyle.alH||'left') && b.dataset.v===(blockStyle.alV||'top')));
     const e=selEl();
     if(e){ if(e.id==='field') document.getElementById('s-field').value=e.field;
@@ -1011,13 +1022,13 @@ function pageInit(){
     document.getElementById('s-bcolorBind').addEventListener('change',e=>{ target().bcolorBind=e.target.value; applyActive(); syncInspector(); commitStyle(); });
     wirePaintB('bg'); wirePaintB('bcolor');
     document.getElementById('s-align').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ target().align=b.dataset.al; document.getElementById('s-align').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
-    document.getElementById('s-wmode').addEventListener('change',e=>{ const prev=blockStyle.wmode; blockStyle.wmode=e.target.value;
+    document.getElementById('s-wmode').addEventListener('change',e=>{ const t=target(), prev=t.wmode; t.wmode=e.target.value;
       // Switching away from Fill adopts the current rendered width, not the stale default.
-      if(prev==='fill' && e.target.value!=='fill'){ const bw=document.getElementById('blockWrap'); if(bw) blockStyle.wpx=Math.round(bw.getBoundingClientRect().width); }
+      if(prev==='fill' && e.target.value!=='fill'){ const node = sel ? elNode(sel.r,sel.c,sel.k) : document.getElementById('blockWrap'); if(node) t.wpx=Math.round(node.getBoundingClientRect().width); }
       applyActive(); syncInspector(); commitStyle(); });
-    document.getElementById('s-wpx').addEventListener('input',e=>{ blockStyle.wpx=+e.target.value||0; applyActive(); commitStyle(); });
-    document.getElementById('s-hmode').addEventListener('change',e=>{ blockStyle.hmode=e.target.value; document.getElementById('s-hpx').disabled=(blockStyle.hmode==='fill'); applyActive(); commitStyle(); });
-    document.getElementById('s-hpx').addEventListener('input',e=>{ blockStyle.hpx=+e.target.value||0; applyActive(); commitStyle(); });
+    document.getElementById('s-wpx').addEventListener('input',e=>{ target().wpx=+e.target.value||0; applyActive(); commitStyle(); });
+    document.getElementById('s-hmode').addEventListener('change',e=>{ target().hmode=e.target.value; document.getElementById('s-hpx').disabled=(e.target.value==='fill'); applyActive(); commitStyle(); });
+    document.getElementById('s-hpx').addEventListener('input',e=>{ target().hpx=+e.target.value||0; applyActive(); commitStyle(); });
     document.querySelectorAll('#s-align3 button').forEach(b=>b.addEventListener('click',()=>{ blockStyle.alH=b.dataset.h; blockStyle.alV=b.dataset.v; document.querySelectorAll('#s-align3 button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
     // field / image-source / permission
     document.getElementById('s-field').addEventListener('change',e=>{ if(selEl()){ selEl().field=e.target.value; render(); commit(); } });
