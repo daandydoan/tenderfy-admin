@@ -159,7 +159,6 @@
   .insp-h::after,.insp-sec>.fig-sec-h .fig-sec-t::after{content:'expand_more';font-family:'Material Symbols Outlined';font-size:16px;float:right;color:var(--light);transition:transform .15s;text-transform:none;letter-spacing:0}
   .insp-sec.closed .insp-h::after,.insp-sec.closed>.fig-sec-h .fig-sec-t::after{transform:rotate(-90deg)}
   .insp-sec.closed>:not(.insp-h):not(.fig-sec-h){display:none!important}
-  #sec-perm .insp-h{color:var(--teal);font-size:11.5px}
   /* Advanced styling fold — native <details>, keeps every control on record without cluttering the panel */
   .insp-adv{margin-top:16px;border-top:1px solid var(--border);padding-top:8px}
   .insp-adv summary{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600;color:var(--gray);list-style:none;padding:6px 0}
@@ -471,15 +470,6 @@
             <div class="tbl-ops"><button data-tbl="row+"><span class="ms">add</span> Row</button><button data-tbl="row-"><span class="ms">remove</span> Row</button><button data-tbl="col+"><span class="ms">add</span> Column</button><button data-tbl="col-"><span class="ms">remove</span> Column</button></div>
           </div>
 
-          <div class="insp-sec" id="sec-perm" style="display:none">
-            <div class="insp-h">Client permission</div>
-            <div class="insp-row"><label>Access</label><div class="seg full" id="s-perm">
-              <button data-perm="fixed" title="Words are set by the block — the client can't change them">Fixed</button>
-              <button data-perm="editable" title="The client can rewrite the words">Editable</button>
-              <button data-perm="locked" title="Kept in place — the client can't move or remove it">Locked</button>
-            </div></div>
-            <div class="fhint" id="permHint" style="margin-top:-3px"></div>
-          </div>
 
           <div class="insp-sec" data-sec="layout" data-need="width">
             <div class="insp-h">Layout</div>
@@ -979,7 +969,6 @@ function pageInit(){
     });
     const id = sel?selEl().id:null;
     document.getElementById('s-blockLayout').style.display = sel?'none':'';   // Alignment + Gap are block-only; Resizing stays for elements
-    document.getElementById('sec-perm').style.display = sel?'':'none';
     document.getElementById('sec-field').style.display = id==='field'?'':'none';
     document.getElementById('sec-imgsrc').style.display = id==='image'?'':'none';
     document.getElementById('imgUploadBtn').style.display = (id==='image' && selEl().src==='upload')?'':'none';
@@ -1108,9 +1097,7 @@ function pageInit(){
     document.querySelectorAll('#s-align3 button').forEach(b=>b.classList.toggle('on', b.dataset.h===(blockStyle.alH||'left') && b.dataset.v===(blockStyle.alV||'top')));
     const e=selEl();
     if(e){ if(e.id==='field') document.getElementById('s-field').value=e.field;
-      document.querySelectorAll('#s-imgsrc button').forEach(b=>b.classList.toggle('on',b.dataset.src===(e.src||'placeholder')));
-      document.querySelectorAll('#s-perm button').forEach(b=>b.classList.toggle('on',b.dataset.perm===(e.perm||'fixed')));
-      document.getElementById('permHint').textContent={fixed:'Words set by the block — the client can’t change them.',editable:'The client can rewrite the words.',locked:'Kept in place — the client can’t move or remove it.'}[e.perm||'fixed']; }
+      document.querySelectorAll('#s-imgsrc button').forEach(b=>b.classList.toggle('on',b.dataset.src===(e.src||'placeholder'))); }
     document.getElementById('s-preset').value='';
     document.getElementById('s-paste').disabled=!styleClip;
     const stt=document.getElementById('styleTarget');
@@ -1159,7 +1146,6 @@ function pageInit(){
         else if(op==='col+'){ c.headers.push('Column'); c.rows.forEach(r=>r.push('')); } else if(op==='col-'&&c.headers.length>1){ c.headers.pop(); c.rows.forEach(r=>r.pop()); } else return; }
       el.content=c; const keep=sel; render(); sel=keep; applySelection(); commit();
     }));
-    document.querySelectorAll('#s-perm button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().perm=b.dataset.perm; render(); commit(); } }));
     // presets / copy / paste / reset
     document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); if('bg' in p.st) target().bgBind=''; if('bcolor' in p.st) target().bcolorBind=''; applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
     document.getElementById('s-copy').addEventListener('click',()=>{ styleClip=clone(target()); document.getElementById('s-paste').disabled=false; showToast('Style copied'); });
