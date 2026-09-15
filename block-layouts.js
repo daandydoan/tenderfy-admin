@@ -50,10 +50,10 @@ function composeBlock(block, brand){
   const doc = P2DOC[block.p] || [{cols:[[block.p]]}];
   return doc.map(row=>{
     if(row.cols.length>1){
-      const cols = row.cols.map(col=>`<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:11px">${col.map(id=>renderPrimitive(id, brand)).join('')}</div>`).join('');
+      const cols = row.cols.map((col,i)=>`<div style="flex:${(row.ratio&&row.ratio[i])||1};min-width:0;display:flex;flex-direction:column;gap:11px">${col.map(el=>renderPrimitive(el.id||el, brand, el.content)).join('')}</div>`).join('');
       return `<div style="display:flex;gap:24px;margin-bottom:18px">${cols}</div>`;
     }
-    return `<div style="display:flex;flex-direction:column;gap:11px;margin-bottom:18px">${row.cols[0].map(id=>renderPrimitive(id, brand)).join('')}</div>`;
+    return `<div style="display:flex;flex-direction:column;gap:11px;margin-bottom:18px">${row.cols[0].map(el=>renderPrimitive(el.id||el, brand, el.content)).join('')}</div>`;
   }).join('');
 }
 
@@ -61,8 +61,9 @@ function composeBlock(block, brand){
 function blockElements(block){
   const doc = P2DOC[block.p] || [];
   const seen=[];
-  doc.forEach(row=>row.cols.forEach(col=>col.forEach(id=>{ if(!seen.includes(id)) seen.push(id); })));
+  doc.forEach(row=>row.cols.forEach(col=>col.forEach(el=>{ const id=el.id||el; if(!seen.includes(id)) seen.push(id); })));
   return seen;
 }
 
+if(typeof mergeCustomBlocks==='function') mergeCustomBlocks();   // blocks-data.js may have loaded first
 if(typeof window!=='undefined'){ window.P2DOC=P2DOC; window.composeBlock=composeBlock; window.blockElements=blockElements; window.renderStationery=renderStationery; }

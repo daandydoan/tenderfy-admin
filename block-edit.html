@@ -76,7 +76,30 @@
   .vb-el.dragging{opacity:.4}
   .vb-el.ins-before::before{content:'';position:absolute;top:-3px;left:6px;right:6px;height:3px;background:var(--teal);border-radius:2px}
   .vb-name{position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;transition:.1s;display:flex;align-items:center;gap:4px;z-index:2;white-space:nowrap}
+  .vb-block .vb-name{opacity:.45}   /* always readable at a glance; full on hover/select */
   .vb-el:hover .vb-name,.vb-el.selected .vb-name{opacity:1}
+  .vb-body [contenteditable]{outline:none;cursor:text;min-width:1ch;border-radius:3px}
+  .vb-body [contenteditable]:focus{box-shadow:0 0 0 2px var(--teal-tint)}
+  /* Inline name in the header (replaces the title) + back / kebab, matching the document editor */
+  .pg-titlerow{display:flex;align-items:center;gap:10px}
+  .pg-back{width:34px;height:34px;flex-shrink:0;border:1px solid var(--border);background:#fff;border-radius:9px;color:var(--gray);display:flex;align-items:center;justify-content:center;text-decoration:none}
+  .pg-back:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
+  .pg-back .ms{font-size:19px}
+  .pg-kebab{width:34px;height:34px;flex-shrink:0;border:1px solid var(--border);background:#fff;border-radius:9px;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+  .pg-kebab:hover{border-color:var(--teal);color:var(--teal)}
+  .pg-name{font-size:22px;font-weight:600;font-family:inherit;color:var(--ink);border:1px solid transparent;background:transparent;border-radius:8px;padding:2px 8px;margin-left:-8px;min-width:300px;outline:none}
+  .pg-name:hover{border-color:var(--border)} .pg-name:focus{border-color:var(--teal);background:#fff}
+  .pg-name::placeholder{color:var(--light);font-weight:500}
+  .pg-name.err{border-color:#d5493f;background:#fdf3f2}
+  /* Palette search */
+  .pal-search{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:8px;padding:0 8px;height:32px;margin-bottom:10px;background:#fff}
+  .pal-search .ms{font-size:17px;color:var(--light)} .pal-search input{flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-size:12.5px;background:transparent}
+  /* Collapsible style sections */
+  .insp-h,.insp-sec>.fig-sec-h{cursor:pointer;user-select:none}
+  .insp-h::after,.insp-sec>.fig-sec-h .fig-sec-t::after{content:'expand_more';font-family:'Material Symbols Outlined';font-size:16px;float:right;color:var(--light);transition:transform .15s;text-transform:none;letter-spacing:0}
+  .insp-sec.closed .insp-h::after,.insp-sec.closed>.fig-sec-h .fig-sec-t::after{transform:rotate(-90deg)}
+  .insp-sec.closed>:not(.insp-h):not(.fig-sec-h){display:none!important}
+  #sec-perm .insp-h{color:var(--teal);font-size:11.5px}
   .vb-perm{position:absolute;bottom:-9px;left:8px;display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:1px 6px;border-radius:5px;z-index:2}
   .vb-perm .ms{font-size:11px}
   .vb-perm.edit{background:#f2e8fb;color:#8646c4}
@@ -281,19 +304,27 @@
 <div id="app-content">
   <div class="pad">
     <div class="pg-head">
-      <div>
-        <div class="tn-title" id="pg-title">New Custom Block</div>
-        <div class="pg-sub">Build visually or in code. Rendered per client's brand.</div>
+      <div class="pg-titlerow">
+        <a href="blocks.html" class="pg-back" id="cancelBtn" title="Back to blocks"><span class="ms">arrow_back</span></a>
+        <div>
+          <input class="pg-name" id="b-label" placeholder="Name this block…" title="Customer-facing label — what clients see when they insert it">
+          <div class="pg-sub">Build visually or in code. Rendered per client's brand.</div>
+        </div>
       </div>
       <div class="pg-acts">
         <span class="use-chip" id="useChip" style="display:none"></span>
         <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select><button class="tb-btn" id="editBrandBtn" title="Edit this brand style" style="margin-left:4px"><span class="ms">edit</span></button></span>
-        <a class="btn btn-outline btn-sm" id="cancelBtn" href="blocks.html">Cancel</a>
-        <a class="btn btn-outline btn-sm" id="toDocBtn" href="document-edit.html#type=section" title="Use this block in a document">Use in a document <span class="ms" style="font-size:17px">east</span></a>
-        <a class="btn btn-outline btn-sm" id="dupBtn" style="display:none"><span class="ms" style="font-size:17px">content_copy</span> Duplicate</a>
-        <a class="btn btn-danger btn-sm" id="delBtn" style="display:none"><span class="ms" style="font-size:17px">delete</span> Delete</a>
-        <a class="btn btn-outline btn-sm" id="blockDetailsBtn"><span class="ms" style="font-size:17px">tune</span> Details</a>
         <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Block</a>
+        <span class="lst-kebwrap">
+          <button class="pg-kebab" data-kebab aria-label="More actions"><span class="ms">more_vert</span></button>
+          <div class="kebab-menu">
+            <a id="blockDetailsBtn"><span class="ms">tune</span> Details</a>
+            <a id="toDocBtn" href="document-edit.html#type=section"><span class="ms">east</span> Use in a document</a>
+            <a id="dupBtn" style="display:none"><span class="ms">content_copy</span> Duplicate</a>
+            <div class="kebab-sep" id="del-sep" style="display:none"></div>
+            <a class="danger" id="delBtn" style="display:none"><span class="ms">delete</span> Delete</a>
+          </div>
+        </span>
       </div>
     </div>
 
@@ -305,6 +336,7 @@
         </div>
         <div class="card" id="elementsCard">
           <h3 class="ed-h">Elements</h3>
+          <label class="pal-search"><span class="ms">search</span><input id="palQ" placeholder="Search elements…"></label>
           <div class="vb-pal" id="palette"></div>
           <div class="fhint" style="margin-top:10px">Drag onto the page, or click to add.</div>
         </div>
@@ -382,10 +414,11 @@
           <div class="insp-sec" id="sec-perm" style="display:none">
             <div class="insp-h">Client permission</div>
             <div class="insp-row"><label>Access</label><div class="seg full" id="s-perm">
-              <button data-perm="fixed" title="Part of the block; clients can't change it">Fixed</button>
-              <button data-perm="editable" title="Clients can edit this content">Editable</button>
-              <button data-perm="locked" title="Pinned — can't be moved or removed">Locked</button>
+              <button data-perm="fixed" title="Words are set by the block — the client can't change them">Fixed</button>
+              <button data-perm="editable" title="The client can rewrite the words">Editable</button>
+              <button data-perm="locked" title="Kept in place — the client can't move or remove it">Locked</button>
             </div></div>
+            <div class="fhint" id="permHint" style="margin-top:-3px"></div>
           </div>
 
           <div class="insp-sec" data-sec="layout" data-need="width">
@@ -471,12 +504,11 @@
 <div class="modal-overlay" id="saveModal">
   <div class="cfm">
     <h3>Block details</h3>
-    <div class="sub">Name it so it reads clearly in the Block Builder — you can tweak this any time.</div>
+    <div class="sub">Internal name, helper text and category — clients see the label from the header.</div>
     <div class="cfm-cols">
       <div class="cfm-col">
         <div class="sv-sync" id="svSync"></div>
         <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="e.g. Branded Callout"><span class="fld-err" id="b-name-err"></span></div>
-        <div class="fld"><label for="b-label">Customer-facing label</label><input class="fin" id="b-label" placeholder="e.g. Highlight box"><span class="fld-err" id="b-label-err"></span></div>
         <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. A coloured box for key text."></div>
         <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
         <div class="fld" id="slotFld" style="display:none"><label>Save as</label>
@@ -514,7 +546,7 @@
 
     <div class="cfm-acts">
       <a class="btn btn-outline" id="svCancel">Cancel</a>
-      <a class="btn btn-primary" id="svConfirm"><span class="ms" style="font-size:17px">arrow_forward</span> Start editing</a>
+      <a class="btn btn-primary" id="svConfirm"><span class="ms" style="font-size:17px">check</span> Done</a>
     </div>
   </div>
 </div>
@@ -586,9 +618,9 @@ const PRESETS=[
   {key:'',label:'Apply a style preset…',st:{}},
   {key:'emphasis',label:'Emphasis',st:{weight:'700',color:'#111827',size:22}},
   {key:'muted',label:'Muted note',st:{color:'#6B7280',size:12}},
-  {key:'callout',label:'Callout box',st:{bg:'#F1F6F5',pad:16,rad:10,bw:1,bstyle:'solid',bcolor:'#BFE0D9'}},
+  {key:'callout',label:'Callout box',st:{bg:'#F1F6F5',padH:16,padV:16,rad:10,bw:1,bstyle:'solid',bcolor:'#BFE0D9'}},
   {key:'fineprint',label:'Fine print',st:{size:10,color:'#9AA5A3',lh:15}},
-  {key:'accentborder',label:'Accent border',st:{bw:2,bstyle:'solid',bcolor:'#38988A',rad:8,pad:12}},
+  {key:'accentborder',label:'Accent border',st:{bw:2,bstyle:'solid',bcolor:'#38988A',rad:8,padH:12,padV:12}},
 ];
 function kindOf(id){
   if(id==='image') return 'image';
@@ -622,6 +654,7 @@ function pageInit(){
   rebuildBrands();
   const NEUTRAL={primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
   const blockStyle={wmode:'fill', wpx:520, hmode:'fill', hpx:200, alH:'left', alV:'top', padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', bgA:100, bgVis:true, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:'', bcolorA:100, bcolorVis:true, bpos:'inside'};
+  if(existing && existing.blockStyle) Object.assign(blockStyle, existing.blockStyle);
   // Padding / margin CSS — one number (overall) or four (per side).
   function boxCss(s,key){ if(!s)return '0px'; if(s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; const h=(s[key+'H']!=null)?s[key+'H']:(s[key]||0), v=(s[key+'V']!=null)?s[key+'V']:(s[key]||0); return `${v}px ${h}px`; }
   function radCss(s){ if(s&&s.radSides) return `${s.radTL||0}px ${s.radTR||0}px ${s.radBR||0}px ${s.radBL||0}px`; return `${(s&&s.rad)||0}px`; }
@@ -654,10 +687,7 @@ function pageInit(){
     document.getElementById('slotFld').style.display = st?'':'none';
     document.querySelectorAll('#b-slot button').forEach(x=>x.classList.toggle('on', x.dataset.slot===blockSlot));
   }
-  document.getElementById('b-cat').addEventListener('change',()=>{
-    applyStationeryUI();
-    if(isStationery() && !hasContent()){ doc=normDoc([{cols:[['image','heading'],['paragraph']]}]); sel=null; render(); commit(); }
-  });
+  document.getElementById('b-cat').addEventListener('change',applyStationeryUI);
   document.querySelectorAll('#b-slot button').forEach(b=>b.addEventListener('click',()=>{
     blockSlot=b.dataset.slot;
     document.querySelectorAll('#b-slot button').forEach(x=>x.classList.toggle('on',x===b));
@@ -684,9 +714,16 @@ function pageInit(){
     w.addEventListener('dragend',()=>{drag=null;clearInd();});
     w.addEventListener('click',()=>{
       if(w.dataset.row) doc.push({cols:Array.from({length:+w.dataset.row},()=>[])});
-      else doc.push({cols:[[mkEl(w.dataset.id)]]});
+      else addEl(mkEl(w.dataset.id));
       sel=null; render(); commit();
     });
+  });
+  // Click-to-add stacks into the last single-column row (reads as one flow); a new row only when needed.
+  function addEl(el){ const last=doc[doc.length-1]; if(last && last.cols.length===1) last.cols[0].push(el); else doc.push({cols:[[el]]}); }
+  document.getElementById('palQ').addEventListener('input',e=>{
+    const q=e.target.value.trim().toLowerCase();
+    document.querySelectorAll('#palette .vb-widget').forEach(w=>{ w.style.display=(!q||w.textContent.toLowerCase().includes(q))?'':'none'; });
+    document.querySelectorAll('#palette .pal-tag').forEach(t=>{ let n=t.nextElementSibling, any=false; while(n && !n.classList.contains('pal-tag')){ if(n.style.display!=='none') any=true; n=n.nextElementSibling; } t.style.display=any?'':'none'; });
   });
 
   if(existing){
@@ -694,11 +731,8 @@ function pageInit(){
     document.getElementById('b-label').value=existing.label;
     document.getElementById('b-desc').value=existing.desc;
     document.getElementById('b-cat').value=BLOCK_CATS.includes(existing.cat)?existing.cat:BLOCK_CATS[0];
-    document.getElementById('pg-title').textContent='Edit — '+existing.label;
-    document.getElementById('dupBtn').style.display='';
-    document.getElementById('delBtn').style.display='';
-    document.getElementById('previewFld').style.display='';   // preview override only for a saved block
-    document.getElementById('dupBtn').addEventListener('click',()=>duplicateBlock(existing.label));
+    ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='');   // preview override only for a saved block
+    document.getElementById('dupBtn').addEventListener('click',()=>{ leaving=true; duplicateBlock(existing.label, existing.id); });
   }
 
   // ---- Render ----
@@ -717,7 +751,7 @@ function pageInit(){
       }
       return `<div style="height:84px;border:1.5px dashed #b7c2bf;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--light)"><span class="ms">account_balance</span><span style="font-size:11px">Client logo — per client</span></div>`;
     }
-    return renderPrimitive(el.id, brand);
+    return renderPrimitive(el.id, brand, el.content);
   }
   function elHtml(el,r,c,k){
     const on = sel && sel.r===r && sel.c===c && sel.k===k;
@@ -745,7 +779,7 @@ function pageInit(){
             <option value="">Choose an element…</option>${opts}
           </select>
         </div></div>`;
-      document.getElementById('emptyAdd').addEventListener('change',e=>{ const v=e.target.value; if(!v)return; doc.push({cols:[[mkEl(v)]]}); sel={r:0,c:0,k:0}; render(); commit(); });
+      document.getElementById('emptyAdd').addEventListener('change',e=>{ const v=e.target.value; if(!v)return; addEl(mkEl(v)); sel={r:0,c:0,k:0}; render(); commit(); });
     } else {
       page.innerHTML=`<div class="vb-block" id="blockWrap">`+doc.map((row,r)=>`
         <div class="vb-row" data-r="${r}">
@@ -753,16 +787,17 @@ function pageInit(){
             <span class="rb grab" data-rhandle title="Move row"><span class="ms">drag_indicator</span></span>
             <span class="rb" data-addcol title="Add column"><span class="ms">add</span></span>
             <span class="rb" data-delcol title="Remove column"><span class="ms">remove</span></span>
+            ${row.cols.length>1?'<span class="rb" data-ratio title="Column widths"><span class="ms">view_column_2</span></span>':''}
             <span class="rb del" data-delrow title="Delete row"><span class="ms">delete</span></span>
           </div>
-          ${row.cols.map((col,c)=>`<div class="vb-col" data-r="${r}" data-c="${c}">
+          ${row.cols.map((col,c)=>`<div class="vb-col" data-r="${r}" data-c="${c}" style="flex:${(row.ratio&&row.ratio[c])||1}">
               ${col.length?col.map((el,k)=>elHtml(el,r,c,k)).join(''):'<div class="vb-colph"><span class="ms">add</span>Drop element</div>'}
             </div>`).join('')}
         </div>`).join('')+`</div>`;
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
-    wire(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
+    wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
   function loadTemplate(key){ doc = key ? normDoc(clone(P2DOC[key]||[])) : []; sel=null; render(); commit(); }
 
@@ -794,8 +829,7 @@ function pageInit(){
       if(newIdx===brandIdx) return;
       const to=BRANDS[newIdx];
       const proceed=()=>{ brandIdx=newIdx; el.value=String(newIdx); brand=to.brand; activeTenant=to.tenant||null; updateEditBtn(); applyBrand(); render(); renderCode(); };
-      if(hasContent()) confirmAction({title:'Change preview style?',body:`Previewing in ${to.brand?to.name+'’s brand':'the brand-neutral default'} re-renders the block. Style tweaks you’ve made are shown as-is and can’t be automatically reverted.`,confirm:'Change style'}, proceed);
-      else proceed();
+      proceed();   // re-render only — nothing is lost
     });
     document.getElementById('editBrandBtn').addEventListener('click',editBrand);
     updateEditBtn();
@@ -835,27 +869,28 @@ function pageInit(){
     const mV = (bs.marV!=null)?bs.marV:(bs.mar||0);
     w.style.marginTop = (bs.marSides?(bs.marT||0):mV)+'px'; w.style.marginBottom = (bs.marSides?(bs.marB||0):mV)+'px';
     w.style.background = paintVisible(bs,'bg') ? (paintCss(resolveFill(bs), bs.bgA)||'') : '';
-    w.style.borderRadius = radAny(bs)?radCss(bs):''; w.style.overflow = radAny(bs)?'hidden':'';
+    w.style.borderRadius = radAny(bs)?radCss(bs):''; w.style.overflow = (radAny(bs)||hm==='fixed')?'hidden':'';   // fixed height clips, never spills
     w.style.border='none'; w.style.boxShadow='';
     if(paintVisible(bs,'bcolor') && bs.bw>0){ const col=paintCss(resolveBColor(bs), bs.bcolorA); if(bs.bpos==='inside') w.style.boxShadow=`inset 0 0 0 ${bs.bw}px ${col}`; else w.style.border=`${bs.bw}px ${bs.bstyle} ${col}`; }
     if((bs.hmode||'fill')==='max') w.style.overflowY='auto';   // after the radius `overflow` shorthand so it isn't clobbered
   }
   function applyElStyle(node, st){
     if(!node) return;
-    // Per-element resizing (width Fill/Fixed/Min/Max, height Fill/Fixed/Max)
-    const ewm=st.wmode||'fill';
-    node.style.width = ewm==='fixed' ? (st.wpx||0)+'px' : (ewm==='fill'?'':'100%');
-    node.style.minWidth = ewm==='min' ? (st.wpx||0)+'px' : '';
-    node.style.maxWidth = ewm==='max' ? (st.wpx||0)+'px' : '';
-    const ehm=st.hmode||'fill';
-    node.style.height = ehm==='fixed' ? (st.hpx||0)+'px' : '';
+    // Per-element resizing goes on the element frame (.vb-el) so the selection outline matches the size;
+    // paint/padding stay on the body. Fixed/Max width hug to the left; Fill stretches.
+    const box=node.parentElement, ewm=st.wmode||'fill', ehm=st.hmode||'fill';
+    box.style.width = ewm==='fixed' ? (st.wpx||0)+'px' : '';
+    box.style.minWidth = ewm==='min' ? (st.wpx||0)+'px' : '';
+    box.style.maxWidth = ewm==='max' ? (st.wpx||0)+'px' : '';
+    box.style.alignSelf = (ewm==='fixed'||ewm==='max') ? 'flex-start' : '';
+    node.style.height = ehm==='fixed' ? (st.hpx||0)+'px' : '';   // height stays on the body so hover tools aren't clipped
     node.style.maxHeight = ehm==='max' ? (st.hpx||0)+'px' : '';
     node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar');
     node.style.background = paintVisible(st,'bg') ? (paintCss(resolveFill(st), st.bgA)||'') : '';
-    node.style.borderRadius = radAny(st)?radCss(st):''; node.style.overflow = radAny(st)?'hidden':'';
+    node.style.borderRadius = radAny(st)?radCss(st):'';
+    node.style.overflow = ehm==='fixed' ? 'hidden' : (ehm==='max' ? 'auto' : (radAny(st)?'hidden':''));   // fixed clips, never spills
     node.style.border=''; node.style.boxShadow='';
     if(paintVisible(st,'bcolor') && st.bw>0){ const col=paintCss(resolveBColor(st), st.bcolorA); if(st.bpos==='inside') node.style.boxShadow=`inset 0 0 0 ${st.bw}px ${col}`; else node.style.border=`${st.bw}px ${st.bstyle} ${col}`; }
-    if((st.hmode||'fill')==='max') node.style.overflowY='auto';   // after the radius overflow so it isn't clobbered
     node.style.textAlign = st.align||'';
     const typo={};
     if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
@@ -1016,7 +1051,8 @@ function pageInit(){
     const e=selEl();
     if(e){ if(e.id==='field') document.getElementById('s-field').value=e.field;
       document.querySelectorAll('#s-imgsrc button').forEach(b=>b.classList.toggle('on',b.dataset.src===(e.src||'placeholder')));
-      document.querySelectorAll('#s-perm button').forEach(b=>b.classList.toggle('on',b.dataset.perm===(e.perm||'fixed'))); }
+      document.querySelectorAll('#s-perm button').forEach(b=>b.classList.toggle('on',b.dataset.perm===(e.perm||'fixed')));
+      document.getElementById('permHint').textContent={fixed:'Words set by the block — the client can’t change them.',editable:'The client can rewrite the words.',locked:'Kept in place — the client can’t move or remove it.'}[e.perm||'fixed']; }
     document.getElementById('s-preset').value='';
     document.getElementById('s-paste').disabled=!styleClip;
     const stt=document.getElementById('styleTarget');
@@ -1059,6 +1095,14 @@ function pageInit(){
     document.getElementById('s-copy').addEventListener('click',()=>{ styleClip=clone(target()); document.getElementById('s-paste').disabled=false; showToast('Style copied'); });
     document.getElementById('s-paste').addEventListener('click',()=>{ if(!styleClip) return; Object.assign(target(), clone(styleClip)); applyActive(); syncInspector(); commit(); showToast('Style pasted'); });
     document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,hmode:'fill',hpx:200,alH:'left',alV:'top',padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',bgA:100,bgVis:true,rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'}); } applyActive(); render(); commit(); showToast('Style reset'); });
+    // Collapsible sections — remembered per browser; the long tail starts closed so Permission/Layout/Fill are one glance.
+    const CKEY='tf_insp_closed'; let closed; try{ closed=JSON.parse(localStorage.getItem(CKEY)); }catch(e){} if(!Array.isArray(closed)) closed=['dim','typo','border'];
+    const applyClosed=()=>document.querySelectorAll('#styleCard .insp-sec[data-sec]').forEach(s=>s.classList.toggle('closed', closed.includes(s.dataset.sec)));
+    document.querySelectorAll('#styleCard .insp-sec[data-sec] > .insp-h, #styleCard .insp-sec[data-sec] > .fig-sec-h').forEach(h=>h.addEventListener('click',e=>{
+      if(e.target.closest('button')) return; const k=h.parentElement.dataset.sec;
+      closed = closed.includes(k) ? closed.filter(x=>x!==k) : closed.concat(k); try{ localStorage.setItem(CKEY, JSON.stringify(closed)); }catch(_){} applyClosed();
+    }));
+    applyClosed();
     syncInspector();
   }
 
@@ -1082,8 +1126,8 @@ function pageInit(){
     page.querySelectorAll('.vb-el').forEach(el=>{
       const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k;
       el.addEventListener('click',e=>{ if(e.target.closest('[data-handle],[data-dup],[data-del]'))return; e.stopPropagation(); selectEl(r,c,k); });
-      el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();doc[r].cols[c].splice(k,1);cleanup();sel=null;render();commit();});
-      el.querySelector('[data-dup]').addEventListener('click',e=>{e.stopPropagation();doc[r].cols[c].splice(k+1,0,clone(doc[r].cols[c][k]));sel=null;render();commit();});
+      el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();delEl({r,c,k});});
+      el.querySelector('[data-dup]').addEventListener('click',e=>{e.stopPropagation();dupEl({r,c,k});});
       const h=el.querySelector('[data-handle]');
       h.addEventListener('mousedown',()=>{el.draggable=true;});
       el.addEventListener('mouseup',()=>{el.draggable=false;});
@@ -1095,6 +1139,11 @@ function pageInit(){
       rowEl.querySelector('[data-addcol]').addEventListener('click',e=>{e.stopPropagation();if(doc[r].cols.length<3){doc[r].cols.push([]);sel=null;render();commit();}else showToast('A row can have up to 3 columns');});
       rowEl.querySelector('[data-delcol]').addEventListener('click',e=>{e.stopPropagation();if(doc[r].cols.length>1){const last=doc[r].cols.pop();if(last.length)doc[r].cols[doc[r].cols.length-1].push(...last);sel=null;render();commit();}else showToast('A row needs at least one column');});
       rowEl.querySelector('[data-delrow]').addEventListener('click',e=>{e.stopPropagation();doc.splice(r,1);sel=null;render();commit();});
+      const rt=rowEl.querySelector('[data-ratio]'); if(rt) rt.addEventListener('click',e=>{e.stopPropagation();
+        const opts = doc[r].cols.length===2 ? [[1,1],[1,2],[2,1]] : [[1,1,1],[2,1,1],[1,2,1],[1,1,2]];
+        const cur=JSON.stringify(doc[r].ratio||opts[0]); const i=opts.findIndex(o=>JSON.stringify(o)===cur);
+        doc[r].ratio=opts[(i+1)%opts.length]; render(); commit(); showToast('Columns '+doc[r].ratio.join(' : '));
+      });
       const rh=rowEl.querySelector('[data-rhandle]');
       rh.addEventListener('mousedown',()=>{rowEl.draggable=true;});
       rowEl.addEventListener('mouseup',()=>{rowEl.draggable=false;});
@@ -1103,7 +1152,32 @@ function pageInit(){
     });
   }
 
-  function cleanup(){ doc = doc.filter(row => !(row.cols.length===1 && row.cols[0].length===0)); }
+  function delEl(p){ doc[p.r].cols[p.c].splice(p.k,1); cleanup(); sel=null; render(); commit(); }
+  function dupEl(p){ doc[p.r].cols[p.c].splice(p.k+1,0,clone(doc[p.r].cols[p.c][p.k])); sel={r:p.r,c:p.c,k:p.k+1}; render(); commit(); }
+  function cleanup(){ doc = doc.filter(row => !(row.cols.length===1 && row.cols[0].length===0)); doc.forEach(row=>{ if(row.ratio && row.ratio.length!==row.cols.length) delete row.ratio; }); }
+
+  // ---- Inline text editing: leaves marked data-ek / data-ec by renderPrimitive become contenteditable;
+  // on input the element's `content` is rebuilt from the DOM (same keys renderPrimitive reads back).
+  function captureContent(body){
+    const c={};
+    body.querySelectorAll('[data-ek]').forEach(n=>{ const k=n.dataset.ek;
+      if(k==='items') c.items=[...n.querySelectorAll('li')].map(t=>t.textContent);
+      else if(k==='headers') (c.headers=c.headers||[]).push(n.textContent);
+      else if(k==='row'||k==='pair') (c[k+'s']=c[k+'s']||[]).push([...n.querySelectorAll('[data-ec]')].map(t=>t.textContent));
+      else c[k]=n.textContent;
+    });
+    return c;
+  }
+  function wireText(){
+    page.querySelectorAll('.vb-el').forEach(el=>{
+      const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k, body=el.querySelector('.vb-body');
+      body.querySelectorAll('[data-ek]:not([data-ek=row]):not([data-ek=pair]),[data-ec]').forEach(n=>n.setAttribute('contenteditable','plaintext-only'));
+      body.addEventListener('input',()=>{ doc[r].cols[c][k].content=captureContent(body); autosave(); });
+      body.addEventListener('focusout',()=>pushHist());
+      body.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.target.closest('[data-ek=items]')) e.preventDefault(); });
+      body.addEventListener('paste',e=>{ e.preventDefault(); document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text')); });
+    });
+  }
   function pluck(d){ const el=doc[d.r].cols[d.c][d.k]; doc[d.r].cols[d.c].splice(d.k,1); return el; }
   function clearInd(){
     page.querySelectorAll('.ins-before').forEach(e=>e.classList.remove('ins-before'));
@@ -1145,7 +1219,7 @@ function pageInit(){
   // ---- Code mode ----
   function docToHtml(){
     if(!doc.length) return '<!-- Empty block -->';
-    const one=el=> el.id==='field' ? `{{${el.field}}}` : renderPrimitive(el.id);
+    const one=el=> el.id==='field' ? `{{${el.field}}}` : renderPrimitive(el.id, undefined, el.content);
     return doc.map(row=>{
       const multi=row.cols.length>1;
       if(!multi){ return row.cols[0].map(one).join('\n'); }
@@ -1174,7 +1248,7 @@ function pageInit(){
   document.querySelectorAll('.vb-modes button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
 
   // ---- Undo / redo / history / autosave ----
-  const VKEY='tf_bver_'+(existing?existing.id:'new');
+  const vkey=bid=>'tf_bver_'+(bid||(existing?existing.id:'new'));
   const DKEY='tf_bdraft_'+(existing?existing.id:'new');
   let history=[], hidx=-1, restoring=false, autoT=null, styleT=null;
   const snap=()=>JSON.stringify({doc, blockStyle});
@@ -1182,17 +1256,40 @@ function pageInit(){
   function commit(){ pushHist(); autosave(); }
   function commitStyle(){ clearTimeout(styleT); styleT=setTimeout(commit,350); }
   function updateHistBtns(){ document.getElementById('undoBtn').disabled=hidx<=0; document.getElementById('redoBtn').disabled=hidx>=history.length-1; }
-  function restore(){ restoring=true; const s=JSON.parse(history[hidx]); doc=s.doc; for(const k in s.blockStyle) blockStyle[k]=s.blockStyle[k]; sel=null; render(); restoring=false; updateHistBtns(); autosave(); }
+  function restore(){ restoring=true; const s=JSON.parse(history[hidx]); doc=s.doc; for(const k in s.blockStyle) blockStyle[k]=s.blockStyle[k]; if(sel && !(doc[sel.r]&&doc[sel.r].cols[sel.c]&&doc[sel.r].cols[sel.c][sel.k])) sel=null; render(); restoring=false; updateHistBtns(); autosave(); }
   function undo(){ if(hidx>0){ hidx--; restore(); } }
   function redo(){ if(hidx<history.length-1){ hidx++; restore(); } }
   document.getElementById('undoBtn').addEventListener('click',undo);
   document.getElementById('redoBtn').addEventListener('click',redo);
-  document.addEventListener('keydown',e=>{ if(e.target.matches('input,textarea,select'))return; const m=e.ctrlKey||e.metaKey; if(m&&e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); } else if(m&&e.key.toLowerCase()==='y'){ e.preventDefault(); redo(); } });
-  function autosave(){ clearTimeout(autoT); autoT=setTimeout(()=>{ try{ localStorage.setItem(DKEY, JSON.stringify({doc, blockStyle})); }catch(e){} const t=new Date(); document.getElementById('autosave').innerHTML=`<span class="ms">cloud_done</span> Autosaved · ${t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`; },600); }
+  document.addEventListener('keydown',e=>{
+    if(e.target.closest && e.target.closest('input,textarea,select,[contenteditable]')) return;
+    const m=e.ctrlKey||e.metaKey, k=e.key.toLowerCase();
+    if(m&&k==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); }
+    else if(m&&k==='y'){ e.preventDefault(); redo(); }
+    else if(m&&k==='d'&&sel){ e.preventDefault(); dupEl(sel); }
+    else if((e.key==='Delete'||e.key==='Backspace')&&sel){ e.preventDefault(); delEl(sel); }
+    else if(e.key==='Escape'&&sel){ sel=null; applySelection(); syncInspector(); }
+  });
+  // Draft = canvas + style + the details fields, so a reload can pick up exactly where you were.
+  const fields=()=>Object.fromEntries(['b-name','b-label','b-desc','b-cat'].map(i=>[i,document.getElementById(i).value]));
+  function autosave(){ clearTimeout(autoT); autoT=setTimeout(()=>{ try{ localStorage.setItem(DKEY, JSON.stringify({doc, blockStyle, fields:fields(), slot:blockSlot})); }catch(e){} const t=new Date(); document.getElementById('autosave').innerHTML=`<span class="ms">cloud_done</span> Autosaved · ${t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`; },600); }
+  function resumeDraft(){
+    let d; try{ d=JSON.parse(localStorage.getItem(DKEY)); }catch(e){} if(!d || !(d.doc&&d.doc.length)) return;
+    confirmAction({title:'Resume unsaved draft?',body:'You have autosaved changes to this block that were never saved. Pick up where you left off, or discard them.',confirm:'Resume',cancel:'Discard'},()=>{
+      doc=normDoc(d.doc); Object.assign(blockStyle, d.blockStyle||{}); Object.entries(d.fields||{}).forEach(([i,v])=>{ document.getElementById(i).value=v; }); if(d.slot) blockSlot=d.slot;
+      sel=null; applyStationeryUI(); render(); syncBar(); pushHist(); showToast('Draft restored');
+    }, ()=>{ try{ localStorage.removeItem(DKEY); }catch(e){} });
+  }
+  // Dirty = anything differs from what was loaded (or last saved). Guards every way off the page.
+  let base='', leaving=false;
+  const isDirty=()=>snap()!==base;
+  function leaveGuard(go){ if(!isDirty()) return go(); confirmAction({title:'Discard changes?',body:'This block has unsaved changes. Leaving now discards them.',confirm:'Discard',danger:true},go); }
+  window.addEventListener('beforeunload',e=>{ if(isDirty()&&!leaving){ e.preventDefault(); e.returnValue=''; } });
+  ['cancelBtn','toDocBtn'].forEach(i=>document.getElementById(i).addEventListener('click',e=>{ const href=e.currentTarget.href; e.preventDefault(); leaveGuard(()=>{ leaving=true; location.href=href; }); }));
 
   // Version history
-  function loadVersions(){ try{ return JSON.parse(localStorage.getItem(VKEY))||[]; }catch(e){ return []; } }
-  function saveVersion(label){ const v=loadVersions(); v.unshift({ts:new Date().toISOString(), label, doc:clone(doc), blockStyle:clone(blockStyle)}); try{ localStorage.setItem(VKEY, JSON.stringify(v.slice(0,10))); }catch(e){} }
+  function loadVersions(){ try{ return JSON.parse(localStorage.getItem(vkey()))||[]; }catch(e){ return []; } }
+  function saveVersion(label, bid){ let v=[]; try{ v=JSON.parse(localStorage.getItem(vkey(bid)))||[]; }catch(e){} v.unshift({ts:new Date().toISOString(), label, doc:clone(doc), blockStyle:clone(blockStyle)}); try{ localStorage.setItem(vkey(bid), JSON.stringify(v.slice(0,10))); }catch(e){} }
   function renderVersions(){
     const v=loadVersions(); const list=document.getElementById('verList');
     if(!v.length){ list.innerHTML='<div class="ver-empty">No saved versions yet — Save Block creates one.</div>'; return; }
@@ -1212,15 +1309,12 @@ function pageInit(){
   // ---- Naming / save ----
   const hasContent=()=> doc.reduce((s,row)=>s+row.cols.reduce((a,c)=>a+c.length,0),0)>0 || (mode==='code' && !!codeArea.value.trim());
   function syncBar(){ document.getElementById('bar-name').textContent=document.getElementById('b-label').value.trim()||'Untitled block'; }
-  document.getElementById('b-label').addEventListener('input',syncBar);
-  document.getElementById('b-name').addEventListener('input',e=>{ if(!existing) document.getElementById('pg-title').textContent=e.target.value.trim()||'New Custom Block'; });
+  document.getElementById('b-label').addEventListener('input',()=>{ syncBar(); autosave(); });
 
-  document.getElementById('cancelBtn').addEventListener('click',e=>{ if(!hasContent()) return; e.preventDefault(); confirmAction({title:'Discard changes?',body:'This block hasn’t been saved. Leaving now discards your layout and style changes.',confirm:'Discard',danger:true},()=>{ location.href='blocks.html'; }); });
-
-  // ---- Block details are the step BEFORE editing; Save then saves directly ----
+  // ---- Block details (internal name / helper / category) live behind the kebab; the label is inline in the header ----
   const saveModal=document.getElementById('saveModal');
-  function fldErr(idn,msg){ document.getElementById(idn).classList.add('err'); const e=document.getElementById(idn+'-err'); e.textContent=msg; e.classList.add('show'); }
-  function fldClear(idn){ document.getElementById(idn).classList.remove('err'); document.getElementById(idn+'-err').classList.remove('show'); }
+  function fldErr(idn,msg){ document.getElementById(idn).classList.add('err'); const e=document.getElementById(idn+'-err'); if(e){ e.textContent=msg; e.classList.add('show'); } }
+  function fldClear(idn){ document.getElementById(idn).classList.remove('err'); const e=document.getElementById(idn+'-err'); if(e) e.classList.remove('show'); }
   ['b-name','b-label'].forEach(idn=>document.getElementById(idn).addEventListener('input',()=>fldClear(idn)));
   function openDetails(){
     document.getElementById('svSync').innerHTML = usage>0
@@ -1228,7 +1322,7 @@ function pageInit(){
       : `<span class="ms">library_add</span><div>New block — it becomes available in every client’s Block Builder, rendered in their brand.</div>`;
     saveModal.classList.add('open'); renderThumbOverride(); document.getElementById('b-name').focus();
   }
-  function closeDetails(){ saveModal.classList.remove('open'); const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility=''; }
+  function closeDetails(){ saveModal.classList.remove('open'); autosave(); }
   // ---- Art-direction: optional custom preview image (overrides the auto thumbnail) ----
   let _thumbMem='';   // holds an uploaded image for a not-yet-saved (new) block
   function currentOvr(){ return blockThumbOverride(id) || _thumbMem; }
@@ -1246,16 +1340,14 @@ function pageInit(){
       const rd=new FileReader(); rd.onload=()=>{ _thumbMem=rd.result; setBlockThumbOverride(id, rd.result); renderThumbOverride(); showToast('Custom preview set'); }; rd.readAsDataURL(f); e.target.value=''; });
     if(auto) auto.addEventListener('click',()=>{ _thumbMem=''; setBlockThumbOverride(id,''); renderThumbOverride(); showToast('Using the auto-generated preview'); });
   })();
+  // Only the label is required (it's the name clients see); internal name defaults to it.
   function detailsValid(){
-    const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
-    let ok=true, first=null;
-    if(!nm){ fldErr('b-name','Give the block an internal name.'); ok=false; first='b-name'; } else fldClear('b-name');
-    if(!l){ fldErr('b-label','Add a customer-facing label so clients know what they’re inserting.'); ok=false; first=first||'b-label'; } else fldClear('b-label');
-    if(!ok) document.getElementById(first).focus();
-    return ok;
+    const l=document.getElementById('b-label').value.trim(), nm=document.getElementById('b-name');
+    if(!l){ fldErr('b-label',''); document.getElementById('b-label').focus(); showToast('Name the block first'); return false; }
+    fldClear('b-label'); if(!nm.value.trim()) nm.value=l; return true;
   }
-  document.getElementById('svConfirm').addEventListener('click',()=>{ if(detailsValid()) closeDetails(); });
-  document.getElementById('svCancel').addEventListener('click',()=>{ if(!existing && !hasContent()) location.href='blocks.html'; else closeDetails(); });
+  document.getElementById('svConfirm').addEventListener('click',closeDetails);
+  document.getElementById('svCancel').addEventListener('click',closeDetails);
   saveModal.addEventListener('click',e=>{ if(e.target===saveModal) closeDetails(); });
   document.getElementById('blockDetailsBtn').addEventListener('click',openDetails);
 
@@ -1282,9 +1374,8 @@ function pageInit(){
     setIf('b-name',name); setIf('b-label',label); setIf('b-desc',help);
     if(BLOCK_CATS.includes(cat)) document.getElementById('b-cat').value=cat;
     applyStationeryUI();
-    if(mode==='code'){ document.querySelector('#modeSeg [data-mode=visual]')?.click(); }
+    if(mode==='code') setMode('visual');
     doc=normDoc(layout); sel=null; render(); commit(); syncBar();
-    document.getElementById('pg-title').textContent=document.getElementById('b-name').value.trim()||'New Custom Block';
   }
   // Reference-image drop zone (mock — Ray "reads" the image alongside the description)
   let rayBlockHasImg=false;
@@ -1302,8 +1393,8 @@ function pageInit(){
   document.getElementById('rayBlockBtn').addEventListener('click',()=>{
     const p=document.getElementById('rayBlockPrompt').value.trim();
     if(!p && !rayBlockHasImg){ showToast('Add a reference image or describe the block'); return; }
-    rayDraftBlock(p); closeDetails();
-    showToast('Ray drafted a starting point'+(rayBlockHasImg?' from your reference':'')+' — refine it, then Save');
+    const go=()=>{ rayDraftBlock(p); closeDetails(); showToast('Ray drafted a starting point'+(rayBlockHasImg?' from your reference':'')+' — refine it, then Save'); };
+    if(hasContent()) confirmAction({title:'Replace the canvas?',body:'Ray’s draft replaces what’s on the canvas now. Undo brings it back.',confirm:'Draft it'},go); else go();
   });
 
   // ---- Save → publish confirmation ----
@@ -1320,7 +1411,11 @@ function pageInit(){
   }
   function finishSave(published){
     const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
-    saveVersion(nm);
+    const bid = existing ? existing.id : 'cb-'+Date.now();
+    saveCustomBlock({id:bid, name:nm, label:l, desc:document.getElementById('b-desc').value.trim(), cat:document.getElementById('b-cat').value,
+      slot:isStationery()?blockSlot:undefined, status:published?'active':'draft', doc:clone(doc), blockStyle:clone(blockStyle)});
+    saveVersion(nm, bid); base=snap(); leaving=true;
+    try{ localStorage.removeItem(DKEY); }catch(e){}
     const kind = isStationery() ? (blockSlot==='footer'?'footer':'letterhead') : 'block';
     const msg = published
       ? (existing?'Updated & published':'Published')+(mode==='code'?' custom-coded':'')+' '+kind+': '+l+(usage>0?` · pushed to ${usage} documents`:'')
@@ -1333,7 +1428,7 @@ function pageInit(){
     if(mode==='code'){ if(!codeArea.value.trim()){showToast('Add some code, or switch to the visual builder');return;} }
     else if(!total){ showToast('Add at least one element to the canvas'); return; }
     const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
-    if(!nm||!l){ openDetails(); detailsValid(); return; }
+    if(!detailsValid()) return;
     openPublish();
   }
   document.getElementById('saveBtn').addEventListener('click',doSave);
@@ -1341,7 +1436,15 @@ function pageInit(){
   pubModal.addEventListener('click',e=>{ if(e.target===pubModal) pubModal.classList.remove('open'); });
   document.getElementById('pubConfirm').addEventListener('click',()=>{ pubModal.classList.remove('open'); finishSave(true); });
   document.getElementById('pubDraft').addEventListener('click',()=>{ pubModal.classList.remove('open'); finishSave(false); });
-  document.getElementById('delBtn').addEventListener('click',()=>deleteBlock(existing.label));
+  document.getElementById('delBtn').addEventListener('click',()=>{ leaving=true; deleteBlock(existing.label, existing.id); });
+
+  (function(){ // Header overflow kebab (Details / Use in a document / Duplicate / Delete)
+    const kb=document.querySelector('.pg-acts [data-kebab]'); if(!kb) return;
+    const menu=kb.parentElement.querySelector('.kebab-menu');
+    kb.addEventListener('click',e=>{ e.stopPropagation(); menu.classList.toggle('open'); });
+    document.addEventListener('click',()=>menu.classList.remove('open'));
+    menu.addEventListener('click',()=>menu.classList.remove('open'));
+  })();
 
   // ---- Responsive panels (Style collapsible / drawers on small screens) ----
   const ed3=document.querySelector('.ed3');
@@ -1361,10 +1464,9 @@ function pageInit(){
     document.getElementById('b-cat').value='Headers & Footers';
     blockSlot=wantSlot;
     if(!hasContent()){ doc=normDoc([{cols:[['image','heading'],['paragraph']]}]); sel=null; }
-    document.getElementById('pg-title').textContent = wantSlot==='footer'?'New footer':'New letterhead';
+    document.getElementById('b-label').placeholder = wantSlot==='footer'?'Name this footer…':'Name this letterhead…';
   }
-  buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar(); pushHist(); applyPanels(); applyStationeryUI();
-  if(!existing){ const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility='hidden'; openDetails(); } // details are the step before editing a new block — keep the editor hidden until Start editing
+  buildBrandSelect(); applyBrand(); initStyle(); render(); syncBar(); pushHist(); base=snap(); applyPanels(); applyStationeryUI(); resumeDraft();
 }
 </script>
 </body>

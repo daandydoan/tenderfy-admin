@@ -16,8 +16,8 @@ function showToast(msg){
 window.showToast = showToast;
 
 // Reusable confirm dialog — used by every CRUD page before a destructive action.
-window.confirmAction = function(opts, onConfirm){
-  const o = Object.assign({title:'Are you sure?', body:'', confirm:'Confirm', danger:false}, opts);
+window.confirmAction = function(opts, onConfirm, onCancel){
+  const o = Object.assign({title:'Are you sure?', body:'', confirm:'Confirm', cancel:'Cancel', danger:false}, opts);
   let m = document.getElementById('confirmModal');
   if(!m){ m = document.createElement('div'); m.id='confirmModal'; m.className='modal-overlay'; document.body.appendChild(m); }
   m.innerHTML = `<div class="cfm">
@@ -25,11 +25,11 @@ window.confirmAction = function(opts, onConfirm){
     <h3>${o.title}</h3>
     <p>${o.body}</p>
     <div class="cfm-acts">
-      <a class="btn btn-outline" data-cfm-cancel>Cancel</a>
+      <a class="btn btn-outline" data-cfm-cancel>${o.cancel}</a>
       <a class="btn ${o.danger?'btn-danger':'btn-primary'}" data-cfm-ok>${o.confirm}</a>
     </div></div>`;
   m.classList.add('open');
-  m.querySelector('[data-cfm-cancel]').onclick = ()=>m.classList.remove('open');
+  m.querySelector('[data-cfm-cancel]').onclick = ()=>{ m.classList.remove('open'); if(onCancel) onCancel(); };
   m.onclick = (e)=>{ if(e.target===m) m.classList.remove('open'); };
   m.querySelector('[data-cfm-ok]').onclick = ()=>{ m.classList.remove('open'); if(onConfirm) onConfirm(); };
 };

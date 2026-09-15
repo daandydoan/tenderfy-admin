@@ -105,7 +105,7 @@ function pageInit(){
       const card=item.closest('.lst-card'), id=card.dataset.id, blk=BLOCKS.find(x=>x.id===id);
       item.closest('.kebab-menu').classList.remove('open');
       if(item.dataset.act==='edit'){ location.href='block-edit.html#id='+id; }
-      else if(item.dataset.act==='dup'){ duplicateBlock(blk.label); }
+      else if(item.dataset.act==='dup'){ duplicateBlock(blk.label, blk.id); }
       else if(item.dataset.act==='toggle'){
         const nowInactive=blockStatus(id)==='inactive';
         BLOCK_STATUS[id]=nowInactive?'active':'inactive';

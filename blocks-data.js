@@ -136,8 +136,8 @@ function blockSchematic(block){
   if(/^l[hf]-/.test(block.p||'')) return blockPreview(block.p);   // letterhead / footer bands keep their bespoke schematic
   const doc = P2DOC[block.p] || [{cols:[[block.p]]}];
   return doc.map(row => row.cols.length>1
-    ? `<div class="blk-cols">${row.cols.map(col=>`<div>${col.map(id=>primSchematic(id,true)).join('')}</div>`).join('')}</div>`
-    : row.cols[0].map(id=>primSchematic(id,false)).join('')
+    ? `<div class="blk-cols">${row.cols.map(col=>`<div>${col.map(id=>primSchematic(id.id||id,true)).join('')}</div>`).join('')}</div>`
+    : row.cols[0].map(id=>primSchematic(id.id||id,false)).join('')
   ).join('');
 }
 // Art-direction override — an optional custom image a user sets in the block
@@ -154,13 +154,35 @@ function fitThumbs(){}   // no-op: schematic thumbnails are %-based and need no 
 
 // Shared block actions — kept in one place so the block view and the block
 // editor share identical wording and behaviour.
-function deleteBlock(label){
+function deleteBlock(label, id){
   confirmAction({title:'Delete this block?',body:`“${label}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
-    showToast('Deleted block: '+label); setTimeout(()=>location.href='blocks.html',700);
+    removeCustomBlock(id); showToast('Deleted block: '+label); setTimeout(()=>location.href='blocks.html',700);
   });
 }
-function duplicateBlock(label){
+function duplicateBlock(label, id){
+  const src=loadCustomBlocks()[id];
+  if(src) saveCustomBlock(Object.assign({},src,{id:'cb-'+Date.now(),name:src.name+' copy',label:src.label+' copy'}));
   showToast('Duplicated block: “'+label+' copy” — find it in the library'); setTimeout(()=>location.href='blocks.html',800);
+}
+
+// ---- Saved blocks (localStorage) — anything built or edited in the block editor.
+// {id,name,label,desc,cat,slot?,status,doc,blockStyle}; doc rows hold element
+// objects ({id,st,content,perm}) so composeBlock/blockSchematic coerce `el.id||el`.
+// Merged into BLOCKS/P2DOC once both exist — load order differs per page.
+const CBKEY='tf_blocks_custom';
+function loadCustomBlocks(){ try{ return JSON.parse(localStorage.getItem(CBKEY))||{}; }catch(e){ return {}; } }
+function saveCustomBlock(b){ const all=loadCustomBlocks(); all[b.id]=b; try{ localStorage.setItem(CBKEY, JSON.stringify(all)); }catch(e){} mergeCustomBlocks(); }
+function removeCustomBlock(id){ const all=loadCustomBlocks(); delete all[id]; try{ localStorage.setItem(CBKEY, JSON.stringify(all)); }catch(e){} }
+function mergeCustomBlocks(){
+  if(typeof P2DOC==='undefined') return;
+  Object.values(loadCustomBlocks()).forEach(c=>{
+    let b=BLOCKS.find(x=>x.id===c.id);
+    if(!b){ b={id:c.id, p:c.id, kind:'block'}; BLOCKS.push(b); COMPOSED_BLOCKS.push(b); }
+    Object.assign(b,{name:c.name,label:c.label,desc:c.desc,cat:c.cat}); if(c.slot) b.slot=c.slot;
+    P2DOC[b.p]=c.doc; b.blockStyle=c.blockStyle;
+    BLOCK_STATUS[c.id]=c.status||'active';
+    if(!BLOCK_LIB_CATS.includes(b.cat)) BLOCK_LIB_CATS.push(b.cat);
+  });
 }
 // Realistic "used in N documents" counts, shared by the block view and editor
 // so the same block reads consistently everywhere. Common blocks are used more.
@@ -171,7 +193,7 @@ const BLOCK_USAGE = {
   table:26, signature:34, catalogue:6,
   'lh-brand':19, 'lh-contact':8, 'lh-min':5, 'lf-page':17, 'lf-legal':22, 'lf-contact':6,
 };
-function blockUsage(id){ return (id in BLOCK_USAGE) ? BLOCK_USAGE[id] : 6; }
+function blockUsage(id){ return BLOCK_USAGE[id] || 0; }
 
 // Per-block status: Draft (being built), Active (live), Inactive (retired).
 // Default is 'active'; overrides below make the set realistic.
@@ -188,4 +210,5 @@ const BLOCK_STATUS_META = {
   inactive:{cls:'b-deprecated', label:'Inactive'},
 };
 function blockStatusBadge(id){ const m=BLOCK_STATUS_META[blockStatus(id)]||BLOCK_STATUS_META.active; return `<span class="badge ${m.cls}"><span class="b-dot"></span>${m.label}</span>`; }
-if(typeof window!=='undefined'){ window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.COMPOSED_BLOCKS=COMPOSED_BLOCKS; window.BLOCK_LIB_CATS=BLOCK_LIB_CATS; window.BLOCK_ELEMENT_IDS=BLOCK_ELEMENT_IDS; window.blockPreview=blockPreview; window.blockThumb=blockThumb; window.blockSchematic=blockSchematic; window.fitThumbs=fitThumbs; window.blockThumbOverride=blockThumbOverride; window.setBlockThumbOverride=setBlockThumbOverride; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }
+mergeCustomBlocks();
+if(typeof window!=='undefined'){ window.loadCustomBlocks=loadCustomBlocks; window.saveCustomBlock=saveCustomBlock; window.removeCustomBlock=removeCustomBlock; window.mergeCustomBlocks=mergeCustomBlocks; window.BLOCKS=BLOCKS; window.BLOCK_CATS=BLOCK_CATS; window.COMPOSED_BLOCKS=COMPOSED_BLOCKS; window.BLOCK_LIB_CATS=BLOCK_LIB_CATS; window.BLOCK_ELEMENT_IDS=BLOCK_ELEMENT_IDS; window.blockPreview=blockPreview; window.blockThumb=blockThumb; window.blockSchematic=blockSchematic; window.fitThumbs=fitThumbs; window.blockThumbOverride=blockThumbOverride; window.setBlockThumbOverride=setBlockThumbOverride; window.deleteBlock=deleteBlock; window.duplicateBlock=duplicateBlock; window.BLOCK_USAGE=BLOCK_USAGE; window.blockUsage=blockUsage; window.BLOCK_STATUS=BLOCK_STATUS; window.blockStatus=blockStatus; window.BLOCK_STATUS_META=BLOCK_STATUS_META; window.blockStatusBadge=blockStatusBadge; }
