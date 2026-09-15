@@ -56,6 +56,31 @@
   .perm-empty{font-size:12px;color:var(--light);text-align:center;padding:14px 0}
   .add-menu{min-width:200px;max-height:380px;overflow:auto} .add-menu .pal-tag{padding:6px 12px 2px} .add-menu a{padding:7px 12px}
   .kebab-menu.add-menu{left:0;right:auto}
+  /* Blocks from this document + skipped sections */
+  .ws-blocks{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;min-height:0}
+  .ws-blocks .bk{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#1f5a50;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:100px;padding:2px 9px;cursor:pointer;max-width:100%} .ws-blocks .bk:hover{border-color:var(--teal)} .ws-blocks .bk .ms{font-size:13px} .ws-blocks .bk.cur{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .ws-blocks .bk .pg{font-weight:400;color:inherit;opacity:.7}
+  .ws-blocks .none{font-size:11px;color:var(--light)}
+  .ws-docpage .src-region.skipped{opacity:.55;border-style:dotted;border-color:#d4dcd9}
+  .ws-docpage .src-region.skipped::after{content:'– skipped';font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--light);position:absolute;top:6px;right:8px}
+  .ws-docpage .src-region.skipped .src-draft{display:none}
+  .ws-docpage .src-skip{position:absolute;right:6px;top:6px;display:none;align-items:center;gap:3px;border:1px solid var(--border);background:#fff;color:var(--gray);border-radius:6px;padding:3px 7px;font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;cursor:pointer} .ws-docpage .src-skip .ms{font-size:13px}
+  .ws-docpage .src-region:hover .src-skip{display:inline-flex} .ws-docpage .src-region.drafted .src-skip,.ws-docpage .src-region.skipped .src-skip{display:none}
+  .ws-docpage .src-region.skipped:hover .src-unskip{display:inline-flex}
+  .ws-docpage .src-unskip{position:absolute;right:6px;bottom:6px;display:none;font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;color:var(--teal);background:#fff;border:1px solid #bfe0d9;border-radius:6px;padding:3px 7px;cursor:pointer}
+  .ws-docpage .src-warn button,.ws-scan button{margin-left:auto;border:1px solid #f3d9a4;background:#fff;color:#8a5a00;border-radius:6px;padding:2px 8px;font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;cursor:pointer}
+  .ws-scan button{border-color:var(--border);color:var(--gray);margin:0}
+  /* Permission control on the selected element (canvas) */
+  .vb-permctl{position:absolute;top:-13px;left:8px;display:none;gap:0;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,.3);z-index:3;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .vb-el.selected .vb-permctl{display:inline-flex} .vb-el.selected .vb-name{display:none}
+  .vb-permctl button{border:none;background:#3a4a52;color:#dfe7e4;font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:4px 7px;cursor:pointer;border-right:1px solid rgba(255,255,255,.15)} .vb-permctl button:last-child{border-right:none}
+  .vb-permctl button.on{background:var(--teal);color:#fff}
+  .vb-perm.fix{background:#eef1f0;color:#6b7773;display:none} .vb-el.selected .vb-perm.fix{display:inline-flex}
+  /* Client picker */
+  .pick-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+  .pick-list a{display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:9px;padding:9px 10px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink)} .pick-list a:hover{border-color:var(--teal);background:var(--teal-tint)}
+  .pick-list .av{width:28px;height:28px;border-radius:7px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+  .pick-list .sub{font-size:10.5px;color:var(--light);font-weight:400}
   .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
   .ed3-col .card{margin-bottom:14px}
   .ed3-mid{height:100%;min-width:0;display:flex;flex-direction:column}
@@ -379,13 +404,11 @@
       <div class="pg-acts">
         <span class="use-chip" id="useChip" style="display:none"></span>
         <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select><button class="tb-btn" id="editBrandBtn" title="Edit this brand style" style="margin-left:4px"><span class="ms">edit</span></button></span>
-        <a class="btn btn-outline btn-sm" id="saveNewBtn" title="Save this block and start another"><span class="ms" style="font-size:17px">add</span> Save &amp; new</a>
         <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Block</a>
         <span class="lst-kebwrap">
           <button class="pg-kebab" data-kebab aria-label="More actions"><span class="ms">more_vert</span></button>
           <div class="kebab-menu">
-            <a id="draftBtn"><span class="ms">edit_note</span> Save as draft</a>
-            <a id="attachDocBtn"><span class="ms">picture_as_pdf</span> Attach a source document</a>
+            <a id="saveNewBtn"><span class="ms">add</span> Save &amp; start another</a>
             <a id="toDocBtn" href="document-edit.html#type=section"><span class="ms">east</span> Use in a document</a>
             <a id="dupBtn" style="display:none"><span class="ms">content_copy</span> Duplicate</a>
             <div class="kebab-sep" id="del-sep" style="display:none"></div>
@@ -398,33 +421,23 @@
     <div class="ed3 st-on" id="ws">
       <!-- Source document — the client's file, any page, any order. Click a section or select text to make a block. -->
       <div class="ed3-col" id="leftCol">
-        <div class="ws-tabs"><button class="on" data-wtab="doc" id="tabDoc">Document</button><button data-wtab="els">Elements</button><button data-wtab="block">Block</button><button data-wtab="style">Style</button></div>
+        <div class="ws-tabs"><button class="on" data-wtab="doc" id="tabDoc">Document</button><button data-wtab="els">Elements</button><button data-wtab="style">Style</button></div>
         <div class="ws-doc" id="docPane">
         <div class="ws-dochead">
           <span class="ms" style="color:var(--teal);font-size:18px">picture_as_pdf</span>
           <div class="ws-doctitle"><div class="nm" id="docName">—</div><div class="meta" id="docMeta"></div></div>
           <span class="ws-pagenav"><button class="tb-btn" id="pgPrev" title="Previous page"><span class="ms">chevron_left</span></button><span id="pgLbl">p.1 / 9</span><button class="tb-btn" id="pgNext" title="Next page"><span class="ms">chevron_right</span></button></span>
         </div>
+        <div class="ws-blocks" id="docBlocks"></div>
         <div class="ws-pages" id="docPages"></div>
         <div class="ws-docpage" id="docPage"></div>
-        <div class="fhint" style="margin-top:8px">Click a section → <strong>New block</strong>. Drag across any text → <strong>Make block</strong>. ✓ marks what’s already a block.</div>
+        <div class="fhint" style="margin-top:8px">Click a section → <strong>New block</strong>. Drag across any text → <strong>Make block</strong>. Hover a section to <strong>skip</strong> it. ✓ = block · – = skipped.</div>
         <div class="sel-pop" id="selPop" style="display:none"><button id="selNew"><span class="ms">add_box</span> New block from selection</button><button id="selAdd"><span class="ms">playlist_add</span> Add to this block</button></div>
         </div>
         <div class="card" id="elPane" style="display:none">
           <label class="pal-search"><span class="ms">search</span><input id="palQ" placeholder="Search elements…"></label>
           <div class="vb-pal" id="palette"></div>
           <div class="fhint" style="margin-top:10px">Drag onto the block, or click to add. Text comes from the document — select it there.</div>
-        </div>
-        <div class="card" id="blockCard" style="display:none">
-          <div class="insp-sec"><div class="insp-h" style="cursor:default">Elements &amp; client permission</div>
-            <div class="fhint" style="margin:-4px 0 8px">Fixed: words set by the block · Editable: client can rewrite · Locked: kept in place.</div>
-            <div class="perm-list" id="permList"></div>
-          </div>
-          <div class="insp-sec"><div class="insp-h" style="cursor:default">Where it lives</div>
-            <div class="ws-owner" id="blockOwner"></div>
-            <label class="ws-check" style="margin-top:8px"><input type="checkbox" id="b-share"> <span>Also available to all clients</span></label>
-            <div class="fhint" style="margin-top:6px">Category, internal name and helper text are set when you save (<a class="lnk" id="blockDetailsBtn">edit now</a>).</div>
-          </div>
         </div>
         <div class="card" id="styleCard">
           <h3 class="ed-h">Style</h3>
@@ -591,10 +604,20 @@
     </div>
     <div class="fld"><label for="b-name">Internal name <span class="fld-opt">· optional</span></label><input class="fin" id="b-name" placeholder="Defaults to the name"></div>
     <div class="fld"><label for="b-desc">Helper description <span class="fld-opt">· optional</span></label><input class="fin" id="b-desc" placeholder="e.g. Our safety commitment, from the WHS plan."></div>
+    <label class="ws-check"><input type="checkbox" id="b-share"> <span>Share as a generic template <span class="fld-opt">· other clients can use it — check it holds nothing specific to this client</span></span></label>
     <div class="fld" id="previewFld" style="display:none"><label>Preview image <span class="fld-opt">· optional</span></label>
       <div class="thumbovr"><div class="thumbovr-box" id="thumbOvrBox"></div><div class="thumbovr-acts"><label class="btn btn-outline btn-sm"><span class="ms" style="font-size:16px">image</span> Upload image<input type="file" id="thumbFile" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label><a class="btn btn-outline btn-sm" id="thumbAuto" style="display:none"><span class="ms" style="font-size:16px">auto_awesome</span> Use auto</a></div></div>
     </div>
     <div class="cfm-acts"><a class="btn btn-outline" id="svCancel">Cancel</a><a class="btn btn-primary" id="svConfirm"><span class="ms" style="font-size:17px">save</span> Save block</a></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pickModal">
+  <div class="cfm" style="text-align:left;max-width:440px">
+    <h3>Who is this block for?</h3>
+    <div class="sub" style="color:var(--gray);font-size:12.5px;margin:-2px 0 14px">Blocks belong to a client and are drafted from their documents. Pick the client to open their file beside the canvas.</div>
+    <div class="pick-list" id="pickList"></div>
+    <div class="cfm-acts"><a class="btn btn-outline" href="blocks.html">Back to blocks</a><a class="btn btn-outline" id="pickGeneral"><span class="ms" style="font-size:17px">public</span> General library block</a></div>
   </div>
 </div>
 
@@ -727,7 +750,9 @@ function pageInit(){
 
   // ---- Elements tab: the palette (drag onto the block, or click to add). A block normally starts from the document.
   const byTag={};
-  PRIMITIVES.forEach(p=>{ (byTag[p.tag]=byTag[p.tag]||[]).push(p); });
+  // Block-level parts only — cover, contents, page break, button, signature, stat, divider, spacer are document/template concerns.
+  const BLOCK_PARTS=new Set(['heading','subheading','paragraph','list','quote','callout','image','table','keyvalue','field']);
+  PRIMITIVES.filter(p=>BLOCK_PARTS.has(p.id)).forEach(p=>{ (byTag[p.tag]=byTag[p.tag]||[]).push(p); });
   document.getElementById('palette').innerHTML =
     `<div class="pal-tag">Structure</div><div class="vb-widget struct" draggable="true" data-row="2" title="A row with two columns"><span class="ms">view_column</span>2 Columns</div><div class="vb-widget struct" draggable="true" data-row="3" title="A row with three columns"><span class="ms">view_week</span>3 Columns</div>`
     + Object.entries(byTag).map(([tag,ps])=>`<div class="pal-tag">${tag}</div>`+ps.map(p=>`<div class="vb-widget" draggable="true" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('')).join('');
@@ -753,31 +778,14 @@ function pageInit(){
     ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='');   // preview override only for a saved block
   }
   document.getElementById('dupBtn').addEventListener('click',()=>{ if(cur){ leaving=true; duplicateBlock(cur.label, cur.id); } });
-  document.getElementById('blockOwner').innerHTML = clientId ? `<span class="ms">apartment</span> Built for <strong>&nbsp;${tenant.name}</strong>` : `<span class="ms">public</span> General library — not tied to a client`;
   // Left panel tabs: Document · Elements · Block · Style
-  const PANES={doc:'docPane',els:'elPane',block:'blockCard',style:'styleCard'};
+  const PANES={doc:'docPane',els:'elPane',style:'styleCard'};
   function showTab(k){
     document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.wtab===k));
     Object.entries(PANES).forEach(([key,id])=>{ document.getElementById(id).style.display = key===k?'':'none'; });
   }
   document.querySelectorAll('.ws-tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.wtab)));
   // Elements & permissions list — every element in the block with its Fixed/Editable/Locked, click to select.
-  function renderPermList(){
-    const host=document.getElementById('permList'), rows=[];
-    doc.forEach((row,r)=>row.cols.forEach((col,c)=>col.forEach((el,k)=>{
-      const cnt=el.content||{}; const snippet=(cnt.title||cnt.body||(cnt.items&&cnt.items[0])||(cnt.pairs&&cnt.pairs[0]&&cnt.pairs[0][0])||(cnt.value)||'').toString().slice(0,60);
-      const on = sel && sel.r===r && sel.c===c && sel.k===k;
-      rows.push(`<div class="perm-row${on?' on':''}" data-r="${r}" data-c="${c}" data-k="${k}"><div><div class="pn"><span class="ms">${PRIM_ICON[el.id]||'widgets'}</span>${ELEMS[el.id]||el.id}</div><div class="pt">${snippet||'&nbsp;'}</div></div>
-        <div class="seg" data-permseg>${['fixed','editable','locked'].map(p=>`<button data-p="${p}" class="${(el.perm||'fixed')===p?'on':''}" title="${p==='fixed'?'Words set by the block':p==='editable'?'Client can rewrite':'Kept in place'}">${p[0].toUpperCase()+p.slice(1)}</button>`).join('')}</div></div>`);
-    })));
-    host.innerHTML = rows.length ? rows.join('') : `<div class="perm-empty">No elements yet — click a section of the document, select some text, or add an element.</div>`;
-    host.querySelectorAll('.perm-row').forEach(rw=>{
-      const p={r:+rw.dataset.r,c:+rw.dataset.c,k:+rw.dataset.k};
-      rw.addEventListener('click',e=>{ if(e.target.closest('[data-permseg]')) return; selectEl(p.r,p.c,p.k); renderPermList(); });
-      rw.querySelectorAll('[data-permseg] button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); doc[p.r].cols[p.c][p.k].perm=b.dataset.p; render(); commit(); }));
-    });
-  }
-
   // ---- Render ----
   function elBody(el){
     if(el.id==='field'){
@@ -802,9 +810,10 @@ function pageInit(){
     const perm = el.perm||'fixed';
     const cls = 'vb-el'+(on?' selected':'')+(perm==='editable'?' is-editable':'')+(perm==='locked'?' is-locked':'');
     const badge = perm==='editable' ? '<span class="vb-perm edit"><span class="ms">edit</span>Editable</span>'
-      : perm==='locked' ? '<span class="vb-perm lock"><span class="ms">lock</span>Locked</span>' : '';
+      : perm==='locked' ? '<span class="vb-perm lock"><span class="ms">lock</span>Locked</span>' : '<span class="vb-perm fix"><span class="ms">push_pin</span>Fixed</span>';
+    const permCtl = `<div class="vb-permctl" data-permctl title="What the client may do with this element">${['fixed','editable','locked'].map(p=>`<button data-p="${p}" class="${perm===p?'on':''}" title="${p==='fixed'?'Words set by the block — client can’t change them':p==='editable'?'Client can rewrite the words':'Kept in place — client can’t move or remove it'}">${p[0].toUpperCase()+p.slice(1)}</button>`).join('')}</div>`;
     return `<div class="${cls}" data-id="${el.id}" data-r="${r}" data-c="${c}" data-k="${k}">
-      <div class="vb-name"><span class="ms" style="font-size:12px">${PRIM_ICON[el.id]||'widgets'}</span>${ELEMS[el.id]||el.id}</div>
+      ${permCtl}<div class="vb-name"><span class="ms" style="font-size:12px">${PRIM_ICON[el.id]||'widgets'}</span>${ELEMS[el.id]||el.id}</div>
       <div class="vb-tools">
         <span class="tb grab" data-handle title="Drag to move"><span class="ms">drag_indicator</span></span>
         <span class="tb" data-dup title="Duplicate"><span class="ms">content_copy</span></span>
@@ -842,7 +851,7 @@ function pageInit(){
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
     const sc=document.getElementById('srcChip'); sc.style.display=source?'':'none'; sc.innerHTML=source?`<span class="ms">picture_as_pdf</span> From ${source}`:'';
-    wire(); wireText(); renderPermList(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
+    wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
   function loadTemplate(key){ doc = key ? normDoc(clone(P2DOC[key]||[])) : []; sel=null; render(); commit(); }
 
@@ -1172,7 +1181,7 @@ function pageInit(){
   function applySelection(){
     page.querySelectorAll('.vb-el.selected').forEach(e=>e.classList.remove('selected'));
     if(sel){ const node=page.querySelector(`.vb-el[data-r="${sel.r}"][data-c="${sel.c}"][data-k="${sel.k}"]`); if(node) node.classList.add('selected'); else sel=null; }
-    renderPill(); if(document.getElementById('permList')) renderPermList();
+    renderPill();
   }
   function renderPill(){
     const el=document.getElementById('selPill');
@@ -1186,7 +1195,8 @@ function pageInit(){
   function wire(){
     page.querySelectorAll('.vb-el').forEach(el=>{
       const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k;
-      el.addEventListener('click',e=>{ if(clientView || e.target.closest('[data-handle],[data-dup],[data-del]'))return; e.stopPropagation(); selectEl(r,c,k); });
+      el.addEventListener('click',e=>{ if(clientView || e.target.closest('[data-handle],[data-dup],[data-del],[data-permctl]'))return; e.stopPropagation(); selectEl(r,c,k); });
+      el.querySelectorAll('[data-permctl] button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); doc[r].cols[c][k].perm=b.dataset.p; const keep={r,c,k}; render(); sel=keep; applySelection(); commit(); }));
       el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();delEl({r,c,k});});
       el.querySelector('[data-dup]').addEventListener('click',e=>{e.stopPropagation();dupEl({r,c,k});});
       const h=el.querySelector('[data-handle]');
@@ -1368,7 +1378,7 @@ function pageInit(){
     {t:'2. Company Overview', r:[{id:'p2-overview',h:'Who we are',p:'Northside Civil is a Brisbane-based civil contractor delivering road, drainage and traffic-management packages for state and local government since 2011. We self-perform the majority of our scope with a directly employed workforce of 48.'},{id:'p2-people',h:'Key personnel',rows:[['Project Director','Kenzie May'],['HSEQ Manager','Sam Ortiz'],['Site Supervisor','Dana Reilly']]}]},
     {t:'3. Roles & Responsibilities', r:[{id:'p3-roles',h:'Responsibilities',items:['Directors — provide resources and set safety expectations','HSEQ Manager — maintains the system and audits sites','Supervisors — daily pre-starts, SWMS sign-on, incident reporting','All workers — follow SWMS, report hazards']}]},
     {t:'4. Safety Management System', r:[{id:'p4-sms',h:'Our commitment',p:'Northside Civil operates a certified Safety Management System (AS/NZS ISO 45001) covering all civil, drainage and traffic-management works. Every project is delivered under a site-specific WHS Management Plan reviewed by our HSEQ Manager before mobilisation.'},{id:'p4-stats',h:'Safety performance (last 24 months)',rows:[['Lost-time injuries','0'],['Total recordable injury frequency rate','2.1'],['Toolbox talks delivered','412'],['Site inductions completed','1,180']]},{id:'p4-controls',h:'Key controls on every site',items:['Daily pre-start and SWMS sign-on','Exclusion zones for plant and live traffic','Certified traffic controllers on all road interfaces','Weekly HSEQ site audit with corrective-action register']}]},
-    {t:'5. Risk Management', r:[{id:'p5-risk',h:'Hazard identification and control',warn:'Ray merged two sections here — check the split',p:'Hazards are identified at tender, at mobilisation and daily at pre-start. Controls follow the hierarchy of control and are recorded in the project risk register. High-risk construction work requires a signed SWMS before it starts. Incidents are reported within 24 hours and investigated by the HSEQ Manager, with corrective actions tracked to closure.'}]},
+    {t:'5. Risk Management', r:[{id:'p5-risk',h:'Hazard identification and control',warn:'Auto-split may be wrong — this looks like two sections',splitAt:'Incidents are reported',splitTitle:'Incident reporting',p:'Hazards are identified at tender, at mobilisation and daily at pre-start. Controls follow the hierarchy of control and are recorded in the project risk register. High-risk construction work requires a signed SWMS before it starts. Incidents are reported within 24 hours and investigated by the HSEQ Manager, with corrective actions tracked to closure.'}]},
     {t:'6. Training & Competency', r:[{id:'p6-training',h:'Training',items:['White Card and site induction for every worker','Traffic controller and plant tickets verified before start','Annual first-aid and fire-warden refreshers']},{id:'p6-matrix',h:'Competency matrix',rows:[['Excavator','12 ticketed operators'],['Roller','8 ticketed operators'],['Traffic control','19 accredited']]}]},
     {t:'7. Site Layout Plan', scan:true},
     {t:'8. Emergency Response', r:[{id:'p8-emerg',h:'Emergency procedures',p:'Each site maintains an Emergency Response Plan with assembly points, first-aid kits and trained wardens. Emergency contacts are displayed at the site office and reviewed at every induction.'}]},
@@ -1377,12 +1387,14 @@ function pageInit(){
   const srcDoc = clientId && SRC_DOCS[docId] ? SRC_DOCS[docId] : null;
   const DSKEY='tf_docs_'+(clientId||'none');
   let docState={}; try{ docState=JSON.parse(localStorage.getItem(DSKEY))||{}; }catch(e){}
-  if(srcDoc && !docState[docId]) docState[docId]={done:{}};
+  if(srcDoc && !docState[docId]) docState[docId]={done:{},skip:{}};
   const saveDocState=()=>{ try{ localStorage.setItem(DSKEY, JSON.stringify(docState)); }catch(e){} };
   let regionsUsed = (existing && existing.regions) ? existing.regions.slice() : [];
   let curPage = 0;
   const regionOf=(id)=>{ for(const [i,pg] of (srcDoc?srcDoc.pages:[]).entries()){ const r=(pg.r||[]).find(x=>x.id===id); if(r) return {r,n:i+1}; } return null; };
   const provenance=n=>srcDoc.name.replace(/\.(pdf|docx)$/i,'')+' · p.'+n;
+  // Provenance from the regions actually used: "WHS Management Plan · p.4–5" (a block can span pages).
+  const provenanceOf=()=>{ const ps=[...new Set(regionsUsed.map(r=>{ const f=regionOf(r); return f?f.n:null; }).filter(Boolean))].sort((a,b)=>a-b); if(!ps.length) return source; const runs=[]; ps.forEach(n=>{ const l=runs[runs.length-1]; if(l&&l[1]===n-1) l[1]=n; else runs.push([n,n]); }); return srcDoc.name.replace(/.(pdf|docx)$/i,'')+' · p.'+runs.map(r=>r[0]===r[1]?r[0]:r[0]+'–'+r[1]).join(', '); };
   function regionEls(r){
     const mk=(id,content)=>{ const e=mkEl(id); e.content=content; return e; };
     const els=[mk('subheading',{title:r.h})];
@@ -1392,31 +1404,52 @@ function pageInit(){
     if(r.quote) els.push(mk('quote',{body:r.quote}));
     return els;
   }
+  // Sections are "handled" when they're a block or skipped — that's the number that can reach the end.
+  const secStats=()=>{ const st=docState[docId]; const total=srcDoc.pages.reduce((s,p)=>s+(p.r||[]).length,0); const handledDone=Object.keys(st.done).length, blocks=new Set(Object.values(st.done)).size, skipped=Object.keys(st.skip||{}).filter(k=>!k.startsWith('page-')).length; return {total, done:blocks, skipped, handled:handledDone+skipped}; };
   function renderDocHead(){
     if(!srcDoc) return;
-    const done=Object.keys(docState[docId].done).length, total=srcDoc.pages.reduce((s,p)=>s+(p.r||[]).length,0);
+    const st=docState[docId], s=secStats();
     document.getElementById('docName').textContent=srcDoc.name;
-    document.getElementById('docMeta').textContent=`${srcDoc.pages.length} pages · ${done} of ${total} sections are blocks`;
+    document.getElementById('docMeta').textContent = s.handled>=s.total ? `${srcDoc.pages.length} pages · all ${s.total} sections handled — ${s.done} blocks, ${s.skipped} skipped` : `${srcDoc.pages.length} pages · ${s.handled} of ${s.total} sections handled · ${s.done} blocks`;
     document.getElementById('pgLbl').textContent=`p.${curPage+1} / ${srcDoc.pages.length}`;
-    document.getElementById('docPages').innerHTML=srcDoc.pages.map((pg,i)=>`<button class="${i===curPage?'on':''}${(pg.r||[]).some(r=>docState[docId].done[r.id])?' done':''}" data-pg="${i}" title="${pg.t}">${i+1}</button>`).join('');
+    document.getElementById('docPages').innerHTML=srcDoc.pages.map((pg,i)=>`<button class="${i===curPage?'on':''}${(pg.r||[]).some(r=>st.done[r.id])?' done':''}" data-pg="${i}" title="${pg.t}">${i+1}</button>`).join('');
     document.querySelectorAll('#docPages button').forEach(b=>b.addEventListener('click',()=>gotoPage(+b.dataset.pg)));
-    document.getElementById('pgSub').innerHTML=`<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">apartment</span> ${tenant.name} · ${srcDoc.name}`;
+    // Blocks from this document — the memory of the file, click to open.
+    const ids=[...new Set(Object.values(st.done))], host=document.getElementById('docBlocks');
+    host.innerHTML = ids.length ? ids.map(bid=>{ const b=BLOCKS.find(x=>x.id===bid); if(!b) return ''; const pages=[...new Set((b.regions||[]).map(r=>{ const f=regionOf(r); return f?f.n:null; }).filter(Boolean))]; return `<span class="bk${cur&&cur.id===bid?' cur':''}" data-open="${bid}" title="Open this block"><span class="ms">grid_view</span>${b.label}${pages.length?` <span class="pg">p.${pages.join(',')}</span>`:''}</span>`; }).join('') : `<span class="none">No blocks from this document yet.</span>`;
+    host.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>{ const bid=el.dataset.open; if(cur&&cur.id===bid) return; leaveGuard(()=>{ leaving=true; location.href=location.pathname+'#id='+bid+'&client='+clientId+'&doc='+docId; }); }));
+    document.getElementById('pgSub').innerHTML=`<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">apartment</span> Built for ${tenant.name} · ${srcDoc.name} <span class="muted" title="A block is a reusable section of a tender — the client's words, marked for what they may change">· a block is a reusable section of a tender</span>`;
   }
   function renderDocPage(){
     if(!srcDoc) return;
-    const pg=srcDoc.pages[curPage], host=document.getElementById('docPage'), done=docState[docId].done;
-    if(pg.scan){ host.innerHTML=`<div class="src-hd">${pg.t}</div><div class="ws-scan"><div class="fake"></div><span class="ms">image_not_supported</span>Ray couldn’t read this page — it’s a drawing.<span style="font-size:11.5px;color:var(--light)">Select text on another page, or add an Image element to the block.</span></div>`; return; }
-    host.innerHTML=`<div class="src-hd">${pg.t}</div>`+pg.r.map(r=>`<div class="src-region${done[r.id]?' drafted':''}${r.warn?' warn':''}" data-region="${r.id}" title="${done[r.id]?'Open this block':'Make a block from this section'}">
-        ${r.warn?`<div class="src-warn"><span class="ms">warning</span>${r.warn}</div>`:''}<div class="src-h2">${r.h}</div>
+    const pg=srcDoc.pages[curPage], host=document.getElementById('docPage'), st=docState[docId], done=st.done, skip=st.skip=st.skip||{};
+    if(pg.scan){ host.innerHTML=`<div class="src-hd">${pg.t}</div><div class="ws-scan"><div class="fake"></div><span class="ms">image_not_supported</span>Not readable — this page is a drawing.<span style="font-size:11.5px;color:var(--light)">Select text on another page, or add an Image element to the block.</span>${skip['page-'+curPage]?`<span class="src-chip" style="color:var(--gray)">– page skipped</span>`:`<button data-skippage><span class="ms" style="font-size:13px;vertical-align:-2px">block</span> Skip this page</button>`}</div>`;
+      host.querySelector('[data-skippage]')?.addEventListener('click',()=>{ skip['page-'+curPage]=true; saveDocState(); renderDocPage(); showToast('Page skipped — it won’t count against the document'); });
+      return; }
+    host.innerHTML=`<div class="src-hd">${pg.t}</div>`+pg.r.map(r=>`<div class="src-region${done[r.id]?' drafted':''}${skip[r.id]?' skipped':''}${r.warn?' warn':''}" data-region="${r.id}" title="${done[r.id]?'Open this block':skip[r.id]?'Skipped — not reusable':'Make a block from this section'}">
+        ${r.warn?`<div class="src-warn"><span class="ms">warning</span>${r.warn}${r.splitAt?`<button data-split title="Split at the sentence Auto-split missed">Split here</button>`:''}</div>`:''}<div class="src-h2">${r.h}</div>
         ${r.p?`<p>${r.p}</p>`:''}${r.items?`<ul>${r.items.map(i=>`<li>${i}</li>`).join('')}</ul>`:''}${r.rows?`<table>${r.rows.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join('')}</table>`:''}${r.quote?`<p style="font-style:italic">“${r.quote}”</p>`:''}
+        <button class="src-skip" data-skip title="Not reusable — boilerplate, contents, project-specific"><span class="ms">block</span> Skip</button><button class="src-unskip" data-unskip>Un-skip</button>
         <button class="src-draft"><span class="ms">auto_awesome</span> ${hasContent()?'New block / add':'New block'}</button></div>`).join('');
-    host.querySelectorAll('.src-region').forEach(reg=>reg.addEventListener('click',()=>{
-      if(window.getSelection && String(window.getSelection()).trim().length>10) return;   // a drag-select — handled by the mouseup popover
+    host.querySelectorAll('.src-region').forEach(reg=>{
       const id=reg.dataset.region, r=pg.r.find(x=>x.id===id);
-      if(done[id]){ leaveGuard(()=>{ leaving=true; location.href='block-edit.html#id='+done[id]+'&client='+clientId+'&doc='+docId; }); return; }
-      if(hasContent()) showPop(reg.getBoundingClientRect(), ()=>newBlockFrom(r,[id]), ()=>addToBlock(regionEls(r),[id],curPage+1));
-      else newBlockFrom(r,[id]);
-    }));
+      reg.querySelector('[data-skip]').addEventListener('click',e=>{ e.stopPropagation(); skip[id]=true; saveDocState(); renderDocPage(); renderDocHead(); });
+      reg.querySelector('[data-unskip]').addEventListener('click',e=>{ e.stopPropagation(); delete skip[id]; saveDocState(); renderDocPage(); renderDocHead(); });
+      reg.querySelector('[data-split]')?.addEventListener('click',e=>{ e.stopPropagation(); splitRegion(pg, r); });
+      reg.addEventListener('click',()=>{
+        if(window.getSelection && String(window.getSelection()).trim().length>10) return;   // a drag-select — handled by the mouseup popover
+        if(skip[id]) return;
+        if(done[id]){ if(cur&&cur.id===done[id]) return; leaveGuard(()=>{ leaving=true; location.href=location.pathname+'#id='+done[id]+'&client='+clientId+'&doc='+docId; }); return; }
+        if(hasContent()) showPop(reg.getBoundingClientRect(), ()=>newBlockFrom(r,[id]), ()=>addToBlock(regionEls(r),[id],curPage+1));
+        else newBlockFrom(r,[id]);
+      });
+    });
+  }
+  // "Split here": the flagged section becomes two — text before/after the sentence Auto-split missed.
+  function splitRegion(pg, r){
+    const i=pg.r.indexOf(r), at=r.p.indexOf(r.splitAt); if(i<0||at<0) return;
+    const a={id:r.id, h:r.h, p:r.p.slice(0,at).trim()}, b={id:r.id+'-b', h:r.splitTitle||'Incident reporting', p:r.p.slice(at).trim()};
+    pg.r.splice(i,1,a,b); renderDocPage(); renderDocHead(); showToast('Split into two sections');
   }
   function gotoPage(i){ curPage=Math.max(0,Math.min(srcDoc.pages.length-1,i)); renderDocHead(); renderDocPage(); hidePop(); }
   function newBlockFrom(r, ids){
@@ -1425,7 +1458,7 @@ function pageInit(){
   }
   function addToBlock(els, ids, pageNo){
     doc.push({cols:[els]}); ids.forEach(i=>{ if(!regionsUsed.includes(i)) regionsUsed.push(i); });
-    source = source ? (source.includes('p.'+pageNo)?source:source.replace(/ · p\..*$/,'')+' · p.'+pageNo) : provenance(pageNo);
+    source = provenanceOf();
     sel=null; render(); commit(); renderDocPage(); hidePop();
     showToast('Added from '+provenance(pageNo)+' — mark what the client may edit');
   }
@@ -1449,9 +1482,17 @@ function pageInit(){
   document.addEventListener('mousedown',e=>{ if(!e.target.closest('#selPop')) hidePop(); });
   document.getElementById('pgPrev').addEventListener('click',()=>gotoPage(curPage-1));
   document.getElementById('pgNext').addEventListener('click',()=>gotoPage(curPage+1));
-  document.getElementById('attachDocBtn').addEventListener('click',()=>{ const t=tenant||TENANTS[0]; leaveGuard(()=>{ leaving=true; location.href='block-edit.html#'+(cur?'id='+cur.id+'&':'')+'client='+t.id+'&doc=whs'; }); });
   if(srcDoc){ if(existing && existing.regions && existing.regions.length){ const f=regionOf(existing.regions[0]); if(f) curPage=f.n-1; } renderDocHead(); renderDocPage(); }
-  else { document.getElementById('ws').classList.add('no-doc'); showTab('els'); }
+  else {
+    document.getElementById('ws').classList.add('no-doc'); showTab('els');
+    document.getElementById('pgSub').innerHTML = existing ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">public</span> General library block · not tied to a client` : 'A block is a reusable section of a tender.';
+    if(!existing){   // a new block belongs to a client — pick one before anything else
+      document.getElementById('pickList').innerHTML=TENANTS.map(t=>`<a data-pick="${t.id}"><span class="av" style="background:${t.brand.primary}">${t.initials}</span><span>${t.name}<div class="sub">${brandMeta(t).files.length?'Documents received':'Waiting on documents'}</div></span></a>`).join('');
+      document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{ leaving=true; location.href=location.pathname+'#client='+a.dataset.pick+'&doc=whs'; location.reload(); }));
+      document.getElementById('pickGeneral').addEventListener('click',()=>document.getElementById('pickModal').classList.remove('open'));
+      document.getElementById('pickModal').classList.add('open');
+    }
+  }
 
   // ---- Client view: what the client sees. Only Editable sections take a cursor; Locked shows its padlock; nothing else responds.
 
@@ -1484,7 +1525,6 @@ function pageInit(){
   });
   document.getElementById('svCancel').addEventListener('click',()=>{ closeSaveDialog(); pendingNew=false; });
   saveModal.addEventListener('click',e=>{ if(e.target===saveModal){ closeSaveDialog(); pendingNew=false; } });
-  document.getElementById('blockDetailsBtn').addEventListener('click',()=>openSaveDialog(null));
   let pendingNew=false;
   function save(published, thenNew){
     if(!hasContent()){ showToast('Add something to the block first'); return; }
@@ -1513,9 +1553,8 @@ function pageInit(){
     ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='none');
     render(); syncBar(); history=[]; hidx=-1; pushHist(); base=snap(); }
   document.getElementById('saveBtn').addEventListener('click',()=>save(true,false));
-  document.getElementById('draftBtn').addEventListener('click',()=>save(false,false));
   document.getElementById('saveNewBtn').addEventListener('click',()=>save(true,true));
-  document.getElementById('delBtn').addEventListener('click',()=>{ if(cur){ leaving=true; deleteBlock(cur.label, cur.id); } });
+  document.getElementById('delBtn').addEventListener('click',()=>{ if(!cur) return; if(srcDoc){ const d=docState[docId].done; Object.keys(d).forEach(k=>{ if(d[k]===cur.id) delete d[k]; }); saveDocState(); } leaving=true; deleteBlock(cur.label, cur.id); });
 
   (function(){ // Kebab menus: header overflow + Add element
     document.querySelectorAll('[data-kebab]').forEach(kb=>{ const menu=kb.parentElement.querySelector('.kebab-menu'); if(!menu) return;
@@ -1544,6 +1583,8 @@ function pageInit(){
     if(!hasContent()){ doc=normDoc([{cols:[['image','heading'],['paragraph']]}]); sel=null; }
     document.getElementById('b-label').placeholder = wantSlot==='footer'?'Name this footer…':'Name this letterhead…';
   }
+  // Style tab: brand does the styling — Layout and Fill live under Advanced with spacing/type/borders.
+  (function(){ const adv=document.getElementById('inspAdv'); if(!adv) return; const first=adv.querySelector('.insp-sec'); ['layout','fill'].forEach(k=>{ const s=document.querySelector('#styleCard .insp-sec[data-sec="'+k+'"]'); if(s) adv.insertBefore(s, first); }); })();
   buildBrandSelect();
   if(tenant){ const i=BRANDS.findIndex(x=>x.id===tenant.id); if(i>0){ brandIdx=i; brand=tenant.brand; activeTenant=tenant; document.getElementById('brandSel').value=String(i); updateEditBtn(); } }   // a client's block previews in their brand by default
   applyBrand(); initStyle(); render(); syncBar(); pushHist(); base=snap(); applyPanels(); applyStationeryUI(); resumeDraft();

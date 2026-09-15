@@ -112,3 +112,26 @@ head-contractor kit library, brand-check score.
 
 Multi-select · per-element horizontal alignment · smarter Ray · deeper version history · a client fact
 store (ABN/licences/insurance) that blocks reference · block analytics / win-rate · starter library per trade.
+
+## Block workspace — rules the mockup now models
+
+- **Sections are handled, not blocks**: a section is handled when it's a block *or* skipped. "8 of 15 sections
+  handled · 6 blocks" — the denominator can reach the end; one block can cover several sections.
+- **Blocks from this document** strip at the top of the Document tab is the memory of the file; deleting a block
+  clears its ✓ and drops it from the strip.
+- **Auto-split may be wrong** → *Split here* makes two sections; **Not readable (drawing)** → *Skip this page*.
+- **A block belongs to a client**: New Block asks *Who is this block for?* before anything else; *General library
+  block* is the only client-less path (Tenderfy's seeded blocks).
+- **Provenance is by region**, shown as a page range: *From WHS Management Plan · p.4–5*.
+- **Permissions live on the element**: select it → Fixed / Editable / Locked in its toolbar; Fixed also shows a
+  badge while selected. No Block tab.
+- **Sharing is a save decision**: *Share as a generic template* sits in the Save dialog with category/name/helper,
+  with a warning that it must hold nothing client-specific.
+- **One save**: *Save Block*; *Save & start another* in the kebab. Autosave is the draft.
+- Elements are block-level parts only (heading, sub-heading, paragraph, list, quote, callout, image, table,
+  key/value, merge field, 2/3 columns). Style shows permission, image source and table shape; layout, fill,
+  spacing, type and borders live under *Advanced styling*.
+
+Parked for the real build: **source updated** — when a client uploads v2 of a document, blocks whose regions
+changed are flagged *review*; **block-in-use check** — drop a block into a real tender with merge fields resolved
+before calling it done; multiple documents per client; real upload.
