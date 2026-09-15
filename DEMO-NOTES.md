@@ -4,28 +4,43 @@ Static prototype. Everything persists in the browser only (localStorage). Two au
 **developers** (what to build) and **prospects** (why it matters). The script below is the prospect demo;
 the "For developers" notes are what the mockup deliberately fakes.
 
-## The 5-click demo (≈2 minutes)
+## The block workspace (how it's meant to be used)
 
-Open `block-edit.html` (New Block).
+One screen, no steps: the client's document on the left, the block on the right, the block panel
+(Block · Style) on the far right. Entry: Client detail → *Original files* → **Build blocks from these**
+(`block-edit.html#client=taylor&doc=whs`). From the Blocks list you get the same screen with no document;
+*Attach a source document* in the kebab opens one.
 
-1. **Source document → "Our commitment" → Draft from this.**
-   Ray lifts the client's own wording off their WHS Management Plan and lays it out. The bar shows
-   *From WHS Management Plan · p.4*. The block is named after the section.
+You can, in any order:
+- click any section of any page → **New block** (or **Add to this block** if one is open)
+- drag across any text → **New block from selection** / **Add to this block**
+- **+ Add element** for anything not in the document; every element's words are editable inline
+- set **Fixed / Editable / Locked** per element in the *Elements & client permission* list (or on the canvas)
+- **Save** (stays here; the section gets a ✓ on the document) or **Save & new**
+- click a ✓ section to reopen that block
+
+The document is a map, not a to-do list: "2 of 14 sections are blocks" in its header, a dot on pages that
+have blocks, one section deliberately flagged *Ray merged two sections — check the split*, one page that
+*Ray couldn't read* (a drawing). Blocks save against the client (*Built for Taylor Builders*) with the
+regions they came from; *Also available to all clients* is a checkbox.
+
+## The 2-minute demo
+
+1. Client detail (Taylor) → **Build blocks from these**. Their WHS plan opens beside an empty block.
    > "We start from your documents, not a blank page."
-2. **Click the paragraph → Client permission → Editable.** Dashed outline + badge.
-   > "You decide what your estimators can change."
-3. **Click the sub-heading → Locked.** Padlock badge.
-   > "…and what they can't."
-4. **Client view** (toolbar). Only the dashed paragraph takes a cursor; the heading is locked; everything
-   else is read-only.
+2. Page 4 → click **Our commitment**. Their words land in the block, named after the section,
+   *From WHS Management Plan · p.4*.
+3. Click **Safety performance** → *Add to this block*. A key/value table joins it.
+4. In the panel, set the paragraph **Editable**, the heading **Locked**.
+   > "You decide what your estimators can change — and what they can't."
+5. **Client view**. Only the dashed paragraph takes a cursor.
    > "This is exactly what your team sees."
-5. **Preview style → pick a client.** Fonts and colours switch.
-   > "Same block, your brand — no re-formatting, ever."
+6. **Save & new** → both sections show ✓ on the document. Drag across a sentence on page 2 → *New block
+   from selection*.
+   > "Any text, any page, any order."
 
-Then **Save Block → Publish**. It appears in the Blocks list and in the Document builder palette.
-
-Optional beats: *Source document → "Safety performance" → Draft from this* (a key/value table);
-*Rows & columns → + Row*; upload a real photo into an Image element.
+Optional: Preview style → another client (same block, their brand); page 7 (the drawing Ray can't read);
+page 5 (the flagged merge).
 
 ## Glossary — say this, not that
 
