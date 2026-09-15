@@ -6,7 +6,7 @@ the "For developers" notes are what the mockup deliberately fakes.
 
 ## The block workspace (how it's meant to be used)
 
-One screen, no steps: the client's document on the left, the block on the right, the block panel
+One screen, no steps: a tabbed panel on the left (Document · Elements · Block · Style), the block on the right.
 Entry: Client detail → *Original files* → **Build blocks from these**
 (`block-edit.html#client=taylor&doc=whs`). From the Blocks list you get the same screen with no document;
 *Attach a source document* in the kebab opens one.
