@@ -7,16 +7,16 @@ the "For developers" notes are what the mockup deliberately fakes.
 ## The block workspace (how it's meant to be used)
 
 One screen, no steps: the client's document on the left, the block on the right, the block panel
-(Block · Style) on the far right. Entry: Client detail → *Original files* → **Build blocks from these**
+Entry: Client detail → *Original files* → **Build blocks from these**
 (`block-edit.html#client=taylor&doc=whs`). From the Blocks list you get the same screen with no document;
 *Attach a source document* in the kebab opens one.
 
 You can, in any order:
 - click any section of any page → **New block** (or **Add to this block** if one is open)
 - drag across any text → **New block from selection** / **Add to this block**
-- **+ Add element** for anything not in the document; every element's words are editable inline
-- set **Fixed / Editable / Locked** per element in the *Elements & client permission* list (or on the canvas)
-- **Save** (stays here; the section gets a ✓ on the document) or **Save & new**
+- **Elements** tab for anything not in the document (drag or click); every element’s words are editable inline
+- set **Fixed / Editable / Locked** per element in the **Block** tab (or on the canvas)
+- **Save** — the first save asks for name · category · helper in a dialog; later saves are one click. Stays here; the section gets a ✓. **Save & new** clears the canvas
 - click a ✓ section to reopen that block
 
 The document is a map, not a to-do list: "2 of 14 sections are blocks" in its header, a dot on pages that

@@ -14,10 +14,10 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
-  .ed3{display:grid;grid-template-columns:400px minmax(0,1fr) 300px;gap:16px;align-items:stretch;height:calc(100vh - 152px);min-height:500px}
-  .ed3.no-doc{grid-template-columns:minmax(0,1fr) 300px} .ed3.no-doc #leftCol{display:none}
+  .ed3{display:grid;grid-template-columns:380px minmax(0,1fr);gap:16px;align-items:stretch;height:calc(100vh - 152px);min-height:500px}
+  .ed3.no-doc #tabDoc{display:none}
   /* Source document pane — the client's file, big enough to read */
-  .ws-doc{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;position:relative}
+  .ws-doc{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;position:relative;height:calc(100% - 52px)}
   .ws-dochead{display:flex;align-items:center;gap:9px;margin-bottom:10px}
   .ws-doctitle{flex:1;min-width:0} .ws-doctitle .nm{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .ws-doctitle .meta{font-size:11px;color:var(--gray)}
   .ws-pagenav{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--gray);white-space:nowrap} .ws-pagenav .tb-btn{width:26px;height:26px}
@@ -350,17 +350,16 @@
   #elBtn{display:none}
   .ed3-scrim{display:none}
   @media(min-width:1101px){
-    .ed3:not(.st-on) #rightCol{display:none}
-    .ed3:not(.st-on){grid-template-columns:400px minmax(0,1fr)} .ed3.no-doc:not(.st-on){grid-template-columns:minmax(0,1fr)}
+    .ed3:not(.st-on) #leftCol{display:none}
+    .ed3:not(.st-on){grid-template-columns:minmax(0,1fr)}
   }
   @media(max-width:1100px){
     #elBtn{display:flex}
     .ed3{grid-template-columns:minmax(0,1fr)!important}
-    #leftCol,#rightCol{position:fixed;top:58px;bottom:0;width:290px;max-width:86vw;z-index:70;background:var(--page,#eef2f1);box-shadow:0 14px 44px rgba(0,0,0,.24);transition:transform .22s ease;overflow-y:auto;padding:16px}
+    #leftCol{position:fixed;top:58px;bottom:0;width:290px;max-width:86vw;z-index:70;background:var(--page,#eef2f1);box-shadow:0 14px 44px rgba(0,0,0,.24);transition:transform .22s ease;overflow-y:auto;padding:16px}
     #leftCol{left:0;transform:translateX(-106%)}
-    #rightCol{right:0;transform:translateX(106%);display:block}
     .ed3.el-on #leftCol{transform:translateX(0)}
-    .ed3.st-on #rightCol{transform:translateX(0)}
+    .ed3.st-on #leftCol{transform:translateX(0)}
     .ed3-scrim{display:block;position:fixed;inset:0;background:rgba(16,26,23,.4);opacity:0;visibility:hidden;transition:opacity .2s;z-index:65}
     .ed3.el-on ~ .ed3-scrim,.ed3.st-on ~ .ed3-scrim{opacity:1;visibility:visible}
   }
@@ -398,7 +397,9 @@
 
     <div class="ed3 st-on" id="ws">
       <!-- Source document — the client's file, any page, any order. Click a section or select text to make a block. -->
-      <aside class="ed3-col ws-doc" id="leftCol">
+      <div class="ed3-col" id="leftCol">
+        <div class="ws-tabs"><button class="on" data-wtab="doc" id="tabDoc">Document</button><button data-wtab="els">Elements</button><button data-wtab="block">Block</button><button data-wtab="style">Style</button></div>
+        <div class="ws-doc" id="docPane">
         <div class="ws-dochead">
           <span class="ms" style="color:var(--teal);font-size:18px">picture_as_pdf</span>
           <div class="ws-doctitle"><div class="nm" id="docName">—</div><div class="meta" id="docMeta"></div></div>
@@ -408,60 +409,22 @@
         <div class="ws-docpage" id="docPage"></div>
         <div class="fhint" style="margin-top:8px">Click a section → <strong>New block</strong>. Drag across any text → <strong>Make block</strong>. ✓ marks what’s already a block.</div>
         <div class="sel-pop" id="selPop" style="display:none"><button id="selNew"><span class="ms">add_box</span> New block from selection</button><button id="selAdd"><span class="ms">playlist_add</span> Add to this block</button></div>
-      </aside>
-
-      <div class="ed3-mid">
-        <div id="visualPanel">
-          <div class="vb-toolbar">
-            <button class="tb-btn tb-lbl" id="elBtn" title="Show the source document"><span class="ms">picture_as_pdf</span> Document</button>
-            <span class="lst-kebwrap"><button class="tb-btn tb-lbl" id="addElBtn" data-kebab title="Add an element to the block"><span class="ms">add</span> Add element</button><div class="kebab-menu add-menu" id="addMenu"></div></span>
-            <span class="sel-pill" id="selPill"></span>
-            <span class="tb-group">
-              <button class="tb-btn" id="undoBtn" title="Undo (Ctrl+Z)"><span class="ms">undo</span></button>
-              <button class="tb-btn" id="redoBtn" title="Redo (Ctrl+Y)"><span class="ms">redo</span></button>
-              <button class="tb-btn" id="histBtn" title="Version history"><span class="ms">history</span></button>
-            </span>
-            <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
-              <span class="autosave" id="autosave"></span>
-              <button class="tb-btn tb-lbl" id="clientViewBtn" title="See the block as the client will — only Editable sections can be changed"><span class="ms">visibility</span> Client view</button>
-              <button class="tb-btn tb-lbl on" id="styleBtn" title="Toggle the block panel"><span class="ms">tune</span> Panel</button>
-            </span>
-          </div>
-          <div class="vb-canvas" id="cvWrap">
-            <div class="vb-bar">
-              <span class="ms" style="font-size:16px;color:var(--teal)">web</span>
-              <span id="bar-name">Untitled block</span>
-              <span class="muted" id="bar-count" style="font-weight:400"></span>
-              <span class="src-chip" id="srcChip" style="display:none"></span>
-              <span class="cv-banner" id="cvBanner" style="display:none"><span class="ms">visibility</span> Client view — dashed sections are editable, the rest is fixed</span>
-            </div>
-            <div class="vb-page" id="page"></div>
-          </div>
         </div>
-      </div>
-
-      <div class="ed3-col" id="rightCol">
-        <div class="ws-tabs"><button class="on" data-wtab="block">Block</button><button data-wtab="style">Style</button></div>
-        <div class="card" id="blockCard">
-          <div class="insp-sec"><div class="insp-h" style="cursor:default">This block</div>
-            <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
-            <div class="fld" id="slotFld" style="display:none"><label>Save as</label>
-              <div class="seg full" id="b-slot"><button type="button" data-slot="header" class="on"><span class="ms" style="font-size:16px">flip_to_front</span> Letterhead</button><button type="button" data-slot="footer"><span class="ms" style="font-size:16px">flip_to_back</span> Footer</button></div>
-            </div>
-            <label class="ws-check"><input type="checkbox" id="b-share"> <span>Also available to all clients</span></label>
-            <div class="ws-owner" id="blockOwner"></div>
-          </div>
+        <div class="card" id="elPane" style="display:none">
+          <label class="pal-search"><span class="ms">search</span><input id="palQ" placeholder="Search elements…"></label>
+          <div class="vb-pal" id="palette"></div>
+          <div class="fhint" style="margin-top:10px">Drag onto the block, or click to add. Text comes from the document — select it there.</div>
+        </div>
+        <div class="card" id="blockCard" style="display:none">
           <div class="insp-sec"><div class="insp-h" style="cursor:default">Elements &amp; client permission</div>
             <div class="fhint" style="margin:-4px 0 8px">Fixed: words set by the block · Editable: client can rewrite · Locked: kept in place.</div>
             <div class="perm-list" id="permList"></div>
           </div>
-          <details class="insp-adv"><summary><span class="ms">tune</span> Details <span class="fhint" style="margin-left:auto">internal name · helper · preview</span></summary>
-            <div class="fld"><label for="b-name">Internal name</label><input class="fin" id="b-name" placeholder="Defaults to the block name"></div>
-            <div class="fld"><label for="b-desc">Helper description</label><input class="fin" id="b-desc" placeholder="e.g. Our safety commitment, from the WHS plan."></div>
-            <div class="fld" id="previewFld" style="display:none"><label>Preview image <span class="fld-opt">· optional</span></label>
-              <div class="thumbovr"><div class="thumbovr-box" id="thumbOvrBox"></div><div class="thumbovr-acts"><label class="btn btn-outline btn-sm"><span class="ms" style="font-size:16px">image</span> Upload image<input type="file" id="thumbFile" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label><a class="btn btn-outline btn-sm" id="thumbAuto" style="display:none"><span class="ms" style="font-size:16px">auto_awesome</span> Use auto</a></div></div>
-            </div>
-          </details>
+          <div class="insp-sec"><div class="insp-h" style="cursor:default">Where it lives</div>
+            <div class="ws-owner" id="blockOwner"></div>
+            <label class="ws-check" style="margin-top:8px"><input type="checkbox" id="b-share"> <span>Also available to all clients</span></label>
+            <div class="fhint" style="margin-top:6px">Category, internal name and helper text are set when you save (<a class="lnk" id="blockDetailsBtn">edit now</a>).</div>
+          </div>
         </div>
         <div class="card" id="styleCard">
           <h3 class="ed-h">Style</h3>
@@ -582,8 +545,56 @@
           </details>
         </div>
       </div>
+
+      <div class="ed3-mid">
+        <div id="visualPanel">
+          <div class="vb-toolbar">
+            <button class="tb-btn tb-lbl" id="elBtn" title="Show the panel"><span class="ms">left_panel_open</span> Panel</button>
+            <span class="sel-pill" id="selPill"></span>
+            <span class="tb-group">
+              <button class="tb-btn" id="undoBtn" title="Undo (Ctrl+Z)"><span class="ms">undo</span></button>
+              <button class="tb-btn" id="redoBtn" title="Redo (Ctrl+Y)"><span class="ms">redo</span></button>
+              <button class="tb-btn" id="histBtn" title="Version history"><span class="ms">history</span></button>
+            </span>
+            <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
+              <span class="autosave" id="autosave"></span>
+              <button class="tb-btn tb-lbl" id="clientViewBtn" title="See the block as the client will — only Editable sections can be changed"><span class="ms">visibility</span> Client view</button>
+              <button class="tb-btn tb-lbl on" id="styleBtn" title="Hide / show the left panel"><span class="ms">left_panel_close</span> Panel</button>
+            </span>
+          </div>
+          <div class="vb-canvas" id="cvWrap">
+            <div class="vb-bar">
+              <span class="ms" style="font-size:16px;color:var(--teal)">web</span>
+              <span id="bar-name">Untitled block</span>
+              <span class="muted" id="bar-count" style="font-weight:400"></span>
+              <span class="src-chip" id="srcChip" style="display:none"></span>
+              <span class="cv-banner" id="cvBanner" style="display:none"><span class="ms">visibility</span> Client view — dashed sections are editable, the rest is fixed</span>
+            </div>
+            <div class="vb-page" id="page"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
     <div class="ed3-scrim" id="ed3Scrim"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="saveModal">
+  <div class="cfm" style="text-align:left;max-width:460px">
+    <h3 id="svTitle">Save block</h3>
+    <div class="sub" id="svSub" style="color:var(--gray);font-size:12.5px;margin:-2px 0 14px">How it appears in the Blocks list and to the client.</div>
+    <div class="fld"><label for="b-label2">Name <span class="fld-opt">· what the client sees</span></label><input class="fin" id="b-label2" placeholder="e.g. Our safety commitment"></div>
+    <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
+    <div class="fld" id="slotFld" style="display:none"><label>Save as</label>
+      <div class="seg full" id="b-slot"><button type="button" data-slot="header" class="on"><span class="ms" style="font-size:16px">flip_to_front</span> Letterhead</button><button type="button" data-slot="footer"><span class="ms" style="font-size:16px">flip_to_back</span> Footer</button></div>
+    </div>
+    <div class="fld"><label for="b-name">Internal name <span class="fld-opt">· optional</span></label><input class="fin" id="b-name" placeholder="Defaults to the name"></div>
+    <div class="fld"><label for="b-desc">Helper description <span class="fld-opt">· optional</span></label><input class="fin" id="b-desc" placeholder="e.g. Our safety commitment, from the WHS plan."></div>
+    <div class="fld" id="previewFld" style="display:none"><label>Preview image <span class="fld-opt">· optional</span></label>
+      <div class="thumbovr"><div class="thumbovr-box" id="thumbOvrBox"></div><div class="thumbovr-acts"><label class="btn btn-outline btn-sm"><span class="ms" style="font-size:16px">image</span> Upload image<input type="file" id="thumbFile" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label><a class="btn btn-outline btn-sm" id="thumbAuto" style="display:none"><span class="ms" style="font-size:16px">auto_awesome</span> Use auto</a></div></div>
+    </div>
+    <div class="cfm-acts"><a class="btn btn-outline" id="svCancel">Cancel</a><a class="btn btn-primary" id="svConfirm"><span class="ms" style="font-size:17px">save</span> Save block</a></div>
   </div>
 </div>
 
@@ -714,17 +725,22 @@ function pageInit(){
 
   if(usage>0){ const uc=document.getElementById('useChip'); uc.style.display=''; uc.innerHTML=`<span class="ms">description</span> Used in ${usage} documents`; }
 
-  // ---- "+ Add element" menu (the palette, as a dropdown — a block normally starts from the document, not from tiles)
+  // ---- Elements tab: the palette (drag onto the block, or click to add). A block normally starts from the document.
   const byTag={};
   PRIMITIVES.forEach(p=>{ (byTag[p.tag]=byTag[p.tag]||[]).push(p); });
-  document.getElementById('addMenu').innerHTML =
-    `<div class="pal-tag">Structure</div><a data-row="2"><span class="ms">view_column</span> 2 columns</a><a data-row="3"><span class="ms">view_week</span> 3 columns</a>`
-    + Object.entries(byTag).map(([tag,ps])=>`<div class="pal-tag">${tag}</div>`+ps.map(p=>`<a data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span> ${p.name}</a>`).join('')).join('');
-  document.querySelectorAll('#addMenu a').forEach(a=>a.addEventListener('click',()=>{
-    if(a.dataset.row) doc.push({cols:Array.from({length:+a.dataset.row},()=>[])});
-    else addEl(mkEl(a.dataset.id));
-    sel=null; render(); commit();
-  }));
+  document.getElementById('palette').innerHTML =
+    `<div class="pal-tag">Structure</div><div class="vb-widget struct" draggable="true" data-row="2" title="A row with two columns"><span class="ms">view_column</span>2 Columns</div><div class="vb-widget struct" draggable="true" data-row="3" title="A row with three columns"><span class="ms">view_week</span>3 Columns</div>`
+    + Object.entries(byTag).map(([tag,ps])=>`<div class="pal-tag">${tag}</div>`+ps.map(p=>`<div class="vb-widget" draggable="true" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('')).join('');
+  document.querySelectorAll('.vb-widget').forEach(w=>{
+    w.addEventListener('dragstart',e=>{ drag = w.dataset.row ? {kind:'new-row',cols:+w.dataset.row} : {kind:'new-prim',id:w.dataset.id}; if(e.dataTransfer){ e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text','n'); } });
+    w.addEventListener('dragend',()=>{drag=null;clearInd();});
+    w.addEventListener('click',()=>{ if(w.dataset.row) doc.push({cols:Array.from({length:+w.dataset.row},()=>[])}); else addEl(mkEl(w.dataset.id)); sel=null; render(); commit(); });
+  });
+  document.getElementById('palQ').addEventListener('input',e=>{
+    const q=e.target.value.trim().toLowerCase();
+    document.querySelectorAll('#palette .vb-widget').forEach(w=>{ w.style.display=(!q||w.textContent.toLowerCase().includes(q))?'':'none'; });
+    document.querySelectorAll('#palette .pal-tag').forEach(t=>{ let n=t.nextElementSibling, any=false; while(n && !n.classList.contains('pal-tag')){ if(n.style.display!=='none') any=true; n=n.nextElementSibling; } t.style.display=any?'':'none'; });
+  });
   // Click-to-add stacks into the last single-column row (reads as one flow); a new row only when needed.
   function addEl(el){ const last=doc[doc.length-1]; if(last && last.cols.length===1) last.cols[0].push(el); else doc.push({cols:[[el]]}); }
 
@@ -738,13 +754,13 @@ function pageInit(){
   }
   document.getElementById('dupBtn').addEventListener('click',()=>{ if(cur){ leaving=true; duplicateBlock(cur.label, cur.id); } });
   document.getElementById('blockOwner').innerHTML = clientId ? `<span class="ms">apartment</span> Built for <strong>&nbsp;${tenant.name}</strong>` : `<span class="ms">public</span> General library — not tied to a client`;
-  // Panel tabs: Block (what it is, who may edit what) / Style
-  document.querySelectorAll('.ws-tabs button').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.toggle('on',x===b));
-    document.getElementById('blockCard').style.display = b.dataset.wtab==='block'?'':'none';
-    document.getElementById('styleCard').style.display = b.dataset.wtab==='style'?'':'none';
-  }));
-  document.getElementById('styleCard').style.display='none';
+  // Left panel tabs: Document · Elements · Block · Style
+  const PANES={doc:'docPane',els:'elPane',block:'blockCard',style:'styleCard'};
+  function showTab(k){
+    document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.wtab===k));
+    Object.entries(PANES).forEach(([key,id])=>{ document.getElementById(id).style.display = key===k?'':'none'; });
+  }
+  document.querySelectorAll('.ws-tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.wtab)));
   // Elements & permissions list — every element in the block with its Fixed/Editable/Locked, click to select.
   function renderPermList(){
     const host=document.getElementById('permList'), rows=[];
@@ -1435,7 +1451,7 @@ function pageInit(){
   document.getElementById('pgNext').addEventListener('click',()=>gotoPage(curPage+1));
   document.getElementById('attachDocBtn').addEventListener('click',()=>{ const t=tenant||TENANTS[0]; leaveGuard(()=>{ leaving=true; location.href='block-edit.html#'+(cur?'id='+cur.id+'&':'')+'client='+t.id+'&doc=whs'; }); });
   if(srcDoc){ if(existing && existing.regions && existing.regions.length){ const f=regionOf(existing.regions[0]); if(f) curPage=f.n-1; } renderDocHead(); renderDocPage(); }
-  else document.getElementById('ws').classList.add('no-doc');
+  else { document.getElementById('ws').classList.add('no-doc'); showTab('els'); }
 
   // ---- Client view: what the client sees. Only Editable sections take a cursor; Locked shows its padlock; nothing else responds.
 
@@ -1448,10 +1464,37 @@ function pageInit(){
     if(clientView && !page.querySelector('.vb-el.is-editable')) showToast('Nothing is marked Editable — the client could only read this block');
   });
 
-  // ---- Save: no modal. Writes against the client (or the general library), marks the source regions, stays on the page.
+  // ---- Save. First save of a block opens the details dialog (name · category · internal name · helper);
+  // later saves go straight through. "Details" in the panel/kebab reopens the dialog any time.
+  const saveModal=document.getElementById('saveModal'); let pendingPublish=null;
+  function openSaveDialog(published){
+    pendingPublish=published;
+    document.getElementById('b-label2').value=document.getElementById('b-label').value;
+    document.getElementById('svTitle').textContent = published==null ? 'Block details' : (published?'Save block':'Save as draft');
+    document.getElementById('svConfirm').innerHTML = published==null ? '<span class="ms" style="font-size:17px">check</span> Done' : '<span class="ms" style="font-size:17px">save</span> '+(published?'Save block':'Save draft');
+    if(!document.getElementById('b-cat').value) document.getElementById('b-cat').value=BLOCK_CATS[1];
+    applyStationeryUI(); renderThumbOverride(); saveModal.classList.add('open'); document.getElementById('b-label2').focus();
+  }
+  function closeSaveDialog(){ saveModal.classList.remove('open'); }
+  document.getElementById('svConfirm').addEventListener('click',()=>{
+    const l=document.getElementById('b-label2').value.trim(); if(!l){ document.getElementById('b-label2').focus(); showToast('Name the block first'); return; }
+    document.getElementById('b-label').value=l; syncBar();
+    if(pendingPublish==null){ closeSaveDialog(); autosave(); return; }
+    closeSaveDialog(); if(finishSave(pendingPublish) && pendingNew){ resetBlock(); document.getElementById('b-label').focus(); } pendingNew=false;
+  });
+  document.getElementById('svCancel').addEventListener('click',()=>{ closeSaveDialog(); pendingNew=false; });
+  saveModal.addEventListener('click',e=>{ if(e.target===saveModal){ closeSaveDialog(); pendingNew=false; } });
+  document.getElementById('blockDetailsBtn').addEventListener('click',()=>openSaveDialog(null));
+  let pendingNew=false;
+  function save(published, thenNew){
+    if(!hasContent()){ showToast('Add something to the block first'); return; }
+    pendingNew=!!thenNew;
+    if(!cur || !document.getElementById('b-label').value.trim()) return openSaveDialog(published);
+    if(finishSave(published) && thenNew){ resetBlock(); document.getElementById('b-label').focus(); }
+    pendingNew=false;
+  }
   function finishSave(published){
-    const l=document.getElementById('b-label').value.trim(); if(!l){ document.getElementById('b-label').focus(); showToast('Name the block first'); return false; }
-    if(!hasContent()){ showToast('Add something to the block first'); return false; }
+    const l=document.getElementById('b-label').value.trim(); if(!l){ openSaveDialog(published); return false; }
     const nm=document.getElementById('b-name').value.trim()||l;
     const bid = cur ? cur.id : 'cb-'+Date.now();
     saveCustomBlock({id:bid, name:nm, label:l, desc:document.getElementById('b-desc').value.trim(), cat:document.getElementById('b-cat').value,
@@ -1469,9 +1512,9 @@ function pageInit(){
     ['b-label','b-name','b-desc'].forEach(i=>document.getElementById(i).value=''); document.getElementById('b-share').checked=false;
     ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='none');
     render(); syncBar(); history=[]; hidx=-1; pushHist(); base=snap(); }
-  document.getElementById('saveBtn').addEventListener('click',()=>finishSave(true));
-  document.getElementById('draftBtn').addEventListener('click',()=>finishSave(false));
-  document.getElementById('saveNewBtn').addEventListener('click',()=>{ if(finishSave(true)){ resetBlock(); document.getElementById('b-label').focus(); } });
+  document.getElementById('saveBtn').addEventListener('click',()=>save(true,false));
+  document.getElementById('draftBtn').addEventListener('click',()=>save(false,false));
+  document.getElementById('saveNewBtn').addEventListener('click',()=>save(true,true));
   document.getElementById('delBtn').addEventListener('click',()=>{ if(cur){ leaving=true; deleteBlock(cur.label, cur.id); } });
 
   (function(){ // Kebab menus: header overflow + Add element
