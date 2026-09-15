@@ -72,6 +72,42 @@ function ensureBrandTokens(t){
   if(!b.type)    b.type    = TYPE_SCALE.map(s=>({name:s.label, size:s.size, lh:s.lh, weight:String(s.weight), font:s.font, color:(s.font==='heading'?'primary':(s.key==='small'?'secondary':'ink'))}));
 }
 
+// ---- Brand provenance & approval (per client, persisted in localStorage) ----
+// The brand is evidence + sign-off, not a document we store: every value says where it
+// came from (or that it was assumed), the client's original files sit beside it, the
+// client approves a rendered sample before templates are built, and an issued document
+// freezes the brand it was sent with.
+const BRAND_META_KEY = id => 'tf_brandmeta_'+id;
+function brandMeta(t){
+  if(t._meta) return t._meta;
+  let m=null; try{ m=JSON.parse(localStorage.getItem(BRAND_META_KEY(t.id))); }catch(e){}
+  if(!m){
+    const guide = t.name.replace(/\s+/g,'-')+'-Brand-Guide.pdf', tender='2025-'+t.name.split(' ')[0]+'-Tender.docx';
+    const seeded = t.templates>0;   // clients with templates already have their files in; new ones are still waiting
+    m = {
+      files: seeded ? [
+        {type:'logo',        name:t.initials.toLowerCase()+'-logo.png', by:'Client', date:'28 Aug 2026'},
+        {type:'brand-guide', name:guide,  by:'Client', date:'28 Aug 2026', pages:12},
+        {type:'past-tender', name:tender, by:'Client', date:'29 Aug 2026', pages:31},
+      ] : [],
+      requested: seeded ? null : '3 Sep 2026',
+      // Where each value came from. from/page = evidence; assumed = admin's best guess.
+      evidence: seeded
+        ? {primary:{from:guide,page:4}, secondary:{from:guide,page:4}, background:{from:guide,page:6}, tint:{derived:true}, ink:{assumed:true}, surface:{assumed:true}, border:{assumed:true}, font:{from:guide,page:8}, bodyFont:{from:tender,page:2}, logo:{from:t.initials.toLowerCase()+'-logo.png'}}
+        : {primary:{from:'email from client'}, secondary:{assumed:true}, background:{assumed:true}, tint:{derived:true}, ink:{assumed:true}, surface:{assumed:true}, border:{assumed:true}, font:{assumed:true}, bodyFont:{assumed:true}, logo:{assumed:true}},
+      page: {marginTop:22, marginSide:18, logoPos:'top-left', footer:t.name+' · Commercial-in-confidence'},
+      approval: seeded ? {status:'approved', by:'Client · '+t.name, date:'1 Sep 2026'} : {status:'not-sent'},
+      log: seeded ? [{date:'1 Sep 2026', by:'Kaila', what:'Client approved brand sample'},{date:'29 Aug 2026', by:'Kaila', what:'Body font set from past tender'},{date:'28 Aug 2026', by:'Kaila', what:'Colours & heading font from brand guide'}] : [],
+      issued: seeded ? [{name:'Kingsford Smith Drive Upgrade — Tender Response', date:'3 Sep 2026', brandVersion:1}] : [],
+    };
+  }
+  t._meta=m; return m;
+}
+function saveBrandMeta(t){ try{ localStorage.setItem(BRAND_META_KEY(t.id), JSON.stringify(t._meta)); }catch(e){} }
+function brandLog(t, by, what){ const m=brandMeta(t); m.log.unshift({date:new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}), by, what}); saveBrandMeta(t); }
+// One-line status for pickers: "Taylor Builders · approved 1 Sep" / "· awaiting approval" / "· brand not approved".
+function brandStatusLabel(t){ const a=brandMeta(t).approval; return a.status==='approved' ? 'approved '+a.date : a.status==='pending' ? 'awaiting client approval' : 'brand not approved'; }
+
 // Resolve a colour-role key to a concrete value for a given brand or the neutral default.
 // Prefers the client's own editable colours[] when present.
 function roleValue(brand, key){
@@ -94,4 +130,5 @@ if(typeof window!=='undefined'){
   window.COLOUR_ROLES = COLOUR_ROLES; window.TYPE_SCALE = TYPE_SCALE;
   window.SPACE_SCALE = SPACE_SCALE; window.RADIUS_SCALE = RADIUS_SCALE; window.roleValue = roleValue;
   window.FONTS = FONTS; window.ensureBrandTokens = ensureBrandTokens;
+  window.brandMeta = brandMeta; window.saveBrandMeta = saveBrandMeta; window.brandLog = brandLog; window.brandStatusLabel = brandStatusLabel;
 }

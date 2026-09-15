@@ -14,6 +14,46 @@
 <link rel="stylesheet" href="components.css">
 <style>
   .bt-board{display:flex;flex-direction:column;gap:20px}
+  /* Evidence tags — where a value came from, or that it was assumed */
+  .ev{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;border-radius:100px;padding:1px 7px;margin-top:6px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .ev .ms{font-size:12px}
+  .ev.from{background:var(--teal-tint);color:#1f5a50;border:1px solid #bfe0d9}
+  .ev.assumed{background:#fff4e0;color:#8a5a00;border:1px solid #f3d9a4}
+  .ev.derived{background:#eef2f1;color:var(--gray);border:1px solid var(--border)}
+  .bt-log{margin-top:18px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--gray)}
+  .bt-log .row{display:flex;gap:10px;padding:3px 0} .bt-log .d{color:var(--light);width:82px;flex-shrink:0} .bt-log .w{flex:1} .bt-log .b{color:var(--light)}
+  /* Page setup */
+  .pg-setup{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .pg-setup label{display:block;font-size:10.5px;color:var(--light);margin-bottom:4px}
+  .pg-setup .fin{padding:6px 9px;font-size:12px}
+  /* Original files */
+  .of-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .of-slot{border:1.5px dashed #c2ccc9;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:104px;cursor:pointer}
+  .of-slot:hover{border-color:var(--teal);background:var(--teal-tint)}
+  .of-slot.has{border-style:solid;border-color:var(--border);cursor:default;background:#fff}
+  .of-slot .h{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;display:flex;align-items:center;gap:5px} .of-slot .h .ms{font-size:15px}
+  .of-slot .nm{font-weight:600;font-size:12.5px;word-break:break-all;display:flex;align-items:center;gap:8px}
+  .of-slot .meta{font-size:11px;color:var(--gray)}
+  .of-slot .thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px}
+  .of-slot .pdf{width:40px;height:48px;border:1px solid var(--border);border-radius:4px;background:#fff;position:relative;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .of-slot .pdf::before,.of-slot .pdf::after{content:'';position:absolute;left:7px;right:7px;height:2px;background:#d4dcd9} .of-slot .pdf::before{top:11px} .of-slot .pdf::after{top:19px;right:14px}
+  .of-slot .empty{font-size:11.5px;color:var(--light);display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:3px;text-align:center} .of-slot .empty .ms{font-size:22px}
+  .of-req{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#8a5a00;background:#fff4e0;border:1px solid #f3d9a4;border-radius:100px;padding:2px 9px}
+  /* Approve brand — side-by-side */
+  .ap-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .ap-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:8px} .ap-lbl .ms{font-size:15px;color:var(--teal)}
+  .ap-page{aspect-ratio:1/1.1;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 16px rgba(20,45,38,.1);padding:22px 24px;overflow:hidden;font-size:9px;line-height:1.45}
+  .ap-theirs{font-family:Georgia,'Times New Roman',serif;color:#222;filter:contrast(.96) sepia(.08)}
+  .ap-theirs .lh{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid;padding-bottom:6px;margin-bottom:10px;font-weight:700;font-size:11px}
+  .ap-theirs h4{margin:8px 0 3px;font-size:10.5px} .ap-theirs p{margin:0 0 6px} .ap-theirs table{width:100%;border-collapse:collapse;margin-top:4px} .ap-theirs td,.ap-theirs th{padding:3px 5px;border-bottom:1px solid #ddd;text-align:left} .ap-theirs th{color:#fff}
+  .ap-foot{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .ap-stamp{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#1f5a50;background:var(--teal-tint);border:1.5px solid #38988a;border-radius:8px;padding:6px 12px;transform:rotate(-1.5deg)} .ap-stamp .ms{font-size:17px}
+  .ap-pending{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;color:#8a5a00;background:#fff4e0;border:1px solid #f3d9a4;border-radius:8px;padding:6px 12px} .ap-pending .ms{font-size:16px}
+  /* Issued documents — brand frozen */
+  .issued-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:14px;background:#fff}
+  .issued-card .ms.big{font-size:22px;color:var(--teal)} .issued-card .nm{font-weight:600;font-size:13px} .issued-card .meta{font-size:11.5px;color:var(--gray)}
+  .frozen{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:#1f5a50;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:100px;padding:2px 8px;margin-left:auto;white-space:nowrap} .frozen .ms{font-size:13px}
+  @media(max-width:900px){ .ap-cols,.of-grid{grid-template-columns:1fr} }
   .bt-sec-h{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--light);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
   .bt-sec-h .shared{font-size:9.5px;background:#eef2f1;color:var(--gray);border:1px solid var(--border);border-radius:100px;padding:2px 9px;letter-spacing:.3px;font-weight:700}
   .bt-note{font-size:12px;color:var(--gray);margin-top:10px;display:flex;align-items:center;gap:6px}
@@ -171,9 +211,27 @@
         </div>
       </aside>
 
-      <div class="card">
-        <div class="cd2-cardhead"><h3>Brand tokens</h3><span class="sub">The design tokens blocks &amp; templates inherit for this client</span></div>
-        <div class="bt-board" id="btBoard"></div>
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="card">
+          <div class="cd2-cardhead"><h3>Original files</h3><span class="sub" id="of-status">What the client sent us — the brand below is read from these</span></div>
+          <div class="of-grid" id="ofGrid"></div>
+          <input type="file" id="ofFile" hidden>
+        </div>
+
+        <div class="card" id="approveCard">
+          <div class="cd2-cardhead"><h3>Approve brand</h3><span class="sub">Their real tender page beside ours — nothing gets built until the client says it looks like theirs</span></div>
+          <div class="ap-cols">
+            <div><div class="ap-lbl"><span class="ms">picture_as_pdf</span> Their page · <span id="ap-src"></span></div><div class="ap-page ap-theirs" id="apTheirs"></div></div>
+            <div><div class="ap-lbl"><span class="ms">auto_awesome</span> Rendered in Tenderfy</div><div class="ap-page" id="apOurs"></div></div>
+          </div>
+          <div class="ap-foot" id="apFoot"></div>
+        </div>
+
+        <div class="card">
+          <div class="cd2-cardhead"><h3>Brand</h3><span class="sub">What blocks &amp; templates inherit for this client — every value says where it came from</span></div>
+          <div class="bt-board" id="btBoard"></div>
+          <div class="bt-log" id="btLog"></div>
+        </div>
       </div>
     </div>
 
@@ -253,6 +311,7 @@ function pageInit(){
   const t=TENANTS.find(x=>x.id===id)||TENANTS[0];
   const b=t.brand;
   ensureBrandTokens(t);
+  const M=brandMeta(t);
   const initialsOf = n => (n.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2)||'—').toUpperCase();
   const emailOf = ()=> t.email || (t.id+'@'+t.name.toLowerCase().replace(/[^a-z]+/g,'')+'.com.au');
   const phoneOf = ()=> t.phone || ('+61 7 '+(3000+t.name.length*13)+' '+(1000+t.templates*97));
@@ -294,21 +353,93 @@ function pageInit(){
     ensureFont(b.font); ensureFont(b.bodyFont);
     const scopeLabel = s => s==='brand'?'Brand':s==='derived'?'Derived':'Shared';
     const colVal = key=>{ const c=b.colours.find(x=>x.key===key); return c?c.value:'#2E3C3B'; };
+    // Evidence tag: where the value came from, or that we assumed it.
+    const ev = key=>{ const e=M.evidence[key]||{assumed:true};
+      if(e.derived) return `<span class="ev derived" title="Computed from another value"><span class="ms">functions</span> derived</span>`;
+      if(e.assumed) return `<span class="ev assumed" title="No evidence from the client — admin's best guess"><span class="ms">help</span> assumed</span>`;
+      return `<span class="ev from" title="${e.from}${e.page?' · p.'+e.page:''}"><span class="ms">verified</span> ${e.from.replace(/-Brand-Guide\.pdf$/,' brand guide').replace(/\.(pdf|docx|png)$/,'')}${e.page?' p.'+e.page:''}</span>`; };
     const colCard = c=>`<div class="bt-tok"><div class="bt-sw" style="background:${c.value}"><span class="bt-scope">${scopeLabel(c.scope)}</span></div>
-      <div class="bt-body"><div class="nm">${c.name}</div><div class="val">${(c.value||'').toUpperCase()}</div>${c.applies?`<div class="ap">${c.applies}</div>`:''}</div></div>`;
-    const fontCard = (label, fam)=>`<div class="bt-font"><div class="big" style="font-family:'${fam}',sans-serif;color:${b.primary}">Ag</div><div style="font-weight:600;font-size:12.5px">${label}</div><div class="val" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--gray)">${fam}</div></div>`;
+      <div class="bt-body"><div class="nm">${c.name}</div><div class="val">${(c.value||'').toUpperCase()}</div>${c.applies?`<div class="ap">${c.applies}</div>`:''}${ev(c.key)}</div></div>`;
+    const fontCard = (label, fam, key)=>`<div class="bt-font"><div class="big" style="font-family:'${fam}',sans-serif;color:${b.primary}">Ag</div><div style="font-weight:600;font-size:12.5px">${label}</div><div class="val" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--gray)">${fam}</div>${ev(key)}</div>`;
     const typeRows = b.type.map(s=>{ const fam = s.font==='heading'?b.font:b.bodyFont; const col=colVal(s.color); return `<div class="bt-scale-row"><span class="bt-scale-l"><span class="sq" style="background:${col}"></span><span style="font-family:'${fam}',sans-serif;font-size:${s.size}px;font-weight:${s.weight};color:${col}">${s.name}</span></span><span class="meta">${s.size}/${s.lh} · ${s.weight} · ${s.font}</span></div>`; }).join('');
     const logoHtml = b.logo
       ? `<div style="display:flex;align-items:center;gap:12px"><img src="${b.logo}" style="width:48px;height:48px;border-radius:10px;object-fit:cover"><div><div style="font-weight:600;font-size:12.5px">Logo</div><div class="ap" style="font-size:10.5px;color:var(--light)">Cover lockup &amp; running header</div></div></div>`
       : `<div style="display:flex;align-items:center;gap:12px"><span style="width:48px;height:48px;border-radius:10px;background:${b.primary};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'${b.font}',sans-serif;font-size:17px">${t.initials}</span><div><div style="font-weight:600;font-size:12.5px">Logo</div><div class="ap" style="font-size:10.5px;color:var(--light)">Cover lockup &amp; running header</div></div></div>`;
+    const P=M.page;
     document.getElementById('btBoard').innerHTML = `
-      <div><div class="bt-sec-h">Logo</div>${logoHtml}</div>
+      <div><div class="bt-sec-h">Logo</div>${logoHtml}<div>${ev('logo')}</div></div>
       <div><div class="bt-sec-h">Colours</div><div class="bt-cols">${b.colours.map(colCard).join('')}</div></div>
       <div>
         <div class="bt-sec-h">Typography</div>
-        <div class="bt-fonts">${fontCard('Heading font', b.font)}${fontCard('Body font', b.bodyFont)}</div>
+        <div class="bt-fonts">${fontCard('Heading font', b.font, 'font')}${fontCard('Body font', b.bodyFont, 'bodyFont')}</div>
         <div class="bt-scale">${typeRows}</div>
+      </div>
+      <div><div class="bt-sec-h">Page setup <span class="shared" title="Part of the brand — a brand guide dictates margins and logo placement">A4</span></div>
+        <div class="pg-setup">
+          <div><label>Top / bottom margin</label><input class="fin" type="number" data-pg="marginTop" value="${P.marginTop}" min="8" max="40"> <span class="muted" style="font-size:11px">mm</span></div>
+          <div><label>Side margin</label><input class="fin" type="number" data-pg="marginSide" value="${P.marginSide}" min="8" max="40"> <span class="muted" style="font-size:11px">mm</span></div>
+          <div><label>Logo position</label><select class="fin" data-pg="logoPos"><option value="top-left"${P.logoPos==='top-left'?' selected':''}>Top left</option><option value="top-right"${P.logoPos==='top-right'?' selected':''}>Top right</option><option value="top-centre"${P.logoPos==='top-centre'?' selected':''}>Top centre</option></select></div>
+          <div style="grid-column:1/-1"><label>Footer text</label><input class="fin" data-pg="footer" value="${P.footer.replace(/"/g,'&quot;')}"></div>
+        </div>
       </div>`;
+    document.querySelectorAll('[data-pg]').forEach(i=>i.addEventListener('change',()=>{ M.page[i.dataset.pg]=i.type==='number'?+i.value:i.value; brandLog(t,'Kaila','Page setup: '+i.previousElementSibling.textContent); renderLog(); showToast('Page setup saved'); }));
+    renderLog();
+  }
+  function renderLog(){
+    const el=document.getElementById('btLog');
+    el.innerHTML = M.log.length ? `<div style="font-weight:600;color:var(--ink);margin-bottom:4px">Changes</div>`+M.log.slice(0,4).map(l=>`<div class="row"><span class="d">${l.date}</span><span class="w">${l.what}</span><span class="b">${l.by}</span></div>`).join('') : `<span class="muted">No changes yet — values are seeded from the client's files or assumed.</span>`;
+  }
+
+  // ---- Original files: what the client sent. Three slots; a slot without a file shows the request status.
+  const SLOTS=[['logo','Logo','image'],['brand-guide','Brand document','picture_as_pdf'],['past-tender','Past tenders','description']];
+  let pendingSlot=null;
+  function renderFiles(){
+    const st=document.getElementById('of-status');
+    st.innerHTML = M.files.length ? `Sent by the client · ${M.files[0].date}` : `<span class="of-req"><span class="ms" style="font-size:13px">schedule</span> Requested ${M.requested||'—'} — waiting on the client</span>`;
+    document.getElementById('ofGrid').innerHTML = SLOTS.map(([type,label,ic])=>{
+      const fs=M.files.filter(f=>f.type===type);
+      if(!fs.length) return `<div class="of-slot" data-slot="${type}"><div class="h"><span class="ms">${ic}</span>${label}</div><div class="empty"><span class="ms">upload</span>Not received<span style="font-size:10.5px">click to add on the client's behalf</span></div></div>`;
+      return `<div class="of-slot has" data-slot="${type}"><div class="h"><span class="ms">${ic}</span>${label}</div>${fs.map(f=>`<div class="nm">${type==='logo'?(f.data?`<img class="thumb" src="${f.data}">`:`<span class="thumb" style="background:${b.primary};font-family:'${b.font}',sans-serif">${t.initials}</span>`):`<span class="pdf"></span>`}<span>${f.name}<div class="meta">${f.by} · ${f.date}${f.pages?' · '+f.pages+' pages':''}</div></span></div>`).join('')}</div>`;
+    }).join('');
+    document.querySelectorAll('.of-slot:not(.has)').forEach(s=>s.addEventListener('click',()=>{ pendingSlot=s.dataset.slot; const inp=document.getElementById('ofFile'); inp.accept=pendingSlot==='logo'?'image/*':'.pdf,.doc,.docx'; inp.click(); }));
+  }
+  document.getElementById('ofFile').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; if(!f||!pendingSlot) return;
+    const add=data=>{ M.files.push({type:pendingSlot,name:f.name,by:'Kaila (on client’s behalf)',date:new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}),data}); if(M.files.length>=3) M.requested=null; brandLog(t,'Kaila','Added '+f.name); saveBrandMeta(t); renderFiles(); renderBoard(); renderApprove(); showToast('Added '+f.name); };
+    if(pendingSlot==='logo' && f.size<1600000){ const rd=new FileReader(); rd.onload=()=>add(rd.result); rd.readAsDataURL(f); } else add(null);
+    e.target.value='';
+  });
+
+  // ---- Approve brand: their page vs ours. The gate before templates get built.
+  function renderApprove(){
+    const tender=M.files.find(f=>f.type==='past-tender');
+    document.getElementById('ap-src').textContent = tender ? tender.name+' · p.2' : 'no tender received yet';
+    // "Their" page: a plausible scan of the client's old tender in their colours, set in Word-ish serif.
+    document.getElementById('apTheirs').innerHTML = `
+      <div class="lh" style="border-color:${b.primary};color:${b.primary}"><span>${t.name.toUpperCase()}</span><span style="font-size:8px;font-weight:400;color:#666">Tender Response · 2025</span></div>
+      <h4 style="color:${b.primary}">2. Company Overview</h4>
+      <p>${t.name} is a ${t.industry.toLowerCase()} contractor delivering projects across South-East Queensland. We self-perform the majority of our scope with a directly employed workforce.</p>
+      <h4 style="color:${b.primary}">2.1 Key personnel</h4>
+      <table><tr><th style="background:${b.primary}">Role</th><th style="background:${b.primary}">Name</th></tr><tr><td>Project Director</td><td>Kenzie May</td></tr><tr><td>HSEQ Manager</td><td>Sam Ortiz</td></tr><tr><td>Site Supervisor</td><td>Dana Reilly</td></tr></table>`;
+    // "Ours": the same content through the shared renderer in the client's brand.
+    const items=[{el:true,pid:'heading',content:{title:'Company Overview'}},{el:true,pid:'paragraph',content:{body:`${t.name} is a ${t.industry.toLowerCase()} contractor delivering projects across South-East Queensland. We self-perform the majority of our scope with a directly employed workforce.`}},{el:true,pid:'subheading',content:{title:'Key personnel'}},{el:true,pid:'table',content:{headers:['Role','Name'],rows:[['Project Director','Kenzie May'],['HSEQ Manager','Sam Ortiz'],['Site Supervisor','Dana Reilly']]}}];
+    document.getElementById('apOurs').innerHTML = `<div style="border-bottom:3px solid ${b.secondary};padding-bottom:6px;margin-bottom:10px;display:flex;align-items:center;gap:6px;font-family:'${b.font}',sans-serif;font-weight:700;font-size:10px;color:${b.primary}"><span style="width:14px;height:14px;border-radius:4px;background:${b.primary};display:inline-block"></span>${t.name}</div>`
+      + `<div style="zoom:.62">${(typeof renderComposedDoc==='function')?renderComposedDoc(items, b).replace('padding:46px 50px','padding:0'):''}</div>`;
+    const a=M.approval, foot=document.getElementById('apFoot');
+    if(a.status==='approved') foot.innerHTML=`<span class="ap-stamp"><span class="ms">verified</span> Client approved · ${a.date}</span><span class="muted" style="font-size:12px">${a.by}</span><a class="lnk" id="apReset" style="margin-left:auto;font-size:12px">Re-request</a>`;
+    else if(a.status==='pending') foot.innerHTML=`<span class="ap-pending"><span class="ms">schedule</span> Sent to client · ${a.date}</span><a class="btn btn-primary btn-sm" id="apMark"><span class="ms" style="font-size:16px">check</span> Mark approved</a><a class="lnk" id="apReset" style="margin-left:auto;font-size:12px">Cancel</a>`;
+    else foot.innerHTML=`<span class="muted" style="font-size:12.5px">Not sent yet.</span><a class="btn btn-primary btn-sm" id="apSend"><span class="ms" style="font-size:16px">send</span> Send to client for approval</a><a class="btn btn-outline btn-sm" id="apMark"><span class="ms" style="font-size:16px">check</span> Approved in person</a>`;
+    const today=()=>new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+    const set=(status,extra,msg)=>{ M.approval=Object.assign({status},extra); brandLog(t,'Kaila',msg); saveBrandMeta(t); renderApprove(); renderLog(); showToast(msg); };
+    document.getElementById('apSend')?.addEventListener('click',()=>set('pending',{date:today()},'Brand sample sent to '+t.name+' for approval'));
+    document.getElementById('apMark')?.addEventListener('click',()=>set('approved',{date:today(),by:'Client · '+t.name},'Client approved brand sample'));
+    document.getElementById('apReset')?.addEventListener('click',()=>set('not-sent',{},'Brand approval reset'));
+  }
+
+  // ---- Issued documents: a sent tender keeps the brand it went out with.
+  function renderIssued(){
+    const host=document.getElementById('ad-list');
+    if(!M.issued.length) return;
+    host.insertAdjacentHTML('afterbegin', M.issued.map(d=>`<div class="issued-card"><span class="ms big">send</span><div><div class="nm">${d.name}</div><div class="meta">Issued ${d.date} · rendered with brand as approved ${M.approval.date||''}</div></div><span class="frozen" title="Brand changes after this date only affect drafts"><span class="ms">lock</span> Brand frozen at issue</span></div>`).join(''));
   }
 
   // Subscription & credits
@@ -320,7 +451,7 @@ function pageInit(){
   document.getElementById('cd-tu-v').textContent=t.topup?t.topup+'% left':'None';
   meterFill(document.getElementById('cd-tu-m'),t.topup);
 
-  renderIdentity(); renderDetails(); renderBoard();
+  renderIdentity(); renderDetails(); renderFiles(); renderApprove(); renderBoard();
 
   // ---- Documents tab: per-document breakdown across assigned packs + direct docs ----
   const assignedTemplates = (typeof TEMPLATES!=='undefined') ? TEMPLATES.filter(x=>x.tenants && x.tenants.includes(t.id)) : [];
@@ -352,6 +483,7 @@ function pageInit(){
         `<div class="ad-row"><span class="ad-nm">${d.name}</span><button class="btn btn-outline btn-sm ad-prev" data-id="${d.id}"><span class="ms" style="font-size:15px">visibility</span> Preview</button>${(d.direct&&!d.packs.length)?`<span class="ms ad-x" data-rm="${d.id}" title="Unassign document">close</span>`:''}</div>`
       ).join('')}</div></div>`;
     }).join('');
+    renderIssued();
     el.querySelectorAll('.ad-gh').forEach(h=>h.addEventListener('click',()=>h.closest('.ad-group').classList.toggle('collapsed')));
     el.querySelectorAll('.ad-prev').forEach(bp=>bp.addEventListener('click',e=>{ e.stopPropagation(); openDocPreview(bp.dataset.id); }));
     el.querySelectorAll('.ad-x').forEach(x=>x.addEventListener('click',e=>{ e.stopPropagation(); directDocs.delete(x.dataset.rm); renderBreakdown(); showToast('Document unassigned'); }));
@@ -456,7 +588,7 @@ function pageInit(){
 
   // ---- Brand Kit editor (shared component) ----
   function openBrand(){
-    openBrandEditor(b, {title:'Brand Kit — '+t.name, onSave:()=>{ renderIdentity(); renderBoard(); }});
+    openBrandEditor(b, {title:'Brand — '+t.name, onSave:()=>{ brandLog(t,'Kaila','Edited brand values'); if(M.approval.status==='approved'){ M.approval={status:'not-sent'}; saveBrandMeta(t); showToast('Brand changed — client approval needs renewing'); } renderIdentity(); renderBoard(); renderApprove(); }});
   }
 }
 </script>

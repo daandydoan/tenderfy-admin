@@ -61,6 +61,38 @@ Optional beats: *Source document → "Safety performance" → Draft from this* (
 - **Client view** is a CSS/contenteditable mode inside the admin editor. Real: the client-side editor
   enforces Fixed/Editable/Locked server-side.
 
+## Brand / styleguide — how it's modelled
+
+The brand is **evidence + sign-off**, not a document we store or a kit we version.
+
+Workflow: **Request** (client sends logo · brand document · past tenders) → **Derive** (admin, Ray suggesting,
+fills the Brand; every value carries *from file · page* or *assumed*; page setup is part of it) → **Approve**
+(client sees their real tender page beside ours; one click) → **Build** (blocks bind roles) → **Assign**
+(no ceremony — render applies the brand) → **Issue** (a sent document freezes its brand; later changes affect drafts only).
+
+Where it lives in the mockup: Client detail → *Original files*, *Approve brand*, *Brand* (with evidence tags,
+page setup, change log); Documents tab → *Brand frozen at issue* on a sent tender; Block builder →
+Preview style reads "Taylor Builders · approved 1 Sep".
+
+Data model (per client, `tenant-data.js` → `brandMeta(client)`; mockup persists in `tf_brandmeta_<id>`):
+
+```
+client.files[]        {type: logo | brand-guide | past-tender, name, by, date, pages?, data?}
+client.requested      date the three-slot request went out (null once files are in)
+brand.evidence[key]   {from, page} | {assumed:true} | {derived:true}   — key = colour role or font
+brand.page            {marginTop, marginSide, logoPos, footer}        — geometry IS brand
+brand.approval        {status: not-sent | pending | approved, by, date}
+brand.log[]           {date, by, what}                                — a log, not versions
+document.issued       {date, brandSnapshot}                           — frozen at issue
+client.kits[]         later: head-contractor kits, chosen per document, co-branded by default
+```
+
+Rules for the real build: no template is built on a brand that isn't `approved`; editing the brand after
+approval resets it to `not-sent`; an issued document renders from its snapshot, never the live brand.
+
+Parked: real extraction from PDF/DOCX, kit versioning with diff preview, custom font upload, cross-client
+head-contractor kit library, brand-check score.
+
 ## Deliberately not built (parked)
 
 Multi-select · per-element horizontal alignment · smarter Ray · deeper version history · a client fact
