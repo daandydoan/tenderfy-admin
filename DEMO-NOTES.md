@@ -1,0 +1,67 @@
+# Block Builder — demo notes
+
+Static prototype. Everything persists in the browser only (localStorage). Two audiences:
+**developers** (what to build) and **prospects** (why it matters). The script below is the prospect demo;
+the "For developers" notes are what the mockup deliberately fakes.
+
+## The 5-click demo (≈2 minutes)
+
+Open `block-edit.html` (New Block).
+
+1. **Source document → "Our commitment" → Draft from this.**
+   Ray lifts the client's own wording off their WHS Management Plan and lays it out. The bar shows
+   *From WHS Management Plan · p.4*. The block is named after the section.
+   > "We start from your documents, not a blank page."
+2. **Click the paragraph → Client permission → Editable.** Dashed outline + badge.
+   > "You decide what your estimators can change."
+3. **Click the sub-heading → Locked.** Padlock badge.
+   > "…and what they can't."
+4. **Client view** (toolbar). Only the dashed paragraph takes a cursor; the heading is locked; everything
+   else is read-only.
+   > "This is exactly what your team sees."
+5. **Preview style → pick a client.** Fonts and colours switch.
+   > "Same block, your brand — no re-formatting, ever."
+
+Then **Save Block → Publish**. It appears in the Blocks list and in the Document builder palette.
+
+Optional beats: *Source document → "Safety performance" → Draft from this* (a key/value table);
+*Rows & columns → + Row*; upload a real photo into an Image element.
+
+## Glossary — say this, not that
+
+| On screen | Say to a prospect | Means |
+|---|---|---|
+| Block | reusable section | A piece of a tender you write once and reuse |
+| Element | part | Heading, paragraph, table… the things inside a section |
+| Merge field | auto-filled detail | Client name, ABN, project ref — filled in per document |
+| Key / Value | details list | Label + value rows |
+| Stat | headline number | A big figure with a caption |
+| Fixed | can't be changed | Client sees it, can't edit the words |
+| Editable | your team can edit | Client can rewrite the words |
+| Locked | stays put | Client can't move or remove it |
+| Ray | the assistant | Drafts from a source document or description |
+| Preview style | see it in a brand | Renders the block in a client's brand kit |
+| Publish / Save as draft | make it available / keep working | Draft = only staff see it |
+| Used in N documents | where it's used | Which documents include this block |
+
+## For developers — what the mockup fakes
+
+- **Source document** is a static page with three draftable regions. Real: upload PDF/Word, render pages,
+  select a region, extract text/tables. Provenance (`source`) is stored on the block and should become
+  `{docId, page, region}`.
+- **Ray** is a keyword matcher on the description and a fixed lift from the source regions. Real: LLM over
+  the extracted region, returning elements + suggested permissions.
+- **Client attachment.** Blocks are stored brand-neutral with `availability: All clients`. Prior reviews
+  agree the real model is *block → client* (admin-built blocks belong to one client; Tenderfy base blocks
+  are the exception). The mockup does not model this yet; "Preview style" stands in for it.
+- **Persistence** is `localStorage` (`tf_blocks_custom`, `tf_bdraft_*`, `tf_bver_*`). Real: API, per-user
+  drafts, server-side versions.
+- **Image upload** stores a data URL. Real: asset store, per-client library.
+- **"Used in N"** comes from a seeded table; new blocks are 0. Real: count from documents, list them on click.
+- **Client view** is a CSS/contenteditable mode inside the admin editor. Real: the client-side editor
+  enforces Fixed/Editable/Locked server-side.
+
+## Deliberately not built (parked)
+
+Multi-select · per-element horizontal alignment · smarter Ray · deeper version history · a client fact
+store (ABN/licences/insurance) that blocks reference · block analytics / win-rate · starter library per trade.

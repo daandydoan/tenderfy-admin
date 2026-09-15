@@ -15,23 +15,17 @@
 <link rel="stylesheet" href="components.css">
 <style>
   .ed3{display:grid;grid-template-columns:250px minmax(0,1fr) 308px;gap:16px;align-items:stretch;height:calc(100vh - 152px);min-height:500px}
-  .ed3.code-mode{grid-template-columns:250px minmax(0,1fr)}
   .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
   .ed3-col .card{margin-bottom:14px}
   .ed3-mid{height:100%;min-width:0;display:flex;flex-direction:column}
   #visualPanel{display:flex;flex-direction:column;height:100%;min-height:0}
-  #codePanel{display:flex;flex-direction:column;height:100%;min-height:0}
-  .ed3-col,.vb-canvas,.code-ta,.code-prev,.ver-list{scrollbar-width:none;-ms-overflow-style:none}
-  .ed3-col::-webkit-scrollbar,.vb-canvas::-webkit-scrollbar,.code-ta::-webkit-scrollbar,.code-prev::-webkit-scrollbar,.ver-list::-webkit-scrollbar{width:0;height:0;display:none}
+  .ed3-col,.vb-canvas,.ver-list{scrollbar-width:none;-ms-overflow-style:none}
+  .ed3-col::-webkit-scrollbar,.vb-canvas::-webkit-scrollbar,.ver-list::-webkit-scrollbar{width:0;height:0;display:none}
   .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px;margin-right:6px}
   .hdr-brand .ms{font-size:17px;color:var(--teal)}
   .hdr-brand .fin-sm{min-width:172px}
   .use-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--gray);background:#eef2f1;border:1px solid var(--border);border-radius:100px;padding:4px 10px;margin-right:8px}
   .use-chip .ms{font-size:14px;color:var(--teal)}
-  .vb-modes{display:flex;background:#eef2f1;border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:14px;gap:2px}
-  .vb-modes button{flex:1;border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);padding:7px 10px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-  .vb-modes button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.09)}
-  .vb-modes button .ms{font-size:16px}
   .vb-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
   .sel-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--gray);background:#eef2f1;border:1px solid var(--border);border-radius:100px;padding:5px 6px 5px 11px}
   .sel-pill.on{color:var(--teal);background:var(--teal-tint);border-color:#bfe0d9}
@@ -100,6 +94,44 @@
   .insp-sec.closed .insp-h::after,.insp-sec.closed>.fig-sec-h .fig-sec-t::after{transform:rotate(-90deg)}
   .insp-sec.closed>:not(.insp-h):not(.fig-sec-h){display:none!important}
   #sec-perm .insp-h{color:var(--teal);font-size:11.5px}
+  /* Advanced styling fold — native <details>, keeps every control on record without cluttering the panel */
+  .insp-adv{margin-top:16px;border-top:1px solid var(--border);padding-top:8px}
+  .insp-adv summary{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600;color:var(--gray);list-style:none;padding:6px 0}
+  .insp-adv summary::-webkit-details-marker{display:none}
+  .insp-adv summary .ms{font-size:16px;transition:transform .15s} .insp-adv[open] summary .ms{transform:rotate(90deg)}
+  .insp-adv summary .fhint{margin:0;font-size:10.5px}
+  .insp-adv .insp-sec:first-of-type .insp-h{margin-top:6px}
+  /* Table row / column ops */
+  .tbl-ops{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .tbl-ops button{display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid var(--border);background:#fff;border-radius:7px;padding:6px 4px;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--gray);cursor:pointer}
+  .tbl-ops button:hover{border-color:var(--teal);color:var(--teal)} .tbl-ops button .ms{font-size:15px}
+  /* Source document (the client's PDF) — a static page with draftable regions */
+  .src-meta{font-size:11px;color:var(--light);margin:-4px 0 8px}
+  .src-page{background:#fff;border:1px solid var(--border);border-radius:6px;padding:12px 12px 6px;box-shadow:0 2px 8px rgba(20,45,38,.08);font-family:Georgia,'Times New Roman',serif;color:#333;font-size:9.5px;line-height:1.45}
+  .src-hd{font-weight:700;font-size:10.5px;color:#1f2a2e;border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:6px}
+  .src-h2{font-weight:700;font-size:10px;margin-bottom:3px;color:#27535C}
+  .src-region{position:relative;padding:6px 6px 8px;margin:0 -6px 4px;border-radius:6px;border:1.5px dashed transparent;cursor:pointer;transition:.12s}
+  .src-region:hover{border-color:#a893e0;background:#faf9ff}
+  .src-region p,.src-region ul{margin:0} .src-region ul{padding-left:14px}
+  .src-region table{width:100%;border-collapse:collapse} .src-region td{padding:2px 4px;border-bottom:1px solid #eee} .src-region td:last-child{text-align:right;font-weight:700}
+  .src-draft{position:absolute;right:6px;bottom:6px;display:none;align-items:center;gap:4px;border:none;background:#5b46b8;color:#fff;border-radius:6px;padding:4px 8px;font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;cursor:pointer}
+  .src-draft .ms{font-size:13px} .src-region:hover .src-draft{display:inline-flex}
+  .src-region.drafted{border-color:#bfe0d9;background:var(--teal-tint)} .src-region.drafted::after{content:'check_circle';font-family:'Material Symbols Outlined';position:absolute;top:4px;right:6px;color:var(--teal);font-size:14px}
+  .src-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#5b46b8;background:#f3f0fb;border:1px solid #d9d0f2;border-radius:100px;padding:2px 9px}
+  .src-chip .ms{font-size:13px}
+  /* Client view — what the client sees: only Editable sections respond; Locked shows a padlock; nothing else is touchable */
+  .cv-banner{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#1f5a50;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:100px;padding:3px 10px;margin-left:auto}
+  .cv-banner .ms{font-size:14px}
+  .vb-page.client-view .vb-el{cursor:default;border-color:transparent!important;box-shadow:none!important}
+  .vb-page.client-view .vb-el .vb-name,.vb-page.client-view .vb-el .vb-tools,.vb-page.client-view .vb-rowtools{display:none}
+  .vb-page.client-view .vb-el:not(.is-editable) .vb-body{pointer-events:none}
+  .vb-page.client-view .vb-el.is-editable{border:1.5px dashed #c9a9e8!important;cursor:text}
+  .vb-page.client-view .vb-el.is-editable:hover{background:#fbf8ff}
+  .vb-page.client-view .vb-el.is-locked .vb-perm{display:inline-flex} .vb-page.client-view .vb-el.is-locked{border:1.5px solid #e3e8e6!important}
+  .vb-page.client-view .vb-el.is-editable .vb-perm{display:none}
+  /* Page break — reads as a page split, not a divider */
+  .vb-el[data-id="pagebreak"]{margin:10px -60px;padding:14px 0;border-radius:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border-top:1px solid #d9e0de;border-bottom:1px solid #d9e0de}
+  .vb-el[data-id="pagebreak"] .vb-body>div{padding:0 60px}
   .vb-perm{position:absolute;bottom:-9px;left:8px;display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:1px 6px;border-radius:5px;z-index:2}
   .vb-perm .ms{font-size:11px}
   .vb-perm.edit{background:#f2e8fb;color:#8646c4}
@@ -129,13 +161,6 @@
   .vb-widget.struct{background:#f4f7f6}
   .pal-tag{grid-column:1/-1;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:9px 0 1px}
   .pal-tag:first-child{margin-top:0}
-  .code-split{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .code-pane{display:flex;flex-direction:column;min-width:0}
-  .code-pane .ph{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:6px}
-  .code-ta{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.65;border:1px solid var(--border);border-radius:12px;padding:16px;resize:none;background:#0f1720;color:#d7e2df;tab-size:2;outline:none;white-space:pre;overflow:auto}
-  .code-ta:focus{border-color:var(--teal)}
-  .code-prev{flex:1;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto}
-  .code-prev-page{width:100%;max-width:460px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:40px 44px}
   #styleTarget{font-size:12px;color:var(--teal);font-weight:600;margin:-4px 0 10px;display:flex;align-items:center;gap:6px}
   #styleTarget .ms{font-size:15px}
   .insp-actions{display:flex;gap:6px;margin-bottom:12px}
@@ -285,7 +310,7 @@
   .ed3-scrim{display:none}
   @media(min-width:1101px){
     .ed3:not(.st-on) #rightCol{display:none}
-    .ed3:not(.st-on):not(.code-mode){grid-template-columns:250px minmax(0,1fr)}
+    .ed3:not(.st-on){grid-template-columns:250px minmax(0,1fr)}
   }
   @media(max-width:1100px){
     #elBtn{display:flex}
@@ -294,9 +319,9 @@
     #leftCol{left:0;transform:translateX(-106%)}
     #rightCol{right:0;transform:translateX(106%);display:block}
     .ed3.el-on #leftCol{transform:translateX(0)}
-    .ed3.st-on:not(.code-mode) #rightCol{transform:translateX(0)}
+    .ed3.st-on #rightCol{transform:translateX(0)}
     .ed3-scrim{display:block;position:fixed;inset:0;background:rgba(16,26,23,.4);opacity:0;visibility:hidden;transition:opacity .2s;z-index:65}
-    .ed3.el-on ~ .ed3-scrim,.ed3.st-on:not(.code-mode) ~ .ed3-scrim{opacity:1;visibility:visible}
+    .ed3.el-on ~ .ed3-scrim,.ed3.st-on ~ .ed3-scrim{opacity:1;visibility:visible}
   }
 </style>
 </head>
@@ -308,7 +333,7 @@
         <a href="blocks.html" class="pg-back" id="cancelBtn" title="Back to blocks"><span class="ms">arrow_back</span></a>
         <div>
           <input class="pg-name" id="b-label" placeholder="Name this block…" title="Customer-facing label — what clients see when they insert it">
-          <div class="pg-sub">Build visually or in code. Rendered per client's brand.</div>
+          <div class="pg-sub">Reusable section — rendered in each client’s brand.</div>
         </div>
       </div>
       <div class="pg-acts">
@@ -330,20 +355,34 @@
 
     <div class="ed3 st-on">
       <div class="ed3-col" id="leftCol">
-        <div class="vb-modes">
-          <button data-mode="visual" class="on"><span class="ms">dashboard_customize</span> Visual</button>
-          <button data-mode="code"><span class="ms">code</span> Code</button>
+        <div class="card" id="sourceCard">
+          <h3 class="ed-h" style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:17px;color:var(--teal)">picture_as_pdf</span> Source document</h3>
+          <div class="src-meta">WHS Management Plan.pdf · <span id="srcPage">p.4</span> of 31</div>
+          <div class="src-page" id="srcPage4">
+            <div class="src-hd">4.2 Safety Management System</div>
+            <div class="src-region" data-region="sms" title="Draft a block from this section">
+              <div class="src-h2">Our commitment</div>
+              <p>Northside Civil operates a certified Safety Management System (AS/NZS ISO 45001) covering all civil, drainage and traffic-management works. Every project is delivered under a site-specific WHS Management Plan reviewed by our HSEQ Manager before mobilisation.</p>
+              <button class="src-draft"><span class="ms">auto_awesome</span> Draft from this</button>
+            </div>
+            <div class="src-region" data-region="stats" title="Draft a block from this section">
+              <div class="src-h2">Safety performance (last 24 months)</div>
+              <table><tr><td>Lost-time injuries</td><td>0</td></tr><tr><td>Total recordable injury frequency rate</td><td>2.1</td></tr><tr><td>Toolbox talks delivered</td><td>412</td></tr><tr><td>Site inductions completed</td><td>1,180</td></tr></table>
+              <button class="src-draft"><span class="ms">auto_awesome</span> Draft from this</button>
+            </div>
+            <div class="src-region" data-region="controls" title="Draft a block from this section">
+              <div class="src-h2">Key controls on every site</div>
+              <ul><li>Daily pre-start and SWMS sign-on</li><li>Exclusion zones for plant and live traffic</li><li>Certified traffic controllers on all road interfaces</li><li>Weekly HSEQ site audit with corrective-action register</li></ul>
+              <button class="src-draft"><span class="ms">auto_awesome</span> Draft from this</button>
+            </div>
+          </div>
+          <div class="fhint" style="margin-top:8px">Click a section to draft it as a block — Ray keeps the client’s wording and remembers where it came from.</div>
         </div>
         <div class="card" id="elementsCard">
           <h3 class="ed-h">Elements</h3>
           <label class="pal-search"><span class="ms">search</span><input id="palQ" placeholder="Search elements…"></label>
           <div class="vb-pal" id="palette"></div>
           <div class="fhint" style="margin-top:10px">Drag onto the page, or click to add.</div>
-        </div>
-        <div class="card" id="codeCard" style="display:none">
-          <h3 class="ed-h">Custom code</h3>
-          <a class="btn btn-outline btn-sm" id="genBtn" style="width:100%;justify-content:center;margin-bottom:14px"><span class="ms" style="font-size:16px">bolt</span> Generate from visual layout</a>
-          <div class="fhint" style="line-height:1.7"><code style="font-size:11px">var(--brand-primary)</code> · headings<br><code style="font-size:11px">var(--brand-secondary)</code> · accents<br><code style="font-size:11px">{{client.name}}</code> · merge field</div>
         </div>
       </div>
 
@@ -359,6 +398,7 @@
             </span>
             <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
               <span class="autosave" id="autosave"></span>
+              <button class="tb-btn tb-lbl" id="clientViewBtn" title="See the block as the client will — only Editable sections can be changed"><span class="ms">visibility</span> Client view</button>
               <button class="tb-btn tb-lbl on" id="styleBtn" title="Toggle Style panel"><span class="ms">tune</span> Style</button>
             </span>
           </div>
@@ -367,20 +407,10 @@
               <span class="ms" style="font-size:16px;color:var(--teal)">web</span>
               <span id="bar-name">Untitled block</span>
               <span class="muted" id="bar-count" style="font-weight:400"></span>
+              <span class="src-chip" id="srcChip" style="display:none"></span>
+              <span class="cv-banner" id="cvBanner" style="display:none"><span class="ms">visibility</span> Client view — dashed sections are editable, the rest is fixed</span>
             </div>
             <div class="vb-page" id="page"></div>
-          </div>
-        </div>
-        <div id="codePanel" style="display:none">
-          <div class="code-split">
-            <div class="code-pane">
-              <div class="ph"><span class="ms" style="font-size:15px">code</span> HTML</div>
-              <textarea id="codeArea" class="code-ta" spellcheck="false" placeholder="<div>Your block markup…</div>"></textarea>
-            </div>
-            <div class="code-pane">
-              <div class="ph"><span class="ms" style="font-size:15px">visibility</span> Live preview</div>
-              <div class="code-prev"><div class="code-prev-page" id="codePrev"></div></div>
-            </div>
           </div>
         </div>
       </div>
@@ -406,9 +436,16 @@
             <div class="insp-h">Image source</div>
             <div class="insp-row"><label>Source</label><div class="seg full" id="s-imgsrc">
               <button data-src="placeholder">Placeholder</button>
-              <button data-src="client">Client asset</button>
+              <button data-src="client">Client logo</button>
+              <button data-src="upload">Upload</button>
             </div></div>
-            <div class="fhint">“Client asset” inherits each client’s logo — pick a client in Preview style to see it.</div>
+            <label class="btn btn-outline btn-sm" id="imgUploadBtn" style="display:none;margin-top:6px"><span class="ms" style="font-size:16px">upload</span> Choose image<input type="file" id="imgFile" accept="image/*" hidden></label>
+            <div class="fhint">“Client logo” inherits each client’s logo — pick a client in Preview style to see it.</div>
+          </div>
+
+          <div class="insp-sec" id="sec-table" style="display:none">
+            <div class="insp-h">Rows &amp; columns</div>
+            <div class="tbl-ops"><button data-tbl="row+"><span class="ms">add</span> Row</button><button data-tbl="row-"><span class="ms">remove</span> Row</button><button data-tbl="col+"><span class="ms">add</span> Column</button><button data-tbl="col-"><span class="ms">remove</span> Column</button></div>
           </div>
 
           <div class="insp-sec" id="sec-perm" style="display:none">
@@ -445,6 +482,7 @@
               </div>
             </div>
           </div>
+          <details class="insp-adv" id="inspAdv"><summary><span class="ms">tune</span> Advanced styling <span class="fhint" style="margin-left:auto">spacing · type · borders</span></summary>
           <div class="insp-sec" data-sec="dim" data-need="pad">
             <div class="insp-h">Dimension</div>
             <div class="fig-box" data-box="pad">
@@ -494,6 +532,7 @@
               <div class="insp-row" data-field="bwstyle" style="margin-top:8px"><label>Style</label><select class="insp-sel" id="s-bstyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
             </div>
           </div>
+          </details>
         </div>
       </div>
     </div>
@@ -586,12 +625,6 @@ const TEMPLATES=[
   {key:'paragraph',label:'Paragraph',icon:'notes'},{key:'imgtext',label:'Image + text',icon:'wysiwyg'},
   {key:'double',label:'Two columns of text',icon:'view_column'},{key:'feature',label:'Feature panel',icon:'featured_video'},
 ];
-const CODE_STARTER=`<div style="display:flex;gap:24px">
-  <div style="flex:1">
-    <h3 style="font-family:inherit;color:var(--brand-primary,#27535C);border-bottom:2px solid var(--brand-secondary,#38988A);padding-bottom:6px;margin:0 0 10px">{{client.name}}</h3>
-    <p style="color:#3A4442;line-height:1.6;margin:0">Use <b>var(--brand-primary)</b> and merge fields like <b>{{client.name}}</b> so this block personalises per client automatically.</p>
-  </div>
-</div>`;
 // Dynamic fields available to insert / bind.
 const FIELDS=[
   {key:'client.name',label:'Client name'},{key:'client.industry',label:'Client industry'},{key:'client.abn',label:'Client ABN'},
@@ -643,7 +676,6 @@ function pageInit(){
   const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
   let doc = existing ? normDoc(clone(P2DOC[existing.p]||[{cols:[['paragraph']]}])) : [];
-  let mode = 'visual';
   let drag = null;
   let brand = null, brandIdx = 0, activeTenant = null;
   let sel = null;
@@ -655,6 +687,8 @@ function pageInit(){
   const NEUTRAL={primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
   const blockStyle={wmode:'fill', wpx:520, hmode:'fill', hpx:200, alH:'left', alV:'top', padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', bgA:100, bgVis:true, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:'', bcolorA:100, bcolorVis:true, bpos:'inside'};
   if(existing && existing.blockStyle) Object.assign(blockStyle, existing.blockStyle);
+  let source = (existing && existing.source) || '';   // provenance: which client document this block was drafted from
+  let clientView=false;
   // Padding / margin CSS — one number (overall) or four (per side).
   function boxCss(s,key){ if(!s)return '0px'; if(s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; const h=(s[key+'H']!=null)?s[key+'H']:(s[key]||0), v=(s[key+'V']!=null)?s[key+'V']:(s[key]||0); return `${v}px ${h}px`; }
   function radCss(s){ if(s&&s.radSides) return `${s.radTL||0}px ${s.radTR||0}px ${s.radBR||0}px ${s.radBL||0}px`; return `${(s&&s.rad)||0}px`; }
@@ -671,8 +705,6 @@ function pageInit(){
 
   const page=document.getElementById('page');
   const wrap=document.getElementById('cvWrap');
-  const codeArea=document.getElementById('codeArea');
-  const codePrev=document.getElementById('codePrev');
 
   document.getElementById('b-cat').innerHTML=BLOCK_CATS.map(c=>`<option>${c}</option>`).join('');
   document.getElementById('s-field').innerHTML=FIELDS.map(f=>`<option value="${f.key}">${f.label}</option>`).join('');
@@ -743,6 +775,7 @@ function pageInit(){
         ? `<span style="border-bottom:1px dashed ${activeTenant?activeTenant.brand.secondary:'#38988a'};color:#3A4442;font-size:13px">${val}</span>`
         : `<span style="background:var(--teal-tint);color:var(--teal);border:1px solid #bfe0d9;border-radius:5px;padding:1px 8px;font-size:12.5px;font-weight:600">{{ ${fieldLabel(el.field)} }}</span>`;
     }
+    if(el.id==='image' && el.src==='upload' && !(el.content&&el.content.img)) return `<div style="height:118px;border:1.5px dashed #b7c2bf;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--light)"><span class="ms">upload</span><span style="font-size:11px">Choose an image in the Style panel</span></div>`;
     if(el.id==='image' && el.src==='client'){
       if(activeTenant){ const t=activeTenant;
         return `<div style="display:flex;align-items:center;gap:11px;background:${t.brand.background};border:1px solid ${t.brand.primary}22;border-radius:8px;padding:12px 14px">
@@ -759,7 +792,7 @@ function pageInit(){
     const cls = 'vb-el'+(on?' selected':'')+(perm==='editable'?' is-editable':'')+(perm==='locked'?' is-locked':'');
     const badge = perm==='editable' ? '<span class="vb-perm edit"><span class="ms">edit</span>Editable</span>'
       : perm==='locked' ? '<span class="vb-perm lock"><span class="ms">lock</span>Locked</span>' : '';
-    return `<div class="${cls}" data-r="${r}" data-c="${c}" data-k="${k}">
+    return `<div class="${cls}" data-id="${el.id}" data-r="${r}" data-c="${c}" data-k="${k}">
       <div class="vb-name"><span class="ms" style="font-size:12px">${PRIM_ICON[el.id]||'widgets'}</span>${ELEMS[el.id]||el.id}</div>
       <div class="vb-tools">
         <span class="tb grab" data-handle title="Drag to move"><span class="ms">drag_indicator</span></span>
@@ -797,6 +830,7 @@ function pageInit(){
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
+    const sc=document.getElementById('srcChip'); sc.style.display=source?'':'none'; sc.innerHTML=source?`<span class="ms">picture_as_pdf</span> From ${source}`:'';
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
   function loadTemplate(key){ doc = key ? normDoc(clone(P2DOC[key]||[])) : []; sel=null; render(); commit(); }
@@ -811,14 +845,14 @@ function pageInit(){
   function editBrand(){
     if(!brand) return;
     ensureBrandTokens({brand});
-    openBrandEditor(brand,{title:'Brand Kit — '+(BRANDS[brandIdx]?BRANDS[brandIdx].name:'brand'), onSave:()=>{ applyBrand(); render(); renderCode(); }});
+    openBrandEditor(brand,{title:'Brand Kit — '+(BRANDS[brandIdx]?BRANDS[brandIdx].name:'brand'), onSave:()=>{ applyBrand(); render(); }});
   }
   function addStyle(){
     const s={id:'style-'+Date.now(), name:'New style '+(customStyles.length+1), initials:'NS', brand:{primary:'#27535C',secondary:'#38988A',background:'#F7F9F8',font:'Outfit',bodyFont:'Outfit'}};
     ensureBrandTokens(s); customStyles.push(s); rebuildBrands();
     brandIdx=BRANDS.findIndex(x=>x.id===s.id); brand=s.brand; activeTenant=s;
-    refreshBrandOptions(); updateEditBtn(); applyBrand(); render(); renderCode();
-    openBrandEditor(brand,{title:'Brand Kit — '+s.name, onSave:()=>{ rebuildBrands(); refreshBrandOptions(); applyBrand(); render(); renderCode(); }});
+    refreshBrandOptions(); updateEditBtn(); applyBrand(); render();
+    openBrandEditor(brand,{title:'Brand Kit — '+s.name, onSave:()=>{ rebuildBrands(); refreshBrandOptions(); applyBrand(); render(); }});
   }
   function buildBrandSelect(){
     const el=document.getElementById('brandSel');
@@ -828,14 +862,14 @@ function pageInit(){
       const newIdx=+el.value; el.value=String(brandIdx);
       if(newIdx===brandIdx) return;
       const to=BRANDS[newIdx];
-      const proceed=()=>{ brandIdx=newIdx; el.value=String(newIdx); brand=to.brand; activeTenant=to.tenant||null; updateEditBtn(); applyBrand(); render(); renderCode(); };
+      const proceed=()=>{ brandIdx=newIdx; el.value=String(newIdx); brand=to.brand; activeTenant=to.tenant||null; updateEditBtn(); applyBrand(); render(); };
       proceed();   // re-render only — nothing is lost
     });
     document.getElementById('editBrandBtn').addEventListener('click',editBrand);
     updateEditBtn();
   }
   function applyBrand(){
-    [page, codePrev].forEach(elm=>{ if(!elm) return;
+    [page].forEach(elm=>{
       if(brand){ elm.style.setProperty('--brand-primary',brand.primary); elm.style.setProperty('--brand-secondary',brand.secondary); elm.style.setProperty('--brand-bg',brand.background); }
       else { elm.style.removeProperty('--brand-primary'); elm.style.removeProperty('--brand-secondary'); elm.style.removeProperty('--brand-bg'); }
     });
@@ -928,6 +962,10 @@ function pageInit(){
     document.getElementById('sec-perm').style.display = sel?'':'none';
     document.getElementById('sec-field').style.display = id==='field'?'':'none';
     document.getElementById('sec-imgsrc').style.display = id==='image'?'':'none';
+    document.getElementById('imgUploadBtn').style.display = (id==='image' && selEl().src==='upload')?'':'none';
+    document.getElementById('sec-table').style.display = (id==='table'||id==='keyvalue')?'':'none';
+    document.getElementById('imgUploadBtn').style.display = (id==='image' && selEl().src==='upload')?'':'none';
+    document.getElementById('sec-table').style.display = (id==='table'||id==='keyvalue')?'':'none';
     document.getElementById('s-preset').style.display = sel?'':'none';
   }
 
@@ -1088,7 +1126,19 @@ function pageInit(){
       figScrub(ic, ()=>+inp.value||0, v=>{ if(inp.disabled) return; const mn=+inp.min||0, mx=(inp.max!==''&&inp.max!=null)?+inp.max:1e5; inp.value=Math.max(mn,Math.min(mx,v)); inp.dispatchEvent(new Event('input',{bubbles:true})); }); });
     // field / image-source / permission
     document.getElementById('s-field').addEventListener('change',e=>{ if(selEl()){ selEl().field=e.target.value; render(); commit(); } });
-    document.querySelectorAll('#s-imgsrc button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().src=b.dataset.src; render(); commit(); } }));
+    document.querySelectorAll('#s-imgsrc button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().src=b.dataset.src; render(); commit(); if(b.dataset.src==='upload' && !(selEl().content&&selEl().content.img)) document.getElementById('imgFile').click(); } }));
+    document.getElementById('imgFile').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0], el=selEl(); if(!f||!el) return;
+      if(f.size>1600000){ showToast('Image too large — keep it under ~1.5 MB'); e.target.value=''; return; }
+      const rd=new FileReader(); rd.onload=()=>{ el.content=Object.assign({},el.content,{img:rd.result}); render(); commit(); }; rd.readAsDataURL(f); e.target.value=''; });
+    // Table / key-value rows & columns — edit the captured content, re-render.
+    document.querySelectorAll('.tbl-ops button').forEach(b=>b.addEventListener('click',()=>{ const el=selEl(); if(!el) return;
+      const c=captureContent(elNode(sel.r,sel.c,sel.k)), op=b.dataset.tbl;
+      if(el.id==='keyvalue'){ c.pairs=c.pairs||[]; if(op==='row+') c.pairs.push(['Label','Value']); else if(op==='row-'&&c.pairs.length>1) c.pairs.pop(); else { showToast('Key / value has two columns'); return; } }
+      else { c.headers=c.headers||[]; c.rows=c.rows||[]; const n=c.headers.length||1;
+        if(op==='row+') c.rows.push(Array(n).fill('')); else if(op==='row-'&&c.rows.length>1) c.rows.pop();
+        else if(op==='col+'){ c.headers.push('Column'); c.rows.forEach(r=>r.push('')); } else if(op==='col-'&&c.headers.length>1){ c.headers.pop(); c.rows.forEach(r=>r.pop()); } else return; }
+      el.content=c; const keep=sel; render(); sel=keep; applySelection(); commit();
+    }));
     document.querySelectorAll('#s-perm button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().perm=b.dataset.perm; render(); commit(); } }));
     // presets / copy / paste / reset
     document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); if('bg' in p.st) target().bgBind=''; if('bcolor' in p.st) target().bcolorBind=''; applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
@@ -1096,7 +1146,7 @@ function pageInit(){
     document.getElementById('s-paste').addEventListener('click',()=>{ if(!styleClip) return; Object.assign(target(), clone(styleClip)); applyActive(); syncInspector(); commit(); showToast('Style pasted'); });
     document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,hmode:'fill',hpx:200,alH:'left',alV:'top',padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',bgA:100,bgVis:true,rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'}); } applyActive(); render(); commit(); showToast('Style reset'); });
     // Collapsible sections — remembered per browser; the long tail starts closed so Permission/Layout/Fill are one glance.
-    const CKEY='tf_insp_closed'; let closed; try{ closed=JSON.parse(localStorage.getItem(CKEY)); }catch(e){} if(!Array.isArray(closed)) closed=['dim','typo','border'];
+    const CKEY='tf_insp_closed'; let closed; try{ closed=JSON.parse(localStorage.getItem(CKEY)); }catch(e){} if(!Array.isArray(closed)) closed=[];
     const applyClosed=()=>document.querySelectorAll('#styleCard .insp-sec[data-sec]').forEach(s=>s.classList.toggle('closed', closed.includes(s.dataset.sec)));
     document.querySelectorAll('#styleCard .insp-sec[data-sec] > .insp-h, #styleCard .insp-sec[data-sec] > .fig-sec-h').forEach(h=>h.addEventListener('click',e=>{
       if(e.target.closest('button')) return; const k=h.parentElement.dataset.sec;
@@ -1125,7 +1175,7 @@ function pageInit(){
   function wire(){
     page.querySelectorAll('.vb-el').forEach(el=>{
       const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k;
-      el.addEventListener('click',e=>{ if(e.target.closest('[data-handle],[data-dup],[data-del]'))return; e.stopPropagation(); selectEl(r,c,k); });
+      el.addEventListener('click',e=>{ if(clientView || e.target.closest('[data-handle],[data-dup],[data-del]'))return; e.stopPropagation(); selectEl(r,c,k); });
       el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();delEl({r,c,k});});
       el.querySelector('[data-dup]').addEventListener('click',e=>{e.stopPropagation();dupEl({r,c,k});});
       const h=el.querySelector('[data-handle]');
@@ -1171,7 +1221,8 @@ function pageInit(){
   function wireText(){
     page.querySelectorAll('.vb-el').forEach(el=>{
       const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k, body=el.querySelector('.vb-body');
-      body.querySelectorAll('[data-ek]:not([data-ek=row]):not([data-ek=pair]),[data-ec]').forEach(n=>n.setAttribute('contenteditable','plaintext-only'));
+      const canEdit = !clientView || el.classList.contains('is-editable');
+      body.querySelectorAll('[data-ek]:not([data-ek=row]):not([data-ek=pair]),[data-ec]').forEach(n=>n.setAttribute('contenteditable', canEdit?'plaintext-only':'false'));
       body.addEventListener('input',()=>{ doc[r].cols[c][k].content=captureContent(body); autosave(); });
       body.addEventListener('focusout',()=>pushHist());
       body.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.target.closest('[data-ek=items]')) e.preventDefault(); });
@@ -1216,37 +1267,6 @@ function pageInit(){
     cleanup(); clearInd(); drag=null; sel=null; render(); commit();
   });
 
-  // ---- Code mode ----
-  function docToHtml(){
-    if(!doc.length) return '<!-- Empty block -->';
-    const one=el=> el.id==='field' ? `{{${el.field}}}` : renderPrimitive(el.id, undefined, el.content);
-    return doc.map(row=>{
-      const multi=row.cols.length>1;
-      if(!multi){ return row.cols[0].map(one).join('\n'); }
-      const cols=row.cols.map(col=>`  <div style="flex:1">\n    ${col.map(one).join('\n    ')}\n  </div>`).join('\n');
-      return `<div style="display:flex;gap:24px">\n${cols}\n</div>`;
-    }).join('\n\n');
-  }
-  function renderCode(){ codePrev.innerHTML = codeArea.value.trim() || '<div style="color:#9aa5a3;text-align:center;padding:50px 0">Preview appears as you type</div>'; }
-  codeArea.addEventListener('input',()=>{renderCode();autosave();});
-  document.getElementById('genBtn').addEventListener('click',()=>{
-    const fill=()=>{ codeArea.value=docToHtml(); renderCode(); showToast('Generated code from the visual layout'); };
-    if(codeArea.value.trim()) confirmAction({title:'Replace your code?',body:'This overwrites the editor with markup generated from the visual layout.',confirm:'Replace'},fill);
-    else fill();
-  });
-  function setMode(m){
-    if(m===mode) return; mode=m;
-    document.querySelectorAll('.vb-modes button').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
-    document.getElementById('visualPanel').style.display = m==='visual'?'':'none';
-    document.getElementById('codePanel').style.display  = m==='code'?'':'none';
-    document.getElementById('elementsCard').style.display = m==='visual'?'':'none';
-    document.getElementById('codeCard').style.display     = m==='code'?'':'none';
-    document.getElementById('rightCol').style.display = m==='code'?'none':'';
-    document.querySelector('.ed3').classList.toggle('code-mode', m==='code');
-    if(m==='code'){ if(!codeArea.value.trim()){ codeArea.value = doc.length?docToHtml():CODE_STARTER; } renderCode(); if(doc.length) showToast('Editing custom code — the visual layout stays intact until you save'); }
-  }
-  document.querySelectorAll('.vb-modes button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
-
   // ---- Undo / redo / history / autosave ----
   const vkey=bid=>'tf_bver_'+(bid||(existing?existing.id:'new'));
   const DKEY='tf_bdraft_'+(existing?existing.id:'new');
@@ -1272,11 +1292,11 @@ function pageInit(){
   });
   // Draft = canvas + style + the details fields, so a reload can pick up exactly where you were.
   const fields=()=>Object.fromEntries(['b-name','b-label','b-desc','b-cat'].map(i=>[i,document.getElementById(i).value]));
-  function autosave(){ clearTimeout(autoT); autoT=setTimeout(()=>{ try{ localStorage.setItem(DKEY, JSON.stringify({doc, blockStyle, fields:fields(), slot:blockSlot})); }catch(e){} const t=new Date(); document.getElementById('autosave').innerHTML=`<span class="ms">cloud_done</span> Autosaved · ${t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`; },600); }
+  function autosave(){ clearTimeout(autoT); autoT=setTimeout(()=>{ try{ localStorage.setItem(DKEY, JSON.stringify({doc, blockStyle, fields:fields(), slot:blockSlot, source})); }catch(e){} const t=new Date(); document.getElementById('autosave').innerHTML=`<span class="ms">cloud_done</span> Autosaved · ${t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`; },600); }
   function resumeDraft(){
     let d; try{ d=JSON.parse(localStorage.getItem(DKEY)); }catch(e){} if(!d || !(d.doc&&d.doc.length)) return;
     confirmAction({title:'Resume unsaved draft?',body:'You have autosaved changes to this block that were never saved. Pick up where you left off, or discard them.',confirm:'Resume',cancel:'Discard'},()=>{
-      doc=normDoc(d.doc); Object.assign(blockStyle, d.blockStyle||{}); Object.entries(d.fields||{}).forEach(([i,v])=>{ document.getElementById(i).value=v; }); if(d.slot) blockSlot=d.slot;
+      doc=normDoc(d.doc); Object.assign(blockStyle, d.blockStyle||{}); Object.entries(d.fields||{}).forEach(([i,v])=>{ document.getElementById(i).value=v; }); if(d.slot) blockSlot=d.slot; source=d.source||'';
       sel=null; applyStationeryUI(); render(); syncBar(); pushHist(); showToast('Draft restored');
     }, ()=>{ try{ localStorage.removeItem(DKEY); }catch(e){} });
   }
@@ -1307,7 +1327,7 @@ function pageInit(){
   document.getElementById('verModal').addEventListener('click',e=>{ if(e.target.id==='verModal') e.currentTarget.classList.remove('open'); });
 
   // ---- Naming / save ----
-  const hasContent=()=> doc.reduce((s,row)=>s+row.cols.reduce((a,c)=>a+c.length,0),0)>0 || (mode==='code' && !!codeArea.value.trim());
+  const hasContent=()=> doc.reduce((s,row)=>s+row.cols.reduce((a,c)=>a+c.length,0),0)>0;
   function syncBar(){ document.getElementById('bar-name').textContent=document.getElementById('b-label').value.trim()||'Untitled block'; }
   document.getElementById('b-label').addEventListener('input',()=>{ syncBar(); autosave(); });
 
@@ -1374,7 +1394,6 @@ function pageInit(){
     setIf('b-name',name); setIf('b-label',label); setIf('b-desc',help);
     if(BLOCK_CATS.includes(cat)) document.getElementById('b-cat').value=cat;
     applyStationeryUI();
-    if(mode==='code') setMode('visual');
     doc=normDoc(layout); sel=null; render(); commit(); syncBar();
   }
   // Reference-image drop zone (mock — Ray "reads" the image alongside the description)
@@ -1397,6 +1416,35 @@ function pageInit(){
     if(hasContent()) confirmAction({title:'Replace the canvas?',body:'Ray’s draft replaces what’s on the canvas now. Undo brings it back.',confirm:'Draft it'},go); else go();
   });
 
+  // ---- Source document: draft a block from a region of the client's PDF (mock — the page is static,
+  // but the words that land on the canvas are the client's, and the block remembers where they came from).
+  document.querySelectorAll('.src-region').forEach(reg=>reg.addEventListener('click',()=>{
+    const h=reg.querySelector('.src-h2').textContent, els=[];
+    const mk=(id,content)=>{ const e=mkEl(id); e.content=content; return e; };
+    els.push(mk('subheading',{title:h}));
+    const p=reg.querySelector('p'); if(p) els.push(mk('paragraph',{body:p.textContent}));
+    const ul=reg.querySelector('ul'); if(ul) els.push(mk('list',{items:[...ul.querySelectorAll('li')].map(l=>l.textContent)}));
+    const tb=reg.querySelector('table'); if(tb) els.push(mk('keyvalue',{pairs:[...tb.querySelectorAll('tr')].map(tr=>[...tr.children].map(td=>td.textContent))}));
+    const go=()=>{
+      doc.push({cols:[els]}); source='WHS Management Plan · p.4'; reg.classList.add('drafted');
+      const lbl=document.getElementById('b-label'); if(!lbl.value.trim()){ lbl.value=h; syncBar(); }
+      sel=null; render(); commit(); showToast('Ray drafted “'+h+'” from the source document — mark what the client may edit, then Save');
+      page.scrollIntoView({block:'end',behavior:'smooth'});
+    };
+    go();
+  }));
+
+  // ---- Client view: what the client sees. Only Editable sections take a cursor; Locked shows its padlock; nothing else responds.
+
+  document.getElementById('clientViewBtn').addEventListener('click',()=>{
+    clientView=!clientView; sel=null; applySelection();
+    page.classList.toggle('client-view', clientView);
+    document.getElementById('clientViewBtn').classList.toggle('on', clientView);
+    document.getElementById('cvBanner').style.display = clientView?'':'none';
+    page.querySelectorAll('.vb-el').forEach(el=>{ const editable=el.classList.contains('is-editable'); el.querySelectorAll('[contenteditable]').forEach(n=>n.setAttribute('contenteditable', (!clientView||editable)?'plaintext-only':'false')); });
+    if(clientView && !page.querySelector('.vb-el.is-editable')) showToast('Nothing is marked Editable — the client could only read this block');
+  });
+
   // ---- Save → publish confirmation ----
   const pubModal=document.getElementById('pubModal');
   function openPublish(){
@@ -1413,20 +1461,19 @@ function pageInit(){
     const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
     const bid = existing ? existing.id : 'cb-'+Date.now();
     saveCustomBlock({id:bid, name:nm, label:l, desc:document.getElementById('b-desc').value.trim(), cat:document.getElementById('b-cat').value,
-      slot:isStationery()?blockSlot:undefined, status:published?'active':'draft', doc:clone(doc), blockStyle:clone(blockStyle)});
+      slot:isStationery()?blockSlot:undefined, source, status:published?'active':'draft', doc:clone(doc), blockStyle:clone(blockStyle)});
     saveVersion(nm, bid); base=snap(); leaving=true;
     try{ localStorage.removeItem(DKEY); }catch(e){}
     const kind = isStationery() ? (blockSlot==='footer'?'footer':'letterhead') : 'block';
     const msg = published
-      ? (existing?'Updated & published':'Published')+(mode==='code'?' custom-coded':'')+' '+kind+': '+l+(usage>0?` · pushed to ${usage} documents`:'')
+      ? (existing?'Updated & published':'Published')+' '+kind+': '+l+(usage>0?` · pushed to ${usage} documents`:'')
       : 'Saved “'+l+'” as a draft';
     showToast(msg);
     setTimeout(()=>location.href='blocks.html',900);
   }
   function doSave(){
     const total=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
-    if(mode==='code'){ if(!codeArea.value.trim()){showToast('Add some code, or switch to the visual builder');return;} }
-    else if(!total){ showToast('Add at least one element to the canvas'); return; }
+    if(!total){ showToast('Add at least one element to the canvas'); return; }
     const nm=document.getElementById('b-name').value.trim(), l=document.getElementById('b-label').value.trim();
     if(!detailsValid()) return;
     openPublish();

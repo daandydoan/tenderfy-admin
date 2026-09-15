@@ -178,7 +178,7 @@ function mergeCustomBlocks(){
   Object.values(loadCustomBlocks()).forEach(c=>{
     let b=BLOCKS.find(x=>x.id===c.id);
     if(!b){ b={id:c.id, p:c.id, kind:'block'}; BLOCKS.push(b); COMPOSED_BLOCKS.push(b); }
-    Object.assign(b,{name:c.name,label:c.label,desc:c.desc,cat:c.cat}); if(c.slot) b.slot=c.slot;
+    Object.assign(b,{name:c.name,label:c.label,desc:c.desc,cat:c.cat,source:c.source||''}); if(c.slot) b.slot=c.slot;
     P2DOC[b.p]=c.doc; b.blockStyle=c.blockStyle;
     BLOCK_STATUS[c.id]=c.status||'active';
     if(!BLOCK_LIB_CATS.includes(b.cat)) BLOCK_LIB_CATS.push(b.cat);
