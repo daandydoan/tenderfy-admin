@@ -44,18 +44,63 @@ function renderStationery(p, b){
   }
 }
 
+// ---- Element style (el.st) -> CSS. Shared by the block builder canvas and this renderer so they can't drift. ----
+function boxCss(s,key){ if(!s)return '0px'; if(s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; const h=(s[key+'H']!=null)?s[key+'H']:(s[key]||0), v=(s[key+'V']!=null)?s[key+'V']:(s[key]||0); return `${v}px ${h}px`; }
+function radCss(s){ if(s&&s.radSides) return `${s.radTL||0}px ${s.radTR||0}px ${s.radBR||0}px ${s.radBL||0}px`; return `${(s&&s.rad)||0}px`; }
+const radAny=s=>!!s&&(s.radSides?(s.radTL||s.radTR||s.radBR||s.radBL):s.rad>0);
+function paintCss(hex,a){ if(a==null||a>=100||!hex) return hex||''; a=Math.max(0,Math.min(100,a))/100; let h=String(hex).replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); if(isNaN(n)) return hex; return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`; }
+// A stroke with no weight isn't a stroke — older elements carry a default colour with bw:0.
+const paintOn=(t,key)=> (key==='bcolor' && !(t.bw>0)) ? false : (!!(t[key]&&t[key]!=='') || !!(t[key+'Bind']&&t[key+'Bind']!=='none'));
+const paintVisible=(t,key)=> paintOn(t,key) && t[key+'Vis']!==false;
+const roleOr=(brand,key)=> (typeof roleValue==='function') ? roleValue(brand,key) : '';
+function resolveFill(st, brand){ const bd=st.bgBind; if(!bd) return (st.bg&&st.bg!=='transparent')?st.bg:''; if(bd==='none') return ''; return roleOr(brand, bd); }
+function resolveBColor(st, brand){ const bd=st.bcolorBind; if(!bd) return st.bcolor; return roleOr(brand, bd); }
+// Three style maps: the element's outer box (sizing), its body (paint/spacing) and typography for its text nodes.
+function elStyle(st, brand){
+  st=st||{}; const ewm=st.wmode||'fill', ehm=st.hmode||'fill', HM={left:'flex-start',center:'center',right:'flex-end'};
+  const box={ flex:'0 0 auto' };
+  if(ewm==='fixed') box.width=(st.wpx||0)+'px'; if(ewm==='min') box.minWidth=(st.wpx||0)+'px'; if(ewm==='max') box.maxWidth=(st.wpx||0)+'px';
+  if(ewm==='fixed'||ewm==='max') box.alignSelf=HM[st.alH||'left'];
+  const body={};
+  if(ehm==='fixed') body.height=(st.hpx||0)+'px'; if(ehm==='max') body.maxHeight=(st.hpx||0)+'px';
+  const pad=boxCss(st,'pad'), mar=boxCss(st,'mar'); if(pad!=='0px 0px'&&pad!=='0px') body.padding=pad; if(mar!=='0px 0px'&&mar!=='0px') body.margin=mar;
+  if(paintVisible(st,'bg')){ const bg=paintCss(resolveFill(st,brand), st.bgA); if(bg) body.background=bg; }
+  if(radAny(st)) body.borderRadius=radCss(st);
+  const ov = ehm==='fixed' ? 'hidden' : (ehm==='max' ? 'auto' : (radAny(st)?'hidden':'')); if(ov) body.overflow=ov;
+  if(paintVisible(st,'bcolor') && st.bw>0){ const col=paintCss(resolveBColor(st,brand), st.bcolorA); if(st.bpos==='inside') body.boxShadow=`inset 0 0 0 ${st.bw}px ${col}`; else body.border=`${st.bw}px ${st.bstyle||'solid'} ${col}`; }
+  if(st.align) body.textAlign=st.align;
+  const typo={};
+  if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
+  if(st.size) typo.fontSize=st.size+'px'; if(st.lh) typo.lineHeight=st.lh+'px'; if(st.ls) typo.letterSpacing=st.ls+'px'; if(st.color) typo.color=st.color;
+  return {box, body, typo};
+}
+const TYPO_SEL='h1,h2,h3,h4,h5,p,li,span,a,blockquote,strong,em,td,th,ul,div';
+const cssStr=o=>Object.entries(o).map(([k,v])=>k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';');
+// One element as the document sees it: sizing box > body > primitive, typography pushed onto the text nodes (primitives set inline colours, so inheritance isn't enough).
+function renderStyledEl(el, brand){
+  const html=renderPrimitive(el.id||el, brand, el.content); const st=el.st; if(!st) return html;
+  const {box,body,typo}=elStyle(st, brand);
+  let inner=html;
+  if(Object.keys(typo).length && typeof document!=='undefined'){ const tpl=document.createElement('template'); tpl.innerHTML=html; tpl.content.querySelectorAll(TYPO_SEL).forEach(n=>Object.assign(n.style,typo)); inner=tpl.innerHTML; }
+  return `<div style="${cssStr(box)}"><div style="${cssStr(Object.assign({},typo,body))}">${inner}</div></div>`;
+}
+const isSized=el=>{ const s=el&&el.st; return !!s && ['fixed','min','max'].includes(s.wmode||'fill'); };
+
 // Render a real preview of a block (rows -> columns -> primitives) in a brand.
 function composeBlock(block, brand){
   if(/^l[hf]-/.test(block.p)) return renderStationery(block.p, brand);
   const doc = P2DOC[block.p] || [{cols:[[block.p]]}];
-  return doc.map(row=>{
+  const rowHtml=row=>{
     if(row.cols.length>1){
       const VJ={top:'flex-start',middle:'center',bottom:'flex-end'};
-      const cols = row.cols.map((col,i)=>`<div style="flex:${(row.ratio&&row.ratio[i])||1};min-width:0;display:flex;flex-direction:column;gap:11px;justify-content:${VJ[(row.valign||[])[i]]||'flex-start'}">${col.map(el=>renderPrimitive(el.id||el, brand, el.content)).join('')}</div>`).join('');
+      // A column holding a Fixed/Min/Max-width element sizes to it; the others fill the rest (same rule as the canvas).
+      const cols = row.cols.map((col,i)=>`<div style="flex:${col.some(isSized)?'0 1 auto':((row.ratio&&row.ratio[i])||1)};min-width:0;display:flex;flex-direction:column;gap:11px;justify-content:${VJ[(row.valign||[])[i]]||'flex-start'}">${col.map(el=>renderStyledEl(el, brand)).join('')}</div>`).join('');
       return `<div style="display:flex;gap:24px;margin-bottom:18px">${cols}</div>`;
     }
-    return `<div style="display:flex;flex-direction:column;gap:11px;margin-bottom:18px">${row.cols[0].map(el=>renderPrimitive(el.id||el, brand, el.content)).join('')}</div>`;
-  }).join('');
+    return `<div style="display:flex;flex-direction:column;gap:11px;margin-bottom:18px">${row.cols[0].map(el=>renderStyledEl(el, brand)).join('')}</div>`;
+  };
+  // ponytail: a repeating row renders twice as a stand-in for "one per item" until the estimator side can add items.
+  return doc.map(row=>{ const h=rowHtml(row); if(!row.repeat) return h; return row.repeat==='h' ? `<div style="display:flex;gap:24px;margin-bottom:18px">${[h,h].map(x=>'<div style="flex:1;min-width:0">'+x.replace('margin-bottom:18px','margin-bottom:0')+'</div>').join('')}</div>` : h+h; }).join('');
 }
 
 // The distinct primitives a block is composed from (for a "made of" summary).
@@ -67,4 +112,4 @@ function blockElements(block){
 }
 
 if(typeof mergeCustomBlocks==='function') mergeCustomBlocks();   // blocks-data.js may have loaded first
-if(typeof window!=='undefined'){ window.P2DOC=P2DOC; window.composeBlock=composeBlock; window.blockElements=blockElements; window.renderStationery=renderStationery; }
+if(typeof window!=='undefined'){ window.P2DOC=P2DOC; window.composeBlock=composeBlock; Object.assign(window,{boxCss,radCss,radAny,paintCss,paintOn,paintVisible,resolveFill,resolveBColor,elStyle,TYPO_SEL}); window.blockElements=blockElements; window.renderStationery=renderStationery; }

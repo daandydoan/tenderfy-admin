@@ -674,15 +674,8 @@ function pageInit(){
   if(existing && existing.blockStyle) Object.assign(blockStyle, existing.blockStyle);
   let source = (existing && existing.source) || '';   // provenance: which client document this block was drafted from
   // Padding / margin CSS — one number (overall) or four (per side).
-  function boxCss(s,key){ if(!s)return '0px'; if(s[key+'Sides']) return `${s[key+'T']||0}px ${s[key+'R']||0}px ${s[key+'B']||0}px ${s[key+'L']||0}px`; const h=(s[key+'H']!=null)?s[key+'H']:(s[key]||0), v=(s[key+'V']!=null)?s[key+'V']:(s[key]||0); return `${v}px ${h}px`; }
-  function radCss(s){ if(s&&s.radSides) return `${s.radTL||0}px ${s.radTR||0}px ${s.radBR||0}px ${s.radBL||0}px`; return `${(s&&s.rad)||0}px`; }
-  const radAny=s=>!!s&&(s.radSides?(s.radTL||s.radTR||s.radBR||s.radBL):s.rad>0);
   // A paint (fill/stroke) colour with optional opacity → hex or rgba().
-  function paintCss(hex,a){ if(a==null||a>=100||!hex) return hex||''; a=Math.max(0,Math.min(100,a))/100; let h=String(hex).replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); if(isNaN(n)) return hex; return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`; }
   // A paint exists if it has a colour or a non-'none' brand bind; visible unless the eye is off.
-  // A stroke with no weight isn't a stroke — older elements carry a default colour with bw:0.
-  const paintOn=(t,key)=> (key==='bcolor' && !(t.bw>0)) ? false : (!!(t[key]&&t[key]!=='') || !!(t[key+'Bind']&&t[key+'Bind']!=='none'));
-  const paintVisible=(t,key)=> paintOn(t,key) && t[key+'Vis']!==false;
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
   const selEl=()=> sel ? doc[sel.r].cols[sel.c][sel.k] : null;
   // Real "used in N documents" (shared with the block view) for the synced-block story.
@@ -902,8 +895,6 @@ function pageInit(){
   // Colours can bind to a brand token so they resolve per client; geometry stays shared.
   // Colour roles resolve through the shared token catalog (tenant-data.js) so the
   // block builder and the client Brand-tokens board always agree.
-  function resolveFill(st){ const bd=st.bgBind; if(!bd) return (st.bg&&st.bg!=='transparent')?st.bg:''; if(bd==='none') return ''; return roleValue(brand, bd); }
-  function resolveBColor(st){ const bd=st.bcolorBind; if(!bd) return st.bcolor; return roleValue(brand, bd); }
   function applyBlockStyle(){
     const w=document.getElementById('blockWrap'); if(!w) return; const bs=blockStyle;
     // Resizing — width mode (Fill / Fixed / Min / Max)
@@ -925,39 +916,22 @@ function pageInit(){
     // Vertical margin only on the block wrap — left/right stay auto for centering.
     const mV = (bs.marV!=null)?bs.marV:(bs.mar||0);
     w.style.marginTop = (bs.marSides?(bs.marT||0):mV)+'px'; w.style.marginBottom = (bs.marSides?(bs.marB||0):mV)+'px';
-    w.style.background = paintVisible(bs,'bg') ? (paintCss(resolveFill(bs), bs.bgA)||'') : '';
+    w.style.background = paintVisible(bs,'bg') ? (paintCss(resolveFill(bs, brand), bs.bgA)||'') : '';
     w.style.borderRadius = radAny(bs)?radCss(bs):''; w.style.overflow = hm==='fixed'?'hidden':'';   // only a fixed height clips — radius alone must not hide the hover tools above the first row
     w.style.border='none'; w.style.boxShadow='';
-    if(paintVisible(bs,'bcolor') && bs.bw>0){ const col=paintCss(resolveBColor(bs), bs.bcolorA); if(bs.bpos==='inside') w.style.boxShadow=`inset 0 0 0 ${bs.bw}px ${col}`; else w.style.border=`${bs.bw}px ${bs.bstyle} ${col}`; }
+    if(paintVisible(bs,'bcolor') && bs.bw>0){ const col=paintCss(resolveBColor(bs, brand), bs.bcolorA); if(bs.bpos==='inside') w.style.boxShadow=`inset 0 0 0 ${bs.bw}px ${col}`; else w.style.border=`${bs.bw}px ${bs.bstyle} ${col}`; }
     if((bs.hmode||'fill')==='max') w.style.overflowY='auto';   // after the radius `overflow` shorthand so it isn't clobbered
   }
   function applyElStyle(node, st){
     if(!node) return;
-    // Per-element resizing goes on the element frame (.vb-el) so the selection outline matches the size;
-    // paint/padding stay on the body. Fixed/Max width hug to the left; Fill stretches.
-    const box=node.parentElement, ewm=st.wmode||'fill', ehm=st.hmode||'fill';
-    box.style.width = ewm==='fixed' ? (st.wpx||0)+'px' : '';
-    box.style.minWidth = ewm==='min' ? (st.wpx||0)+'px' : '';
-    box.style.maxWidth = ewm==='max' ? (st.wpx||0)+'px' : '';
-    // Element H alignment inside its column (matters when the element isn't Fill width). V alignment is per column — see row.valign.
-    const HM2={left:'flex-start',center:'center',right:'flex-end'};
-    box.style.alignSelf = (ewm==='fixed'||ewm==='max') ? HM2[st.alH||'left'] : '';   // Fill width must keep stretching
-    box.style.flex = '0 0 auto';   // elements stack at their natural height, like the document renderer
+    // Same style maps as the document renderer (block-layouts.js elStyle) — sizing on the frame (.vb-el) so the
+    // selection outline matches, paint/spacing on the body, typography pushed onto text nodes.
+    const box=node.parentElement, {box:bx, body, typo}=elStyle(st, brand);
+    ['width','minWidth','maxWidth','alignSelf'].forEach(k=>box.style[k]=bx[k]||''); box.style.flex='0 0 auto';
+    ['height','maxHeight','padding','margin','background','borderRadius','overflow','border','boxShadow','textAlign'].forEach(k=>node.style[k]=body[k]||'');
+    [node, ...node.querySelectorAll(TYPO_SEL)].forEach(n=>['fontFamily','fontWeight','fontSize','lineHeight','letterSpacing','color'].forEach(k=>{ if(typo[k]) n.style[k]=typo[k]; }));
     // A column holding a Fixed/Min/Max-width element sizes to it; the other columns fill the rest.
     const col=box.parentElement; if(col && col.classList.contains('vb-col')){ const multi=col.parentElement.querySelectorAll(':scope > .vb-col').length>1; const sized=multi && [...col.querySelectorAll(':scope > .vb-el')].some(el=>el.style.width||el.style.minWidth||el.style.maxWidth); col.style.flex = sized ? '0 1 auto' : (col.dataset.ratio||'1'); }
-    node.style.height = ehm==='fixed' ? (st.hpx||0)+'px' : '';   // height stays on the body so hover tools aren't clipped
-    node.style.maxHeight = ehm==='max' ? (st.hpx||0)+'px' : '';
-    node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar');
-    node.style.background = paintVisible(st,'bg') ? (paintCss(resolveFill(st), st.bgA)||'') : '';
-    node.style.borderRadius = radAny(st)?radCss(st):'';
-    node.style.overflow = ehm==='fixed' ? 'hidden' : (ehm==='max' ? 'auto' : (radAny(st)?'hidden':''));   // fixed clips, never spills
-    node.style.border=''; node.style.boxShadow='';
-    if(paintVisible(st,'bcolor') && st.bw>0){ const col=paintCss(resolveBColor(st), st.bcolorA); if(st.bpos==='inside') node.style.boxShadow=`inset 0 0 0 ${st.bw}px ${col}`; else node.style.border=`${st.bw}px ${st.bstyle} ${col}`; }
-    node.style.textAlign = st.align||'';
-    const typo={};
-    if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
-    if(st.size) typo.fontSize=st.size+'px'; if(st.lh) typo.lineHeight=st.lh+'px'; if(st.ls) typo.letterSpacing=st.ls+'px'; if(st.color) typo.color=st.color;
-    [node, ...node.querySelectorAll('h1,h2,h3,h4,h5,p,li,span,a,blockquote,strong,em,td,th,ul,div')].forEach(n=>Object.assign(n.style,typo));
   }
   function elNode(r,c,k){ return page.querySelector(`.vb-el[data-r="${r}"][data-c="${c}"][data-k="${k}"] .vb-body`); }
   function applyAllElStyles(){
@@ -1079,7 +1053,7 @@ function pageInit(){
     if(sec){ const add=sec.querySelector('[data-add]'); if(add) add.style.display=on?'none':''; sec.classList.toggle('no-paint',!on); }   // nothing applied → just the header and its +
     if(bind && bind!=='none'){
       lit.style.display='none'; note.style.display=on?'':'none';
-      const col = key==='bg'?resolveFill(t):resolveBColor(t);
+      const col = key==='bg'?resolveFill(t, brand):resolveBColor(t, brand);
       note.innerHTML=`<span style="display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.12);background:${col||'transparent'}"></span> Follows the client’s brand${brand?'':' (Default preview)'}`;
     } else {
       lit.style.display=on?'':'none'; note.style.display='none';
@@ -1331,7 +1305,7 @@ function pageInit(){
   let history=[], hidx=-1, restoring=false, autoT=null, styleT=null;
   const snap=()=>JSON.stringify({doc, blockStyle});
   function pushHist(){ if(restoring) return; history=history.slice(0,hidx+1); history.push(snap()); if(history.length>60) history.shift(); hidx=history.length-1; updateHistBtns(); }
-  function commit(){ pushHist(); autosave(); }
+  function commit(){ pushHist(); autosave(); renderCodeTab(); }
   function commitStyle(){ clearTimeout(styleT); styleT=setTimeout(commit,350); }
   function updateHistBtns(){ document.getElementById('undoBtn').disabled=hidx<=0; document.getElementById('redoBtn').disabled=hidx>=history.length-1; }
   function restore(){ restoring=true; const s=JSON.parse(history[hidx]); doc=s.doc; for(const k in s.blockStyle) blockStyle[k]=s.blockStyle[k]; if(sel && !(doc[sel.r]&&doc[sel.r].cols[sel.c]&&doc[sel.r].cols[sel.c][sel.k])) sel=null; render(); restoring=false; updateHistBtns(); autosave(); }
