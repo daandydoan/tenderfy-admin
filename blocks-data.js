@@ -155,7 +155,7 @@ function fitThumbs(){}   // no-op: schematic thumbnails are %-based and need no 
 // Shared block actions — kept in one place so the block view and the block
 // editor share identical wording and behaviour.
 function deleteBlock(label, id){
-  confirmAction({title:'Delete this block?',body:`“${label}” will be removed from the Block Builder. Documents already using it keep their content.`,confirm:'Delete block',danger:true},()=>{
+  confirmAction({title:'Delete this block?',body:`“${label}” will be removed from the Blocks list.`,confirm:'Delete block',danger:true},()=>{
     removeCustomBlock(id); showToast('Deleted block: '+label); setTimeout(()=>location.href='blocks.html',700);
   });
 }

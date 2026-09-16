@@ -22,6 +22,9 @@
   .ws-tabs{display:flex;background:#eef2f1;border:1px solid var(--border);border-radius:9px;padding:3px;gap:2px;margin-bottom:12px}
   .ws-tabs button{flex:1;border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);padding:7px 10px;border-radius:7px;cursor:pointer}
   .ws-tabs button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.09)}
+  .ref-thumb{position:relative;display:inline-flex;margin-left:6px;cursor:zoom-in} .ref-thumb img{height:28px;width:auto;max-width:80px;border-radius:5px;border:1px solid var(--border);object-fit:cover;display:block}
+  .ref-thumb .ref-x{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;border:none;background:#1f2a2e;color:#fff;display:none;align-items:center;justify-content:center;cursor:pointer;padding:0} .ref-thumb .ref-x .ms{font-size:11px} .ref-thumb:hover .ref-x{display:inline-flex}
+  #refModal img{max-width:100%;max-height:70vh;display:block;margin:0 auto;border-radius:8px}
   .ws-check{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:4px 0 8px;cursor:pointer} .ws-check input{accent-color:var(--teal)}
   .ws-owner{font-size:11.5px;color:var(--gray);display:flex;align-items:center;gap:5px} .ws-owner .ms{font-size:14px;color:var(--teal)}
   .add-menu{min-width:200px;max-height:380px;overflow:auto} .add-menu .pal-tag{padding:6px 12px 2px} .add-menu a{padding:7px 12px}
@@ -320,13 +323,14 @@
       </div>
       <div class="pg-acts">
         <span class="use-chip" id="useChip" style="display:none"></span>
+        <span class="autosave" id="autosave"></span>
         <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Block</a>
         <span class="lst-kebwrap">
           <button class="pg-kebab" data-kebab aria-label="More actions"><span class="ms">more_vert</span></button>
           <div class="kebab-menu">
             <a id="saveNewBtn"><span class="ms">add</span> Save &amp; start another</a>
             <a id="toDocBtn" href="document-edit.html#type=section"><span class="ms">east</span> Use in a document</a>
-            <a id="dupBtn" style="display:none"><span class="ms">content_copy</span> Duplicate</a>
+            <a id="dupBtn"><span class="ms">content_copy</span> Duplicate</a>
             <div class="kebab-sep" id="del-sep" style="display:none"></div>
             <a class="danger" id="delBtn" style="display:none"><span class="ms">delete</span> Delete</a>
           </div>
@@ -337,10 +341,10 @@
     <div class="ed3 st-on" id="ws">
       <!-- Source document — the client's file, any page, any order. Click a section or select text to make a block. -->
       <div class="ed3-col" id="leftCol">
-        <div class="ws-tabs"><button class="on" data-wtab="ai">Draft with AI</button><button data-wtab="els">Elements</button><button data-wtab="style">Style</button></div>
-        <div class="card" id="aiPane">
+        <div class="ws-tabs"><button class="on" data-wtab="els">Elements</button><button data-wtab="ai">Draft with AI</button><button data-wtab="style">Style</button></div>
+        <div class="card" id="aiPane" style="display:none">
           <div class="ray-draft">
-            <div class="ray-h"><span class="ms">auto_awesome</span> Draft a block from an image</div>
+            <div class="ray-h"><span class="ms">auto_awesome</span> Draft a block from an image <span class="fld-opt" style="margin-left:auto;font-weight:500">with Tenderfy AI (Ray)</span></div>
             <div class="ray-lbl">Screenshot or photo of the section</div>
             <div class="ray-ref" id="aiRef"><input type="file" accept="image/*" id="aiImg" hidden><label for="aiImg" class="ray-drop" id="aiDrop"><span class="ms">add_photo_alternate</span> Upload, drop, or paste (Ctrl+V)</label></div>
             <div class="ray-lbl">What is it? <span class="fld-opt">· optional</span></div>
@@ -349,12 +353,12 @@
           </div>
           <div class="fhint" style="margin-top:10px">Ray reads the image and lays it out as elements with the words it finds — you edit from there. Paste anywhere on the page to add an image.</div>
         </div>
-        <div class="card" id="elPane" style="display:none">
+        <div class="card" id="elPane">
           <label class="pal-search"><span class="ms">search</span><input id="palQ" placeholder="Search elements…"></label>
           <div class="vb-pal" id="palette"></div>
           <div class="fhint" style="margin-top:10px">Drag onto the block, or click to add. Text comes from the document — select it there.</div>
         </div>
-        <div class="card" id="styleCard">
+        <div class="card" id="styleCard" style="display:none">
           <h3 class="ed-h">Style</h3>
           <div id="styleTarget"></div>
           <div class="insp-actions">
@@ -476,7 +480,6 @@
               <button class="tb-btn" id="histBtn" title="Version history"><span class="ms">history</span></button>
             </span>
             <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
-              <span class="autosave" id="autosave"></span>
         <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select><button class="tb-btn" id="editBrandBtn" title="Edit this brand style" style="margin-left:4px"><span class="ms">edit</span></button></span>
             </span>
           </div>
@@ -486,6 +489,7 @@
               <span id="bar-name">Untitled block</span>
               <span class="muted" id="bar-count" style="font-weight:400"></span>
               <span class="src-chip" id="srcChip" style="display:none"></span>
+              <span class="ref-thumb" id="refThumb" style="display:none" title="The image this block was drafted from — click to enlarge"><img alt=""><button type="button" class="ref-x" title="Clear image"><span class="ms">close</span></button></span>
             </div>
             <div class="vb-page" id="page"></div>
           </div>
@@ -524,6 +528,7 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="refModal"><div class="cfm" style="max-width:900px"><img alt="reference"><div class="cfm-acts"><a class="btn btn-outline" id="refClose">Close</a></div></div></div>
 <div class="modal-overlay" id="verModal">
   <div class="cfm">
     <h3>Version history</h3>
@@ -677,9 +682,10 @@ function pageInit(){
     document.getElementById('b-desc').value=existing.desc;
     document.getElementById('b-cat').value=BLOCK_CATS.includes(existing.cat)?existing.cat:BLOCK_CATS[0];
     document.getElementById('b-share').checked=!!existing.share;
-    ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='');   // preview override only for a saved block
+    ['delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='');   // preview override only for a saved block
   }
-  document.getElementById('dupBtn').addEventListener('click',()=>{ if(cur){ leaving=true; duplicateBlock(cur.label, cur.id); } });
+  // Duplicate works before the first save too: keep the canvas, drop the identity, name it "(copy)".
+  document.getElementById('dupBtn').addEventListener('click',()=>{ if(cur){ leaving=true; duplicateBlock(cur.label, cur.id); return; } const l=document.getElementById('b-label'); l.value=(l.value.trim()||'Untitled block')+' (copy)'; syncBar(); commit(); showToast('Duplicated on the canvas — save it as a new block'); });
   // Left panel tabs: Document · Elements · Block · Style
   const PANES={ai:'aiPane',els:'elPane',style:'styleCard'};
   function showTab(k){
@@ -687,6 +693,7 @@ function pageInit(){
     Object.entries(PANES).forEach(([key,id])=>{ document.getElementById(id).style.display = key===k?'':'none'; });
   }
   document.querySelectorAll('.ws-tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.wtab)));
+  showTab('els');
   // ---- Render ----
   function elBody(el){
     if(el.id==='field'){
@@ -1294,17 +1301,27 @@ function pageInit(){
     if(els.length===1 || /para|text|commitment|overview|statement|about/.test(d)) els.splice(1,0,mk('paragraph',{body:'Paragraph read from the image — replace with the exact wording once you’ve checked it.'}));
     return els;
   }
+  // The image stays beside the canvas after drafting so the words can be checked against it; click to enlarge, ✕ to clear.
+  const refThumb=document.getElementById('refThumb');
+  function setRefThumb(dataUrl){ refThumb.style.display=dataUrl?'':'none'; if(dataUrl) refThumb.querySelector('img').src=dataUrl; }
+  refThumb.querySelector('img').addEventListener('click',()=>{ document.querySelector('#refModal img').src=refThumb.querySelector('img').src; document.getElementById('refModal').classList.add('open'); });
+  refThumb.querySelector('.ref-x').addEventListener('click',e=>{ e.stopPropagation(); setRefThumb(null); });
+  document.getElementById('refClose').addEventListener('click',()=>document.getElementById('refModal').classList.remove('open'));
+  document.getElementById('refModal').addEventListener('click',e=>{ if(e.target.id==='refModal') e.currentTarget.classList.remove('open'); });
   document.getElementById('aiBtn').addEventListener('click',()=>{
     const desc=document.getElementById('aiPrompt').value.trim();
     if(!aiImage && !desc){ showToast('Add an image or say what the block is'); return; }
-    const go=()=>{ doc.push({cols:[aiDraft(desc)]}); source='Drafted by Ray from '+(aiImage?'an image':'a description'); if(!document.getElementById('b-label').value.trim() && desc){ document.getElementById('b-label').value=desc.charAt(0).toUpperCase()+desc.slice(1).replace(/\s+(with|and)\s+.*$/,''); syncBar(); }
+    const go=()=>{ doc.push({cols:[aiDraft(desc)]}); source='Drafted by Ray from '+(aiImage?'an image':'a description'); if(aiImage) setRefThumb(aiImage); if(!document.getElementById('b-label').value.trim() && desc){ document.getElementById('b-label').value=desc.charAt(0).toUpperCase()+desc.slice(1).replace(/\s+(with|and)\s+.*$/,''); syncBar(); }
       sel=null; render(); commit(); showToast('Ray drafted a starting point — check the words against the image, then Save'); };
     go();
   });
 
   // Who the block is for. A new block belongs to a client — pick one before anything else.
+  // The explainer shows once; after that it's a tooltip on the sub-line.
+  let seenExplainer=false; try{ seenExplainer=!!localStorage.getItem('tf_seen_block_explainer'); localStorage.setItem('tf_seen_block_explainer','1'); }catch(e){}
+  document.getElementById('pgSub').title='A block is a reusable section of a tender';
   document.getElementById('pgSub').innerHTML = clientId
-    ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">apartment</span> Built for ${tenant.name} <span class="muted">· a block is a reusable section of a tender</span>`
+    ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">apartment</span> Built for ${tenant.name}${seenExplainer?'':' <span class="muted">· a block is a reusable section of a tender</span>'}`
     : existing ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">public</span> General library block · not tied to a client` : 'A block is a reusable section of a tender.';
   if(!clientId && !existing){
     document.getElementById('pickList').innerHTML=TENANTS.map(t=>`<a data-pick="${t.id}"><span class="av" style="background:${t.brand.primary}">${t.initials}</span><span>${t.name}<div class="sub">${brandMeta(t).files.length?'Documents received':'Waiting on documents'}</div></span></a>`).join('');
@@ -1350,14 +1367,14 @@ function pageInit(){
       status:published?'active':'draft', doc:clone(doc), blockStyle:clone(blockStyle)});
     saveVersion(nm, bid); try{ localStorage.removeItem(DKEY); }catch(e){}
     cur = BLOCKS.find(b=>b.id===bid) || {id:bid,label:l};
-    ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='');
+    ['delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='');
     base=snap();
     showToast((published?'Saved':'Saved as draft')+' “'+l+'”'+(clientId?' for '+tenant.name:'')+(usage>0?` · updates ${usage} documents`:''));
     return true;
   }
   function resetBlock(){ doc=[]; source=''; cur=null; sel=null;
     ['b-label','b-name','b-desc'].forEach(i=>document.getElementById(i).value=''); document.getElementById('b-share').checked=false;
-    ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='none');
+    ['delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='none'); setRefThumb(null);
     render(); syncBar(); history=[]; hidx=-1; pushHist(); base=snap(); }
   document.getElementById('saveBtn').addEventListener('click',()=>save(true,false));
   document.getElementById('saveNewBtn').addEventListener('click',()=>save(true,true));
