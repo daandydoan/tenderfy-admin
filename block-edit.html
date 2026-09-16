@@ -109,6 +109,9 @@
   .vb-name{position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;transition:.1s;display:flex;align-items:center;gap:4px;z-index:2;white-space:nowrap}
   .vb-block .vb-name{opacity:.45}   /* always readable at a glance; full on hover/select */
   .vb-el:hover .vb-name,.vb-el.selected .vb-name{opacity:1}
+  #s-richRow{display:block!important} #s-richRow[hidden]{display:none!important}
+  .rich-box{min-height:72px;max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5;background:#fff;outline:none}
+  .rich-box:focus{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-tint)}
   .vb-body [contenteditable]{outline:none;cursor:text;min-width:1ch;border-radius:3px}
   .vb-body [contenteditable]:focus{box-shadow:0 0 0 2px var(--teal-tint)}
   /* Inline name in the header (replaces the title) + back / kebab, matching the document editor */
@@ -464,6 +467,7 @@
           <div class="insp-sec" data-sec="typo">
             <div class="insp-h">Typography</div>
             <div class="insp-row" data-field="font"><label>Text</label><span class="fig-align" id="s-rich"><span class="seg"><button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><span class="ms">format_bold</span></button><button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><span class="ms">format_italic</span></button><button type="button" data-cmd="underline" title="Underline (Ctrl+U)"><span class="ms">format_underlined</span></button><button type="button" data-cmd="strikeThrough" title="Strikethrough"><span class="ms">format_strikethrough</span></button></span><span class="seg"><button type="button" data-cmd="createLink" title="Link"><span class="ms">link</span></button><button type="button" data-cmd="removeFormat" title="Clear formatting"><span class="ms">format_clear</span></button></span></span></div>
+            <div class="insp-row" data-field="font" style="display:block" id="s-richRow"><div class="rich-box" id="s-richBox" contenteditable="true" spellcheck="true"></div><div class="fhint" id="s-richHint" style="margin-top:4px"></div></div>
             <div class="insp-row" data-field="font"><label>Font</label><select class="insp-sel" id="s-font"></select></div>
             <div class="insp-row" data-field="weight"><label>Weight</label><select class="insp-sel" id="s-weight"><option value="">Inherit from brand</option><option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select></div>
             <div class="insp-row" data-field="sizelh"><label>Size</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-size" placeholder="brand"><span class="insp-unit">px</span><input type="number" class="insp-num" id="s-lh" placeholder="brand"><span class="insp-unit">line</span></div></div>
@@ -1069,7 +1073,7 @@ function pageInit(){
     const add=sec.querySelector('[data-add]'); if(add) add.addEventListener('click',()=>{ const t=target(); if(!t[key]) t[key]=(key==='bg'?'#ffffff':'#38988a'); t[key+'Bind']=''; t[key+'Vis']=true; if(key==='bcolor'&&!(t.bw>0)) t.bw=1; syncInspector(); applyActive(); commitStyle(); });
     if(key==='bcolor'){ const bp=document.getElementById('s-bpos'); if(bp) bp.addEventListener('change',e=>{ target().bpos=e.target.value; applyActive(); commitStyle(); }); }
   }
-  function syncInspector(){
+  function syncInspector(){ syncRichBox();
     const t=target();
     const setR=(rId,nId,k)=>{ document.getElementById(rId).value=t[k]||0; document.getElementById(nId).value=t[k]||0; };
     fillBoxB('pad'); fillBoxB('mar'); fillRadB(); document.getElementById('s-sp').value=blockStyle.sp||0;
@@ -1158,17 +1162,25 @@ function pageInit(){
   }
 
   // ---- Selection ----
-  // Rich text: the toolbar formats the caret/selection inside the selected element's text on the canvas.
+  // Rich text editor in the panel mirrors the selected element's main text leaf; the toolbar formats whichever is focused (panel box or canvas).
+  const richBox=document.getElementById('s-richBox');
+  const richLeaf=()=>{ if(!sel) return null; const body=elNode(sel.r,sel.c,sel.k); return body && body.querySelector('[data-ek]:not([data-ek=items]):not([data-ek=headers]):not([data-ek=row]):not([data-ek=pair])'); };
+  function syncRichBox(){ const richBox=document.getElementById('s-richBox'); const leaf=richLeaf(); /* looked up here: syncInspector runs before the const above is initialised */ const row=richBox.parentElement; row.hidden=!leaf; if(!leaf || document.activeElement===richBox) return; richBox.innerHTML=leaf.innerHTML; document.getElementById('s-richHint').textContent='Editing “'+leaf.dataset.ek+'” — the canvas updates as you type.'; }
+  richBox.addEventListener('input',()=>{ const leaf=richLeaf(); if(!leaf) return; leaf.innerHTML=richBox.innerHTML; leaf.closest('.vb-body').dispatchEvent(new Event('input',{bubbles:true})); });
+  richBox.addEventListener('blur',commit);
+  richBox.addEventListener('paste',e=>{ e.preventDefault(); document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text')); });
+  page.addEventListener('input',()=>syncRichBox());
   document.querySelectorAll('#s-rich button').forEach(b=>{
-    b.addEventListener('mousedown',e=>e.preventDefault());   // keep the canvas selection alive
+    b.addEventListener('mousedown',e=>e.preventDefault());   // keep the text selection alive
     b.addEventListener('click',()=>{
       if(!sel) return; const body=elNode(sel.r,sel.c,sel.k); if(!body) return;
-      let leaf=document.activeElement && document.activeElement.closest && document.activeElement.closest('.vb-body')===body ? document.activeElement : null;
-      if(!leaf){ leaf=body.querySelector('[contenteditable]'); if(!leaf) return; leaf.focus(); document.execCommand('selectAll'); }
+      const a=document.activeElement; let leaf = a===richBox ? a : (a && a.closest && a.closest('.vb-body')===body ? a : null);
+      if(!leaf){ leaf=!richBox.parentElement.hidden ? richBox : body.querySelector('[contenteditable]'); if(!leaf) return; leaf.focus(); document.execCommand('selectAll'); }
       const cmd=b.dataset.cmd; let arg=null;
-      if(cmd==='createLink'){ arg=prompt('Link URL','https://'); if(!arg) return; }
+      if(cmd==='createLink'){ try{ arg=prompt('Link URL','https://'); }catch(_){ arg=null; } if(!arg) return; }
       document.execCommand(cmd,false,arg);
-      body.dispatchEvent(new Event('input',{bubbles:true})); commit();
+      if(leaf===richBox) richBox.dispatchEvent(new Event('input')); else body.dispatchEvent(new Event('input',{bubbles:true}));
+      commit();
     });
   });
   function selectEl(r,c,k){ sel={r,c,k}; applySelection(); syncInspector(); }
