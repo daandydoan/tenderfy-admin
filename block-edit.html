@@ -338,7 +338,6 @@
         <a href="blocks.html" class="pg-back" id="cancelBtn" title="Back"><span class="ms">arrow_back</span></a>
         <div>
           <input class="pg-name" id="b-label" placeholder="Name this block…" title="Customer-facing label — what clients see when they insert it">
-          <div class="pg-sub" id="pgSub">Reusable section — rendered in each client’s brand.</div>
         </div>
       </div>
       <div class="pg-acts">
@@ -1405,12 +1404,6 @@ function pageInit(){
   });
 
   // Who the block is for. A new block belongs to a client — pick one before anything else.
-  // The explainer shows once; after that it's a tooltip on the sub-line.
-  let seenExplainer=false; try{ seenExplainer=!!localStorage.getItem('tf_seen_block_explainer'); localStorage.setItem('tf_seen_block_explainer','1'); }catch(e){}
-  document.getElementById('pgSub').title='A block is a reusable section of a tender';
-  document.getElementById('pgSub').innerHTML = clientId
-    ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">apartment</span> Built for ${tenant.name}${seenExplainer?'':' <span class="muted">· a block is a reusable section of a tender</span>'}`
-    : existing ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">public</span> General library block · not tied to a client` : 'A block is a reusable section of a tender.';
   if(!clientId && !existing){
     document.getElementById('pickList').innerHTML=TENANTS.map(t=>`<a data-pick="${t.id}"><span class="av" style="background:${t.brand.primary}">${t.initials}</span><span>${t.name}<div class="sub">${brandMeta(t).files.length?'Documents received':'Waiting on documents'}</div></span></a>`).join('');
     document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{ leaving=true; location.href=location.pathname+'#client='+a.dataset.pick; location.reload(); }));
