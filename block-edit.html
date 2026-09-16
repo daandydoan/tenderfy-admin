@@ -289,25 +289,22 @@
   .seg button:first-child{border-left:none}
   .seg button.on{background:var(--teal-tint);color:var(--teal)}
   .seg button .ms{font-size:16px}
-  #saveModal .cfm,#verModal .cfm{text-align:left;max-width:460px;max-height:90vh;overflow-y:auto}
-  #saveModal .cfm{max-width:840px}
   /* Dialogs: icon + heading/sub + close, grey scrolling body, actions along the bottom (primary right) */
-  .cfm.dlg{text-align:left;padding:0;display:flex;flex-direction:column;max-height:88vh;overflow:hidden;border-radius:18px}
-  .dlg-h{display:flex;align-items:flex-start;gap:14px;padding:20px 22px 18px;background:#fff}
-  .dlg-ic{width:44px;height:44px;border-radius:12px;background:#FBF1E3;color:#C58A3A;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .dlg-ic .ms{font-size:22px}
-  .dlg-t{flex:1;min-width:0;padding-top:2px} .dlg-t h3{margin:0;font-size:18px} .dlg-t .sub{color:var(--gray);font-size:13px;margin-top:3px}
+  .cfm.dlg{text-align:left;padding:0;display:flex;flex-direction:column;max-width:640px;width:calc(100vw - 48px);max-height:86vh;overflow:hidden;border-radius:20px}
+  .dlg-h{display:flex;align-items:flex-start;gap:16px;padding:26px 30px 22px;background:#fff}
+  .dlg-ic{width:52px;height:52px;border-radius:14px;background:#FBF1E3;color:#C58A3A;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .dlg-ic .ms{font-size:26px}
+  .dlg-t{flex:1;min-width:0;padding-top:2px} .dlg-t h3{margin:0;font-size:20px} .dlg-t .sub{color:var(--gray);font-size:13.5px;margin-top:4px}
   .dlg-x{border:none;background:transparent;color:var(--ink);cursor:pointer;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0;margin:-4px -6px 0 0} .dlg-x:hover{background:#f2f5f4} .dlg-x .ms{font-size:20px}
-  .dlg-b{padding:20px 22px;overflow:auto;flex:1;min-height:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .dlg-b{padding:26px 30px;overflow:auto;flex:1;min-height:180px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
   .dlg-b>.fld:last-child,.dlg-b>.ws-check:last-child{margin-bottom:0}
-  .dlg-f{display:flex;gap:10px;align-items:center;padding:16px 22px;background:#fff}
+  .dlg-f{display:flex;gap:12px;align-items:center;padding:22px 30px;background:#fff}
   .dlg-sp{flex:1}
-  .dlg-f .btn{min-width:0;border-radius:12px;padding:11px 22px;font-size:14px}
-  #saveModal .cfm .sub,#verModal .cfm .sub{color:var(--gray);font-size:12.5px;margin-bottom:14px}
+  .dlg-f .btn{min-width:0;border-radius:14px;padding:14px 26px;font-size:14.5px;font-weight:600}
+  .dlg .fld{margin-bottom:16px} .dlg .fin{padding:11px 13px;font-size:13.5px}
   .cfm-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
   .cfm-col{min-width:0;display:flex;flex-direction:column}
   .cfm-col > .fld:last-child,.cfm-col > .ray-draft:last-child{margin-bottom:0}
-  #saveModal .cfm-acts{margin-top:22px;padding-top:16px;border-top:1px solid var(--border)}
   @media(max-width:760px){ .cfm-cols{grid-template-columns:1fr;gap:0} }
   .fld-err{display:none;color:#d5493f;font-size:11.5px;margin-top:4px}
   .fld-err.show{display:block}
@@ -566,7 +563,7 @@
 </div>
 
 <div class="modal-overlay" id="saveModal">
-  <div class="cfm dlg" style="max-width:460px">
+  <div class="cfm dlg">
     <div class="dlg-h"><span class="dlg-ic"><span class="ms">save</span></span><div class="dlg-t"><h3 id="svTitle">Save block</h3><div class="sub" id="svSub">How it appears in the Blocks list and to the client.</div></div><button type="button" class="dlg-x" data-close title="Close"><span class="ms">close</span></button></div>
     <div class="dlg-b"><div class="fld"><label for="b-label2">Name <span class="fld-opt">· what the client sees</span></label><input class="fin" id="b-label2" placeholder="e.g. Our safety commitment"></div>
     <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
@@ -584,7 +581,7 @@
 </div>
 
 <div class="modal-overlay" id="pickModal">
-  <div class="cfm dlg" style="max-width:440px">
+  <div class="cfm dlg">
     <div class="dlg-h"><span class="dlg-ic"><span class="ms">apartment</span></span><div class="dlg-t"><h3>Who is this block for?</h3><div class="sub">Blocks belong to a client and are drafted from their documents.</div></div><button type="button" class="dlg-x" data-close title="Close"><span class="ms">close</span></button></div>
     <div class="dlg-b"><div class="pick-list" id="pickList"></div></div>
     <div class="dlg-f"><a class="btn btn-outline" href="blocks.html">Back to blocks</a><span class="dlg-sp"></span><a class="btn btn-outline" id="pickGeneral"><span class="ms" style="font-size:17px">public</span> General library block</a></div>
@@ -592,7 +589,7 @@
 </div>
 
 <div class="modal-overlay" id="refModal">
-  <div class="cfm dlg" style="max-width:900px">
+  <div class="cfm dlg">
     <div class="dlg-h"><span class="dlg-ic"><span class="ms">image</span></span><div class="dlg-t"><h3>Reference image</h3><div class="sub">The screenshot this block was drafted from.</div></div><button type="button" class="dlg-x" data-close title="Close"><span class="ms">close</span></button></div>
     <div class="dlg-b"><img alt="reference" style="max-width:100%;display:block;margin:0 auto;border-radius:8px"></div>
     <div class="dlg-f"><span class="dlg-sp"></span><a class="btn btn-primary" id="refClose">Done</a></div>
