@@ -815,7 +815,7 @@ function pageInit(){
     const structure=(!q||'page break'.includes(q)) ? '<div class="pal-tag">Structure</div><div class="pk-it" data-tok="el:pagebreak"><span class="ms">insert_page_break</span>Page break</div>' : '';
     const cats=BLOCK_LIB_CATS.filter(c=>c!=='Headers & Footers' && blocks.some(b=>b.cat===c));
     dpGrid.innerHTML=(structure||cats.length) ? structure+cats.map(c=>'<div class="pal-tag">'+c+'</div>'+blocks.filter(b=>b.cat===c).map(b=>`<div class="pk-it" data-tok="${b.id}" title="${b.desc}"><span class="ms">grid_view</span>${b.label}</div>`).join('')).join('') : '<div class="pk-empty">No block matches.</div>';
-    dpGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ const inst=instFromToken(it.dataset.tok); items.splice(dpAt,0,inst); selK=inst.k; closeDocPick(); render(); renderInspector(); }));
+    dpGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ const inst=instFromToken(it.dataset.tok); items.splice(dpAt,0,inst); closeDocPick(); render(); renderInspector(); }));
   }
   function openDocPick(anchor, at){
     dpAt=at; dpAnchor=anchor; dpQ.value=''; renderDocPick('');
@@ -827,7 +827,7 @@ function pageInit(){
   dpQ.addEventListener('input',()=>renderDocPick(dpQ.value.trim().toLowerCase()));
   document.addEventListener('mousedown',e=>{ if(dPick.style.display!=='none' && !e.target.closest('#docPick') && !e.target.closest('.doc-ins')) closeDocPick(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && dPick.style.display!=='none') closeDocPick(); });
-  function addItem(tok){ const it=instFromToken(tok); items.push(it); selK=(mode==='layout')?it.k:null; render(); renderInspector(); showToast((it.el?'Added element: ':'Added block: ')+instLabel(it)); }
+  function addItem(tok){ const it=instFromToken(tok); items.push(it); render(); renderInspector();   // adding doesn't select — the tab stays where you are showToast((it.el?'Added element: ':'Added block: ')+instLabel(it)); }
   wrap.addEventListener('dragover',e=>{ if(e.dataTransfer.types.includes('add')){ e.preventDefault(); wrap.classList.add('drag-over'); } });
   wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over'); });
   wrap.addEventListener('drop',e=>{ wrap.classList.remove('drag-over'); const add=e.dataTransfer.getData('add'); if(add && !e.target.closest('.doc-blk')){ e.preventDefault(); addItem(add); } });
