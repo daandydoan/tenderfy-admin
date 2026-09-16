@@ -112,6 +112,7 @@
   #s-richRow{display:block!important} #s-richRow[hidden]{display:none!important}
   .typo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
   .typo-grid .fig-label{margin-bottom:5px}
+  .typo-grid .fig-field input:disabled{color:var(--light)}
   .typo-grid .fig-field input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;padding:0}
   .typo-grid .fig-field{flex:1;width:100%}
   .rte{border:1px solid var(--border);border-radius:8px;background:#fff;overflow:hidden}
@@ -261,8 +262,6 @@
   .fig-bind{margin-top:7px}
   /* Figma-style Resizing (W/H) + Alignment + Gap */
   .fig-label{font-size:11.5px;color:var(--gray);font-weight:500}
-  .fig-resize{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;align-items:center}
-  .fig-resize .insp-sel{height:32px;padding:0 8px}
   .fig-align{display:flex;gap:6px;width:100%}
   .fig-align .seg{flex:1;display:flex;gap:2px;background:#f2f5f4;border-radius:7px;padding:2px}
   .fig-align button{flex:1;height:26px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border-radius:5px;color:#7d8b87}
@@ -431,25 +430,18 @@
 
           <div class="insp-sec" data-sec="layout" data-need="width">
             <div class="insp-h">Layout</div>
-            <div class="fig-label" style="margin-bottom:6px">Resizing</div>
-            <div class="fig-resize">
-              <span class="fig-wt" title="Width"><span class="ms">swap_horiz</span><input type="number" id="s-wpx" min="0"></span>
-              <select class="insp-sel" id="s-wmode"><option value="fill">Fill container</option><option value="fixed">Fixed width</option><option value="min">Min width</option><option value="max">Max width</option></select>
-            </div>
-            <div class="fig-resize" style="margin-top:6px">
-              <span class="fig-wt" title="Height"><span class="ms">swap_vert</span><input type="number" id="s-hpx" min="0"></span>
-              <select class="insp-sel" id="s-hmode"><option value="fill">Fill height</option><option value="fixed">Fixed height</option><option value="max">Max height</option></select>
-            </div>
-            <div id="s-blockLayout" style="display:grid;gap:12px;margin-top:12px">
-              <div><div class="fig-label" style="margin-bottom:5px">Alignment</div>
+            <div class="typo-grid" style="margin-top:0">
+              <div><div class="fig-label">Width</div><select class="insp-sel" id="s-wmode"><option value="fill">Fill container</option><option value="fixed">Fixed</option><option value="min">Min</option><option value="max">Max</option></select></div>
+              <div><div class="fig-label">Height</div><select class="insp-sel" id="s-hmode"><option value="fill">Fill container</option><option value="fixed">Fixed</option><option value="max">Max</option></select></div>
+              <span class="fig-field" title="Width"><span class="ms fig-ic">swap_horiz</span><input type="number" id="s-wpx" min="0"><span class="insp-unit">px</span></span>
+              <span class="fig-field" title="Height"><span class="ms fig-ic">swap_vert</span><input type="number" id="s-hpx" min="0"><span class="insp-unit">px</span></span>
+              <div style="grid-column:1/-1"><div class="fig-label">Alignment</div>
                 <div class="fig-align" id="s-align3">
                   <span class="seg"><button type="button" data-h="left" title="Align left"><span class="ms">format_align_left</span></button><button type="button" data-h="center" title="Align centre"><span class="ms">format_align_center</span></button><button type="button" data-h="right" title="Align right"><span class="ms">format_align_right</span></button></span>
                   <span class="seg"><button type="button" data-v="top" title="Align top"><span class="ms">vertical_align_top</span></button><button type="button" data-v="middle" title="Align middle"><span class="ms">vertical_align_center</span></button><button type="button" data-v="bottom" title="Align bottom"><span class="ms">vertical_align_bottom</span></button></span>
                 </div>
               </div>
-              <div id="s-gapWrap"><div class="fig-label" style="margin-bottom:5px">Gap</div>
-                <span class="fig-wt"><span class="ms">width_normal</span><input type="number" id="s-sp" min="0" max="200"></span>
-              </div>
+              <div id="s-gapWrap"><div class="fig-label">Gap</div><span class="fig-field" title="Gap between elements"><span class="ms fig-ic">width_normal</span><input type="number" id="s-sp" min="0" max="200"><span class="insp-unit">px</span></span></div>
             </div>
           </div>
           <details class="insp-adv" id="inspAdv"><summary><span class="ms">tune</span> Advanced styling <span class="fhint" style="margin-left:auto">layout · spacing · borders</span></summary>
