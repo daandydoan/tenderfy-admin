@@ -14,8 +14,10 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="components.css">
 <style>
-  /* Aligned to the block builder: scrollable palette | fixed canvas | scrollable properties */
-  .ed3{display:grid;grid-template-columns:380px minmax(0,1fr);gap:16px;grid-template-rows:minmax(0,1fr);align-items:stretch;flex:1;min-height:0;height:calc(100vh - 152px);transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1),column-gap .28s cubic-bezier(.4,0,.2,1)}
+  /* Aligned to the block builder: the page never scrolls — the panel card and the canvas scroll inside */
+  .c-content>.pad{display:flex;flex-direction:column;height:100%;box-sizing:border-box;overflow:hidden}
+  .c-content>.pad>.pg-head{flex:none}
+  .ed3{display:grid;grid-template-columns:380px minmax(0,1fr);gap:16px;grid-template-rows:minmax(0,1fr);align-items:stretch;flex:1;min-height:0;transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1),column-gap .28s cubic-bezier(.4,0,.2,1)}
   .ed3>*{min-height:0}
   #leftCol{min-width:0;display:flex;flex-direction:column;overflow:hidden;transition:opacity .22s ease,transform .28s cubic-bezier(.4,0,.2,1);transform-origin:left center}
   #leftCol>div>.card,#leftCol>.card{flex:1;min-height:0;overflow-y:auto;margin-bottom:0}
