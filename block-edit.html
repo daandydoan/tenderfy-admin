@@ -1488,8 +1488,8 @@ function pageInit(){
     if(!hasContent()){ doc=normDoc([{cols:[['image','heading'],['paragraph']]}]); sel=null; }
     document.getElementById('b-label').placeholder = wantSlot==='footer'?'Name this footer…':'Name this letterhead…';
   }
-  // Style tab: brand does the styling — Layout and Fill live under Advanced with spacing/type/borders.
-  (function(){ const adv=document.getElementById('inspAdv'); if(!adv) return; const first=adv.querySelector('.insp-sec'); ['layout','fill'].forEach(k=>{ const s=document.querySelector('#styleCard .insp-sec[data-sec="'+k+'"]'); if(s) adv.insertBefore(s, first); }); })();
+  // Style tab: brand does the styling — everything lives under Advanced, in this order.
+  (function(){ const adv=document.getElementById('inspAdv'); if(!adv) return; ['layout','dim','typo','border','fill','stroke'].forEach(k=>{ const s=document.querySelector('#styleCard .insp-sec[data-sec="'+k+'"]'); if(s) adv.appendChild(s); }); })();
   buildBrandSelect();
   if(tenant){ const i=BRANDS.findIndex(x=>x.id===tenant.id); if(i>0){ brandIdx=i; brand=tenant.brand; activeTenant=tenant; document.getElementById('brandSel').value=String(i); updateEditBtn(); } }   // a client's block previews in their brand by default
   applyBrand(); initStyle(); render(); syncBar(); pushHist(); base=snap(); applyPanels(); applyStationeryUI(); resumeDraft();
