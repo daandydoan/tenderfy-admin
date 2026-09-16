@@ -42,7 +42,7 @@
 <script src="blocks-data.js"></script>
 <script>
 function pageInit(){
-  const cats=['All Blocks', ...BLOCK_LIB_CATS];
+  const cats=[...BLOCK_LIB_CATS, 'All Blocks'];
   let active='All Blocks', activeStatus='all', query='';
 
   function renderActs(){
