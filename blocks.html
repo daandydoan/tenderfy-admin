@@ -43,7 +43,7 @@
 <script>
 function pageInit(){
   const cats=[...BLOCK_LIB_CATS, 'All Blocks'];
-  let active='All Blocks', activeStatus='all', query='';
+  let active=cats[0], activeStatus='all', query='';
 
   function renderActs(){
     document.getElementById('pgActs').innerHTML = active==='Headers & Footers'
