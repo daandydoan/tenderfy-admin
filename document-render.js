@@ -10,28 +10,7 @@
 
 const DOC_ITEM_STYLE_DEFAULT = {padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bgOn:false, bg:'#ffffff', bgA:100, bgVis:true, bcOn:false, bc:'#dbe3e0', bcA:100, bcVis:true, bw:1, bpos:'inside', wMode:'fill', wPx:480, hMode:'auto', hVal:120};
 
-// Padding / margin as a CSS value — Horizontal+Vertical (Figma default) or four per side.
-function boxCss(s, key){
-  if(!s) return '0px';
-  if(s[key+'Sides']) return `${(s[key+'T']||0)}px ${(s[key+'R']||0)}px ${(s[key+'B']||0)}px ${(s[key+'L']||0)}px`;
-  const h = (s[key+'H']!=null) ? s[key+'H'] : (s[key]||0);   // fall back to legacy overall
-  const v = (s[key+'V']!=null) ? s[key+'V'] : (s[key]||0);
-  return `${v}px ${h}px`;
-}
-// Corner radius — one value (all) or four corners (TL TR BR BL, the CSS order).
-function radCss(s){
-  if(s && s.radSides) return `${(s.radTL||0)}px ${(s.radTR||0)}px ${(s.radBR||0)}px ${(s.radBL||0)}px`;
-  return `${(s&&s.rad)||0}px`;
-}
-function radAny(s){ return !!s && (s.radSides ? (s.radTL||s.radTR||s.radBR||s.radBL) : s.rad>0); }
-// A paint (fill/stroke) colour with optional opacity → hex or rgba().
-function paintCss(hex, a){
-  if(a==null || a>=100 || !hex) return hex||'';
-  a=Math.max(0,Math.min(100,a))/100;
-  let h=String(hex).replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join('');
-  const n=parseInt(h,16); if(isNaN(n)) return hex;
-  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
-}
+// boxCss / radCss / radAny / paintCss come from block-layouts.js (shared with the editors).
 
 function docHeightCss(s){
   const m=(s&&s.hMode)||'auto', v=Math.max(0,(s&&s.hVal)||0);

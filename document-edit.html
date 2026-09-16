@@ -75,7 +75,7 @@
   .pg-brk::before,.pg-brk::after{content:'';flex:1;border-top:1.5px dashed #c2ccc9}
   .pg-brk span{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
   /* Compact block row — Layout view outline (full render is in Preview) */
-  .doc-compact{display:flex;align-items:center;gap:11px;padding:9px 11px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:grab}
+  .doc-compact{display:flex;align-items:center;gap:11px;padding:9px 11px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:0;cursor:grab}
   .doc-compact:last-child{margin-bottom:0}
   .doc-compact:hover{border-color:var(--teal)}
   .doc-compact.sel{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-tint)}
@@ -127,64 +127,8 @@
   .ds-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
   .ds-ctl input[type=color]{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .ds-u{font-size:10.5px;color:var(--light);flex-shrink:0}
-  /* Figma-style box-model control — Padding / Margin, unified or per-side */
-  .fig-box{margin-bottom:13px}
-  .fig-box-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
-  .fig-box-head .fig-label{font-size:11.5px;color:var(--gray);font-weight:500}
-  .fig-toggle{width:26px;height:26px;border-radius:6px;border:none;background:transparent;color:var(--light);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
-  .fig-toggle:hover{background:#eef3f1;color:var(--gray)}
-  .fig-toggle.on{background:var(--teal-tint);color:var(--teal)}
-  .fig-toggle .ms{font-size:16px}
-  .fig-field{display:flex;align-items:center;gap:5px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;padding:0 8px;height:30px}
-  .fig-field:hover{background:#eaf0ee}
-  .fig-field:focus-within{background:#fff;border-color:var(--teal)}
-  .fig-field .fig-ic{font-size:15px;color:#9aa5a3;cursor:ew-resize;flex-shrink:0;user-select:none;touch-action:none}
-  .fig-field:focus-within .fig-ic{color:var(--teal)}
-  .fig-field input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
-  .fig-field input::-webkit-outer-spin-button,.fig-field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .fig-hv{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .fig-hv[hidden],.fig-cross[hidden],.fig-solo[hidden],.fig-corners[hidden]{display:none}
-  .fig-corners{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .fig-corners .fig-field input{text-align:center}
-  .fig-corners .cn-tr{transform:rotate(90deg)}
-  .fig-corners .cn-br{transform:rotate(180deg)}
-  .fig-corners .cn-bl{transform:rotate(270deg)}
-  /* Figma-style Fill / Stroke paint sections */
-  .fig-sec{border-top:1px solid var(--border);padding:12px 0 2px;margin-top:10px}
-  .fig-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-  .fig-sec-t{font-size:12px;font-weight:600;color:var(--ink)}
-  .fig-acts{display:flex;gap:2px}
-  .fig-a{width:24px;height:24px;border:none;background:transparent;border-radius:6px;color:var(--light);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
-  .fig-a:hover{background:#eef3f1;color:var(--gray)}
-  .fig-a .ms{font-size:16px}
-  .fig-paint{display:flex;align-items:center;gap:6px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;padding:0 4px 0 6px;height:32px}
-  .fig-paint:hover{background:#eaf0ee}
-  .fig-paint.off .fig-sw,.fig-paint.off .fig-hexin,.fig-paint.off .fig-op{opacity:.4}
-  .fig-sw{position:relative;width:20px;height:20px;border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.14);flex-shrink:0}
-  .fig-sw input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;padding:0;margin:0;cursor:pointer;background:none}
-  .fig-hexin{flex:1;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;text-transform:uppercase}
-  .fig-op{display:flex;align-items:center;gap:1px;flex-shrink:0;border-left:1px solid #d7e0dd;padding-left:6px}
-  .fig-op input{width:30px;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;text-align:right;-moz-appearance:textfield}
-  .fig-op input::-webkit-outer-spin-button,.fig-op input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .fig-op-u{font-size:11px;color:var(--light)}
-  .fig-paint .fig-a{width:22px;height:22px}
-  .fig-strokerow{display:grid;grid-template-columns:1fr 92px;gap:8px;margin-top:8px}
-  .fig-strokerow label{display:block;font-size:10.5px;color:var(--gray);margin-bottom:4px}
-  .fig-strokesel{width:100%;box-sizing:border-box;height:30px;border:1px solid var(--border);border-radius:7px;background:#fff;font-family:inherit;font-size:12px;color:var(--ink);padding:0 6px;cursor:pointer}
-  .fig-wt{display:flex;align-items:center;gap:5px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;height:30px;padding:0 8px}
-  .fig-wt:focus-within{background:#fff;border-color:var(--teal)}
-  .fig-wt:has(input:disabled){opacity:.45}
-  .fig-wt input:disabled{cursor:not-allowed}
-  .fig-wt .ms{cursor:ew-resize;user-select:none;touch-action:none}
-  .fig-wt:has(input:disabled) .ms{cursor:not-allowed}
-  .fig-wt .ms{font-size:15px;color:#9aa5a3}
-  .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
-  .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .fig-resize{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;align-items:center}
-  .fig-resize .fig-strokesel{height:30px}
-  .fig-cross{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .fig-cross .fig-field input{text-align:center}
   .doc-blk:hover .doc-tools{opacity:1}
+  .vb-canvas.dnd .doc-tools,.vb-canvas.dnd .doc-ins,.vb-canvas.dnd .cmp-rm{pointer-events:none}
   .doc-tools .tb{width:24px;height:24px;border-radius:6px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.3)}
   .doc-tools .tb.grab{cursor:grab}
   .doc-tools .tb.del{background:#d5493f}
@@ -210,6 +154,7 @@
   .bi-tog{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray);cursor:pointer}
   .bi-tog input[type=checkbox]{accent-color:var(--teal);width:14px;height:14px;margin:0}
   .ds-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;margin:16px 0 8px}
+  #blockInspector .fig-sec{border-top:none;padding:0;margin-top:0}
   .ds-lbl:first-child{margin-top:2px}
   .ds-fld{margin-bottom:9px}
   .ds-fld>label{display:block;font-size:11px;color:var(--gray);margin-bottom:4px}
@@ -286,14 +231,6 @@
   .ds-sumrow span{color:var(--gray)}
   .ds-sumrow strong{color:var(--ink);font-weight:600;text-align:right}
   .btn-block{width:100%;justify-content:center}
-  /* Document details dialog (shown before the edit step) */
-  .modal-scrim{position:fixed;inset:0;background:rgba(16,26,23,.45);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
-  .modal-card{background:#fff;border-radius:15px;width:440px;max-width:100%;max-height:90vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.32)}
-  .modal-h{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
-  .modal-h h3{margin:0;font-size:16.5px}
-  .modal-x{width:30px;height:30px;border:none;background:transparent;color:var(--gray);cursor:pointer;border-radius:7px;display:flex;align-items:center;justify-content:center}
-  .modal-x:hover{background:#f0f3f2}
-  .modal-b{padding:20px 22px}
   .modal-f{padding:15px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
   /* Ray draft box */
   .ray-draft{background:linear-gradient(135deg,#eef7f4,#f3f0fb);border:1px solid #cfe6df;border-radius:11px;padding:12px;margin-bottom:16px}
@@ -438,17 +375,16 @@
             <div class="ds-lbl" id="bi-content-lbl" style="display:none">Example content</div>
             <div id="bi-content"></div>
 
-            <div class="ds-lbl">Layout</div>
-            <div class="fig-resize">
-              <span class="fig-wt" title="Width"><span class="ms">swap_horiz</span><input type="number" id="bs-wpx" min="0"></span>
-              <select class="fig-strokesel" id="bs-wmode"><option value="fill">Fill container</option><option value="fixed">Fixed width</option></select>
+            <div class="insp-sec" data-sec="layout">
+            <div class="insp-h">Layout</div>
+            <div class="typo-grid" style="margin-top:0">
+              <div><div class="fig-label">Width</div><select class="insp-sel" id="bs-wmode"><option value="fill">Fill container</option><option value="fixed">Fixed</option></select></div>
+              <div><div class="fig-label">Height</div><select class="insp-sel" id="bs-hmode"><option value="auto">Auto</option><option value="hug">Hug</option><option value="fixed">Fixed</option><option value="min">Min</option><option value="max">Max</option></select></div>
+              <span class="fig-field" title="Width"><span class="ms fig-ic">swap_horiz</span><input type="number" id="bs-wpx" min="0"><span class="insp-unit">px</span></span>
+              <span class="fig-field" title="Height"><span class="ms fig-ic">swap_vert</span><input type="number" id="bs-hval" min="0"><span class="insp-unit">px</span></span>
             </div>
-            <div class="fig-resize" style="margin-top:6px">
-              <span class="fig-wt" title="Height"><span class="ms">swap_vert</span><input type="number" id="bs-hval"></span>
-              <select class="fig-strokesel" id="bs-hmode"><option value="auto">Auto</option><option value="hug">Hug</option><option value="fixed">Fixed</option><option value="min">Min</option><option value="max">Max</option></select>
-            </div>
-
-            <div class="ds-lbl">Dimension</div>
+            <div class="insp-sec" data-sec="dim">
+            <div class="insp-h">Dimension</div>
             <div class="fig-box" data-box="pad">
               <div class="fig-box-head"><span class="fig-label">Padding</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
               <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="bs-padH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="bs-padV" min="0" max="200"></span></div>
@@ -459,20 +395,23 @@
               <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="bs-marH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="bs-marV" min="0" max="200"></span></div>
               <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="bs-marT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="bs-marR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="bs-marB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="bs-marL" placeholder="0"></span></div>
             </div>
-            <div class="fig-sec" data-paint="bg">
+            </div></div>
+            <div class="insp-sec" data-sec="border">
+            <div class="insp-h">Appearance</div>
+            <div class="insp-sec fig-sec" data-sec="fill" data-paint="bg">
               <div class="fig-sec-h"><span class="fig-sec-t">Fill</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add fill"><span class="ms">add</span></button></span></div>
               <div class="fig-paint" id="bs-bgPaint"><span class="fig-sw"><input type="color" id="bs-bg"></span><input class="fig-hexin" id="bs-bgH" placeholder="FFFFFF"><span class="fig-op"><input type="number" id="bs-bgA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
             </div>
-            <div class="ds-lbl">Appearance</div>
             <div class="fig-box" data-box="rad">
               <div class="fig-box-head"><span class="fig-label">Corner radius</span><button type="button" class="fig-toggle" data-toggle title="Edit corners individually"><span class="ms">rounded_corner</span></button></div>
               <div class="fig-solo"><span class="fig-field"><span class="ms fig-ic" data-scrub>rounded_corner</span><input type="number" id="bs-rad" min="0" max="400"></span></div>
               <div class="fig-corners" hidden><span class="fig-field"><span class="ms fig-ic cn cn-tl">rounded_corner</span><input type="number" id="bs-radTL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-tr">rounded_corner</span><input type="number" id="bs-radTR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-bl">rounded_corner</span><input type="number" id="bs-radBL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-br">rounded_corner</span><input type="number" id="bs-radBR" placeholder="0"></span></div>
             </div>
-            <div class="fig-sec" data-paint="bc">
+            <div class="insp-sec fig-sec" data-sec="stroke" data-paint="bc">
               <div class="fig-sec-h"><span class="fig-sec-t">Stroke</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add stroke"><span class="ms">add</span></button></span></div>
               <div class="fig-paint" id="bs-bcPaint"><span class="fig-sw"><input type="color" id="bs-bc"></span><input class="fig-hexin" id="bs-bcH" placeholder="EAEDEC"><span class="fig-op"><input type="number" id="bs-bcA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
-              <div class="fig-strokerow" id="bs-strokeMeta"><div><label>Position</label><select class="fig-strokesel" id="bs-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><label>Weight</label><span class="fig-wt"><span class="ms">line_weight</span><input type="number" id="bs-bw" min="0" max="40"></span></div></div>
+              <div class="typo-grid" id="bs-strokeMeta" style="margin:10px 0 0"><div><div class="fig-label">Position</div><select class="insp-sel" id="bs-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><div class="fig-label">Weight</div><span class="fig-field" title="Stroke weight"><span class="ms fig-ic">line_weight</span><input type="number" id="bs-bw" min="0" max="40"><span class="insp-unit">px</span></span></div></div>
+            </div>
             </div>
           </div>
         </div>
@@ -500,14 +439,15 @@
       </div>
     </div>
     <div class="ed3-scrim" id="ed3Scrim"></div>
+    <div class="el-pick" id="docPick" style="display:none"><label class="pk-search"><span class="ms">search</span><input id="dpQ" placeholder="Search blocks"></label><div class="pk-grid" id="dpGrid"></div></div>
   </div>
 </div>
 
 <!-- Document details dialog (shown before the edit step) -->
-<div class="modal-scrim" id="docDialog" style="display:none">
-  <div class="modal-card">
-    <div class="modal-h"><h3>Document details</h3><button class="modal-x" id="docDialogX" title="Close"><span class="ms">close</span></button></div>
-    <div class="modal-b">
+<div class="modal-overlay" id="docDialog">
+  <div class="cfm dlg">
+    <div class="dlg-h"><span class="dlg-ic"><span class="ms">description</span></span><div class="dlg-t"><h3>Document details</h3><div class="sub">Who it's for and what it is — shown in the library.</div></div><button type="button" class="dlg-x" id="docDialogX" title="Close"><span class="ms">close</span></button></div>
+    <div class="dlg-b">
       <div class="ray-draft">
         <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
         <div class="ray-lbl">Client's document (reference)</div>
@@ -525,10 +465,11 @@
       <div class="fld"><label for="d-status">Status</label><select class="fin" id="d-status"><option value="draft">Draft</option><option value="published">Published</option><option value="deprecated">Deprecated</option></select></div>
       <div class="fld"><label for="d-desc">Description</label><textarea class="fin" id="d-desc" rows="2" placeholder="What is this document for?"></textarea></div>
     </div>
-    <div class="modal-f"><button class="btn btn-primary btn-sm" id="docDialogDone"><span class="ms" style="font-size:16px">check</span> Start editing</button></div>
+    <div class="dlg-f"><a class="btn btn-outline" id="docDialogCancel">Cancel</a><span class="dlg-sp"></span><a class="btn btn-primary" id="docDialogDone"><span class="ms" style="font-size:17px">save</span> Save document</a></div>
   </div>
 </div>
 <script src="shell.js"></script>
+<script src="editor-shared.js"></script>
 <script src="blocks-data.js"></script>
 <script src="library-data.js"></script>
 <script src="tenant-data.js"></script>
@@ -611,7 +552,8 @@ function pageInit(){
     palette.querySelectorAll('.vb-widget').forEach(el=>{
       const tok=el.dataset.kind==='element'?('el:'+el.dataset.id):el.dataset.id;
       el.addEventListener('click',()=>addItem(tok));
-      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('add',tok);el.classList.add('dragging');});
+      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('add',tok);el.classList.add('dragging');setTimeout(()=>canvas.classList.add('dnd'));});
+      el.addEventListener('dragend',()=>{el.classList.remove('dragging');canvas.classList.remove('dnd');});
       el.addEventListener('dragend',()=>el.classList.remove('dragging'));
     });
   }
@@ -620,6 +562,7 @@ function pageInit(){
 
   // ---- Canvas ----
   const wrap=document.getElementById('cvWrap'), canvas=document.getElementById('canvas');
+  wrap.style.position='relative'; wrap.appendChild(document.getElementById('docPick'));
   // Per-block height mode: auto / hug / fixed / min / max.
   function heightCss(s){
     const m=s.hMode||'auto', v=Math.max(0,s.hVal||0);
@@ -719,14 +662,16 @@ function pageInit(){
             <span class="cmp-tag ${it.el?'el':''}">${it.el?'Element':'Block'}</span>
             <span class="ms cmp-rm" data-rm="${i}" title="Remove">close</span>
           </div>`;
+        const ins=i=>`<div class="vb-ins doc-ins" data-at="${i}" title="Insert a block here"><span class="ms">add</span></div>`;
         const rows=items.map((it,i)=>{
           const brk=(i>0 && pageOf[i]!==pageOf[i-1]) ? `<div class="pg-brk"><span><span class="ms" style="font-size:14px;vertical-align:-2px">insert_page_break</span> Page ${pageOf[i]+1}</span></div>` : '';
-          return brk+card(it,i);
-        }).join('');
+          return brk+ins(i)+card(it,i);
+        }).join('')+ins(items.length);
         canvas.innerHTML=`<div class="vb-page"><div class="doc-bg">${renderDocBg(0)}</div><div class="doc-body">${furnSlot('header')}${rows}${furnSlot('footer',true)}</div></div>`;
       }
     }
     const lc=document.getElementById('lyr-count'); if(lc) lc.textContent=items.length;
+    canvas.querySelectorAll('.doc-ins').forEach(l=>l.addEventListener('click',e=>{ e.stopPropagation(); openDocPick(l,+l.dataset.at); }));
     document.getElementById('doc-count').textContent=items.length?`· ${items.length} block${items.length>1?'s':''} · ${pageCount} A4 page${pageCount>1?'s':''}`:'';
     applyDocStyle();
     wire();
@@ -740,7 +685,7 @@ function pageInit(){
     canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();const [rm]=items.splice(+x.dataset.rm,1);if(rm&&rm.k===selK)selK=null;render();renderInspector();}));
     canvas.querySelectorAll('.doc-blk').forEach(el=>{
       el.addEventListener('click',e=>{ if(e.target.closest('.doc-tools'))return; selK=+el.dataset.k; render(); renderInspector(); });
-      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');});
+      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');setTimeout(()=>canvas.classList.add('dnd'));});
       el.addEventListener('dragend',()=>el.classList.remove('dragging'));
       el.addEventListener('dragover',e=>e.preventDefault());
       el.addEventListener('drop',e=>{
@@ -751,6 +696,25 @@ function pageInit(){
       });
     });
   }
+  // Insert line picker: saved blocks by category, plus a page break. Inserts at the line's index.
+  const dPick=document.getElementById('docPick'), dpQ=document.getElementById('dpQ'), dpGrid=document.getElementById('dpGrid'); let dpAt=null, dpAnchor=null;
+  function renderDocPick(q){
+    const blocks=COMPOSED_BLOCKS.filter(b=>b.cat!=='Headers & Footers' && (!q || (b.label+' '+b.cat).toLowerCase().includes(q)));
+    const structure=(!q||'page break'.includes(q)) ? '<div class="pal-tag">Structure</div><div class="pk-it" data-tok="el:pagebreak"><span class="ms">insert_page_break</span>Page break</div>' : '';
+    const cats=BLOCK_LIB_CATS.filter(c=>c!=='Headers & Footers' && blocks.some(b=>b.cat===c));
+    dpGrid.innerHTML=(structure||cats.length) ? structure+cats.map(c=>'<div class="pal-tag">'+c+'</div>'+blocks.filter(b=>b.cat===c).map(b=>`<div class="pk-it" data-tok="${b.id}" title="${b.desc}"><span class="ms">grid_view</span>${b.label}</div>`).join('')).join('') : '<div class="pk-empty">No block matches.</div>';
+    dpGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ const inst=instFromToken(it.dataset.tok); items.splice(dpAt,0,inst); selK=inst.k; closeDocPick(); render(); renderInspector(); }));
+  }
+  function openDocPick(anchor, at){
+    dpAt=at; dpAnchor=anchor; dpQ.value=''; renderDocPick('');
+    const wr=wrap.getBoundingClientRect(), r=anchor.getBoundingClientRect();
+    dPick.style.display=''; dPick.style.left=Math.max(8,Math.min(wr.width-328, r.left-wr.left+r.width/2-160+wrap.scrollLeft))+'px'; dPick.style.top=(r.bottom-wr.top+8+wrap.scrollTop)+'px';
+    anchor.classList.add('open'); dpQ.focus();
+  }
+  function closeDocPick(){ dPick.style.display='none'; if(dpAnchor) dpAnchor.classList.remove('open'); dpAnchor=null; }
+  dpQ.addEventListener('input',()=>renderDocPick(dpQ.value.trim().toLowerCase()));
+  document.addEventListener('mousedown',e=>{ if(dPick.style.display!=='none' && !e.target.closest('#docPick') && !e.target.closest('.doc-ins')) closeDocPick(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && dPick.style.display!=='none') closeDocPick(); });
   function addItem(tok){ const it=instFromToken(tok); items.push(it); selK=(mode==='layout')?it.k:null; render(); renderInspector(); showToast((it.el?'Added element: ':'Added block: ')+instLabel(it)); }
   wrap.addEventListener('dragover',e=>{ if(e.dataTransfer.types.includes('add')){ e.preventDefault(); wrap.classList.add('drag-over'); } });
   wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over'); });
@@ -763,12 +727,17 @@ function pageInit(){
     document.addEventListener('click',()=>menu.classList.remove('open'));
     menu.addEventListener('click',()=>menu.classList.remove('open'));
   })();
-  document.getElementById('saveBtn').addEventListener('click',()=>{
+  let detailsSeen=!!doc;   // an existing document already has its details; a new one is asked once, on first save
+  function finishSave(){
     const n=document.getElementById('d-name').value.trim();
-    if(!n||n==='Untitled Document'){showToast('Give the document a name first');return;}
-    if(!items.length){showToast('Add at least one block');return;}
-    showToast((doc?'Updated':'Created')+' document: '+n+' · '+items.length+' blocks');
+    if(!n||n==='Untitled Document'){showToast('Give the document a name first'); document.getElementById('d-name').focus(); return;}
+    detailsSeen=true; showToast((doc?'Updated':'Created')+' document: '+n+' · '+items.length+' blocks');
     setTimeout(()=>location.href='library.html',700);
+  }
+  document.getElementById('saveBtn').addEventListener('click',()=>{
+    if(!items.length){showToast('Add at least one block');return;}
+    if(!detailsSeen){ openDocDialog(); return; }
+    finishSave();
   });
   document.getElementById('delBtn').addEventListener('click',()=>{
     confirmAction({title:'Delete this document?',body:`“${doc.name}” will be removed from the library. Tender templates already using it will need a replacement.`,confirm:'Delete document',danger:true},()=>{
@@ -821,9 +790,10 @@ function pageInit(){
     el.innerHTML=`<div class="ds-sumrow"><span>Client</span><strong>${clTxt}</strong></div><div class="ds-sumrow"><span>Type</span><strong>${type}</strong></div><div class="ds-sumrow"><span>Status</span><strong>${stTxt}</strong></div>`;
   }
   const docDialog=document.getElementById('docDialog');
-  function openDocDialog(){ docDialog.style.display='flex'; }
-  function closeDocDialog(){ docDialog.style.display='none'; updateDocSummary(); const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility=''; }
-  document.getElementById('docDialogDone').addEventListener('click',closeDocDialog);
+  function openDocDialog(){ docDialog.classList.add('open'); }
+  function closeDocDialog(){ docDialog.classList.remove('open'); updateDocSummary(); const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility=''; }
+  document.getElementById('docDialogCancel').addEventListener('click',closeDocDialog);
+  document.getElementById('docDialogDone').addEventListener('click',()=>{ closeDocDialog(); finishSave(); });
   document.getElementById('docDialogX').addEventListener('click',closeDocDialog);
   document.getElementById('editDetailsBtn').addEventListener('click',openDocDialog);
   ['d-type','d-status'].forEach(id=>document.getElementById(id).addEventListener('change',updateDocSummary));
@@ -878,8 +848,7 @@ function pageInit(){
   // ---- Left-panel tabs (Blocks / Layers) ----
   function showLeftTab(which){
     document.querySelectorAll('.lt-tab').forEach(x=>x.classList.toggle('on',x.dataset.lt===which));
-    document.getElementById('paneBlocks').style.display=which==='blocks'?'':'none';
-    document.getElementById('paneLayers').style.display=which==='layers'?'':'none';
+    [['paneBlocks','blocks'],['paneLayers','layers']].forEach(([id,k])=>{ const el=document.getElementById(id); const show=which===k; if(show && el.style.display==='none'){ el.classList.remove('tab-in'); void el.offsetWidth; el.classList.add('tab-in'); } el.style.display=show?'':'none'; });
   }
   document.querySelectorAll('.lt-tab').forEach(t=>t.addEventListener('click',()=>showLeftTab(t.dataset.lt)));
 
@@ -1032,11 +1001,6 @@ function pageInit(){
   const SIDES=['T','R','B','L'], AXES=['H','V'];
   const boxClamp=v=>Math.max(0,Math.min(200,Math.round(+v||0)));
   const boxGet=(s,k)=> s[k]!=null ? s[k] : (s[k.slice(0,3)]||0);  // H/V fall back to legacy overall
-  function figScrub(el, get, set){
-    el.addEventListener('pointerdown',e=>{ e.preventDefault(); const x0=e.clientX, v0=+get()||0; try{el.setPointerCapture(e.pointerId);}catch(_){}
-      const mv=ev=>set(v0+Math.round((ev.clientX-x0)/2)); const up=()=>{ el.removeEventListener('pointermove',mv); el.removeEventListener('pointerup',up); };
-      el.addEventListener('pointermove',mv); el.addEventListener('pointerup',up); });
-  }
   function fillBox(it, prop){
     const s=it.style, ctl=document.querySelector(`.fig-box[data-box="${prop}"]`); if(!ctl) return;
     const sm=!!s[prop+'Sides'];
@@ -1097,9 +1061,7 @@ function pageInit(){
     const upd=()=>{ if(!curItem)return; curItem.style.hMode=M.value; V.disabled=(M.value==='auto'||M.value==='hug'); curItem.style.hVal=Math.max(0,Math.round(+V.value||0)); render(); };
     M.addEventListener('change',upd); V.addEventListener('input',upd);
   })();
-  // Drag the icon to scrub the value (Width / Height / Weight), like the padding fields.
-  document.querySelectorAll('.fig-wt').forEach(wt=>{ const ic=wt.querySelector('.ms'), inp=wt.querySelector('input'); if(!ic||!inp) return;
-    figScrub(ic, ()=>+inp.value||0, v=>{ if(inp.disabled) return; const mn=+inp.min||0, mx=(inp.max!==''&&inp.max!=null)?+inp.max:1e5; inp.value=Math.max(mn,Math.min(mx,v)); inp.dispatchEvent(new Event('input',{bubbles:true})); }); });
+  wireScrubFields(); wireInspSections('doc');   // editor-shared.js
   // Figma-style Fill / Stroke paint sections. key = 'bg' (fill) or 'bc' (stroke).
   const clampA=v=>Math.max(0,Math.min(100,Math.round(+v||0)));
   function fillPaint(key){
@@ -1163,7 +1125,7 @@ function pageInit(){
     }
     if(urlP.get('layers')) showLeftTab('layers');
   })();
-  if(!urlP.get('top')){ const ed=document.querySelector('.ed3'); if(ed) ed.style.visibility='hidden'; openDocDialog(); } // details are the step before editing (skip when deep-linked to a result)
+  // Details are asked on the first save (like the block builder) — editing starts straight away.
 }
 </script>
 </body>

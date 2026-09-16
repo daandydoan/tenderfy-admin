@@ -604,3 +604,123 @@ textarea.fin{resize:vertical}
 /* subtle fade-up when a tab pane or list changes */
 @keyframes tabIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .tab-in{animation:tabIn .18s ease-out}
+
+/* ============================================================================
+   Editor inspector controls + dialogs — shared by the Block Builder and Document Builder.
+   ============================================================================ */
+.typo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.typo-grid .fig-label{margin-bottom:5px}
+.typo-grid .fig-field input:disabled{color:var(--light)}
+.typo-grid .fig-field input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;padding:0}
+.typo-grid .fig-field{flex:1;width:100%} .typo-grid .fig-ic{cursor:ew-resize;user-select:none;touch-action:none}
+.typo-grid .fig-field:has(input:disabled){opacity:.45} .typo-grid .fig-field:has(input:disabled) .fig-ic{cursor:not-allowed}
+.insp-h,.insp-sec>.fig-sec-h{cursor:pointer;user-select:none}
+.insp-h::after,.insp-sec>.fig-sec-h::after{content:'expand_more';font-family:'Material Symbols Outlined';font-size:16px;float:right;color:var(--light);transition:transform .15s;text-transform:none;letter-spacing:0}
+/* Paint sections (Fill/Stroke) inside the Style card read like every other section header */
+.insp-sec>.fig-sec-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--light);font-weight:700;margin:16px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border);justify-content:flex-start;gap:6px}
+.insp-sec>.fig-sec-h .fig-sec-t{font:inherit;color:inherit;flex:1}
+.insp-sec.closed .insp-h::after,.insp-sec.closed>.fig-sec-h::after{transform:rotate(-90deg)}
+.insp-sec.closed>:not(.insp-h):not(.fig-sec-h){display:none!important}
+/* nested sub-sections (Dimension in Layout, Fill/Stroke in Appearance) */
+.insp-sec .insp-sec{margin-top:14px}
+.insp-sec .insp-sec>.insp-h,.insp-sec .insp-sec>.fig-sec-h{margin:0 0 7px;border-bottom:none;padding-bottom:0;font-size:11.5px;color:var(--gray);font-weight:500;text-transform:none;letter-spacing:0}   /* nested headers read like field labels (Corner radius) */
+.insp-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--light);font-weight:700;margin:16px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.insp-sec:first-of-type .insp-h{margin-top:0}
+.insp-row{display:grid;grid-template-columns:56px 1fr;align-items:center;gap:10px;margin-bottom:9px}
+.insp-row.tall{align-items:start}
+.insp-row>label{font-size:12px;color:var(--gray)}
+.insp-ctl{display:flex;align-items:center;gap:7px;min-width:0}
+.insp-range{flex:1;min-width:0;accent-color:var(--teal);height:4px}
+.insp-num{width:50px;padding:6px 7px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink);text-align:center}
+.insp-num:disabled{background:#f2f5f4;color:var(--light)}
+.insp-unit{font-size:10.5px;color:var(--light);flex-shrink:0}
+/* Figma-style box-model control — Padding / Margin, unified or per-side */
+.fig-box{margin-bottom:13px}
+.fig-box-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.fig-box-head .fig-label{font-size:11.5px;color:var(--gray);font-weight:500}
+.fig-toggle{width:26px;height:26px;border-radius:6px;border:none;background:transparent;color:var(--light);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.fig-toggle:hover{background:#eef3f1;color:var(--gray)}
+.fig-toggle.on{background:var(--teal-tint);color:var(--teal)}
+.fig-toggle .ms{font-size:16px}
+.fig-field{display:flex;align-items:center;gap:5px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;padding:0 8px;height:30px}
+.fig-field:hover{background:#eaf0ee}
+.fig-field:focus-within{background:#fff;border-color:var(--teal)}
+.fig-field .fig-ic{font-size:15px;color:#9aa5a3;cursor:ew-resize;flex-shrink:0;user-select:none;touch-action:none}
+.fig-field:focus-within .fig-ic{color:var(--teal)}
+.fig-field input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.fig-field input::-webkit-outer-spin-button,.fig-field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.fig-hv{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fig-hv[hidden],.fig-cross[hidden],.fig-solo[hidden],.fig-corners[hidden]{display:none}
+.fig-corners{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fig-corners .fig-field input{text-align:center}
+.fig-corners .cn-tr{transform:rotate(90deg)}
+.fig-corners .cn-br{transform:rotate(180deg)}
+.fig-corners .cn-bl{transform:rotate(270deg)}
+.fig-cross{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fig-cross .fig-field input{text-align:center}
+/* Figma-style Fill / Stroke paint sections */
+.fig-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.fig-sec-t{font-size:12px;font-weight:600;color:var(--ink)}
+.fig-acts{display:flex;gap:2px}
+.fig-a{width:24px;height:24px;border:none;background:transparent;border-radius:6px;color:var(--light);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.fig-a:hover{background:#eef3f1;color:var(--gray)}
+.fig-a.on{background:var(--teal-tint);color:var(--teal)}
+.fig-a .ms{font-size:16px}
+.fig-paint{display:flex;align-items:center;gap:6px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;padding:0 4px 0 6px;height:32px}
+.fig-paint:hover{background:#eaf0ee}
+.fig-paint.off .fig-sw,.fig-paint.off .fig-hexin,.fig-paint.off .fig-op{opacity:.4}
+.fig-sw{position:relative;width:20px;height:20px;border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.14);flex-shrink:0}
+.fig-sw input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;padding:0;margin:0;cursor:pointer;background:none}
+.fig-hexin{flex:1;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;text-transform:uppercase}
+.fig-op{display:flex;align-items:center;gap:1px;flex-shrink:0;border-left:1px solid #d7e0dd;padding-left:6px}
+.fig-op input{width:30px;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;text-align:right;-moz-appearance:textfield}
+.fig-op input::-webkit-outer-spin-button,.fig-op input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.fig-op-u{font-size:11px;color:var(--light)}
+.fig-paint .fig-a{width:22px;height:22px}
+.fig-bind{margin-top:7px}
+.fig-sec.no-paint>:not(.fig-sec-h){display:none!important}
+/* Figma-style Resizing (W/H) + Alignment + Gap */
+.fig-label{font-size:11.5px;color:var(--gray);font-weight:500}
+.fig-align{display:flex;gap:6px;width:100%}
+.fig-align .seg{flex:1;display:flex;gap:2px;background:#f2f5f4;border-radius:7px;padding:2px}
+.fig-align button{flex:1;height:26px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border-radius:5px;color:#7d8b87}
+.fig-align button .ms{font-size:16px} .fig-align button:hover{color:var(--ink)}
+.fig-align button.on{background:#fff;color:var(--teal);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
+.insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
+.insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
+.insp-ctl.col{flex-direction:column;align-items:stretch;gap:6px}
+.bind-note{font-size:11px;color:var(--teal);display:flex;align-items:center;gap:5px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.seg.full{display:flex;width:100%}
+.seg.full button{flex:1;justify-content:center}
+.seg button{border:none;background:#fff;padding:6px 10px;cursor:pointer;color:var(--gray);display:flex;align-items:center;font-family:inherit;font-size:12px;font-weight:600;border-left:1px solid var(--border)}
+.seg button:first-child{border-left:none}
+.seg button.on{background:var(--teal-tint);color:var(--teal)}
+.seg button .ms{font-size:16px}
+/* Dialogs: icon + heading/sub + close, grey scrolling body, actions along the bottom (primary right) */
+.cfm.dlg{text-align:left;padding:0;display:flex;flex-direction:column;max-width:640px;width:calc(100vw - 48px);max-height:86vh;overflow:hidden;border-radius:20px}
+.dlg-h{display:flex;align-items:flex-start;gap:14px;padding:20px 24px 16px;background:#fff}
+.dlg-ic{width:52px;height:52px;border-radius:14px;background:#FBF1E3;color:#C58A3A;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dlg-ic .ms{font-size:26px}
+.dlg-t{flex:1;min-width:0;padding-top:2px} .dlg-t h3{margin:0;font-size:20px} .dlg-t .sub{color:var(--gray);font-size:13.5px;margin-top:4px}
+.dlg-x{border:none;background:transparent;color:var(--ink);cursor:pointer;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0;margin:-4px -6px 0 0} .dlg-x:hover{background:#f2f5f4} .dlg-x .ms{font-size:20px}
+.dlg-b{padding:20px 24px;overflow:auto;flex:1;min-height:140px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.dlg-b>.fld:last-child,.dlg-b>.ws-check:last-child{margin-bottom:0}
+.dlg-f{display:flex;gap:10px;align-items:center;padding:16px 24px;background:#fff}
+.dlg-sp{flex:1}
+.dlg-f .btn{min-width:0;border-radius:12px;padding:12px 22px;font-size:14px;font-weight:600}
+.dlg .fld{margin-bottom:16px} .dlg .fin{padding:11px 13px;font-size:13.5px}
+
+/* Quick element / block picker popover (shared) */
+.el-pick{position:absolute;z-index:80;width:320px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 14px 40px rgba(20,45,38,.18);overflow:hidden}
+.el-pick .pk-search{display:flex;align-items:center;gap:6px;margin:12px;border:1.5px solid var(--teal);border-radius:8px;padding:0 9px;height:34px} .el-pick .pk-search .ms{font-size:18px;color:var(--light)} .el-pick .pk-search input{flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-size:13px;background:transparent}
+.el-pick .pk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:0 12px 12px;max-height:300px;overflow:auto}
+.el-pick .pal-tag{margin:6px 2px 2px}
+.el-pick .pk-it{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 6px 10px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--ink);text-align:center} .el-pick .pk-it:hover{background:var(--teal-tint)} .el-pick .pk-it .ms{font-size:22px;color:var(--ink)}
+.el-pick .pk-empty{grid-column:1/-1;font-size:12px;color:var(--light);text-align:center;padding:14px 0}
+/* Insert line between stacked items: hover the gap -> a line with a + */
+.vb-ins{position:relative;height:16px;margin:0;cursor:pointer;z-index:2}
+.vb-ins::before{content:'';position:absolute;left:8px;right:8px;top:7px;height:2px;background:var(--teal);border-radius:2px;opacity:0;transition:opacity .12s}
+.vb-ins .ms{position:absolute;left:50%;top:-3px;transform:translateX(-50%);width:22px;height:22px;border-radius:6px;background:var(--teal);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.vb-ins:hover::before,.vb-ins:hover .ms,.vb-ins.open::before,.vb-ins.open .ms{opacity:1}
