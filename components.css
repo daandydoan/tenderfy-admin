@@ -724,3 +724,13 @@ textarea.fin{resize:vertical}
 .vb-ins::before{content:'';position:absolute;left:8px;right:8px;top:7px;height:2px;background:var(--teal);border-radius:2px;opacity:0;transition:opacity .12s}
 .vb-ins .ms{position:absolute;left:50%;top:-3px;transform:translateX(-50%);width:22px;height:22px;border-radius:6px;background:var(--teal);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .vb-ins:hover::before,.vb-ins:hover .ms,.vb-ins.open::before,.vb-ins.open .ms{opacity:1}
+
+/* Rich text editor (toolbar over an editable box) */
+.rte{border:1px solid var(--border);border-radius:8px;background:#fff;overflow:hidden}
+.rte:focus-within{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-tint)}
+.rte-bar{display:flex;align-items:center;gap:2px;padding:4px 6px;border-bottom:1px solid var(--border);background:#fafbfb;flex-wrap:wrap}
+.rte-bar button{width:26px;height:26px;border:none;background:transparent;border-radius:5px;color:var(--gray);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.rte-bar button .ms{font-size:17px} .rte-bar button:hover{background:#eef2f1;color:var(--ink)}
+.rte-div{width:1px;height:16px;background:var(--border);margin:0 4px}
+.rich-box{min-height:110px;max-height:260px;overflow-y:auto;padding:10px 12px;font-size:13px;line-height:1.5;outline:none}
+.rich-box:empty::before{content:attr(data-placeholder);color:var(--light)}

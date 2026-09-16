@@ -78,7 +78,7 @@ const TYPO_SEL='h1,h2,h3,h4,h5,p,li,span,a,blockquote,strong,em,td,th,ul,div';
 const cssStr=o=>Object.entries(o).map(([k,v])=>k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';');
 // One element as the document sees it: sizing box > body > primitive, typography pushed onto the text nodes (primitives set inline colours, so inheritance isn't enough).
 function renderStyledEl(el, brand, ref){
-  const html=renderPrimitive(el.id||el, brand, el.content); const st=el.st; const tag=ref?` data-el="${ref}"`:''; if(!st) return `<div${tag}>${html}</div>`;
+  const html=renderPrimitive(el.id||el, brand, el.content); const st=el.st; const tag=ref?` data-el="${ref}" data-elid="${el.id||el}"`:''; if(!st) return `<div${tag}>${html}</div>`;
   const {box,body,typo}=elStyle(st, brand);
   let inner=html;
   if(Object.keys(typo).length && typeof document!=='undefined'){ const tpl=document.createElement('template'); tpl.innerHTML=html; tpl.content.querySelectorAll(TYPO_SEL).forEach(n=>Object.assign(n.style,typo)); inner=tpl.innerHTML; }

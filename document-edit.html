@@ -113,6 +113,13 @@
   .doc-blk .vb-name .ms{font-size:12px}
   .doc-blk:hover .vb-name,.doc-blk.sel .vb-name{opacity:1}
   .doc-blk .pv-blk{outline:none!important;cursor:inherit}
+  /* Inside the selected block, each element gets the block builder's chrome: hover outline, name chip, selection */
+  .doc-blk.sel [data-el]{position:relative;border:1.5px solid transparent;border-radius:7px;padding:4px 5px;margin:-4px -5px;cursor:pointer}
+  .doc-blk.sel [data-el]:hover{border-color:var(--teal)}
+  .doc-blk.sel [data-el].esel{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
+  .doc-blk.sel [data-el]::before{content:attr(data-elname);position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;z-index:2;transition:opacity .1s}
+  .doc-blk.sel [data-el]:hover::before,.doc-blk.sel [data-el].esel::before{opacity:1}
+  .doc-blk.sel [contenteditable]{outline:none;cursor:text;border-radius:3px} .doc-blk.sel [contenteditable]:focus{box-shadow:0 0 0 2px var(--teal-tint)}
   .doc-body > .vb-ins:first-of-type{height:18px}   /* room for the first chip under the letterhead slot */
   .vb-canvas.preview .vb-ins,.vb-canvas.preview .doc-tools,.vb-canvas.preview .vb-name,.vb-canvas.preview .pg-brk{display:none!important}
   .doc-blk.dragging{opacity:.4}
@@ -301,6 +308,33 @@
         <div id="paneStyle" style="display:none"><div class="card">
       <h3 class="ed-h">Style</h3>
       <div id="styleTarget"></div>
+      <!-- Element inspector: an element inside the selected block (this document's copy of the block) -->
+      <div id="elInspector" style="display:none">
+        <div class="fhint" style="margin:-4px 0 10px">Changes apply to this document's copy of the block — the saved block is unchanged.</div>
+        <div class="insp-sec" data-sec="eltypo">
+          <div class="insp-h">Typography</div>
+          <div class="rte" style="margin-bottom:12px">
+            <div class="rte-bar" id="el-rich">
+              <button type="button" data-cmd="bold" title="Bold"><span class="ms">format_bold</span></button><button type="button" data-cmd="italic" title="Italic"><span class="ms">format_italic</span></button><button type="button" data-cmd="strikeThrough" title="Strikethrough"><span class="ms">format_strikethrough</span></button><button type="button" data-cmd="underline" title="Underline"><span class="ms">format_underlined</span></button>
+              <span class="rte-div"></span>
+              <button type="button" data-cmd="createLink" title="Link"><span class="ms">link</span></button><button type="button" data-cmd="unlink" title="Remove link"><span class="ms">link_off</span></button>
+              <span class="rte-div"></span>
+              <button type="button" data-cmd="removeFormat" title="Clear formatting"><span class="ms">format_clear</span></button>
+            </div>
+            <div class="fhint" style="padding:8px 10px">Select text on the canvas, then format it here.</div>
+          </div>
+          <div class="typo-grid" style="margin-top:0">
+            <select class="insp-sel" id="el-font" style="grid-column:1/-1"></select>
+            <select class="insp-sel" id="el-weight"><option value="">Weight · brand</option><option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select>
+            <span class="fig-field" title="Size"><span class="ms fig-ic">format_size</span><input type="number" id="el-size" placeholder="Brand" min="0" max="120"><span class="insp-unit">px</span></span>
+            <div><div class="fig-label">Line height</div><span class="fig-field"><span class="ms fig-ic">format_line_spacing</span><input type="number" id="el-lh" placeholder="Auto" min="0" max="200"><span class="insp-unit">px</span></span></div>
+            <div><div class="fig-label">Letter spacing</div><span class="fig-field"><span class="ms fig-ic">text_fields</span><input type="number" id="el-ls" step="0.1" placeholder="0" min="-5" max="20"><span class="insp-unit">px</span></span></div>
+            <div style="grid-column:1/-1"><div class="fig-label">Colour</div><div class="insp-ctl"><input type="color" class="insp-color" id="el-color"><input type="text" class="insp-hex" id="el-colorH" placeholder="Inherit from brand"></div></div>
+            <div style="grid-column:1/-1"><div class="fig-label">Alignment</div><div class="fig-align"><span class="seg" id="el-align"><button type="button" data-al="left"><span class="ms">format_align_left</span></button><button type="button" data-al="center"><span class="ms">format_align_center</span></button><button type="button" data-al="right"><span class="ms">format_align_right</span></button><button type="button" data-al="justify"><span class="ms">format_align_justify</span></button></span></div></div>
+          </div>
+        </div>
+        <a class="btn btn-outline btn-sm btn-block" id="el-reset" style="margin-top:6px"><span class="ms" style="font-size:16px">restart_alt</span> Reset element style</a>
+      </div>
       <!-- Block inspector: shown when a block is selected -->
       <div id="blockInspector" style="display:none">
         <div>
@@ -708,9 +742,45 @@ function pageInit(){
   }
   function syncEditedRow(it){ const row=document.getElementById('bi-edited'); if(row) row.style.display=(it&&it.doc)?'flex':'none'; }
   // Selection highlight without a re-render (keeps the caret in editable text).
-  function markSelected(){ canvas.querySelectorAll('.doc-blk[data-k],.pv-blk[data-k]').forEach(n=>n.classList.toggle('sel', +n.dataset.k===selK)); renderLayers(); }
+  function markSelected(){ canvas.querySelectorAll('.doc-blk[data-k],.pv-blk[data-k]').forEach(n=>n.classList.toggle('sel', +n.dataset.k===selK)); canvas.querySelectorAll('[data-el]').forEach(n=>n.classList.toggle('esel', !!selEl && +n.closest('.doc-blk').dataset.k===selK && n.dataset.el===selEl)); renderLayers(); }
+  // ---- Element selection inside the selected block (block-builder chrome) ----
+  let selEl=null;   // "r.c.k" within the selected block's doc
+  const ELNAME=Object.fromEntries((typeof PRIMITIVES!=='undefined'?PRIMITIVES:[]).map(p=>[p.id,p.name]));
+  function selElNode(){ const blk=canvas.querySelector('.doc-blk.sel'); return blk && selEl ? blk.querySelector('[data-el="'+selEl+'"]') : null; }
+  function selElObj(){ const it=items.find(x=>x.k===selK); if(!it||!selEl) return null; if(!it.doc) it.doc=blockDocCopy(instObj(it)); const [r,c,k]=selEl.split('.').map(Number); return it.doc[r]&&it.doc[r].cols[c]&&it.doc[r].cols[c][k]||null; }
+  function wireElements(){
+    canvas.querySelectorAll('.doc-blk [data-el]').forEach(w=>{
+      w.dataset.elname=ELNAME[w.dataset.elid]||w.dataset.elid;
+      w.addEventListener('click',e=>{ const blk=w.closest('.doc-blk'); if(!blk.classList.contains('sel')) return; e.stopPropagation(); if(selEl===w.dataset.el) return; selEl=w.dataset.el; markSelected(); renderInspector(); });
+    });
+  }
+  function fillElInspector(){
+    const el=selElObj(); if(!el) return; const st=el.st||{};
+    document.getElementById('el-font').value=st.font||''; document.getElementById('el-weight').value=st.weight||'';
+    document.getElementById('el-size').value=st.size||''; document.getElementById('el-lh').value=st.lh||''; document.getElementById('el-ls').value=st.ls||'';
+    document.getElementById('el-color').value=st.color||'#333333'; document.getElementById('el-colorH').value=(st.color||'').replace('#','').toUpperCase();
+    document.querySelectorAll('#el-align button').forEach(b=>b.classList.toggle('on',b.dataset.al===(st.align||'')));
+  }
+  function setElStyle(patch){ const el=selElObj(); if(!el) return; el.st=Object.assign(el.st||{},patch); render(); renderInspector(); }
+  (function(){
+    document.getElementById('el-font').innerHTML='<option value="">Inherit from brand</option>'+['Outfit','Inter','Poppins','Lora','Roboto'].map(f=>'<option>'+f+'</option>').join('');
+    document.getElementById('el-font').addEventListener('change',e=>setElStyle({font:e.target.value}));
+    document.getElementById('el-weight').addEventListener('change',e=>setElStyle({weight:e.target.value}));
+    [['el-size','size'],['el-lh','lh'],['el-ls','ls']].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>setElStyle({[key]:+e.target.value||0})));
+    document.getElementById('el-color').addEventListener('input',e=>{ document.getElementById('el-colorH').value=e.target.value.replace('#','').toUpperCase(); setElStyle({color:e.target.value}); });
+    document.getElementById('el-colorH').addEventListener('change',e=>{ const v='#'+e.target.value.trim().replace('#',''); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)) setElStyle({color:v}); else if(!e.target.value.trim()) setElStyle({color:''}); });
+    document.querySelectorAll('#el-align button').forEach(b=>b.addEventListener('click',()=>setElStyle({align:b.dataset.al})));
+    document.getElementById('el-reset').addEventListener('click',()=>{ const el=selElObj(); if(el){ delete el.st; render(); renderInspector(); } });
+    // rich text: format the selection inside the selected element (same commands as the block builder)
+    document.querySelectorAll('#el-rich button').forEach(b=>{ b.addEventListener('mousedown',e=>e.preventDefault()); b.addEventListener('click',()=>{
+      const node=selElNode(); if(!node) return; const a=document.activeElement; let leaf = a && a.closest && a.closest('[data-el]')===node ? a : node.querySelector('[contenteditable]'); if(!leaf) return;
+      if(document.activeElement!==leaf){ leaf.focus(); document.execCommand('selectAll'); }
+      let arg=null; if(b.dataset.cmd==='createLink'){ try{ arg=prompt('Link URL','https://'); }catch(_){ arg=null; } if(!arg) return; }
+      document.execCommand(b.dataset.cmd,false,arg); node.dispatchEvent(new Event('input',{bubbles:true}));
+    }); });
+  })();
   function wire(){
-    wireText();
+    wireText(); wireElements(); markSelected();
     // Preview mode: click a rendered block to select it (mirrors Layout selection).
     canvas.querySelectorAll('.pv-blk[data-k]').forEach(el=>{
       el.addEventListener('click',e=>{ e.stopPropagation(); const k=+el.dataset.k; if(selK===k) return; selK=k; markSelected(); renderInspector(); });
@@ -718,7 +788,7 @@ function pageInit(){
     canvas.querySelectorAll('.doc-furn').forEach(el=>el.addEventListener('click',e=>{ e.stopPropagation(); selK=null; renderInspector(); showLeftTab('layers'); }));
     canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();const [rm]=items.splice(+x.dataset.rm,1);if(rm&&rm.k===selK)selK=null;render();renderInspector();}));
     canvas.querySelectorAll('.doc-blk').forEach(el=>{
-      el.addEventListener('click',e=>{ if(e.target.closest('.doc-tools'))return; const k=+el.dataset.k; if(selK===k) return; selK=k; markSelected(); renderInspector(); });
+      el.addEventListener('click',e=>{ if(e.target.closest('.doc-tools'))return; const k=+el.dataset.k; if(selK===k){ if(selEl && !e.target.closest('[data-el]')){ selEl=null; markSelected(); renderInspector(); } return; } selK=k; selEl=null; markSelected(); renderInspector(); });
       const grip=el.querySelector('[data-grip]'); if(grip){ grip.addEventListener('mousedown',()=>{ el.draggable=true; }); el.addEventListener('mouseup',()=>{ el.draggable=false; }); }
       el.addEventListener('dragstart',e=>{ if(!el.draggable){ e.preventDefault(); return; } e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');setTimeout(()=>canvas.classList.add('dnd'));});
       el.addEventListener('dragend',()=>{ el.draggable=false; el.classList.remove('dragging'); canvas.classList.remove('dnd'); });
@@ -989,9 +1059,12 @@ function pageInit(){
   let lastSel=null;
   function renderInspector(){
     const it=items.find(x=>x.k===selK), show=!!it;   // selectable in Layout AND Preview
-    document.getElementById('blockInspector').style.display=show?'':'none';
+    if(!show) selEl=null; const elSel=show && !!selEl && !!selElObj();
+    document.getElementById('elInspector').style.display=elSel?'':'none';
+    document.getElementById('blockInspector').style.display=(show&&!elSel)?'':'none';
     document.getElementById('docSettings').style.display=show?'none':'';
-    document.getElementById('styleTarget').innerHTML = show ? `<span class="ms">check_circle</span> Editing: ${instLabel(it)}` : `<span class="ms" style="color:var(--light)">description</span> Editing: whole document`;
+    document.getElementById('styleTarget').innerHTML = elSel ? `<span class="ms">check_circle</span> Editing: ${ELNAME[selElObj().id]||'element'} <span class="muted" style="font-weight:500">· in ${instLabel(it)}</span>` : show ? `<span class="ms">check_circle</span> Editing: ${instLabel(it)}` : `<span class="ms" style="color:var(--light)">description</span> Editing: whole document`;
+    if(elSel) fillElInspector();
     if(show) fillInspector(it);
     // selecting a block opens its style; deselecting goes back to the palette
     const onLayers=document.querySelector('.ws-tabs button.on')?.dataset.wtab==='layers';
@@ -1110,7 +1183,7 @@ function pageInit(){
     }
   }
   wirePaint('bg'); wirePaint('bc');
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && selK!=null && !(e.target.closest && e.target.closest('input,textarea,select,[contenteditable]'))){ selK=null; renderInspector(); render(); } });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && selK!=null && !(e.target.closest && e.target.closest('input,textarea,select'))){ if(selEl){ selEl=null; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); markSelected(); renderInspector(); } else { selK=null; renderInspector(); render(); } } });
   canvas.addEventListener('click',e=>{ if(!e.target.closest('.doc-blk') && !e.target.closest('.pv-blk[data-k]')){ selK=null; renderInspector(); render(); } });
 
   // ---- Side panel toggle (one panel, like the block builder) ----
