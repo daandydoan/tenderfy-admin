@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tenderfy Tender Kit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f7f8f7; --paper:#ffffff; --ink:#1b2320; --ink-2:#4a5652; --ink-3:#7b8783;
+  --line:#dfe5e2; --teal:#1D9E75; --teal-soft:#e3f4ee; --amber:#b7791f; --amber-soft:#fbf1dc; --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#141917; --paper:#1c2320; --ink:#eef2f0; --ink-2:#b6c0bb; --ink-3:#7f8b86; --line:#2c3632; --teal:#3fc394; --teal-soft:#1c3a30; --amber:#e0a94a; --amber-soft:#3b3020; }
+}
+:root[data-theme="dark"]{ --bg:#141917; --paper:#1c2320; --ink:#eef2f0; --ink-2:#b6c0bb; --ink-3:#7f8b86; --line:#2c3632; --teal:#3fc394; --teal-soft:#1c3a30; --amber:#e0a94a; --amber-soft:#3b3020; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Outfit,system-ui,sans-serif;font-size:16px;line-height:1.5;padding-block:40px;padding-inline:16px}
+.page{max-width:760px;margin:0 auto}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);font-weight:600;margin:0 0 6px}
+h1{font-size:clamp(28px,5vw,38px);line-height:1.1;margin:0 0 10px;font-weight:700;text-wrap:balance}
+.lede{font-size:19px;color:var(--ink-2);margin:0 0 6px;max-width:62ch;text-wrap:balance}
+.meta{font-size:13px;color:var(--ink-3);margin:0 0 36px}
+h2{font-size:20px;margin:40px 0 10px;font-weight:600;letter-spacing:-.01em}
+h2 small{font-weight:400;color:var(--ink-3);font-size:13px;margin-left:8px;letter-spacing:.06em;text-transform:uppercase}
+p{margin:0 0 12px;max-width:66ch}
+ul{margin:0 0 12px;padding-left:20px;max-width:66ch}li{margin:0 0 5px}
+strong{font-weight:600}
+.tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:var(--amber-soft);color:var(--amber);vertical-align:middle;margin-left:4px}
+.tag.ok{background:var(--teal-soft);color:var(--teal)}
+.tbl{overflow-x:auto;margin:0 0 14px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;white-space:nowrap}
+/* pipeline */
+.pipe{overflow-x:auto;margin:6px 0 10px}
+.pipe ol{display:flex;gap:0;list-style:none;margin:0;padding:0;min-width:640px}
+.pipe li{flex:1;position:relative;padding:12px 14px 12px 22px;background:var(--paper);border:1px solid var(--line);border-left:0;font-size:14px}
+.pipe li:first-child{border-left:1px solid var(--line);border-radius:8px 0 0 8px;padding-left:14px}
+.pipe li:last-child{border-radius:0 8px 8px 0}
+.pipe li::after{content:"";position:absolute;right:-9px;top:50%;width:16px;height:16px;transform:translateY(-50%) rotate(45deg);background:var(--paper);border-right:1px solid var(--line);border-top:1px solid var(--line);z-index:1}
+.pipe li:last-child::after{display:none}
+.pipe b{display:block;font-weight:600;font-size:15px}
+.pipe span{color:var(--ink-3);font-size:12.5px}
+.pipe li.freeze{background:var(--teal-soft);border-color:var(--teal)}
+.pipe li.freeze::after{background:var(--teal-soft);border-color:var(--teal)}
+.pipe li.freeze b{color:var(--teal)}
+.pipe li.out{background:var(--bg);border-style:dashed}
+.pipe li.out::after{background:var(--bg);border-style:dashed}
+.cap{font-size:13.5px;color:var(--ink-2);margin:0 0 16px}
+.next{background:var(--paper);border:1px solid var(--teal);border-radius:8px;padding:14px 18px;margin:8px 0 0}
+.next p{margin:0 0 4px}
+.fill{background:var(--amber-soft);color:var(--amber);padding:0 4px;border-radius:3px;font-weight:500}
+hr.pb{border:0;border-top:2px dashed var(--line);margin:48px 0 8px}
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.55;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:0 0 14px;color:var(--ink)}
+code{font-family:var(--mono);font-size:.92em;background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+@media print{body{background:#fff;padding:0}hr.pb{page-break-before:always;border:0}}
+</style></head><body>
+
+<div class="page">
+<p class="eyebrow">Brief · Super-admin onboarding</p>
+<h1>Set up once, bid forever</h1>
+<p class="lede">Tenderfy staff set up each client's tender kit once — brand, blocks, documents, tender template. The client's estimators only ever fill in the words.</p>
+<p class="meta">Prototype at <span style="font-family:var(--mono)">daandydoan.github.io/tenderfy-admin</span> · Daniel · 16 Sep 2026 · page 1 for Tom, Shivam, sales · page 2 for devs</p>
+
+<h2>Why an admin builds it, not the client</h2>
+<p>A client sends us a logo, a brand guide and their last few tenders. They don't know what a block is and shouldn't need to. An admin (Ray suggesting) turns that evidence into a kit; the client only has to say <em>yes</em> to the brand. Two things this buys: <strong>time to first tender</strong> — the client's first bid is a fill-in, not a build — and <strong>consistency</strong> — every tender they send renders from one approved brand through one renderer.</p>
+<p><strong>Cost:</strong> roughly <span class="fill">N hours</span> of admin time per client, by whoever owns onboarding, once. The client hands over: logo, brand guide (or an old tender that shows it), and the tender sections they reuse. Lead time to a fillable template: <span class="fill">N days</span>.</p>
+
+<h2>Who does what</h2>
+<div class="tbl"><table>
+<tr><th>Person</th><th>Does</th><th>Never does</th></tr>
+<tr><td>Tenderfy admin</td><td>Derives the brand, builds blocks and documents, assembles the tender template, assigns it, QA before live</td><td>Writes the tender</td></tr>
+<tr><td>Client owner</td><td>Approves the brand; decides what estimators may change</td><td>Builds anything</td></tr>
+<tr><td>Client estimator</td><td>Opens the assigned template, fills in words, sends</td><td>Touches brand or layout</td></tr>
+</table></div>
+<p>In plain terms: a <strong>block</strong> is one section (a safety statement, a resume, a case study). A <strong>document</strong> is one or more pages made of blocks. A <strong>tender template</strong> is the whole bid — documents in a fixed order. Brand sits across all of it and is painted on at output.</p>
+
+<h2>The pipeline</h2>
+<div class="pipe"><ol>
+<li><b>Brand</b><span>Derive → client approves</span></li>
+<li><b>Blocks</b><span>Sections, per client</span></li>
+<li><b>Documents</b><span>Pages from blocks</span></li>
+<li><b>Tender template</b><span>Documents in order, assigned</span></li>
+<li class="out"><b>Client editor</b><span>Estimator fills · out of scope</span></li>
+<li class="freeze"><b>PDF at Issue</b><span>Brand frozen here</span></li>
+</ol></div>
+<p class="cap">One renderer draws the block canvas, the document preview and the final PDF from the same data. A sent tender pins the brand version it was issued with; later brand edits affect drafts only.</p>
+
+<h2>The four objects</h2>
+<div class="tbl"><table>
+<tr><th>Thing</th><th>Made from</th><th>Who makes it</th><th>Output</th><th>Key rule</th></tr>
+<tr><td>Brand</td><td>Client's logo, guide, past tenders; each value tagged <em>from file p.N</em> or <em>assumed</em></td><td>Admin, Ray suggesting; client approves</td><td>Versioned record of tokens: colours by role, heading/body fonts, type scale, logo</td><td>Nothing is built on an unapproved brand. Editing after approval resets it to <em>not sent</em>.</td></tr>
+<tr><td>Block</td><td>The client's existing section (screenshot → AI draft) or built by hand: rows of 1–3 columns of elements</td><td>Admin</td><td>Reusable, brand-neutral section owned by that client; "share as generic" is the exception</td><td>Blocks carry layout and emphasis, not colours or fonts — the renderer applies those.</td></tr>
+<tr><td>Document</td><td>Saved blocks + letterhead/footer + background regions, A4-paginated</td><td>Admin</td><td>Library item (Resume, Case study, Policy, Insurance, Certification, Org chart, Cover, TOC…) assigned to a client</td><td>Editing words inside a placed block edits a <strong>local copy</strong>. The saved block is never changed, and a later block edit does <strong>not</strong> flow back. "Revert to block" discards the copy.</td></tr>
+<tr><td>Tender template</td><td>Documents in the fixed section order, saved as a preset or assigned to a client, QA'd before live</td><td>Admin</td><td>The thing an estimator opens and fills</td><td>Owner decides, estimator obeys — permissions live in the client editor, not here.</td></tr>
+</table></div>
+
+<h2>Decided · Blocking · Deferred</h2>
+<p><strong>Decided</strong> <span class="tag ok">no re-opening</span></p>
+<ul>
+<li>Blocks belong to a client. No permission controls in the admin builders.</li>
+<li>Brand is applied by the renderer, one renderer everywhere (canvas = preview = PDF).</li>
+<li>One shared component library across super-admin and business-admin (5 Aug).</li>
+<li>Autofill removed; manual editing. No stepper. Resume builder deferred.</li>
+<li>A4 standard; PDF is generated by the backend and downloaded from the client side.</li>
+</ul>
+<p><strong>Blocking</strong> <span class="tag">needs a call before scoping</span></p>
+<ul>
+<li><strong>Styling ownership.</strong> Proposal: brand owns type and colour; block owns layout and emphasis. Today the prototype allows element-level typography overrides inside a document and hides fill/stroke/layout overrides. If the proposal stands, typography overrides go too.</li>
+</ul>
+<p><strong>Deferred to the client editor</strong></p>
+<ul>
+<li>Fixed / Editable / Locked permissions, "add another item" on repeat rows, audit trail, lock-by-head-office, document versioning. Out of scope here — but this is where most of the hard state lives, so it is most of the remaining cost.</li>
+</ul>
+
+<h2>Not in this build</h2>
+<ul>
+<li><strong>AI Draft</strong> from a client file is a keyword match on the description today. The real build reads the image. <span class="tag">not built</span></li>
+<li>The client editor and the backend PDF renderer. The admin side ends at "assigned".</li>
+<li>Rebrand path: a brand change creates a new approved version; issued tenders keep theirs. Not modelled beyond the freeze rule.</li>
+<li>Pagination never splits a block taller than a page.</li>
+</ul>
+
+<div class="next">
+<p><strong>What happens next</strong></p>
+<p>Reviewed by <span class="fill">Tom</span> (model + cost line) and <span class="fill">Shivam</span> (page 2) by <span class="fill">date</span>. One decision needed: styling ownership. Then we scope the client-side builder against page 2.</p>
+</div>
+
+<hr class="pb">
+<p class="eyebrow">Page 2 · for developers</p>
+<h2 style="margin-top:6px">What the prototype models</h2>
+<p>Static HTML/JS, persistence in <code>localStorage</code>. Shared code: <code>block-layouts.js</code> (<code>elStyle</code>, <code>composeBlock</code>, <code>blockDocCopy</code>), <code>document-render.js</code> (pagination), <code>editor-shared.js</code>, <code>components.css</code>. Full notes in <code>DEMO-NOTES.md</code>.</p>
+
+<p><strong>Brand</strong> (per client)</p>
+<pre>brand.evidence[key]   {from, page} | {assumed:true} | {derived:true}   key = colour role or font
+brand.approval        {status: not-sent | pending | approved, by, date}
+brand.log[]           {date, by, what}
+document.issued       {date, brandSnapshot}                           frozen at issue</pre>
+
+<p><strong>Block</strong></p>
+<pre>{ id, name, category, client, generic?,
+  doc: [ { cols:[[el]], ratio?, valign?, repeat?:'v'|'h' } ] }      rows → columns → elements
+el = { id, st, content }                                             st = per-element layout/typography/appearance</pre>
+
+<p><strong>Document</strong></p>
+<pre>{ id, name, category, status, desc, type:'section'|'page', client,
+  docStyle:{bg, pad, gap, rad}, topLayer:{header, footer}, docBg:{mode:'regions', regions:[]},
+  blocks:[ { t:'block'|'element', id, style, content?, doc? } ] }
+blocks[i].doc = this document's copy of the block; exists only once edited; "Revert" deletes it</pre>
+
+<p><strong>Invariants</strong></p>
+<ul>
+<li>Saving a document never writes to a block. Editing a block never rewrites documents.</li>
+<li>Rendering = <code>elStyle(st, brand)</code>. Same function for canvas, preview, PDF. No second renderer.</li>
+<li>No document is built on a brand that isn't <code>approved</code>. An issued document renders from its snapshot.</li>
+<li>Repeat rows are block structure; instances ("add another") are a client-editor concern.</li>
+</ul>
+
+<p><strong>Needed for v1 that the prototype doesn't decide</strong></p>
+<ul>
+<li>Server IDs and versioning for brand (the snapshot a tender pins), blocks and documents; per-user drafts.</li>
+<li>Where the PDF renderer runs (backend) and how it shares <code>elStyle</code> with the front end — the 5 Aug shared-library decision constrains this to one component library.</li>
+<li>AI Draft: store the source image and what was read from it (provenance).</li>
+<li>Pagination that splits long blocks/tables across pages.</li>
+</ul>
+
+<p><strong>What the prototype fakes</strong> (look for the <em>concept</em> badge)</p>
+<ul>
+<li>AI Draft / Suggest blocks: keyword match, file ignored.</li>
+<li>"Used in N" counts are seeded.</li>
+<li>Repeat rows render twice as a stand-in for "one per item".</li>
+<li>Assign / QA / Issue are toasts, no workflow behind them.</li>
+</ul>
+</div>
+</body></html>
