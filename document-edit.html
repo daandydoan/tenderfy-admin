@@ -707,16 +707,18 @@ function pageInit(){
     });
   }
   function syncEditedRow(it){ const row=document.getElementById('bi-edited'); if(row) row.style.display=(it&&it.doc)?'flex':'none'; }
+  // Selection highlight without a re-render (keeps the caret in editable text).
+  function markSelected(){ canvas.querySelectorAll('.doc-blk[data-k],.pv-blk[data-k]').forEach(n=>n.classList.toggle('sel', +n.dataset.k===selK)); renderLayers(); }
   function wire(){
     wireText();
     // Preview mode: click a rendered block to select it (mirrors Layout selection).
     canvas.querySelectorAll('.pv-blk[data-k]').forEach(el=>{
-      el.addEventListener('click',e=>{ e.stopPropagation(); selK=+el.dataset.k; render(); renderInspector(); });
+      el.addEventListener('click',e=>{ e.stopPropagation(); const k=+el.dataset.k; if(selK===k) return; selK=k; markSelected(); renderInspector(); });
     });
     canvas.querySelectorAll('.doc-furn').forEach(el=>el.addEventListener('click',e=>{ e.stopPropagation(); selK=null; renderInspector(); showLeftTab('layers'); }));
     canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();const [rm]=items.splice(+x.dataset.rm,1);if(rm&&rm.k===selK)selK=null;render();renderInspector();}));
     canvas.querySelectorAll('.doc-blk').forEach(el=>{
-      el.addEventListener('click',e=>{ if(e.target.closest('.doc-tools'))return; selK=+el.dataset.k; render(); renderInspector(); });
+      el.addEventListener('click',e=>{ if(e.target.closest('.doc-tools'))return; const k=+el.dataset.k; if(selK===k) return; selK=k; markSelected(); renderInspector(); });
       const grip=el.querySelector('[data-grip]'); if(grip){ grip.addEventListener('mousedown',()=>{ el.draggable=true; }); el.addEventListener('mouseup',()=>{ el.draggable=false; }); }
       el.addEventListener('dragstart',e=>{ if(!el.draggable){ e.preventDefault(); return; } e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');setTimeout(()=>canvas.classList.add('dnd'));});
       el.addEventListener('dragend',()=>{ el.draggable=false; el.classList.remove('dragging'); canvas.classList.remove('dnd'); });
