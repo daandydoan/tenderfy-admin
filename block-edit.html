@@ -905,7 +905,7 @@ function pageInit(){
     box.style.maxWidth = ewm==='max' ? (st.wpx||0)+'px' : '';
     // Element H alignment inside its column (matters when the element isn't Fill width). V alignment is per column — see row.valign.
     const HM2={left:'flex-start',center:'center',right:'flex-end'};
-    box.style.alignSelf = st.alH ? HM2[st.alH] : ((ewm==='fixed'||ewm==='max') ? 'flex-start' : '');
+    box.style.alignSelf = (ewm==='fixed'||ewm==='max') ? HM2[st.alH||'left'] : '';   // Fill width must keep stretching
     box.style.flex = '0 0 auto';   // elements stack at their natural height, like the document renderer
     // A column holding a Fixed/Min/Max-width element sizes to it; the other columns fill the rest.
     const col=box.parentElement; if(col && col.classList.contains('vb-col')){ const sized=[...col.querySelectorAll(':scope > .vb-el')].some(el=>el.style.width||el.style.minWidth||el.style.maxWidth); col.style.flex = sized ? '0 1 auto' : (col.dataset.ratio||'1'); }
