@@ -533,7 +533,6 @@
             </span>
             <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
               <span class="autosave" id="autosave"></span>
-              <button class="tb-btn tb-lbl on" id="styleBtn" title="Hide / show the left panel"><span class="ms">left_panel_close</span> Panel</button>
             </span>
           </div>
           <div class="vb-canvas" id="cvWrap">
@@ -1507,10 +1506,8 @@ function pageInit(){
   function applyPanels(){
     ed3.classList.toggle('st-on', styleOpen);
     ed3.classList.toggle('el-on', elOpen);
-    document.getElementById('styleBtn').classList.toggle('on', styleOpen);
     document.getElementById('elBtn').classList.toggle('on', elOpen);
   }
-  document.getElementById('styleBtn').addEventListener('click',()=>{ styleOpen=!styleOpen; if(styleOpen && window.innerWidth<=1100) elOpen=false; applyPanels(); });
   document.getElementById('elBtn').addEventListener('click',()=>{ elOpen=!elOpen; if(elOpen && window.innerWidth<=1100) styleOpen=false; applyPanels(); });
   document.getElementById('ed3Scrim').addEventListener('click',()=>{ elOpen=false; styleOpen=false; applyPanels(); });
   window.addEventListener('resize',()=>{ const wide=window.innerWidth>1100; if(wide!==lastWide){ lastWide=wide; styleOpen=wide; elOpen=false; applyPanels(); } });
