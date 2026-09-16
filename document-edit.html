@@ -146,7 +146,9 @@
   .pv-blk.sel{outline:2px solid var(--teal);outline-offset:2px}
   .doc-blk .blk-box{transition:padding .1s,background .1s,border-color .1s,border-radius .1s}
   /* Block inspector */
-  .bi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  #styleTarget{font-size:12px;color:var(--teal);font-weight:600;margin:-4px 0 10px;display:flex;align-items:center;gap:6px}
+  #styleTarget .ms{font-size:15px}
+  #docSettings .insp-sec:first-child .insp-h{margin-top:0}
   .bi-x{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer}
   .bi-x:hover{border-color:var(--teal);color:var(--teal)}
   .bi-x .ms{font-size:16px}
@@ -297,12 +299,11 @@
           </div>
         </div>
         <div id="paneStyle" style="display:none"><div class="card">
-      <!-- Block inspector: shown when a block is selected in Layout mode -->
+      <h3 class="ed-h">Style</h3>
+      <div id="styleTarget"></div>
+      <!-- Block inspector: shown when a block is selected -->
       <div id="blockInspector" style="display:none">
         <div>
-          <div class="bi-head"><h3 class="ed-h" style="margin:0">Block</h3><button class="bi-x" id="bi-close" title="Deselect"><span class="ms">close</span></button></div>
-          <strong id="bi-name" style="font-size:13.5px;color:var(--ink)"></strong>
-          <div class="fhint" id="bi-desc" style="margin-top:3px"></div>
 
           <div id="bi-edited" style="display:none;margin-top:10px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:#f7faf9;align-items:center;gap:8px;font-size:12px;color:var(--gray)"><span class="ms" style="font-size:16px;color:var(--teal)">edit_note</span><span style="flex:1">Words edited in this document only — the saved block is unchanged.</span><a class="btn btn-outline btn-sm" id="bi-revert" title="Discard this document's edits and use the block as saved">Revert to block</a></div>
           <div class="fhint" id="bi-editHint" style="margin-top:8px">Click any text on the canvas to edit it for this document.</div>
@@ -349,24 +350,21 @@
       </div>
 
       <div id="docSettings">
-      <h3 class="ed-h">Document</h3>
-      <div class="acc closed" data-acc>
-        <button class="acc-h"><span class="acc-title"><span class="ms" style="color:var(--teal)">description</span> Document</span><span class="ms acc-caret">expand_more</span></button>
-        <div class="acc-body">
+        <div class="insp-sec" data-sec="docinfo">
+          <div class="insp-h">Document</div>
           <div class="doc-summary" id="doc-summary"></div>
-          <button class="btn btn-outline btn-sm btn-block" id="editDetailsBtn"><span class="ms" style="font-size:16px">tune</span> Edit details</button>
+          <button class="btn btn-outline btn-sm btn-block" id="editDetailsBtn" style="margin-top:8px"><span class="ms" style="font-size:16px">tune</span> Edit details</button>
         </div>
-      </div>
-      <div class="acc" data-acc>
-        <button class="acc-h"><span class="acc-title"><span class="ms" style="color:var(--teal)">palette</span> Style</span><span class="ms acc-caret">expand_more</span></button>
-        <div class="acc-body">
-          <div class="ds-row"><label>Fill</label><div class="ds-ctl"><input type="color" id="ds-bg"><input class="ds-hex" id="ds-bgH"></div></div>
-          <div class="ds-row"><label>Padding</label><div class="ds-ctl"><input type="range" id="ds-pad" min="0" max="80"><input type="number" class="ds-num" id="ds-padN"><span class="ds-u">px</span></div></div>
-          <div class="ds-row"><label>Spacing</label><div class="ds-ctl"><input type="range" id="ds-gap" min="0" max="48"><input type="number" class="ds-num" id="ds-gapN"><span class="ds-u">px</span></div></div>
-          <div class="ds-row"><label>Radius</label><div class="ds-ctl"><input type="range" id="ds-rad" min="0" max="24"><input type="number" class="ds-num" id="ds-radN"><span class="ds-u">px</span></div></div>
+        <div class="insp-sec" data-sec="page">
+          <div class="insp-h">Page</div>
+          <div class="typo-grid" style="margin-top:0">
+            <div style="grid-column:1/-1"><div class="fig-label">Fill</div><div class="insp-ctl"><input type="color" class="insp-color" id="ds-bg"><input type="text" class="insp-hex" id="ds-bgH" placeholder="FFFFFF"></div></div>
+            <div><div class="fig-label">Padding</div><span class="fig-field"><span class="ms fig-ic">padding</span><input type="number" id="ds-padN" min="0" max="80"><span class="insp-unit">px</span></span></div>
+            <div><div class="fig-label">Spacing</div><span class="fig-field"><span class="ms fig-ic">width_normal</span><input type="number" id="ds-gapN" min="0" max="48"><span class="insp-unit">px</span></span></div>
+            <div><div class="fig-label">Corner radius</div><span class="fig-field"><span class="ms fig-ic">rounded_corner</span><input type="number" id="ds-radN" min="0" max="24"><span class="insp-unit">px</span></span></div>
+          </div>
           <div class="fhint" style="margin-top:6px">Document-level styling. The assigned client's brand is layered on top.</div>
         </div>
-      </div>
       </div>
         </div></div>
         <div id="paneLayers" style="display:none">
@@ -789,16 +787,16 @@ function pageInit(){
   }
   // Re-paginate in Preview when page metrics change; otherwise just restyle.
   function syncDoc(){ if(mode==='preview') render(); else applyDocStyle(); }
-  function bindRange(rId,nId,key){
-    const R=document.getElementById(rId), N=document.getElementById(nId);
-    const set=v=>{ v=Math.max(+R.min,Math.min(+R.max,Math.round(+v||0))); docStyle[key]=v; R.value=v; N.value=v; syncDoc(); };
-    R.addEventListener('input',()=>set(R.value)); N.addEventListener('input',()=>set(N.value)); set(docStyle[key]);
+  function bindNum(nId,key){
+    const N=document.getElementById(nId);
+    const set=v=>{ v=Math.max(+N.min,Math.min(+N.max,Math.round(+v||0))); docStyle[key]=v; N.value=v; syncDoc(); };
+    N.addEventListener('input',()=>set(N.value)); set(docStyle[key]);
   }
-  bindRange('ds-pad','ds-padN','pad'); bindRange('ds-gap','ds-gapN','gap'); bindRange('ds-rad','ds-radN','rad');
+  bindNum('ds-padN','pad'); bindNum('ds-gapN','gap'); bindNum('ds-radN','rad');
   const dbg=document.getElementById('ds-bg'), dbgH=document.getElementById('ds-bgH');
-  dbg.value=docStyle.bg; dbgH.value=docStyle.bg.toUpperCase();
-  dbg.addEventListener('input',()=>{ docStyle.bg=dbg.value; dbgH.value=dbg.value.toUpperCase(); applyDocStyle(); });
-  dbgH.addEventListener('input',e=>{ const v=e.target.value.trim(); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ docStyle.bg=v; dbg.value=v; applyDocStyle(); } });
+  dbg.value=docStyle.bg; dbgH.value=docStyle.bg.replace('#','').toUpperCase();
+  dbg.addEventListener('input',()=>{ docStyle.bg=dbg.value; dbgH.value=dbg.value.replace('#','').toUpperCase(); applyDocStyle(); });
+  dbgH.addEventListener('input',e=>{ const v='#'+e.target.value.trim().replace('#',''); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){ docStyle.bg=v; dbg.value=v; applyDocStyle(); } });
 
   // ---- Client / brand inheritance ----
   const clientSel=document.getElementById('d-client');
@@ -991,6 +989,7 @@ function pageInit(){
     const it=items.find(x=>x.k===selK), show=!!it;   // selectable in Layout AND Preview
     document.getElementById('blockInspector').style.display=show?'':'none';
     document.getElementById('docSettings').style.display=show?'none':'';
+    document.getElementById('styleTarget').innerHTML = show ? `<span class="ms">check_circle</span> Editing: ${instLabel(it)}` : `<span class="ms" style="color:var(--light)">description</span> Editing: whole document`;
     if(show) fillInspector(it);
     // selecting a block opens its style; deselecting goes back to the palette
     const onLayers=document.querySelector('.ws-tabs button.on')?.dataset.wtab==='layers';
@@ -999,8 +998,6 @@ function pageInit(){
   }
   function fillInspector(it){
     curItem=it; const b=instObj(it);
-    document.getElementById('bi-name').textContent=instLabel(it);
-    document.getElementById('bi-desc').textContent=instDesc(it);
     const s=it.style, setv=(r,n,v)=>{document.getElementById(r).value=v;document.getElementById(n).value=v;};
     fillBox(it,'pad'); fillBox(it,'mar'); fillRad(it);
     const wm=s.wMode||'fill'; document.getElementById('bs-wmode').value=wm; document.getElementById('bs-wpx').value=s.wPx||480; document.getElementById('bs-wpx').disabled=(wm!=='fixed');
@@ -1111,7 +1108,7 @@ function pageInit(){
     }
   }
   wirePaint('bg'); wirePaint('bc');
-  document.getElementById('bi-close').addEventListener('click',()=>{ selK=null; renderInspector(); render(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && selK!=null && !(e.target.closest && e.target.closest('input,textarea,select,[contenteditable]'))){ selK=null; renderInspector(); render(); } });
   canvas.addEventListener('click',e=>{ if(!e.target.closest('.doc-blk') && !e.target.closest('.pv-blk[data-k]')){ selK=null; renderInspector(); render(); } });
 
   // ---- Side panel toggle (one panel, like the block builder) ----
