@@ -34,7 +34,8 @@
   /* Client picker */
   .pick-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
   .pick-list a{display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:9px;padding:9px 10px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink)} .pick-list a:hover{border-color:var(--teal);background:var(--teal-tint)}
-  .pick-list .av{width:28px;height:28px;border-radius:7px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+  .pick-list .av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden} .pick-list .av svg{width:100%;height:100%}
+  #pickModal .dlg-b{max-height:50vh}   /* the client list grows; the body scrolls, header and actions stay put */
   .pick-list .sub{font-size:10.5px;color:var(--light);font-weight:400}
   .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
   .ed3-col .card{margin-bottom:14px}
@@ -1457,7 +1458,8 @@ function pageInit(){
 
   // Who the block is for. A new block belongs to a client — pick one before anything else.
   if(!clientId && !existing){
-    document.getElementById('pickList').innerHTML=TENANTS.map(t=>`<a data-pick="${t.id}"><span class="av" style="background:${t.brand.primary}">${t.initials}</span><span>${t.name}<div class="sub">${brandMeta(t).files.length?'Documents received':'Waiting on documents'}</div></span></a>`).join('');
+    const mark=t=>{ const p=t.brand.primary, s2=t.brand.secondary||'#ffffff', k=[...t.name].reduce((a,c)=>a+c.charCodeAt(0),0)%5; const g=['<circle cx="14" cy="14" r="6.5" fill="none" stroke="'+s2+'" stroke-width="3"/>','<path d="M7 20 L14 8 L21 20 Z" fill="'+s2+'"/>','<rect x="7" y="7" width="6" height="14" rx="1.5" fill="'+s2+'"/><rect x="15" y="11" width="6" height="10" rx="1.5" fill="'+s2+'" opacity=".7"/>','<path d="M7 18 L12 10 L16 15 L21 8" fill="none" stroke="'+s2+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>','<path d="M14 6 L22 14 L14 22 L6 14 Z" fill="none" stroke="'+s2+'" stroke-width="3"/>'][k]; return '<svg viewBox="0 0 28 28" width="28" height="28"><rect width="28" height="28" rx="7" fill="'+p+'"/>'+g+'</svg>'; };   // ponytail: stand-in for the client logo from Original files
+    document.getElementById('pickList').innerHTML=TENANTS.map(t=>`<a data-pick="${t.id}"><span class="av" title="${t.initials}">${mark(t)}</span><span>${t.name}<div class="sub">${brandMeta(t).files.length?'Documents received':'Waiting on documents'}</div></span></a>`).join('');
     document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{ leaving=true; location.href=location.pathname+'#client='+a.dataset.pick; location.reload(); }));
     document.getElementById('pickGeneral').addEventListener('click',()=>document.getElementById('pickModal').classList.remove('open'));
     document.getElementById('pickModal').classList.add('open');
