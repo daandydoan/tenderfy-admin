@@ -97,6 +97,7 @@
   .vb-el.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
   .vb-el.dragging{opacity:.4}
   /* Insert line between elements: hover the gap → a line with a + that opens the element picker */
+  .vb-page.dnd .vb-ins,.vb-page.dnd .vb-tools,.vb-page.dnd .vb-name,.vb-page.dnd .vb-rowtools{pointer-events:none}   /* while dragging, only columns/elements receive the pointer */
   .vb-ins{position:relative;height:16px;margin:0;cursor:pointer;z-index:2}   /* real gap between elements so the insert line is hoverable */
   .vb-col>.vb-ins:first-child{height:18px;margin:0}   /* room above the first element so its name chip clears the row tools */
   .vb-col>.vb-ins:first-child::before{top:12px} .vb-col>.vb-ins:first-child .ms{top:2px}
@@ -715,7 +716,8 @@ function pageInit(){
     `<div class="pal-tag">Structure</div><div class="vb-widget struct" draggable="true" data-row="2" title="A row with two columns"><span class="ms">view_column</span>2 Columns</div><div class="vb-widget struct" draggable="true" data-row="3" title="A row with three columns"><span class="ms">view_week</span>3 Columns</div>`
     + Object.entries(byTag).map(([tag,ps])=>`<div class="pal-tag">${tag}</div>`+ps.map(p=>`<div class="vb-widget" draggable="true" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('')).join('');
   document.querySelectorAll('.vb-widget').forEach(w=>{
-    w.addEventListener('dragstart',e=>{ drag = w.dataset.row ? {kind:'new-row',cols:+w.dataset.row} : {kind:'new-prim',id:w.dataset.id}; if(e.dataTransfer){ e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text','n'); } });
+    w.addEventListener('dragend',()=>{ page.classList.remove('dnd'); drag=null; clearInd(); });
+    w.addEventListener('dragstart',e=>{ page.classList.add('dnd'); drag = w.dataset.row ? {kind:'new-row',cols:+w.dataset.row} : {kind:'new-prim',id:w.dataset.id}; if(e.dataTransfer){ e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text','n'); } });
     w.addEventListener('dragend',()=>{drag=null;clearInd();});
     w.addEventListener('click',()=>{ if(w.dataset.row) doc.push({cols:Array.from({length:+w.dataset.row},()=>[])}); else addEl(mkEl(w.dataset.id)); sel=null; render(); commit(); });
   });
@@ -1225,8 +1227,8 @@ function pageInit(){
       const h=el.querySelector('[data-handle]');
       h.addEventListener('mousedown',()=>{el.draggable=true;});
       el.addEventListener('mouseup',()=>{el.draggable=false;});
-      el.addEventListener('dragstart',e=>{drag={kind:'move-prim',r,c,k};if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','m');}el.classList.add('dragging');});
-      el.addEventListener('dragend',()=>{el.draggable=false;el.classList.remove('dragging');clearInd();drag=null;});
+      el.addEventListener('dragstart',e=>{page.classList.add('dnd');drag={kind:'move-prim',r,c,k};if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','m');}el.classList.add('dragging');});
+      el.addEventListener('dragend',()=>{page.classList.remove('dnd');el.draggable=false;el.classList.remove('dragging');clearInd();drag=null;});
     });
     page.querySelectorAll('.vb-row').forEach(rowEl=>{
       const r=+rowEl.dataset.r;
@@ -1241,8 +1243,8 @@ function pageInit(){
       const rh=rowEl.querySelector('[data-rhandle]');
       rh.addEventListener('mousedown',()=>{rowEl.draggable=true;});
       rowEl.addEventListener('mouseup',()=>{rowEl.draggable=false;});
-      rowEl.addEventListener('dragstart',e=>{if(!rowEl.draggable)return;e.stopPropagation();drag={kind:'move-row',r};if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','r');}});
-      rowEl.addEventListener('dragend',()=>{rowEl.draggable=false;clearInd();drag=null;});
+      rowEl.addEventListener('dragstart',e=>{if(!rowEl.draggable)return;e.stopPropagation();page.classList.add('dnd');drag={kind:'move-row',r};if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','r');}});
+      rowEl.addEventListener('dragend',()=>{page.classList.remove('dnd');rowEl.draggable=false;clearInd();drag=null;});
     });
   }
 
