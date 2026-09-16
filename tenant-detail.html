@@ -73,7 +73,7 @@
   /* ---- Layout: left identity+subscription rail, Brand tokens main, templates full width ---- */
   .cd-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
   .cd-rail{display:flex;flex-direction:column;gap:18px}
-  .cd-templates{margin-top:24px}
+  .cd-templates{margin-top:20px}
   .cd-idhead{display:flex;gap:13px;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:2px}
   .cd-avatar{width:56px;height:56px;border-radius:12px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;flex-shrink:0}
   .cd-name{font-size:18px;font-weight:700;line-height:1.2}
@@ -95,7 +95,7 @@
   .cd-prev-empty{border:1px dashed var(--border);border-radius:12px;padding:52px 24px;text-align:center;color:var(--gray)}
   .cd-prev-empty .ms{font-size:34px;color:var(--light);display:block;margin-bottom:10px}
   /* Assigned packs grid */
-  #assigned{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+  #assigned{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
   .pack-card{border:1px solid var(--border);border-radius:12px;background:#fff;overflow:hidden;cursor:pointer;transition:border-color .12s,box-shadow .12s}
   .pack-card:hover{border-color:var(--teal);box-shadow:0 4px 16px rgba(20,45,38,.08)}
   .pack-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 13px 8px}
@@ -214,8 +214,8 @@
     </div>
 
     <!-- Assigned templates: full width -->
-    <div class="cd-templates">
-      <div class="cd2-sec-h"><h2>Assigned templates</h2><span class="muted" id="asg-total" style="font-size:13px"></span></div>
+    <div class="card cd-templates">
+      <div class="cd2-cardhead"><h3>Assigned templates</h3><span class="sub" id="asg-total"></span></div>
       <div id="assigned"></div>
     </div>
     </div><!-- /tab-overview -->
