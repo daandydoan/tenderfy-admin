@@ -264,6 +264,7 @@
   .fig-wt input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink);outline:none;-moz-appearance:textfield}
   .fig-wt input::-webkit-outer-spin-button,.fig-wt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .fig-bind{margin-top:7px}
+  .fig-sec.no-paint>:not(.fig-sec-h){display:none!important}
   /* Figma-style Resizing (W/H) + Alignment + Gap */
   .fig-label{font-size:11.5px;color:var(--gray);font-weight:500}
   .fig-align{display:flex;gap:6px;width:100%}
@@ -649,7 +650,7 @@ function pageInit(){
   const clientId=_params.get('client')||(existing&&existing.client)||null;
   const tenant=clientId?TENANTS.find(t=>t.id===clientId):null;
 
-  const elDef=()=>({wmode:'fill',wpx:200,hmode:'fill',hpx:120,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',bgA:100,bgVis:true,font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'});
+  const elDef=()=>({wmode:'fill',wpx:200,hmode:'fill',hpx:120,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',bgA:100,bgVis:true,font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'});
   const mkEl=pid=>{ const e={id:pid, st:elDef()}; if(pid==='field') e.field='client.name'; if(pid==='image') e.src='placeholder'; return e; };
   const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
@@ -663,7 +664,7 @@ function pageInit(){
   function rebuildBrands(){ BRANDS=[{id:'default',name:'Default',brand:null}, ...TENANTS.map(t=>({id:t.id,name:t.name,brand:t.brand,tenant:t})), ...customStyles.map(s=>({id:s.id,name:s.name,brand:s.brand,tenant:s}))]; }
   rebuildBrands();
   const NEUTRAL={primary:'#27535C', secondary:'#38988A', background:'#F7F9F8'};
-  const blockStyle={wmode:'fill', wpx:520, hmode:'fill', hpx:200, alH:'left', alV:'top', padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', bgA:100, bgVis:true, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'#E2E8E6', bcolorBind:'', bcolorA:100, bcolorVis:true, bpos:'inside'};
+  const blockStyle={wmode:'fill', wpx:520, hmode:'fill', hpx:200, alH:'left', alV:'top', padH:0, padV:0, padSides:false, padT:0, padR:0, padB:0, padL:0, marH:0, marV:0, marSides:false, marT:0, marR:0, marB:0, marL:0, sp:8, bg:'', bgBind:'', bgA:100, bgVis:true, rad:0, radSides:false, radTL:0, radTR:0, radBR:0, radBL:0, bw:0, bstyle:'solid', bcolor:'', bcolorBind:'', bcolorA:100, bcolorVis:true, bpos:'inside'};
   if(existing && existing.blockStyle) Object.assign(blockStyle, existing.blockStyle);
   let source = (existing && existing.source) || '';   // provenance: which client document this block was drafted from
   // Padding / margin CSS — one number (overall) or four (per side).
@@ -1063,7 +1064,7 @@ function pageInit(){
     document.getElementById('s-'+key+'Bind').value=bind;
     const lit=document.getElementById('s-'+key+'Lit'), note=document.getElementById('s-'+key+'Note');
     const on=paintOn(t,key), vis=t[key+'Vis']!==false;
-    if(sec){ const add=sec.querySelector('[data-add]'); if(add) add.style.display=on?'none':''; }
+    if(sec){ const add=sec.querySelector('[data-add]'); if(add) add.style.display=on?'none':''; sec.classList.toggle('no-paint',!on); }   // nothing applied → just the header and its +
     if(bind && bind!=='none'){
       lit.style.display='none'; note.style.display=on?'':'none';
       const col = key==='bg'?resolveFill(t):resolveBColor(t);
@@ -1163,7 +1164,7 @@ function pageInit(){
     document.getElementById('s-preset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.key===e.target.value); if(p&&p.key){ Object.assign(target(), p.st); if('bg' in p.st) target().bgBind=''; if('bcolor' in p.st) target().bcolorBind=''; applyActive(); syncInspector(); commit(); showToast('Applied preset: '+p.label); } });
     document.getElementById('s-copy').addEventListener('click',()=>{ styleClip=clone(target()); document.getElementById('s-paste').disabled=false; showToast('Style copied'); });
     document.getElementById('s-paste').addEventListener('click',()=>{ if(!styleClip) return; Object.assign(target(), clone(styleClip)); applyActive(); syncInspector(); commit(); showToast('Style pasted'); });
-    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,hmode:'fill',hpx:200,alH:'left',alV:'top',padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',bgA:100,bgVis:true,rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#E2E8E6',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'}); } applyActive(); render(); commit(); showToast('Style reset'); });
+    document.getElementById('s-reset').addEventListener('click',()=>{ if(sel){ const e=selEl(); e.st=elDef(); } else { Object.assign(blockStyle,{wmode:'fill',wpx:520,hmode:'fill',hpx:200,alH:'left',alV:'top',padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,sp:8,bg:'',bgBind:'',bgA:100,bgVis:true,rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'}); } applyActive(); render(); commit(); showToast('Style reset'); });
     // Collapsible sections — remembered per browser; the long tail starts closed so Permission/Layout/Fill are one glance.
     const CKEY='tf_insp_closed'; let closed; try{ closed=JSON.parse(localStorage.getItem(CKEY)); }catch(e){} if(!Array.isArray(closed)) closed=[];
     const applyClosed=()=>document.querySelectorAll('#styleCard .insp-sec[data-sec]').forEach(s=>s.classList.toggle('closed', closed.includes(s.dataset.sec)));
