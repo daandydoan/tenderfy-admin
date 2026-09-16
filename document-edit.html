@@ -480,8 +480,7 @@
               <button data-mode="layout" class="on"><span class="ms">grid_view</span> Build</button>
               <button data-mode="preview"><span class="ms">visibility</span> Preview</button>
             </div>
-            <button class="tb-btn" id="pdfBtn" title="Print the A4 pages to PDF" style="display:none;margin-left:8px"><span class="ms">picture_as_pdf</span> Download PDF
-            </div>
+            <button class="tb-btn" id="pdfBtn" title="Print the A4 pages to PDF" style="display:none;margin-left:8px"><span class="ms">picture_as_pdf</span> Download PDF</button>
           </div>
           <div class="vb-stage" id="canvas"></div>
         </div>
@@ -681,7 +680,7 @@ function pageInit(){
     return {count, pageOf};
   }
   // Autosave = a real localStorage draft (tf_ddraft_<id|new>), written 600ms after the last change; the stamp only shows once it's written.
-  const autosaveEl=document.getElementById('autosave'); let autosaveT=null; const DKEY='tf_ddraft_'+(id||'new');
+  const autosaveEl=document.getElementById('autosave'); let autosaveT=null; const DKEY='tf_ddraft_'+(id||('new-'+docType));
   function docSnapshot(){ return { id:id||null, name:document.getElementById('d-name').value.trim(), category:document.getElementById('d-type').value, status:document.getElementById('d-status').value, desc:document.getElementById('d-desc').value, client:document.getElementById('d-client').value, type:docType, docStyle, topLayer, docBg, blocks:items.map(it=>{ const bl={t:it.el?'element':'block', id:it.el?it.pid:it.bid, style:it.style}; if(it.content&&Object.keys(it.content).length) bl.content=it.content; if(it.doc) bl.doc=it.doc; return bl; }) }; }
   function stampAutosave(){ clearTimeout(autosaveT); autosaveT=setTimeout(()=>{ try{ localStorage.setItem(DKEY, JSON.stringify(docSnapshot())); autosaveEl.innerHTML='<span class="ms">cloud_done</span> Autosaved · '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}); }catch(e){ autosaveEl.innerHTML='<span class="ms" style="color:#d5493f">cloud_off</span> Not saved · storage full'; } },600); }
   function render(){ stampAutosave();
