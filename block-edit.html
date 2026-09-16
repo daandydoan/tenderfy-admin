@@ -674,7 +674,8 @@ function pageInit(){
   // A paint (fill/stroke) colour with optional opacity → hex or rgba().
   function paintCss(hex,a){ if(a==null||a>=100||!hex) return hex||''; a=Math.max(0,Math.min(100,a))/100; let h=String(hex).replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); if(isNaN(n)) return hex; return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`; }
   // A paint exists if it has a colour or a non-'none' brand bind; visible unless the eye is off.
-  const paintOn=(t,key)=> !!(t[key]&&t[key]!=='') || !!(t[key+'Bind']&&t[key+'Bind']!=='none');
+  // A stroke with no weight isn't a stroke — older elements carry a default colour with bw:0.
+  const paintOn=(t,key)=> (key==='bcolor' && !(t.bw>0)) ? false : (!!(t[key]&&t[key]!=='') || !!(t[key+'Bind']&&t[key+'Bind']!=='none'));
   const paintVisible=(t,key)=> paintOn(t,key) && t[key+'Vis']!==false;
   const target=()=> sel ? doc[sel.r].cols[sel.c][sel.k].st : blockStyle;
   const selEl=()=> sel ? doc[sel.r].cols[sel.c][sel.k] : null;
