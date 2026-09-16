@@ -63,6 +63,7 @@
   .autosave .ms{font-size:13px}
   .fin-sm{padding:7px 10px;font-size:12.5px;width:auto;min-width:190px}
   .vb-canvas{position:relative;flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
+  .vb-page.preview{cursor:default}
   .vb-bar{display:flex;align-items:center;gap:9px;width:100%;max-width:620px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
   /* Always A4 width (content-driven height); canvas scrolls if it can't fit */
   .vb-page{width:100%;max-width:620px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px;display:flex;flex-direction:column}
@@ -501,6 +502,7 @@
               <span id="bar-name">Untitled block</span>
               <span class="muted" id="bar-count" style="font-weight:400"></span>
               <span class="ref-thumb" id="refThumb" style="display:none" title="The image this block was drafted from — click to enlarge"><img alt=""><button type="button" class="ref-x" title="Clear image"><span class="ms">close</span></button></span>
+              <span class="view-seg" id="modeSeg" style="margin-left:auto"><button data-m="build" class="on" title="Edit the block"><span class="ms">grid_view</span> Build</button><button data-m="preview" title="See it exactly as it renders in a document"><span class="ms">visibility</span> Preview</button></span>
             </div>
             <div class="vb-page" id="page"></div>
             <div class="el-pick" id="elPick" style="display:none"><label class="pk-search"><span class="ms">search</span><input id="pkQ" placeholder="Search"></label><div class="pk-grid" id="pkGrid"></div></div>
@@ -764,6 +766,10 @@ function pageInit(){
       <div class="vb-body">${elBody(el)}</div>
     </div>`;
   }
+  // Build / Preview: preview swaps the editable canvas for the shared renderer's output — the same HTML a document gets.
+  let previewMode=false;
+  function renderPreview(){ if(!doc.length) return; P2DOC.__preview=doc; page.innerHTML=`<div class="vb-block" id="blockWrap">${composeBlock({p:'__preview'}, brand)}</div>`; applyBlockStyle(); }
+  document.querySelectorAll('#modeSeg button').forEach(b=>b.addEventListener('click',()=>{ previewMode=b.dataset.m==='preview'; document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x===b)); page.classList.toggle('preview',previewMode); sel=null; render(); }));
   function render(){
     if(!doc.length){
       page.innerHTML=`<div class="vb-empty"><span class="ms big">dashboard_customize</span>Empty block
@@ -788,7 +794,8 @@ function pageInit(){
         </div>`).join('')+`</div>`;
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
-    document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
+    wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
+    if(previewMode) renderPreview();
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
   function loadTemplate(key){ doc = key ? normDoc(clone(P2DOC[key]||[])) : []; sel=null; render(); commit(); }
