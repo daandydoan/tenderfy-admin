@@ -6,14 +6,14 @@ the "For developers" notes are what the mockup deliberately fakes.
 
 ## The block workspace (how it's meant to be used)
 
-One screen, no steps: a tabbed panel on the left (Draft with AI · Elements · Style), the block on the right.
+One screen, no steps: a tabbed panel on the left (Elements · Style · AI Draft · Code), the block on the right; Build / Preview toggle on the canvas.
 Entry: Client detail → **Build blocks** (`block-edit.html#client=taylor`); from the Blocks list, New Block asks
 *Who is this block for?* first.
 
 - **Draft with AI**: upload, drop or paste (Ctrl+V anywhere) a screenshot or photo of a section from the client's
   document, optionally say what it is → Ray lays it out as elements. In the mockup the layout follows the description
   (table / list / quote / photo words) and the text is a placeholder; the real build reads the image.
-- **Elements** for anything else (drag or click); every element's words are editable inline
+- **Elements** for anything else (drag or click, or the + line between elements): Structure (2/3 columns, Repeat down/across, Divider), Text, Media, Data, Sign-off. Every element's words are editable inline with rich text (b/i/u/s/link); **Style** shows Typography for text elements and Layout / Dimension / Appearance under Advanced; selecting an element opens Style, Esc returns to Elements.
 - **Save** — the first save asks for name · category · helper in a dialog; later saves are one click.
   **Save & start another** in the kebab.
 
@@ -45,11 +45,9 @@ Optional: Preview style → another client (same block, their brand).
 ## For developers — what the mockup fakes
 
 - **Draft with AI** stores the pasted image as a data URL and drafts a layout from the description keywords. Real: a vision model over the image returning elements + the exact text.
-- **Client attachment.** Blocks are stored brand-neutral with `availability: All clients`. Prior reviews
-  agree the real model is *block → client* (admin-built blocks belong to one client; Tenderfy base blocks
-  are the exception). The mockup does not model this yet; "Preview style" stands in for it.
-- **Persistence** is `localStorage` (`tf_blocks_custom`, `tf_bdraft_*`, `tf_bver_*`). Real: API, per-user
-  drafts, server-side versions.
+- **Client attachment.** Blocks belong to a client (`client` on the record; the picker asks *Who is this block for?*); *Share as a generic template* makes one reusable. "Preview style" renders the block in another client's brand for comparison only.
+- **Persistence** is `localStorage` (`tf_blocks_custom`, `tf_bdraft_*`, `tf_bver_*`; documents in `tf_docs`, `tf_ddraft_*`). Real: API, per-user drafts, server-side versions.
+- **Renderer parity.** One `elStyle(st, brand)` in block-layouts.js drives the canvas, Preview, the Code tab and `composeBlock` for documents, so per-element styling never drifts. Repeat rows render twice in documents as a stand-in.
 - **Image upload** stores a data URL. Real: asset store, per-client library.
 - **"Used in N"** comes from a seeded table; new blocks are 0. Real: count from documents, list them on click.
 
