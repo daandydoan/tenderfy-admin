@@ -1293,7 +1293,7 @@ function pageInit(){
     if(!drag) return; e.preventDefault();
     const overCol = e.target.closest && e.target.closest('.vb-col');
     const rowMode = drag.kind==='new-row' || drag.kind==='move-row' || !overCol;
-    if(e.dataTransfer) e.dataTransfer.dropEffect = drag.kind==='new-prim'?'copy':'move';
+    if(e.dataTransfer) e.dataTransfer.dropEffect = drag.kind.startsWith('new')?'copy':'move';   // must match the source's effectAllowed or Chrome refuses the drop
     clearInd();
     if(rowMode){ const ri=rowIndexFromY(e.clientY); const rows=[...page.querySelectorAll('.vb-row')]; if(ri<rows.length) rows[ri].classList.add('row-ins-before'); else { const bw=document.getElementById('blockWrap'); if(bw) bw.classList.add('drop-end'); else page.classList.add('drop-active'); } }
     else { overCol.classList.add('over'); const ki=colIndexFromY(overCol,e.clientY); const els=[...overCol.querySelectorAll(':scope > .vb-el')]; if(ki<els.length) els[ki].classList.add('ins-before'); else overCol.classList.add('ins-end'); }
