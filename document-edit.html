@@ -35,6 +35,11 @@
   .tb-btn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   /* Header: back icon by the title + overflow kebab */
   .pg-titlerow{display:flex;align-items:center;gap:10px}
+  .pg-name{font-size:22px;font-weight:600;font-family:inherit;color:var(--ink);border:1px solid transparent;background:transparent;border-radius:8px;padding:2px 8px;margin-left:-8px;min-width:300px;outline:none}
+  .pg-name:hover{border-color:var(--border)} .pg-name:focus{border-color:var(--teal);background:#fff}
+  .pg-name::placeholder{color:var(--light);font-weight:500}
+  .autosave{font-size:11px;color:var(--light);display:flex;align-items:center;gap:5px}
+  .autosave .ms{font-size:13px}
   .pg-back{width:34px;height:34px;flex-shrink:0;border:1px solid var(--border);background:#fff;border-radius:9px;color:var(--gray);display:flex;align-items:center;justify-content:center;text-decoration:none}
   .pg-back:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   .pg-back .ms{font-size:19px}
@@ -272,15 +277,13 @@
 <div id="app-content">
   <div class="pad">
     <div class="pg-head">
-      <div>
-        <div class="pg-titlerow">
-          <a href="library.html" class="pg-back" title="Back to Documents (discard changes)"><span class="ms">arrow_back</span></a>
-          <input id="d-name" class="tn-title" style="border:none;background:transparent;outline:none;min-width:280px" value="Untitled Document">
-        </div>
-        <div class="pg-sub" style="margin-left:44px">Built from <a href="blocks.html" style="color:var(--teal)">blocks</a> — style each block, set example content, and pick a client to preview with their brand.</div>
+      <div class="pg-titlerow">
+        <a href="library.html" class="pg-back" title="Back to Documents"><span class="ms">arrow_back</span></a>
+        <div><input class="pg-name" id="d-name" placeholder="Name this document…" title="What the client sees in their library"></div>
       </div>
       <div class="pg-acts">
-        <span class="badge b-draft" id="d-badge"><span class="b-dot"></span>Draft</span>
+        <span class="badge b-draft" id="d-badge" style="display:none"><span class="b-dot"></span>Draft</span>
+        <span class="autosave" id="autosave"></span>
         <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Document</a>
         <span class="lst-kebwrap">
           <button class="pg-kebab" data-kebab aria-label="More actions"><span class="ms">more_vert</span></button>
@@ -554,9 +557,9 @@ function pageInit(){
     document.getElementById('d-status').value=doc.status;
     document.getElementById('d-desc').value=doc.desc;
     document.getElementById('delBtn').style.display=''; document.getElementById('del-sep').style.display='';
-    setBadge(doc.status);
+    setBadge(doc.status); document.getElementById('d-badge').style.display='';
   }
-  const syncBar=()=>document.getElementById('doc-bar').textContent=document.getElementById('d-name').value.trim()||'Untitled Document';
+  const syncBar=()=>document.getElementById('doc-bar').textContent=document.getElementById('d-name').value.trim()||'Untitled document';
   document.getElementById('d-name').addEventListener('input',syncBar); syncBar();
   document.getElementById('d-status').addEventListener('change',e=>setBadge(e.target.value));
   function setBadge(s){ const b=document.getElementById('d-badge'); b.className='badge b-'+s; b.innerHTML=`<span class="b-dot"></span>${s[0].toUpperCase()+s.slice(1)}`; }
@@ -676,7 +679,9 @@ function pageInit(){
     }catch(e){ pageOf=items.map(()=>0); count=1; }
     return {count, pageOf};
   }
-  function render(){
+  const autosaveEl=document.getElementById('autosave'); let autosaveT=null;
+  function stampAutosave(){ clearTimeout(autosaveT); autosaveT=setTimeout(()=>{ autosaveEl.innerHTML='<span class="ms">cloud_done</span> Autosaved · '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}); },600); }
+  function render(){ stampAutosave();
     canvas.style.setProperty('--teal', brand?brand.secondary:'');
     let pageCount=1;
     if(mode==='preview' && items.length){
@@ -827,7 +832,7 @@ function pageInit(){
   dpQ.addEventListener('input',()=>renderDocPick(dpQ.value.trim().toLowerCase()));
   document.addEventListener('mousedown',e=>{ if(dPick.style.display!=='none' && !e.target.closest('#docPick') && !e.target.closest('.doc-ins')) closeDocPick(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && dPick.style.display!=='none') closeDocPick(); });
-  function addItem(tok){ const it=instFromToken(tok); items.push(it); render(); renderInspector();   // adding doesn't select — the tab stays where you are showToast((it.el?'Added element: ':'Added block: ')+instLabel(it)); }
+  function addItem(tok){ const it=instFromToken(tok); items.push(it); render(); renderInspector(); showToast((it.el?'Added element: ':'Added block: ')+instLabel(it)); }   // adding doesn't select — the tab stays where you are
   wrap.addEventListener('dragover',e=>{ if(e.dataTransfer.types.includes('add')){ e.preventDefault(); wrap.classList.add('drag-over'); } });
   wrap.addEventListener('dragleave',e=>{ if(!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over'); });
   wrap.addEventListener('drop',e=>{ wrap.classList.remove('drag-over'); const add=e.dataTransfer.getData('add'); if(add && !e.target.closest('.doc-blk')){ e.preventDefault(); addItem(add); } });
@@ -842,7 +847,7 @@ function pageInit(){
   let detailsSeen=!!doc;   // an existing document already has its details; a new one is asked once, on first save
   function finishSave(){
     const n=document.getElementById('d-name').value.trim();
-    if(!n||n==='Untitled Document'){showToast('Give the document a name first'); document.getElementById('d-name').focus(); return;}
+    if(!n){showToast('Give the document a name first'); document.getElementById('d-name').focus(); return;}
     detailsSeen=true; showToast((doc?'Updated':'Created')+' document: '+n+' · '+items.length+' blocks');
     setTimeout(()=>location.href='library.html',700);
   }
