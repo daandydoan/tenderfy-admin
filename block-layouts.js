@@ -77,12 +77,12 @@ function elStyle(st, brand){
 const TYPO_SEL='h1,h2,h3,h4,h5,p,li,span,a,blockquote,strong,em,td,th,ul,div';
 const cssStr=o=>Object.entries(o).map(([k,v])=>k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';');
 // One element as the document sees it: sizing box > body > primitive, typography pushed onto the text nodes (primitives set inline colours, so inheritance isn't enough).
-function renderStyledEl(el, brand){
-  const html=renderPrimitive(el.id||el, brand, el.content); const st=el.st; if(!st) return html;
+function renderStyledEl(el, brand, ref){
+  const html=renderPrimitive(el.id||el, brand, el.content); const st=el.st; const tag=ref?` data-el="${ref}"`:''; if(!st) return `<div${tag}>${html}</div>`;
   const {box,body,typo}=elStyle(st, brand);
   let inner=html;
   if(Object.keys(typo).length && typeof document!=='undefined'){ const tpl=document.createElement('template'); tpl.innerHTML=html; tpl.content.querySelectorAll(TYPO_SEL).forEach(n=>Object.assign(n.style,typo)); inner=tpl.innerHTML; }
-  return `<div style="${cssStr(box)}"><div style="${cssStr(Object.assign({},typo,body))}">${inner}</div></div>`;
+  return `<div${tag} style="${cssStr(box)}"><div style="${cssStr(Object.assign({},typo,body))}">${inner}</div></div>`;
 }
 const isSized=el=>{ const s=el&&el.st; return !!s && ['fixed','min','max'].includes(s.wmode||'fill'); };
 
@@ -90,18 +90,21 @@ const isSized=el=>{ const s=el&&el.st; return !!s && ['fixed','min','max'].inclu
 function composeBlock(block, brand){
   if(/^l[hf]-/.test(block.p)) return renderStationery(block.p, brand);
   const doc = P2DOC[block.p] || [{cols:[[block.p]]}];
-  const rowHtml=row=>{
+  const rowHtml=(row,r)=>{
     if(row.cols.length>1){
       const VJ={top:'flex-start',middle:'center',bottom:'flex-end'};
       // A column holding a Fixed/Min/Max-width element sizes to it; the others fill the rest (same rule as the canvas).
-      const cols = row.cols.map((col,i)=>`<div style="flex:${col.some(isSized)?'0 1 auto':((row.ratio&&row.ratio[i])||1)};min-width:0;display:flex;flex-direction:column;gap:11px;justify-content:${VJ[(row.valign||[])[i]]||'flex-start'}">${col.map(el=>renderStyledEl(el, brand)).join('')}</div>`).join('');
+      const cols = row.cols.map((col,i)=>`<div style="flex:${col.some(isSized)?'0 1 auto':((row.ratio&&row.ratio[i])||1)};min-width:0;display:flex;flex-direction:column;gap:11px;justify-content:${VJ[(row.valign||[])[i]]||'flex-start'}">${col.map((el,k)=>renderStyledEl(el, brand, r+'.'+i+'.'+k)).join('')}</div>`).join('');
       return `<div style="display:flex;gap:24px;margin-bottom:18px">${cols}</div>`;
     }
-    return `<div style="display:flex;flex-direction:column;gap:11px;margin-bottom:18px">${row.cols[0].map(el=>renderStyledEl(el, brand)).join('')}</div>`;
+    return `<div style="display:flex;flex-direction:column;gap:11px;margin-bottom:18px">${row.cols[0].map((el,k)=>renderStyledEl(el, brand, r+'.0.'+k)).join('')}</div>`;
   };
   // ponytail: a repeating row renders twice as a stand-in for "one per item" until the estimator side can add items.
-  return doc.map(row=>{ const h=rowHtml(row); if(!row.repeat) return h; return row.repeat==='h' ? `<div style="display:flex;gap:24px;margin-bottom:18px">${[h,h].map(x=>'<div style="flex:1;min-width:0">'+x.replace('margin-bottom:18px','margin-bottom:0')+'</div>').join('')}</div>` : h+h; }).join('');
+  return doc.map((row,r)=>{ const h=rowHtml(row,r); if(!row.repeat) return h; return row.repeat==='h' ? `<div style="display:flex;gap:24px;margin-bottom:18px">${[h,h].map(x=>'<div style="flex:1;min-width:0">'+x.replace('margin-bottom:18px','margin-bottom:0')+'</div>').join('')}</div>` : h+h; }).join('');
 }
+
+// A deep, normalised copy of a block's doc — what a document keeps when it edits a block's words locally.
+function blockDocCopy(block){ const doc=P2DOC[block.p]||[{cols:[[block.p]]}]; return JSON.parse(JSON.stringify(doc)).map(row=>({...row, cols:row.cols.map(col=>col.map(x=>typeof x==='string'?{id:x}:x))})); }
 
 // The distinct primitives a block is composed from (for a "made of" summary).
 function blockElements(block){
@@ -112,4 +115,4 @@ function blockElements(block){
 }
 
 if(typeof mergeCustomBlocks==='function') mergeCustomBlocks();   // blocks-data.js may have loaded first
-if(typeof window!=='undefined'){ window.P2DOC=P2DOC; window.composeBlock=composeBlock; Object.assign(window,{boxCss,radCss,radAny,paintCss,paintOn,paintVisible,resolveFill,resolveBColor,elStyle,TYPO_SEL}); window.blockElements=blockElements; window.renderStationery=renderStationery; }
+if(typeof window!=='undefined'){ window.P2DOC=P2DOC; window.composeBlock=composeBlock; window.blockDocCopy=blockDocCopy; Object.assign(window,{boxCss,radCss,radAny,paintCss,paintOn,paintVisible,resolveFill,resolveBColor,elStyle,TYPO_SEL}); window.blockElements=blockElements; window.renderStationery=renderStationery; }

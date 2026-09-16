@@ -32,9 +32,10 @@ function docItemHtml(it, brand, cls){
     inner = (typeof renderPrimitive==='function') ? renderPrimitive(it.pid, brand, content) : '';
   } else {
     const b = (typeof BLOCKS!=='undefined') ? BLOCKS.find(x=>x.id===it.bid) : null;
-    inner = b ? ((typeof composeBlock==='function') ? composeBlock(b, brand) : '') : '';
-    // Blocks compose several primitives — override the first heading/body if given.
-    if(content.title || content.body){
+    if(it.doc && typeof composeBlock==='function'){ P2DOC.__inst=it.doc; inner=composeBlock({p:'__inst'}, brand); }   // edited in this document
+    else inner = b ? ((typeof composeBlock==='function') ? composeBlock(b, brand) : '') : '';
+    // Legacy: blocks without a local doc could override the first heading/body.
+    if(!it.doc && (content.title || content.body)){
       const tmp=document.createElement('div'); tmp.innerHTML=inner;
       if(content.title){ const h=tmp.querySelector('h1,h2,h3,h4'); if(h) h.textContent=content.title; }
       if(content.body){ const p=tmp.querySelector('p,li,blockquote'); if(p) p.textContent=content.body; }

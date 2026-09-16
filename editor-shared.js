@@ -27,4 +27,18 @@ function wireInspSections(key){
   }));
   apply();
 }
-if(typeof window!=='undefined'){ Object.assign(window,{figScrub,wireScrubFields,wireDialogs,wireInspSections}); }
+// Text is kept as inline HTML limited to b/i/u/s/br/a — anything else the browser emits is unwrapped to its text.
+const RICH=new Set(['B','I','U','S','BR','A']);
+function richText(n){ return [...n.childNodes].map(x=>{ if(x.nodeType===3) return x.textContent; if(x.nodeType!==1) return ''; const inner=richText(x); const tag=x.tagName==='STRONG'?'b':x.tagName==='EM'?'i':x.tagName.toLowerCase(); if(x.tagName==='BR') return '<br>'; if(x.tagName==='A' && x.getAttribute('href')) return '<a href="'+x.getAttribute('href').replace(/"/g,'')+'">'+inner+'</a>'; return RICH.has(tag.toUpperCase()) ? '<'+tag+'>'+inner+'</'+tag+'>' : inner; }).join(''); }
+function captureContent(body){
+  const c={};
+  body.querySelectorAll('[data-ek]').forEach(n=>{ const k=n.dataset.ek;
+    if(k==='items') c.items=[...n.querySelectorAll('li')].map(richText);
+    else if(k==='headers') (c.headers=c.headers||[]).push(richText(n));
+    else if(k==='row'||k==='pair') (c[k+'s']=c[k+'s']||[]).push([...n.querySelectorAll('[data-ec]')].map(richText));
+    else c[k]=richText(n);
+  });
+  return c;
+}
+// Preview is the build canvas with the editing chrome hidden (CSS) and text locked — what you built is what you see.
+if(typeof window!=='undefined'){ Object.assign(window,{figScrub,wireScrubFields,wireDialogs,wireInspSections,richText,captureContent}); }

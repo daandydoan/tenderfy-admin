@@ -304,8 +304,8 @@
           <strong id="bi-name" style="font-size:13.5px;color:var(--ink)"></strong>
           <div class="fhint" id="bi-desc" style="margin-top:3px"></div>
 
-          <div class="ds-lbl" id="bi-content-lbl" style="display:none">Example content</div>
-          <div id="bi-content"></div>
+          <div id="bi-edited" style="display:none;margin-top:10px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:#f7faf9;align-items:center;gap:8px;font-size:12px;color:var(--gray)"><span class="ms" style="font-size:16px;color:var(--teal)">edit_note</span><span style="flex:1">Words edited in this document only — the saved block is unchanged.</span><a class="btn btn-outline btn-sm" id="bi-revert" title="Discard this document's edits and use the block as saved">Revert to block</a></div>
+          <div class="fhint" id="bi-editHint" style="margin-top:8px">Click any text on the canvas to edit it for this document.</div>
 
           <div class="insp-sec" data-sec="layout">
           <div class="insp-h">Layout</div>
@@ -651,7 +651,7 @@ function pageInit(){
         const {count, pageOf}=measurePages(); pageCount=count;
         // Build = the real rendered block (same HTML as Preview/documents) wrapped in editing chrome: name chip, tools, insert lines.
         const card=(it,i)=>`
-          <div class="doc-blk ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}" title="${instDesc(it)}">
+          <div class="doc-blk ${it.k===selK?'sel':''}" data-i="${i}" data-k="${it.k}" title="${instDesc(it)}">
             <span class="vb-name"><span class="ms">${instIcon(it)}</span>${instLabel(it)}</span>
             <span class="doc-tools"><span class="tb grab" data-grip title="Drag to move"><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}" title="Remove"><span class="ms">delete</span></span></span>
             ${renderBlockInstance(it).replace(/ data-k="\d+"/,'')}
@@ -691,7 +691,26 @@ function pageInit(){
       el.addEventListener('drop',e=>{ e.preventDefault();e.stopPropagation(); const mv=e.dataTransfer.getData('move'), to=+el.dataset.i; if(mv!==''){const [m]=items.splice(+mv,1);items.splice(to,0,m);render();} });
     });
   }
+  // Build mode: a block's words are editable in place. The first edit gives the instance its own copy of the
+  // block (it.doc); the saved block is never touched. "Revert to block" drops the copy.
+  function wireText(){
+    if(mode!=='layout') return;
+    canvas.querySelectorAll('.doc-blk[data-k]').forEach(blk=>{
+      const it=items.find(x=>x.k===+blk.dataset.k); if(!it || it.el) return;
+      blk.querySelectorAll('[data-el]').forEach(wrap=>{
+        wrap.querySelectorAll('[data-ek]:not([data-ek=row]):not([data-ek=pair]),[data-ec]').forEach(n=>n.setAttribute('contenteditable','true'));
+        wrap.addEventListener('input',()=>{
+          if(!it.doc) it.doc=blockDocCopy(instObj(it));
+          const [r,c,k]=wrap.dataset.el.split('.').map(Number); const el=it.doc[r]&&it.doc[r].cols[c]&&it.doc[r].cols[c][k]; if(!el) return;
+          el.content=captureContent(wrap); if(curItem===it) syncEditedRow(it);
+        });
+        wrap.addEventListener('paste',e=>{ e.preventDefault(); document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text')); });
+      });
+    });
+  }
+  function syncEditedRow(it){ const row=document.getElementById('bi-edited'); if(row) row.style.display=(it&&it.doc)?'flex':'none'; }
   function wire(){
+    wireText();
     // Preview mode: click a rendered block to select it (mirrors Layout selection).
     canvas.querySelectorAll('.pv-blk[data-k]').forEach(el=>{
       el.addEventListener('click',e=>{ e.stopPropagation(); selK=+el.dataset.k; render(); renderInspector(); });
@@ -700,8 +719,9 @@ function pageInit(){
     canvas.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();const [rm]=items.splice(+x.dataset.rm,1);if(rm&&rm.k===selK)selK=null;render();renderInspector();}));
     canvas.querySelectorAll('.doc-blk').forEach(el=>{
       el.addEventListener('click',e=>{ if(e.target.closest('.doc-tools'))return; selK=+el.dataset.k; render(); renderInspector(); });
-      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');setTimeout(()=>canvas.classList.add('dnd'));});
-      el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+      const grip=el.querySelector('[data-grip]'); if(grip){ grip.addEventListener('mousedown',()=>{ el.draggable=true; }); el.addEventListener('mouseup',()=>{ el.draggable=false; }); }
+      el.addEventListener('dragstart',e=>{ if(!el.draggable){ e.preventDefault(); return; } e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');setTimeout(()=>canvas.classList.add('dnd'));});
+      el.addEventListener('dragend',()=>{ el.draggable=false; el.classList.remove('dragging'); canvas.classList.remove('dnd'); });
       el.addEventListener('dragover',e=>e.preventDefault());
       el.addEventListener('drop',e=>{
         e.preventDefault();e.stopPropagation();
@@ -965,15 +985,6 @@ function pageInit(){
   }
   document.querySelectorAll('#modeSeg button').forEach(x=>x.addEventListener('click',()=>setMode(x.dataset.mode)));
 
-  // ---- Ray sample-content bank (per-block "Draft content") ----
-  const RAY_TITLES=['Project Overview','Scope of Works','Our Approach','Key Personnel','Delivery & Programme','Quality & Safety','Company Profile','Why Choose Us'];
-  const RAY_BODIES=[
-    'Our team delivered the full civil works package on time and on budget — coordinating traffic management, bulk earthworks and drainage across a live site.',
-    'We bring a disciplined, safety-first approach honed over fifteen years on transport and infrastructure projects across the region.',
-    'A fully sequenced delivery plan keeps the corridor open throughout, with self-performed drainage to control the programme and protect the deadline.',
-    'Every project is led by a dedicated project director accountable from award through to the defects liability period.',
-    'We hold current accreditations across WHS, quality and environmental management, and have a five-year record with zero lost-time injuries.'
-  ];
   // ---- Block inspector (per-block content + style) ----
   let lastSel=null;
   function renderInspector(){
@@ -995,24 +1006,9 @@ function pageInit(){
     const wm=s.wMode||'fill'; document.getElementById('bs-wmode').value=wm; document.getElementById('bs-wpx').value=s.wPx||480; document.getElementById('bs-wpx').disabled=(wm!=='fixed');
     const hm=s.hMode||'auto'; document.getElementById('bs-hmode').value=hm; document.getElementById('bs-hval').value=s.hVal||120; document.getElementById('bs-hval').disabled=(hm==='auto'||hm==='hug');
     fillPaint('bg'); fillPaint('bc');
-    const els=it.el ? [it.pid] : ((typeof blockElements==='function')?blockElements(b):[]);
-    const hasTitle=els.some(e=>['heading','subheading','cover'].includes(e));
-    const hasBody=els.some(e=>['paragraph','list','quote','callout'].includes(e));
-    document.getElementById('bi-content-lbl').style.display=(hasTitle||hasBody)?'':'none';
-    let html='';
-    if(hasTitle) html+=`<div class="ds-fld"><label>Title</label><input class="ds-in" id="ct-title" placeholder="Heading text…"></div>`;
-    if(hasBody)  html+=`<div class="ds-fld"><label>Body text</label><textarea class="ds-in" id="ct-body" rows="3" placeholder="Body copy…"></textarea></div>`;
-    if(hasTitle||hasBody) html+=`<button type="button" class="btn btn-ray btn-sm btn-block" id="ctDraft" style="margin-bottom:2px"><span class="ms" style="font-size:15px">auto_awesome</span> Draft content with Ray</button>`;
-    if(!hasTitle&&!hasBody) html=`<div class="fhint" style="margin:2px 0 4px">No editable text in this block — style it below, then check Preview.</div>`;
-    const cw=document.getElementById('bi-content'); cw.innerHTML=html;
-    const t=document.getElementById('ct-title'); if(t){ t.value=it.content.title||''; t.addEventListener('input',()=>{it.content.title=t.value; if(mode==='preview')render();}); }
-    const bd=document.getElementById('ct-body'); if(bd){ bd.value=it.content.body||''; bd.addEventListener('input',()=>{it.content.body=bd.value; if(mode==='preview')render();}); }
-    const dc=document.getElementById('ctDraft'); if(dc) dc.addEventListener('click',()=>{
-      if(hasTitle) it.content.title=RAY_TITLES[it.k % RAY_TITLES.length];
-      if(hasBody)  it.content.body =RAY_BODIES[it.k % RAY_BODIES.length];
-      fillInspector(it); render(); showToast('Ray drafted example content');
-    });
+    syncEditedRow(it); document.getElementById('bi-editHint').style.display=it.el?'none':'';
   }
+  document.getElementById('bi-revert').addEventListener('click',()=>{ if(!curItem||!curItem.doc) return; delete curItem.doc; render(); renderInspector(); showToast('Reverted to the saved block'); });
   function biNum(rId,nId,key){
     const R=document.getElementById(rId),N=document.getElementById(nId);
     const set=v=>{ if(!curItem)return; v=Math.max(+R.min,Math.min(+R.max,Math.round(+v||0))); curItem.style[key]=v; R.value=v; N.value=v; render(); };
