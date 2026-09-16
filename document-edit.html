@@ -105,7 +105,14 @@
   .doc-empty{border:1.5px dashed #b3beba;border-radius:10px;padding:44px 20px;text-align:center;color:var(--gray);margin:auto;width:100%}
   .doc-empty .ms.big{font-size:32px;color:var(--light);display:block;margin-bottom:8px}
   /* Blocks in the document render exactly like the block listing cards */
-  .doc-blk{position:relative;margin-bottom:0;cursor:grab}
+  .doc-blk{position:relative;margin-bottom:0;cursor:pointer;padding:6px 5px;border-radius:7px;border:1.5px solid transparent}
+  .doc-blk:hover{border-color:var(--teal)}
+  .doc-blk .vb-name{position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:4px;opacity:.45;pointer-events:none;z-index:2}
+  .doc-blk .vb-name .ms{font-size:12px}
+  .doc-blk:hover .vb-name,.doc-blk.sel .vb-name{opacity:1}
+  .doc-blk .pv-blk{outline:none!important;cursor:inherit}
+  .doc-body > .vb-ins:first-of-type{height:18px}   /* room for the first chip under the letterhead slot */
+  .vb-canvas.preview .vb-ins,.vb-canvas.preview .doc-tools,.vb-canvas.preview .vb-name,.vb-canvas.preview .pg-brk{display:none!important}
   .doc-blk.dragging{opacity:.4}
   .doc-tools{position:absolute;top:-12px;right:10px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:2}
   /* Document style controls */
@@ -130,7 +137,7 @@
   .mode-seg button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.12)}
   /* Selected block + per-block style box */
   .doc-blk{border-radius:12px}
-  .doc-blk.sel{outline:2px solid var(--teal);outline-offset:3px}
+  .doc-blk.sel{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
   /* Preview blocks are selectable too */
   .pv-blk[data-k]{cursor:pointer}
   .pv-blk[data-k]:hover{outline:1.5px solid var(--teal);outline-offset:2px}
@@ -385,8 +392,9 @@
           <div class="acc" data-acc>
             <button class="acc-h"><span class="acc-title"><span class="lyr-ic"><span class="ms">layers</span></span> Main</span><span class="ms acc-caret">expand_more</span></button>
             <div class="acc-body">
-              <div class="hstack" style="gap:10px;align-items:baseline"><span class="lyr-count-big" id="lyr-count">0</span><span class="muted">blocks on the page</span></div>
-              <div class="fhint" style="margin-top:9px">Add, reorder and style these on the canvas. Select any block to edit its content and style.</div>
+              <div class="hstack" style="gap:10px;align-items:baseline;margin-bottom:10px"><span class="lyr-count-big" id="lyr-count">0</span><span class="muted">blocks on the page</span></div>
+              <div id="lyrList"></div>
+              <div class="fhint" style="margin-top:9px">Drag to reorder. Select a block to style it; remove it with ×.</div>
             </div>
           </div>
 
@@ -411,7 +419,7 @@
         <div class="vb-canvas" id="cvWrap">
           <div class="vb-bar"><span class="ms" style="font-size:16px;color:var(--teal)">description</span> <span id="doc-bar">Untitled Document</span> <span class="muted" id="doc-count" style="font-weight:400"></span>
             <div class="mode-seg" id="modeSeg">
-              <button data-mode="layout" class="on"><span class="ms">dashboard</span> Layout</button>
+              <button data-mode="layout" class="on"><span class="ms">grid_view</span> Build</button>
               <button data-mode="preview"><span class="ms">visibility</span> Preview</button>
             </div>
           </div>
@@ -637,13 +645,12 @@ function pageInit(){
         // Layout = one A4-min-height page of compact rows; drop in a page-break divider
         // wherever the real content overflows onto the next A4 page.
         const {count, pageOf}=measurePages(); pageCount=count;
+        // Build = the real rendered block (same HTML as Preview/documents) wrapped in editing chrome: name chip, tools, insert lines.
         const card=(it,i)=>`
-          <div class="doc-blk doc-compact ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}" title="${instDesc(it)}">
-            <span class="ms cmp-grip" data-grip>drag_indicator</span>
-            <span class="cmp-ic"><span class="ms">${instIcon(it)}</span></span>
-            <span class="cmp-name">${instLabel(it)}</span>
-            <span class="cmp-tag ${it.el?'el':''}">${it.el?'Element':'Block'}</span>
-            <span class="ms cmp-rm" data-rm="${i}" title="Remove">close</span>
+          <div class="doc-blk ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}" title="${instDesc(it)}">
+            <span class="vb-name"><span class="ms">${instIcon(it)}</span>${instLabel(it)}</span>
+            <span class="doc-tools"><span class="tb grab" data-grip title="Drag to move"><span class="ms">drag_indicator</span></span><span class="tb del" data-rm="${i}" title="Remove"><span class="ms">delete</span></span></span>
+            ${renderBlockInstance(it).replace(/ data-k="\d+"/,'')}
           </div>`;
         const ins=i=>`<div class="vb-ins doc-ins" data-at="${i}" title="Insert a block here"><span class="ms">add</span></div>`;
         const rows=items.map((it,i)=>{
@@ -654,10 +661,31 @@ function pageInit(){
       }
     }
     const lc=document.getElementById('lyr-count'); if(lc) lc.textContent=items.length;
+    renderLayers();
     canvas.querySelectorAll('.doc-ins').forEach(l=>l.addEventListener('click',e=>{ e.stopPropagation(); openDocPick(l,+l.dataset.at); }));
     document.getElementById('doc-count').textContent=items.length?`· ${items.length} block${items.length>1?'s':''} · ${pageCount} A4 page${pageCount>1?'s':''}`:'';
     applyDocStyle();
     wire();
+  }
+  // Layers tab: compact ordered list — same selection, reorder and remove as the canvas.
+  function renderLayers(){
+    const list=document.getElementById('lyrList'); if(!list) return;
+    list.innerHTML=items.length ? items.map((it,i)=>`
+      <div class="doc-compact ${it.k===selK?'sel':''}" draggable="true" data-i="${i}" data-k="${it.k}" title="${instDesc(it)}">
+        <span class="ms cmp-grip" data-grip>drag_indicator</span>
+        <span class="cmp-ic"><span class="ms">${instIcon(it)}</span></span>
+        <span class="cmp-name">${instLabel(it)}</span>
+        <span class="cmp-tag ${it.el?'el':''}">${it.el?'Element':'Block'}</span>
+        <span class="ms cmp-rm" data-rm="${i}" title="Remove">close</span>
+      </div>`).join('') : '<div class="fhint">No blocks yet — add some from the Blocks tab.</div>';
+    list.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();const [rm]=items.splice(+x.dataset.rm,1);if(rm&&rm.k===selK)selK=null;render();renderInspector();}));
+    list.querySelectorAll('.doc-compact').forEach(el=>{
+      el.addEventListener('click',()=>{ selK=+el.dataset.k; render(); renderInspector(); showLeftTab('layers'); });
+      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('move',el.dataset.i);el.classList.add('dragging');});
+      el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+      el.addEventListener('dragover',e=>e.preventDefault());
+      el.addEventListener('drop',e=>{ e.preventDefault();e.stopPropagation(); const mv=e.dataTransfer.getData('move'), to=+el.dataset.i; if(mv!==''){const [m]=items.splice(+mv,1);items.splice(to,0,m);render();} });
+    });
   }
   function wire(){
     // Preview mode: click a rendered block to select it (mirrors Layout selection).
@@ -927,7 +955,7 @@ function pageInit(){
 
   // ---- Mode toggle (Layout / Preview) ----
   function setMode(m){
-    mode=m;
+    mode=m; wrap.classList.toggle('preview', m==='preview');
     document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x.dataset.mode===m));
     applyDocStyle(); renderInspector(); render();   // selection persists across Layout ⇄ Preview
   }
@@ -950,7 +978,8 @@ function pageInit(){
     document.getElementById('docSettings').style.display=show?'none':'';
     if(show) fillInspector(it);
     // selecting a block opens its style; deselecting goes back to the palette
-    if(show && selK!==lastSel) showLeftTab('style'); else if(!show && lastSel!==null) showLeftTab('blocks');
+    const onLayers=document.querySelector('.ws-tabs button.on')?.dataset.wtab==='layers';
+    if(show && selK!==lastSel && !onLayers) showLeftTab('style'); else if(!show && lastSel!==null && !onLayers) showLeftTab('blocks');
     lastSel=show?selK:null;
   }
   function fillInspector(it){
