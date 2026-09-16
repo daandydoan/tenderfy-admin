@@ -92,11 +92,11 @@
   .vb-el.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
   .vb-el.dragging{opacity:.4}
   /* Insert line between elements: hover the gap → a line with a + that opens the element picker */
-  .vb-ins{position:relative;height:10px;margin:-3px 0;cursor:pointer;z-index:2}
+  .vb-ins{position:relative;height:16px;margin:0;cursor:pointer;z-index:2}   /* real gap between elements so the insert line is hoverable */
   .vb-col>.vb-ins:first-child{height:18px;margin:0}   /* room above the first element so its name chip clears the row tools */
   .vb-col>.vb-ins:first-child::before{top:12px} .vb-col>.vb-ins:first-child .ms{top:2px}
-  .vb-ins::before{content:'';position:absolute;left:8px;right:8px;top:4px;height:2px;background:var(--teal);border-radius:2px;opacity:0;transition:opacity .12s}
-  .vb-ins .ms{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:22px;height:22px;border-radius:6px;background:var(--teal);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .vb-ins::before{content:'';position:absolute;left:8px;right:8px;top:7px;height:2px;background:var(--teal);border-radius:2px;opacity:0;transition:opacity .12s}
+  .vb-ins .ms{position:absolute;left:50%;top:-3px;transform:translateX(-50%);width:22px;height:22px;border-radius:6px;background:var(--teal);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
   .vb-ins:hover::before,.vb-ins:hover .ms,.vb-ins.open::before,.vb-ins.open .ms{opacity:1}
   /* Element picker popover */
   .el-pick{position:absolute;z-index:80;width:320px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 14px 40px rgba(20,45,38,.18);overflow:hidden}
