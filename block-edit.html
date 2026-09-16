@@ -127,8 +127,11 @@
   .pal-search .ms{font-size:17px;color:var(--light)} .pal-search input{flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-size:12.5px;background:transparent}
   /* Collapsible style sections */
   .insp-h,.insp-sec>.fig-sec-h{cursor:pointer;user-select:none}
-  .insp-h::after,.insp-sec>.fig-sec-h .fig-sec-t::after{content:'expand_more';font-family:'Material Symbols Outlined';font-size:16px;float:right;color:var(--light);transition:transform .15s;text-transform:none;letter-spacing:0}
-  .insp-sec.closed .insp-h::after,.insp-sec.closed>.fig-sec-h .fig-sec-t::after{transform:rotate(-90deg)}
+  .insp-h::after,.insp-sec>.fig-sec-h::after{content:'expand_more';font-family:'Material Symbols Outlined';font-size:16px;float:right;color:var(--light);transition:transform .15s;text-transform:none;letter-spacing:0}
+  /* Paint sections (Fill/Stroke) inside the Style card read like every other section header */
+  .insp-sec>.fig-sec-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--light);font-weight:700;margin:16px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border);justify-content:flex-start;gap:6px}
+  .insp-sec>.fig-sec-h .fig-sec-t{font:inherit;color:inherit;flex:1}
+  .insp-sec.closed .insp-h::after,.insp-sec.closed>.fig-sec-h::after{transform:rotate(-90deg)}
   .insp-sec.closed>:not(.insp-h):not(.fig-sec-h){display:none!important}
   /* Advanced styling fold — native <details>, keeps every control on record without cluttering the panel */
   .insp-adv{margin-top:16px;border-top:1px solid var(--border);padding-top:8px}
