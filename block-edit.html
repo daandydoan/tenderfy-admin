@@ -401,6 +401,8 @@
               <button data-src="client">Client logo</button>
               <button data-src="upload">Upload</button>
             </div></div>
+            <div class="insp-row"><label>Fit</label><div class="seg full" id="s-imgfit"><button data-fit="cover" title="Fill the box, crop the edges">Cover</button><button data-fit="contain" title="Show the whole image, letterbox if needed">Contain</button><button data-fit="fill" title="Stretch to the box">Stretch</button></div></div>
+            <div class="fhint" style="margin:-3px 0 8px">Set a Fixed height in Advanced styling to give the box a size; Fit decides how the image sits in it.</div>
             <label class="btn btn-outline btn-sm" id="imgUploadBtn" style="display:none;margin-top:6px"><span class="ms" style="font-size:16px">upload</span> Choose image<input type="file" id="imgFile" accept="image/*" hidden></label>
             <div class="fhint">“Client logo” inherits each client’s logo — pick a client in Preview style to see it.</div>
           </div>
@@ -949,7 +951,8 @@ function pageInit(){
     });
     const id = sel?selEl().id:null;
     document.getElementById('s-blockLayout').style.display = sel?'none':'';   // Alignment + Gap are block-only; Resizing stays for elements
-    document.getElementById('sec-field').style.display = id==='field'?'':'none';
+    document.getElementById('imgUploadBtn').style.display = (id==='image' && selEl().src==='upload')?'':'none';
+    if(id==='image'){ const fit=(selEl().content&&selEl().content.fit)||'cover'; document.querySelectorAll('#s-imgfit button').forEach(b=>b.classList.toggle('on',b.dataset.fit===fit)); }
     document.getElementById('sec-imgsrc').style.display = id==='image'?'':'none';
     document.getElementById('imgUploadBtn').style.display = (id==='image' && selEl().src==='upload')?'':'none';
     document.getElementById('sec-table').style.display = (id==='table'||id==='keyvalue')?'':'none';
@@ -1114,6 +1117,7 @@ function pageInit(){
     // field / image-source
     document.getElementById('s-field').addEventListener('change',e=>{ if(selEl()){ selEl().field=e.target.value; render(); commit(); } });
     document.querySelectorAll('#s-imgsrc button').forEach(b=>b.addEventListener('click',()=>{ if(selEl()){ selEl().src=b.dataset.src; render(); commit(); if(b.dataset.src==='upload' && !(selEl().content&&selEl().content.img)) document.getElementById('imgFile').click(); } }));
+    document.querySelectorAll('#s-imgfit button').forEach(b=>b.addEventListener('click',()=>{ const el=selEl(); if(!el) return; el.content=Object.assign({},el.content,{fit:b.dataset.fit}); const keep=sel; render(); sel=keep; applySelection(); commit(); }));
     document.getElementById('imgFile').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0], el=selEl(); if(!f||!el) return;
       if(f.size>1600000){ showToast('Image too large — keep it under ~1.5 MB'); e.target.value=''; return; }
       const rd=new FileReader(); rd.onload=()=>{ el.content=Object.assign({},el.content,{img:rd.result}); render(); commit(); }; rd.readAsDataURL(f); e.target.value=''; });

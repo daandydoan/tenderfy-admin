@@ -51,7 +51,7 @@ function renderPrimitive(id, b, c){
     case 'quote':
       return `<blockquote style="${T};margin:0;border-left:3px solid ${b.secondary};padding:2px 0 2px 14px;color:${b.primary};font-style:italic;font-size:13.5px">“<span data-ek="body">${esc(c.body||'Delivered ahead of schedule with zero safety incidents.')}</span>”</blockquote>`;
     case 'image':
-      if(c.img) return `<img src="${c.img}" alt="" style="display:block;width:100%;border-radius:8px">`;
+      if(c.img) return `<img src="${c.img}" alt="" style="display:block;width:100%;height:100%;object-fit:${c.fit||'cover'};border-radius:8px">`;   // fit: cover / contain / fill — the box height comes from the element's Fixed height
       return `<div style="height:118px;background:${b.secondary}1f;border:1px solid ${b.secondary}55;border-radius:8px;display:flex;align-items:center;justify-content:center;color:${b.secondary}"><span class="ms" style="font-size:34px">${esc(c.icon||'image')}</span></div>`;
     case 'table':{
       const headers = c.headers || ['Item','Qty','Rate'];
