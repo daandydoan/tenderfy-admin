@@ -482,14 +482,14 @@
               <div class="fig-solo"><span class="fig-field"><span class="ms fig-ic" data-scrub>rounded_corner</span><input type="number" id="s-rad" min="0" max="400"></span></div>
               <div class="fig-corners" hidden><span class="fig-field"><span class="ms fig-ic cn cn-tl">rounded_corner</span><input type="number" id="s-radTL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-tr">rounded_corner</span><input type="number" id="s-radTR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-bl">rounded_corner</span><input type="number" id="s-radBL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-br">rounded_corner</span><input type="number" id="s-radBR" placeholder="0"></span></div>
             </div>
-            <div class="fig-sec" data-sec="stroke" data-paint="bcolor" style="margin-top:14px">
-              <div class="fig-sec-h"><span class="fig-sec-t">Stroke</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add stroke"><span class="ms">add</span></button></span></div>
-              <div class="fig-paint" id="s-bcolorLit" data-paint="bcolor"><span class="fig-sw"><input type="color" class="insp-color" id="s-bcolor"></span><input class="fig-hexin insp-hex" id="s-bcolorH" placeholder="EAEDEC"><span class="fig-op"><input type="number" id="s-bcolorA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
-              <div class="bind-note" id="s-bcolorNote" style="display:none"></div>
-              <select class="insp-sel fig-bind" id="s-bcolorBind"></select>
-              <div class="fig-strokerow"><div><label>Position</label><select class="insp-sel" id="s-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><label>Weight</label><span class="fig-wt"><span class="ms">line_weight</span><input type="number" id="s-bw" min="0" max="40"></span></div></div>
-              <div class="insp-row" data-field="bwstyle" style="margin-top:8px"><label>Style</label><select class="insp-sel" id="s-bstyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
-            </div>
+          </div>
+        <div class="insp-sec fig-sec" data-sec="stroke" data-paint="bcolor" data-need="bcolor">
+            <div class="fig-sec-h"><span class="fig-sec-t">Stroke</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add stroke"><span class="ms">add</span></button></span></div>
+            <div class="fig-paint" id="s-bcolorLit" data-paint="bcolor"><span class="fig-sw"><input type="color" class="insp-color" id="s-bcolor"></span><input class="fig-hexin insp-hex" id="s-bcolorH" placeholder="EAEDEC"><span class="fig-op"><input type="number" id="s-bcolorA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
+            <div class="bind-note" id="s-bcolorNote" style="display:none"></div>
+            <select class="insp-sel fig-bind" id="s-bcolorBind"></select>
+            <div class="fig-strokerow"><div><label>Position</label><select class="insp-sel" id="s-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><label>Weight</label><span class="fig-wt"><span class="ms">line_weight</span><input type="number" id="s-bw" min="0" max="40"></span></div></div>
+            <div class="insp-row" data-field="bwstyle" style="margin-top:8px"><label>Style</label><select class="insp-sel" id="s-bstyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
           </div>
           </details>
         </div>
