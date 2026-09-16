@@ -1461,10 +1461,10 @@ function pageInit(){
     // ponytail: four lettermark styles stand in for the client logo from Original files; picked by name so it's stable
     const mark=t=>{ const [x,y='']=(t.initials||t.name.slice(0,2)).toUpperCase().split(''); const p=t.brand.primary, q=t.brand.secondary||p, F='font-family="Outfit, Inter, sans-serif" font-weight="800"'; const k=[...t.name].reduce((n,c)=>n+c.charCodeAt(0),0)%4;
       const body=[
-        `<rect width="32" height="32" rx="8" fill="#fff" stroke="#E3E8E6"/><text x="8" y="21" ${F} font-size="15" fill="${p}">${x}</text><text x="17" y="21" ${F} font-size="15" fill="${q}">${y}</text><rect x="8" y="24" width="16" height="2.5" rx="1.25" fill="${q}"/>`,   // two-tone + underline
-        `<rect width="32" height="32" rx="8" fill="${p}"/><text x="16" y="21.5" text-anchor="middle" ${F} font-size="14" fill="#fff">${x}${y}</text>`,   // solid tile, white initials
-        `<circle cx="16" cy="16" r="15" fill="#fff" stroke="${p}" stroke-width="2.5"/><text x="16" y="21" text-anchor="middle" ${F} font-size="13" fill="${p}">${x}${y}</text>`,   // ringed roundel
-        `<rect width="32" height="32" rx="8" fill="#fff" stroke="#E3E8E6"/><rect x="6" y="6" width="9" height="20" rx="2" fill="${p}"/><text x="25" y="22" text-anchor="end" ${F} font-size="15" fill="${q}">${y||x}</text>`   // bar + letter
+        `<rect width="32" height="32" rx="8" fill="#fff" stroke="#E3E8E6"/><text x="8" y="21" ${F} font-size="15" fill="${p}" opacity=".85">${x}</text><text x="17" y="21" ${F} font-size="15" fill="${q}" opacity=".85">${y}</text><rect x="8" y="24" width="16" height="2.5" rx="1.25" fill="${q}" opacity=".5"/>`,   // two-tone + underline
+        `<rect width="32" height="32" rx="8" fill="${p}" opacity=".14"/><text x="16" y="21.5" text-anchor="middle" ${F} font-size="14" fill="${p}" opacity=".85">${x}${y}</text>`,   // solid tile, white initials
+        `<circle cx="16" cy="16" r="14.5" fill="${p}" fill-opacity=".08" stroke="${p}" stroke-opacity=".45" stroke-width="2"/><text x="16" y="21" text-anchor="middle" ${F} font-size="13" fill="${p}" opacity=".85">${x}${y}</text>`,   // ringed roundel
+        `<rect width="32" height="32" rx="8" fill="#fff" stroke="#E3E8E6"/><rect x="6" y="6" width="9" height="20" rx="2" fill="${p}" opacity=".55"/><text x="25" y="22" text-anchor="end" ${F} font-size="15" fill="${q}" opacity=".85">${y||x}</text>`   // bar + letter
       ][k];
       return `<svg viewBox="0 0 32 32" width="32" height="32">${body}</svg>`; };
     document.getElementById('pickList').innerHTML=TENANTS.map(t=>`<a data-pick="${t.id}"><span class="av" title="${t.initials}">${mark(t)}</span><span>${t.name}<div class="sub">${brandMeta(t).files.length?'Documents received':'Waiting on documents'}</div></span></a>`).join('');
