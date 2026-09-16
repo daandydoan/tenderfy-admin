@@ -66,7 +66,11 @@
   .vb-canvas{position:relative;flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
   .cd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
   .code-ta{width:100%;box-sizing:border-box;height:calc(100% - 70px);min-height:260px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.6;border:1px solid var(--border);border-radius:10px;padding:12px;resize:none;background:#0f1720;color:#d7e2df;tab-size:2;outline:none;white-space:pre;overflow:auto}
-  .vb-page.preview{cursor:default} .vb-page.preview .vb-block>div{width:100%}   /* renderer rows fill the block like editor rows do */
+  .vb-page.preview{cursor:default}
+  .vb-page.preview .vb-ins,.vb-page.preview .vb-rowtools,.vb-page.preview .vb-tools,.vb-page.preview .vb-name,.vb-page.preview .vb-colph{display:none!important}
+  .vb-page.preview .vb-col>.vb-el+.vb-el{margin-top:11px}   /* same element gap as the document renderer */
+  .vb-page.preview .vb-el,.vb-page.preview .vb-row{cursor:default;pointer-events:none;border-color:transparent!important;box-shadow:none!important;padding-top:0;padding-bottom:0}
+  .vb-page.preview .vb-el{padding:0}
   .vb-bar{display:flex;align-items:center;gap:9px;width:100%;max-width:620px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
   /* Always A4 width (content-driven height); canvas scrolls if it can't fit */
   .vb-page{width:100%;max-width:620px;min-height:160px;margin:0 auto;background:#fff;border-radius:4px;box-shadow:0 10px 34px rgba(20,45,38,.14);padding:52px;display:flex;flex-direction:column}
@@ -810,7 +814,6 @@ function pageInit(){
   codeBig.addEventListener('input',()=>{ codeSmall.value=codeBig.value; codeSmall.dispatchEvent(new Event('input')); });
   document.getElementById('codeModalClose').addEventListener('click',()=>document.getElementById('codeModal').classList.remove('open'));
   document.getElementById('codeModal').addEventListener('click',e=>{ if(e.target.id==='codeModal') e.currentTarget.classList.remove('open'); });
-  function renderPreview(){ if(!doc.length) return; P2DOC.__preview=doc; page.innerHTML=`<div class="vb-block" id="blockWrap">${composeBlock({p:'__preview'}, brand)}</div>`; applyBlockStyle(); }
   document.querySelectorAll('#modeSeg button').forEach(b=>b.addEventListener('click',()=>{ previewMode=b.dataset.m==='preview'; document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x===b)); page.classList.toggle('preview',previewMode); sel=null; render(); }));
   function render(){
     if(!doc.length){
@@ -837,7 +840,6 @@ function pageInit(){
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
-    if(previewMode) renderPreview();
     renderCodeTab();
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
@@ -929,7 +931,7 @@ function pageInit(){
     box.style.alignSelf = (ewm==='fixed'||ewm==='max') ? HM2[st.alH||'left'] : '';   // Fill width must keep stretching
     box.style.flex = '0 0 auto';   // elements stack at their natural height, like the document renderer
     // A column holding a Fixed/Min/Max-width element sizes to it; the other columns fill the rest.
-    const col=box.parentElement; if(col && col.classList.contains('vb-col')){ const sized=[...col.querySelectorAll(':scope > .vb-el')].some(el=>el.style.width||el.style.minWidth||el.style.maxWidth); col.style.flex = sized ? '0 1 auto' : (col.dataset.ratio||'1'); }
+    const col=box.parentElement; if(col && col.classList.contains('vb-col')){ const multi=col.parentElement.querySelectorAll(':scope > .vb-col').length>1; const sized=multi && [...col.querySelectorAll(':scope > .vb-el')].some(el=>el.style.width||el.style.minWidth||el.style.maxWidth); col.style.flex = sized ? '0 1 auto' : (col.dataset.ratio||'1'); }
     node.style.height = ehm==='fixed' ? (st.hpx||0)+'px' : '';   // height stays on the body so hover tools aren't clipped
     node.style.maxHeight = ehm==='max' ? (st.hpx||0)+'px' : '';
     node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar');
@@ -1207,8 +1209,9 @@ function pageInit(){
     const it=selEl(); el.className='sel-pill on';
     el.innerHTML=`<span class="ms">${PRIM_ICON[it.id]||'widgets'}</span> ${ELEMS[it.id]||it.id} <span class="ms x" data-selclear title="Edit whole block">close</span>`;
   }
-  document.getElementById('selPill').addEventListener('click',e=>{ if(e.target.closest('[data-selclear]')){ sel=null; applySelection(); syncInspector(); } });
-  page.addEventListener('click',e=>{ if(!e.target.closest('.vb-el')){ sel=null; applySelection(); syncInspector(); } });
+  function deselect(){ if(!sel) return; sel=null; applySelection(); syncInspector(); showTab('els'); }   // back to the element library
+  document.getElementById('selPill').addEventListener('click',e=>{ if(e.target.closest('[data-selclear]')) deselect(); });
+  page.addEventListener('click',e=>{ if(!e.target.closest('.vb-el')) deselect(); });
 
   function wire(){
     page.querySelectorAll('.vb-ins').forEach(ins=>ins.addEventListener('click',e=>{ e.stopPropagation(); openPicker(ins,{r:+ins.dataset.r,c:+ins.dataset.c,k:+ins.dataset.k}); }));
@@ -1260,7 +1263,8 @@ function pageInit(){
     });
     return c;
   }
-  function wireText(){
+  // Preview is the build canvas with the editing chrome hidden (CSS) and text locked — what you built is what you see.
+  function wireText(){ if(previewMode) return;
     page.querySelectorAll('.vb-el').forEach(el=>{
       const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k, body=el.querySelector('.vb-body');
       body.querySelectorAll('[data-ek]:not([data-ek=row]):not([data-ek=pair]),[data-ec]').forEach(n=>n.setAttribute('contenteditable','true'));
@@ -1329,7 +1333,7 @@ function pageInit(){
     else if(m&&k==='y'){ e.preventDefault(); redo(); }
     else if(m&&k==='d'&&sel){ e.preventDefault(); dupEl(sel); }
     else if((e.key==='Delete'||e.key==='Backspace')&&sel){ e.preventDefault(); delEl(sel); }
-    else if(e.key==='Escape'&&sel){ sel=null; applySelection(); syncInspector(); }
+    else if(e.key==='Escape'&&sel) deselect();
   });
   // Draft = canvas + style + the details fields, so a reload can pick up exactly where you were.
   const fields=()=>Object.fromEntries(['b-name','b-label','b-desc','b-cat'].map(i=>[i,document.getElementById(i).value]));
