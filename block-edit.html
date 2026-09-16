@@ -125,8 +125,6 @@
   .tbl-ops button{display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid var(--border);background:#fff;border-radius:7px;padding:6px 4px;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--gray);cursor:pointer}
   .tbl-ops button:hover{border-color:var(--teal);color:var(--teal)} .tbl-ops button .ms{font-size:15px}
   /* Source document (the client's PDF) — a static page with draftable regions */
-  .src-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#5b46b8;background:#f3f0fb;border:1px solid #d9d0f2;border-radius:100px;padding:2px 9px}
-  .src-chip .ms{font-size:13px}
   /* Page break — reads as a page split, not a divider */
   .vb-el[data-id="pagebreak"]{margin:10px -60px;padding:14px 0;border-radius:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border-top:1px solid #d9e0de;border-bottom:1px solid #d9e0de}
   .vb-el[data-id="pagebreak"] .vb-body>div{padding:0 60px}
@@ -489,7 +487,6 @@
               <span class="ms" style="font-size:16px;color:var(--teal)">web</span>
               <span id="bar-name">Untitled block</span>
               <span class="muted" id="bar-count" style="font-weight:400"></span>
-              <span class="src-chip" id="srcChip" style="display:none"></span>
               <span class="ref-thumb" id="refThumb" style="display:none" title="The image this block was drafted from — click to enlarge"><img alt=""><button type="button" class="ref-x" title="Clear image"><span class="ms">close</span></button></span>
             </div>
             <div class="vb-page" id="page"></div>
@@ -755,7 +752,6 @@ function pageInit(){
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
-    const sc=document.getElementById('srcChip'); sc.style.display=source?'':'none'; sc.innerHTML=source?`<span class="ms">${/Ray/.test(source)?'auto_awesome':'picture_as_pdf'}</span> ${source}`:'';
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
   function loadTemplate(key){ doc = key ? normDoc(clone(P2DOC[key]||[])) : []; sel=null; render(); commit(); }
