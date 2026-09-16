@@ -70,6 +70,7 @@ function docBlocksToItems(blocks){
       el:isEl, bid:isEl?null:bl.id, pid:isEl?bl.id:null,
       style:Object.assign({}, DOC_ITEM_STYLE_DEFAULT, bl.style||{}),
       content:bl.content||{},
+      doc:bl.doc||null,
     };
   });
 }

@@ -143,6 +143,13 @@ const DOC_BLOCKS = (function(){
   };
 })();
 COMPONENTS.forEach(c=>{ if(DOC_BLOCKS[c.id]) c.blocks = DOC_BLOCKS[c.id]; });
+// ---- Documents saved from the Document Builder (localStorage; the real build uses the API) ----
+const CDKEY='tf_docs';
+function loadCustomDocs(){ try{ return JSON.parse(localStorage.getItem(CDKEY)||'{}'); }catch(e){ return {}; } }
+function saveCustomDoc(d){ const all=loadCustomDocs(); all[d.id]=d; try{ localStorage.setItem(CDKEY, JSON.stringify(all)); }catch(e){ return false; } mergeCustomDocs(); return true; }
+function removeCustomDoc(id){ const all=loadCustomDocs(); delete all[id]; try{ localStorage.setItem(CDKEY, JSON.stringify(all)); }catch(e){} const i=COMPONENTS.findIndex(c=>c.id===id); if(i>=0) COMPONENTS.splice(i,1); }
+function mergeCustomDocs(){ Object.values(loadCustomDocs()).forEach(d=>{ const i=COMPONENTS.findIndex(c=>c.id===d.id); if(i>=0) COMPONENTS[i]=d; else COMPONENTS.push(d); }); }
+mergeCustomDocs();
 const DOC_TYPE_META = {
   page:   {label:'Page',    icon:'wysiwyg',   builder:'document-edit.html', mode:'page'},
   section:{label:'Section', icon:'article',   builder:'document-edit.html', mode:'section'},
@@ -165,4 +172,4 @@ function compUsage(id){ return (id in COMP_USAGE) ? COMP_USAGE[id] : 4; }
 function docsUsingBlock(blockId){ return COMPONENTS.filter(c=>Array.isArray(c.blocks) && c.blocks.some(bl=>bl.id===blockId)); }
 // The block/element composition entries of a document (for "Built from").
 function docComposition(c){ return (c && Array.isArray(c.blocks)) ? c.blocks : []; }
-if(typeof window!=='undefined'){ window.COMPONENTS = COMPONENTS; window.COMP_USAGE = COMP_USAGE; window.compUsage = compUsage; window.DOC_TYPE_META = DOC_TYPE_META; window.DOC_TYPES = DOC_TYPES; window.docBuilderHref = docBuilderHref; window.docsUsingBlock = docsUsingBlock; window.docComposition = docComposition; }
+if(typeof window!=='undefined'){ window.COMPONENTS = COMPONENTS; window.COMP_USAGE = COMP_USAGE; window.compUsage = compUsage; window.DOC_TYPE_META = DOC_TYPE_META; window.DOC_TYPES = DOC_TYPES; window.docBuilderHref = docBuilderHref; window.docsUsingBlock = docsUsingBlock; window.docComposition = docComposition; window.loadCustomDocs=loadCustomDocs; window.saveCustomDoc=saveCustomDoc; window.removeCustomDoc=removeCustomDoc; }

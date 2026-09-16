@@ -162,6 +162,8 @@
   #styleTarget{font-size:12px;color:var(--teal);font-weight:600;margin:-4px 0 10px;display:flex;align-items:center;gap:6px}
   #styleTarget .ms{font-size:15px}
   #docSettings .insp-sec:first-child .insp-h{margin-top:0}
+  /* Per-instance layout/paint overrides are hidden: the brand is applied by the renderer (styling ownership is a block/brand decision, not a document one) */
+  #blockInspector .insp-sec[data-sec="layout"],#blockInspector .insp-sec[data-sec="border"]{display:none}
   .bi-x{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer}
   .bi-x:hover{border-color:var(--teal);color:var(--teal)}
   .bi-x .ms{font-size:16px}
@@ -405,7 +407,7 @@
         </div></div>
         <div id="paneAi" style="display:none"><div class="card">
             <div class="ray-draft">
-              <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray from a client file</div>
+              <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray from a client file <span class="concept" title="Prototype: drafts from the description, not the file">concept</span></div>
               <div class="ray-lbl">Client's document (reference)</div>
               <div class="ray-ref" id="rayDocRef">
                 <input type="file" accept="image/*" id="rayDocImg" hidden>
@@ -416,7 +418,7 @@
               <button type="button" class="btn btn-ray btn-sm" id="rayDocBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft document</button>
             </div>
             <div class="insp-sec" data-sec="suggest" style="margin-top:14px">
-              <div class="insp-h">Suggest blocks</div>
+              <div class="insp-h">Suggest blocks <span class="concept" title="Prototype: keyword match on the document name and description">concept</span></div>
               <div class="fhint" style="margin-bottom:8px">Ray picks blocks that fit this document's name, type and description — add the ones you want.</div>
               <button type="button" class="btn btn-ray btn-sm btn-block" id="raySuggestBlocksBtn" style="margin-bottom:8px"><span class="ms" style="font-size:15px">auto_awesome</span> Suggest blocks with Ray</button>
               <div id="rayBlockSuggestions"></div>
@@ -431,7 +433,6 @@
               <div class="lyr-s" style="margin:-2px 0 10px">Fills behind content, per page</div>
               <div class="bg-modeseg" id="bgModeSeg">
                 <button data-bgm="regions" class="on">Regions</button>
-                <button data-bgm="code">Custom CSS</button>
               </div>
               <div id="bgRegionsPane">
                 <div id="bgRegions"></div>
@@ -478,6 +479,8 @@
             <div class="mode-seg" id="modeSeg">
               <button data-mode="layout" class="on"><span class="ms">grid_view</span> Build</button>
               <button data-mode="preview"><span class="ms">visibility</span> Preview</button>
+            </div>
+            <button class="tb-btn" id="pdfBtn" title="Print the A4 pages to PDF" style="display:none;margin-left:8px"><span class="ms">picture_as_pdf</span> Download PDF
             </div>
           </div>
           <div class="vb-stage" id="canvas"></div>
@@ -542,7 +545,7 @@ function pageInit(){
   // Seed the canvas from the document's SAVED composition, so the builder shows
   // exactly what the view/pack renders (see document-render.js).
   let items = (doc && Array.isArray(doc.blocks))
-    ? doc.blocks.map(bl=>{ const it=mkInst(bl.id, bl.t==='element'); if(bl.content) it.content=Object.assign({}, bl.content); if(bl.style) it.style=Object.assign({}, it.style, bl.style); return it; })
+    ? doc.blocks.map(bl=>{ const it=mkInst(bl.id, bl.t==='element'); if(bl.content) it.content=Object.assign({}, bl.content); if(bl.style) it.style=Object.assign({}, it.style, bl.style); if(bl.doc) it.doc=bl.doc; return it; })
     : doc ? ['heading','paragraph','imgtext','list','img2'].map(id=>mkInst(id))
     : isPage ? [mkInst('cover',true)] : [];
   // Editor state
@@ -677,8 +680,10 @@ function pageInit(){
     }catch(e){ pageOf=items.map(()=>0); count=1; }
     return {count, pageOf};
   }
-  const autosaveEl=document.getElementById('autosave'); let autosaveT=null;
-  function stampAutosave(){ clearTimeout(autosaveT); autosaveT=setTimeout(()=>{ autosaveEl.innerHTML='<span class="ms">cloud_done</span> Autosaved · '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}); },600); }
+  // Autosave = a real localStorage draft (tf_ddraft_<id|new>), written 600ms after the last change; the stamp only shows once it's written.
+  const autosaveEl=document.getElementById('autosave'); let autosaveT=null; const DKEY='tf_ddraft_'+(id||'new');
+  function docSnapshot(){ return { id:id||null, name:document.getElementById('d-name').value.trim(), category:document.getElementById('d-type').value, status:document.getElementById('d-status').value, desc:document.getElementById('d-desc').value, client:document.getElementById('d-client').value, type:docType, docStyle, topLayer, docBg, blocks:items.map(it=>{ const bl={t:it.el?'element':'block', id:it.el?it.pid:it.bid, style:it.style}; if(it.content&&Object.keys(it.content).length) bl.content=it.content; if(it.doc) bl.doc=it.doc; return bl; }) }; }
+  function stampAutosave(){ clearTimeout(autosaveT); autosaveT=setTimeout(()=>{ try{ localStorage.setItem(DKEY, JSON.stringify(docSnapshot())); autosaveEl.innerHTML='<span class="ms">cloud_done</span> Autosaved · '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}); }catch(e){ autosaveEl.innerHTML='<span class="ms" style="color:#d5493f">cloud_off</span> Not saved · storage full'; } },600); }
   function render(){ stampAutosave();
     canvas.style.setProperty('--teal', brand?brand.secondary:'');
     let pageCount=1;
@@ -757,7 +762,9 @@ function pageInit(){
   let selEl=null;   // "r.c.k" within the selected block's doc
   const ELNAME=Object.fromEntries((typeof PRIMITIVES!=='undefined'?PRIMITIVES:[]).map(p=>[p.id,p.name]));
   function selElNode(){ const blk=canvas.querySelector('.doc-blk.sel'); return blk && selEl ? blk.querySelector('[data-el="'+selEl+'"]') : null; }
-  function selElObj(){ const it=items.find(x=>x.k===selK); if(!it||!selEl) return null; if(!it.doc) it.doc=blockDocCopy(instObj(it)); const [r,c,k]=selEl.split('.').map(Number); return it.doc[r]&&it.doc[r].cols[c]&&it.doc[r].cols[c][k]||null; }
+  // Reading looks at the document's copy if it exists, else the saved block; only editing forks (forkDoc).
+  function forkDoc(it){ if(!it.doc) it.doc=blockDocCopy(instObj(it)); return it.doc; }
+  function selElObj(fork){ const it=items.find(x=>x.k===selK); if(!it||!selEl) return null; const doc=fork?forkDoc(it):(it.doc||blockDocCopy(instObj(it))); const [r,c,k]=selEl.split('.').map(Number); return doc[r]&&doc[r].cols[c]&&doc[r].cols[c][k]||null; }
   function wireElements(){
     canvas.querySelectorAll('.doc-blk [data-el]').forEach(w=>{
       w.dataset.elname=ELNAME[w.dataset.elid]||w.dataset.elid;
@@ -771,7 +778,7 @@ function pageInit(){
     document.getElementById('el-color').value=st.color||'#333333'; document.getElementById('el-colorH').value=(st.color||'').replace('#','').toUpperCase();
     document.querySelectorAll('#el-align button').forEach(b=>b.classList.toggle('on',b.dataset.al===(st.align||'')));
   }
-  function setElStyle(patch){ const el=selElObj(); if(!el) return; el.st=Object.assign(el.st||{},patch); render(); renderInspector(); }
+  function setElStyle(patch){ const el=selElObj(true); if(!el) return; el.st=Object.assign(el.st||{},patch); render(); renderInspector(); }
   (function(){
     document.getElementById('el-font').innerHTML='<option value="">Inherit from brand</option>'+['Outfit','Inter','Poppins','Lora','Roboto'].map(f=>'<option>'+f+'</option>').join('');
     document.getElementById('el-font').addEventListener('change',e=>setElStyle({font:e.target.value}));
@@ -780,7 +787,7 @@ function pageInit(){
     document.getElementById('el-color').addEventListener('input',e=>{ document.getElementById('el-colorH').value=e.target.value.replace('#','').toUpperCase(); setElStyle({color:e.target.value}); });
     document.getElementById('el-colorH').addEventListener('change',e=>{ const v='#'+e.target.value.trim().replace('#',''); if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)) setElStyle({color:v}); else if(!e.target.value.trim()) setElStyle({color:''}); });
     document.querySelectorAll('#el-align button').forEach(b=>b.addEventListener('click',()=>setElStyle({align:b.dataset.al})));
-    document.getElementById('el-reset').addEventListener('click',()=>{ const el=selElObj(); if(el){ delete el.st; render(); renderInspector(); } });
+    document.getElementById('el-reset').addEventListener('click',()=>{ const el=selElObj(true); if(el){ delete el.st; render(); renderInspector(); } });
     // rich text: format the selection inside the selected element (same commands as the block builder)
     document.querySelectorAll('#el-rich button').forEach(b=>{ b.addEventListener('mousedown',e=>e.preventDefault()); b.addEventListener('click',()=>{
       const node=selElNode(); if(!node) return; const a=document.activeElement; let leaf = a && a.closest && a.closest('[data-el]')===node ? a : node.querySelector('[contenteditable]'); if(!leaf) return;
@@ -846,7 +853,11 @@ function pageInit(){
   function finishSave(){
     const n=document.getElementById('d-name').value.trim();
     if(!n){showToast('Give the document a name first'); document.getElementById('d-name').focus(); return;}
-    detailsSeen=true; showToast((doc?'Updated':'Created')+' document: '+n+' · '+items.length+' blocks');
+    detailsSeen=true;
+    const snap=docSnapshot(); const rec=Object.assign({}, doc||{}, { id: id||('doc-'+Date.now().toString(36)), name:n, category:snap.category||'Sections', status:snap.status||'draft', restricted:0, version: doc? (doc.version||'1.0') : '1.0', updated:'just now', thumb:'lines', icon:'description', desc:snap.desc, type:docType, client:snap.client, docStyle:snap.docStyle, topLayer:snap.topLayer, docBg:snap.docBg, blocks:snap.blocks });
+    const ok=saveCustomDoc(rec); try{ localStorage.removeItem(DKEY); }catch(e){}
+    if(!ok){ showToast('Could not save — browser storage is full'); return; }
+    showToast((doc?'Updated':'Created')+' document: '+n+' · '+items.length+' blocks');
     setTimeout(()=>location.href='library.html',700);
   }
   document.getElementById('saveBtn').addEventListener('click',()=>{
@@ -855,8 +866,8 @@ function pageInit(){
     finishSave();
   });
   document.getElementById('delBtn').addEventListener('click',()=>{
-    confirmAction({title:'Delete this document?',body:`“${doc.name}” will be removed from the library. Tender templates already using it will need a replacement.`,confirm:'Delete document',danger:true},()=>{
-      showToast('Deleted document: '+doc.name); setTimeout(()=>location.href='library.html',700);
+    confirmAction({title:'Delete this document?',body:`“${doc.name}” will be removed from the library.`,confirm:'Delete document',danger:true},()=>{
+      removeCustomDoc(doc.id); try{ localStorage.removeItem(DKEY); }catch(e){} showToast('Deleted document: '+doc.name); setTimeout(()=>location.href='library.html',700);
     });
   });
 
@@ -982,6 +993,7 @@ function pageInit(){
 
   // ---- Background layer (fill regions + custom CSS) ----
   const docBg={ mode:'regions', regions:[], css:'' };
+  if(doc&&doc.docBg) Object.assign(docBg, doc.docBg); if(doc&&doc.docStyle) Object.assign(docStyle, doc.docStyle); if(doc&&doc.topLayer) Object.assign(topLayer, doc.topLayer);
   let bgUid=0;
   const BG_SHAPES=[['full','Full page'],['band-top','Top band'],['band-bottom','Bottom band'],['half-top','Top half'],['half-bottom','Bottom half'],['half-left','Left half'],['half-right','Right half'],['col-left','Left column'],['col-right','Right column'],['region','Custom region']];
   function mkRegion(){ return {id:++bgUid, shape:'band-top', h:120, w:200, x:40, y:40, color:(brand?brand.primary:'#27535C'), gradOn:false, color2:(brand?brand.secondary:'#38988A'), op:1, firstOnly:false}; }
@@ -1026,7 +1038,7 @@ function pageInit(){
   }
   function renderBgRegions(){
     const wrap=document.getElementById('bgRegions');
-    wrap.innerHTML = docBg.regions.length ? docBg.regions.map(regionRow).join('') : `<div class="fhint" style="margin:2px 0 10px">No fill regions yet — add one, or switch to Custom CSS.</div>`;
+    wrap.innerHTML = docBg.regions.length ? docBg.regions.map(regionRow).join('') : `<div class="fhint" style="margin:2px 0 10px">No fill regions yet — add one.</div>`;
     wrap.querySelectorAll('.bg-reg').forEach(el=>{
       const r=docBg.regions.find(x=>x.id==el.dataset.id);
       el.querySelector('.bg-del').addEventListener('click',()=>{ docBg.regions=docBg.regions.filter(x=>x!==r); renderBgRegions(); render(); });
@@ -1059,11 +1071,12 @@ function pageInit(){
 
   // ---- Mode toggle (Layout / Preview) ----
   function setMode(m){
-    mode=m; wrap.classList.toggle('preview', m==='preview');
+    mode=m; wrap.classList.toggle('preview', m==='preview'); document.getElementById('pdfBtn').style.display = m==='preview' ? '' : 'none';
     document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x.dataset.mode===m));
     applyDocStyle(); renderInspector(); render();   // selection persists across Layout ⇄ Preview
   }
   document.querySelectorAll('#modeSeg button').forEach(x=>x.addEventListener('click',()=>setMode(x.dataset.mode)));
+  document.getElementById('pdfBtn').addEventListener('click',()=>window.print());
 
   // ---- Block inspector (per-block content + style) ----
   let lastSel=null;
@@ -1203,6 +1216,12 @@ function pageInit(){
 
   renderPalette(); render(); applyDocStyle(); applyPanels(); renderInspector();
   updateDocSummary();
+  // Resume an unsaved draft silently (same as the block builder)
+  (function(){ let dft=null; try{ dft=JSON.parse(localStorage.getItem(DKEY)||'null'); }catch(e){} if(!dft||!Array.isArray(dft.blocks)||(!dft.blocks.length&&!dft.name)) return;
+    items=docBlocksToItems(dft.blocks).map(x=>{ const it=mkInst(x.bid||x.pid, x.el); it.style=Object.assign({}, it.style, x.style); it.content=x.content||{}; if(x.doc) it.doc=x.doc; return it; });
+    if(dft.name) document.getElementById('d-name').value=dft.name; if(dft.category) document.getElementById('d-type').value=dft.category; if(dft.status) document.getElementById('d-status').value=dft.status; if(dft.desc) document.getElementById('d-desc').value=dft.desc;
+    if(dft.docStyle) Object.assign(docStyle, dft.docStyle); if(dft.topLayer) Object.assign(topLayer, dft.topLayer); if(dft.docBg) Object.assign(docBg, dft.docBg);
+    syncBar(); render(); renderInspector(); showToast('Picked up your unsaved draft'); })();
   // Deep-link: preselect letterhead/footer + open the Layers tab (demo flows)
   (function(){
     const tp=urlP.get('top');

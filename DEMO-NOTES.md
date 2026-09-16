@@ -106,3 +106,39 @@ store (ABN/licences/insurance) that blocks reference · block analytics / win-ra
   spacing, type and borders live under *Advanced styling*.
 
 Parked for the real build: a **block-in-use check** — drop a block into a real tender with merge fields resolved before calling it done; multiple images per block.
+
+## Document Builder — for developers
+
+Same shell as the Block Builder (one tabbed panel · canvas · Build/Preview), same shared code:
+`components.css` (inspector controls, dialogs, picker, insert lines, rich text), `editor-shared.js`
+(scrub, dialogs, collapsible sections, rich-text capture), `block-layouts.js` (`elStyle`, `composeBlock`,
+`blockDocCopy`), `document-render.js` (`docItemHtml`, pagination).
+
+**Document schema** (what Save writes to `tf_docs`, merged into `COMPONENTS` on load):
+
+```
+{ id, name, category, status, desc, type: 'section' | 'page', client,
+  docStyle:{bg, pad, gap, rad},              -- page fill / padding / spacing / radius
+  topLayer:{header, footer},                 -- block ids from Headers & Footers
+  docBg:{mode:'regions', regions:[]},        -- fill regions behind content
+  blocks:[ { t:'block'|'element', id, style, content?, doc? } ] }
+```
+
+- `blocks[i].doc` is **this document's copy of the block** (rows → cols → elements, same shape as a
+  block's `doc`). It exists only once someone edits words or element typography in place; "Revert to
+  block" deletes it. The saved block is never written from here.
+- Drafts autosave to `tf_ddraft_<id|new>` 600ms after the last change and resume silently.
+
+**Decisions encoded in the UI**
+- Brand is applied by the renderer. Per-instance Layout / Fill / Stroke overrides are hidden
+  (`#blockInspector [data-sec=layout|border]`); the code is still there pending the styling-ownership call
+  (block owns layout/emphasis, brand owns type/colour — *proposed, not decided*).
+- Element-level Typography overrides inside a document are allowed and live in `blocks[i].doc`.
+- Repeat rows render twice in documents as a stand-in for "one per item"; the estimator's "add another"
+  belongs to the client editor.
+
+**What the mockup fakes here** (look for the `concept` badge)
+- AI Draft "from a client file" and "Suggest blocks": keyword match on the description / name; the file is ignored.
+- Pagination never splits a block taller than a page; long tables overflow the A4 page in Preview.
+- "Download PDF" is `window.print()` over the preview pages with a print stylesheet.
+- No audit trail, no lock-by-head-office, no versioning of documents — open items the client editor must answer.
