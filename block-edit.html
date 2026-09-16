@@ -802,7 +802,7 @@ function pageInit(){
   // ---- Brand preview ----
   function refreshBrandOptions(){
     const el=document.getElementById('brandSel');
-    el.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.brand?(b.name+(b.tenant&&typeof brandStatusLabel==='function'&&TENANTS.includes(b.tenant)?' · '+brandStatusLabel(b.tenant):'')):'Default (brand-neutral)'}</option>`).join('')+`<option value="new">＋ New style…</option>`;
+    el.innerHTML=BRANDS.map((b,i)=>`<option value="${i}">${b.brand?b.name:'Default (brand-neutral)'}</option>`).join('')+`<option value="new">＋ New style…</option>`;
     el.value=String(brandIdx);
   }
   function updateEditBtn(){ const btn=document.getElementById('editBrandBtn'); if(!btn)return; btn.disabled=!brand; btn.style.opacity=brand?'':'.4'; }
