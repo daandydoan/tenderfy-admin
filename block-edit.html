@@ -345,9 +345,11 @@
   /* ---- Responsive: collapsible Style panel + overlay drawers ---- */
   .tb-btn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   /* The left panel is a real side panel at every width: shown inline, or hidden so the canvas takes the row. */
-  .ed3:not(.st-on) #leftCol{display:none}
-  .ed3:not(.st-on){grid-template-columns:minmax(0,1fr)}
-  @media(max-width:1100px){ .ed3{grid-template-columns:320px minmax(0,1fr)} }
+  .ed3{transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1),column-gap .28s cubic-bezier(.4,0,.2,1)}
+  #leftCol{min-width:0;transition:opacity .22s ease,transform .28s cubic-bezier(.4,0,.2,1);transform-origin:left center}
+  .ed3:not(.st-on){grid-template-columns:0px minmax(0,1fr);column-gap:0}
+  .ed3:not(.st-on) #leftCol{opacity:0;transform:translateX(-24px);pointer-events:none;overflow:hidden}
+  @media(max-width:1100px){ .ed3.st-on{grid-template-columns:320px minmax(0,1fr)} }
   .ed3-scrim{display:none}
 </style>
 </head>
