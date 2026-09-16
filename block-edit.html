@@ -133,6 +133,9 @@
   .insp-sec>.fig-sec-h .fig-sec-t{font:inherit;color:inherit;flex:1}
   .insp-sec.closed .insp-h::after,.insp-sec.closed>.fig-sec-h::after{transform:rotate(-90deg)}
   .insp-sec.closed>:not(.insp-h):not(.fig-sec-h){display:none!important}
+  /* nested sub-sections (Dimension in Layout, Fill/Stroke in Appearance) */
+  .insp-sec .insp-sec{margin-top:14px;padding-left:10px;border-left:2px solid var(--border)}
+  .insp-sec .insp-sec>.insp-h,.insp-sec .insp-sec>.fig-sec-h{margin-top:0;border-bottom:none;padding-bottom:2px}
   /* Advanced styling fold — native <details>, keeps every control on record without cluttering the panel */
   .insp-adv{margin-top:16px;border-top:1px solid var(--border);padding-top:8px}
   .insp-adv summary{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600;color:var(--gray);list-style:none;padding:6px 0}
@@ -473,7 +476,7 @@
             </div></div>
             <div class="fhint" style="margin:2px 0 0">Blank fields inherit the client’s brand &amp; styling.</div>
           </div>
-          <div class="insp-sec" data-sec="border" data-need="rad,bcolor,bwstyle">
+          <div class="insp-sec" data-sec="border" data-need="rad,bcolor,bwstyle,bg">
             <div class="insp-h">Appearance</div>
             <div class="fig-box" data-box="rad" data-field="rad">
               <div class="fig-box-head"><span class="fig-label">Corner radius</span><button type="button" class="fig-toggle" data-toggle title="Edit corners individually"><span class="ms">rounded_corner</span></button></div>
@@ -1489,7 +1492,7 @@ function pageInit(){
     document.getElementById('b-label').placeholder = wantSlot==='footer'?'Name this footer…':'Name this letterhead…';
   }
   // Style tab: brand does the styling — everything lives under Advanced, in this order.
-  (function(){ const adv=document.getElementById('inspAdv'); if(!adv) return; ['layout','dim','typo','border','fill','stroke'].forEach(k=>{ const s=document.querySelector('#styleCard .insp-sec[data-sec="'+k+'"]'); if(s) adv.appendChild(s); }); })();
+  (function(){ const adv=document.getElementById('inspAdv'); if(!adv) return; const sec=k=>document.querySelector('#styleCard .insp-sec[data-sec="'+k+'"]'); ['layout','typo','border'].forEach(k=>adv.appendChild(sec(k))); sec('layout').appendChild(sec('dim')); sec('border').appendChild(sec('fill')); sec('border').appendChild(sec('stroke')); })();
   buildBrandSelect();
   if(tenant){ const i=BRANDS.findIndex(x=>x.id===tenant.id); if(i>0){ brandIdx=i; brand=tenant.brand; activeTenant=tenant; document.getElementById('brandSel').value=String(i); updateEditBtn(); } }   // a client's block previews in their brand by default
   applyBrand(); initStyle(); render(); syncBar(); pushHist(); base=snap(); applyPanels(); applyStationeryUI(); resumeDraft();
