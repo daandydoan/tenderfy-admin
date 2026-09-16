@@ -25,7 +25,7 @@
 
 .c-side .cic{width:100%;height:auto;padding:11px 0;justify-content:center;gap:0;position:relative;border-radius:0}
 .c-side .cic .ms{font-size:24px}
-.c-side:hover .cic{justify-content:flex-start;padding-left:26px;gap:15px}
+.c-side:hover .cic{justify-content:flex-start;padding-left:26px;padding-right:22px;gap:15px}
 .c-side .clbl{display:none;color:#fff;font-size:14.5px;font-weight:500;white-space:nowrap}
 .c-side:hover .clbl{display:inline}
 .c-side .cic:hover{color:var(--teal-bright)}
@@ -43,7 +43,7 @@
 
 /* ---- Sidebar group: parent with collapsible submenu ---- */
 .c-side .cgroup-head{cursor:pointer}
-.c-side .cchev{display:none;margin-left:auto;font-size:19px;color:#fff;opacity:.75;transition:transform .18s ease}
+.c-side .cchev{display:none;margin-left:auto;font-size:18px;color:inherit;opacity:.6;transition:transform .18s ease}
 .c-side:hover .cgroup-head .cchev{display:inline-block}
 .c-side .cgroup.open .cchev{transform:rotate(180deg)}
 .c-side .c-subnav{display:none;flex-direction:column}
