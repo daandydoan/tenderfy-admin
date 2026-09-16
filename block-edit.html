@@ -441,7 +441,7 @@
               </div>
             </div>
           </div>
-          <details class="insp-adv" id="inspAdv"><summary><span class="ms">tune</span> Advanced styling <span class="fhint" style="margin-left:auto">spacing · type · borders</span></summary>
+          <details class="insp-adv" id="inspAdv"><summary><span class="ms">tune</span> Advanced styling <span class="fhint" style="margin-left:auto">layout · spacing · borders</span></summary>
           <div class="insp-sec" data-sec="dim" data-need="pad">
             <div class="insp-h">Dimension</div>
             <div class="fig-box" data-box="pad">
@@ -1502,7 +1502,7 @@ function pageInit(){
     document.getElementById('b-label').placeholder = wantSlot==='footer'?'Name this footer…':'Name this letterhead…';
   }
   // Style tab: brand does the styling — everything lives under Advanced, in this order.
-  (function(){ const adv=document.getElementById('inspAdv'); if(!adv) return; const sec=k=>document.querySelector('#styleCard .insp-sec[data-sec="'+k+'"]'); ['layout','typo','border'].forEach(k=>adv.appendChild(sec(k))); sec('layout').appendChild(sec('dim')); sec('border').appendChild(sec('fill')); sec('border').appendChild(sec('stroke')); })();
+  (function(){ const adv=document.getElementById('inspAdv'); if(!adv) return; const sec=k=>document.querySelector('#styleCard .insp-sec[data-sec="'+k+'"]'); ['layout','border'].forEach(k=>adv.appendChild(sec(k))); document.querySelector('#styleCard .insp-actions').after(sec('typo')); sec('layout').appendChild(sec('dim')); sec('border').appendChild(sec('fill')); sec('border').appendChild(sec('stroke')); })();
   buildBrandSelect();
   if(tenant){ const i=BRANDS.findIndex(x=>x.id===tenant.id); if(i>0){ brandIdx=i; brand=tenant.brand; activeTenant=tenant; document.getElementById('brandSel').value=String(i); updateEditBtn(); } }   // a client's block previews in their brand by default
   applyBrand(); initStyle(); render(); syncBar(); pushHist(); base=snap(); applyPanels(); applyStationeryUI(); resumeDraft();
