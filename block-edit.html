@@ -249,9 +249,9 @@
   .fig-label{font-size:11.5px;color:var(--gray);font-weight:500}
   .fig-resize{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;align-items:center}
   .fig-resize .insp-sel{height:32px;padding:0 8px}
-  .fig-align{display:flex;gap:6px}
-  .fig-align .seg{display:flex;gap:2px;background:#f2f5f4;border-radius:7px;padding:2px}
-  .fig-align button{width:26px;height:24px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border-radius:5px;color:#7d8b87}
+  .fig-align{display:flex;gap:6px;width:100%}
+  .fig-align .seg{flex:1;display:flex;gap:2px;background:#f2f5f4;border-radius:7px;padding:2px}
+  .fig-align button{flex:1;height:26px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border-radius:5px;color:#7d8b87}
   .fig-align button .ms{font-size:16px} .fig-align button:hover{color:var(--ink)}
   .fig-align button.on{background:#fff;color:var(--teal);box-shadow:0 1px 2px rgba(0,0,0,.08)}
   .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
@@ -427,7 +427,7 @@
               <span class="fig-wt" title="Height"><span class="ms">swap_vert</span><input type="number" id="s-hpx" min="0"></span>
               <select class="insp-sel" id="s-hmode"><option value="fill">Fill height</option><option value="fixed">Fixed height</option><option value="max">Max height</option></select>
             </div>
-            <div id="s-blockLayout" style="display:grid;grid-template-columns:auto 1fr;gap:14px;margin-top:12px;align-items:start">
+            <div id="s-blockLayout" style="display:grid;gap:12px;margin-top:12px">
               <div><div class="fig-label" style="margin-bottom:5px">Alignment</div>
                 <div class="fig-align" id="s-align3">
                   <span class="seg"><button type="button" data-h="left" title="Align left"><span class="ms">format_align_left</span></button><button type="button" data-h="center" title="Align centre"><span class="ms">format_align_center</span></button><button type="button" data-h="right" title="Align right"><span class="ms">format_align_right</span></button></span>
