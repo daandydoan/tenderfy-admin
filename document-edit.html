@@ -295,12 +295,10 @@
     <div class="ed3 st-on">
       <!-- LEFT: Blocks palette + Layers -->
       <div class="ed3-col" id="leftCol">
-        <div class="ws-tabs"><button class="on" data-wtab="blocks">Blocks</button><button data-wtab="style">Style</button><button data-wtab="layers">Layers</button></div>
+        <div class="ws-tabs"><button class="on" data-wtab="blocks">Blocks</button><button data-wtab="style">Style</button><button data-wtab="ai">AI Draft</button><button data-wtab="layers">Layers</button></div>
         <div id="paneBlocks">
           <div class="card">
             <h3 class="ed-h" style="display:flex;align-items:center;gap:8px">Blocks <span class="muted" style="font-weight:400;font-size:12px" id="pal-count"></span><a href="block-edit.html" title="Create a new block" style="margin-left:auto;font-size:12px;color:var(--teal);text-decoration:none;font-weight:600"><span class="ms" style="font-size:14px;vertical-align:-2px">add</span> New block</a></h3>
-            <button type="button" class="btn btn-ray btn-sm btn-block" id="raySuggestBlocksBtn" style="margin-bottom:8px"><span class="ms" style="font-size:15px">auto_awesome</span> Suggest blocks with Ray</button>
-            <div id="rayBlockSuggestions"></div>
             <div class="d-search"><span class="ms">search</span><input id="pq" placeholder="Search blocks…"></div>
             <div class="vb-pal" id="palette"></div>
           </div>
@@ -401,6 +399,25 @@
         </div>
       </div>
         </div></div>
+        <div id="paneAi" style="display:none"><div class="card">
+            <div class="ray-draft">
+              <div class="ray-h"><span class="ms">auto_awesome</span> Draft a document from a client file <span class="fld-opt" style="margin-left:auto;font-weight:500">with Tenderfy AI (Ray)</span></div>
+              <div class="ray-lbl">Client's document (reference)</div>
+              <div class="ray-ref" id="rayDocRef">
+                <input type="file" accept="image/*" id="rayDocImg" hidden>
+                <label for="rayDocImg" class="ray-drop"><span class="ms">upload_file</span> Add a client document to match</label>
+              </div>
+              <div class="ray-lbl">Description</div>
+              <textarea id="rayDocPrompt" class="fin" rows="2" placeholder="Describe the document — e.g. “a case study for a council road project”"></textarea>
+              <button type="button" class="btn btn-ray btn-sm" id="rayDocBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft document</button>
+            </div>
+            <div class="insp-sec" data-sec="suggest" style="margin-top:14px">
+              <div class="insp-h">Suggest blocks</div>
+              <div class="fhint" style="margin-bottom:8px">Ray picks blocks that fit this document's name, type and description — add the ones you want.</div>
+              <button type="button" class="btn btn-ray btn-sm btn-block" id="raySuggestBlocksBtn" style="margin-bottom:8px"><span class="ms" style="font-size:15px">auto_awesome</span> Suggest blocks with Ray</button>
+              <div id="rayBlockSuggestions"></div>
+            </div>
+        </div></div>
         <div id="paneLayers" style="display:none">
           <div class="side-title">Layers</div>
           <!-- Background layer -->
@@ -475,17 +492,6 @@
   <div class="cfm dlg">
     <div class="dlg-h"><span class="dlg-ic"><span class="ms">description</span></span><div class="dlg-t"><h3>Document details</h3><div class="sub">Who it's for and what it is — shown in the library.</div></div><button type="button" class="dlg-x" id="docDialogX" title="Close"><span class="ms">close</span></button></div>
     <div class="dlg-b">
-      <div class="ray-draft">
-        <div class="ray-h"><span class="ms">auto_awesome</span> Draft with Ray</div>
-        <div class="ray-lbl">Client's document (reference)</div>
-        <div class="ray-ref" id="rayDocRef">
-          <input type="file" accept="image/*" id="rayDocImg" hidden>
-          <label for="rayDocImg" class="ray-drop"><span class="ms">upload_file</span> Add a client document to match</label>
-        </div>
-        <div class="ray-lbl">Description</div>
-        <textarea id="rayDocPrompt" class="fin" rows="2" placeholder="Describe the document — e.g. “a case study for a council road project”"></textarea>
-        <button type="button" class="btn btn-ray btn-sm" id="rayDocBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft it</button>
-      </div>
       <div class="fld"><label for="d-client">Client this document is for</label><select class="fin" id="d-client"></select></div>
       <div class="fhint" id="d-client-hint" style="margin:-6px 0 12px">Brand-neutral — no client brand applied.</div>
       <div class="fld"><label for="d-type">Document type</label><select class="fin" id="d-type"></select></div>
@@ -916,7 +922,7 @@ function pageInit(){
     return ['heading','paragraph','imgtext','list','doc-details'];
   }
   function rayDraftDoc(desc){
-    items = raySeqFor(desc).filter(id=>bById[id]).map(mkInst);
+    items = raySeqFor(desc).filter(id=>bById[id]).map(id=>mkInst(id));   // not .map(mkInst): the index would land in isEl
     selK=null; render(); renderInspector();
     return items.length;
   }
@@ -946,12 +952,12 @@ function pageInit(){
   document.getElementById('rayDocBtn').addEventListener('click',()=>{
     const p=document.getElementById('rayDocPrompt').value.trim();
     if(!p && !document.getElementById('d-type').value && !rayDocHasImg){ showToast('Add a client document, describe it, or pick a type'); return; }
-    const n=rayDraftDoc(p); closeDocDialog();
+    const n=rayDraftDoc(p);
     showToast('Ray drafted '+n+' blocks'+(rayDocHasImg?' to match your reference':'')+' — refine, then Save');
   });
 
   // ---- Left-panel tabs (Blocks / Style / Layers) ----
-  const PANES={blocks:'paneBlocks',style:'paneStyle',layers:'paneLayers'};
+  const PANES={blocks:'paneBlocks',style:'paneStyle',ai:'paneAi',layers:'paneLayers'};
   function showLeftTab(which){
     document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.wtab===which));
     Object.entries(PANES).forEach(([k,id])=>{ const el=document.getElementById(id); const show=k===which; if(show && el.style.display==='none'){ el.classList.remove('tab-in'); void el.offsetWidth; el.classList.add('tab-in'); } el.style.display=show?'':'none'; });
