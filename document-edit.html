@@ -107,12 +107,12 @@
   .doc-empty{border:1.5px dashed #b3beba;border-radius:10px;padding:44px 20px;text-align:center;color:var(--gray);margin:auto;width:100%}
   .doc-empty .ms.big{font-size:32px;color:var(--light);display:block;margin-bottom:8px}
   /* Blocks in the document render exactly like the block listing cards */
-  .doc-blk{position:relative;margin-bottom:0;cursor:pointer;padding:26px 12px 14px;border-radius:10px;border:1.5px solid transparent}   /* same frame on every block, hovered or selected — nothing jumps; top room for the chips */
+  .doc-blk{position:relative;margin-bottom:0;cursor:pointer;padding:16px 12px 8px;border-radius:10px;border:1.5px solid transparent}   /* same frame on every block, hovered or selected — nothing jumps; top room for the chips */
   .doc-blk:hover{border-color:var(--teal)}
   .doc-blk .vb-name{position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:4px;opacity:0;transition:opacity .1s;pointer-events:none;z-index:2}
   .doc-blk .vb-name .ms{font-size:12px}
   .doc-blk:hover .vb-name,.doc-blk.sel .vb-name{opacity:1}
-  .doc-blk .pv-blk{outline:none!important;cursor:inherit}
+  .doc-blk .pv-blk{outline:none!important;cursor:inherit;margin-bottom:0!important} .doc-blk .pv-blk>:last-child{margin-bottom:0!important}   /* the frame + insert line are the spacing in Build */
   /* Inside the selected block, each element gets the block builder's chrome: hover outline, name chip, selection */
   .doc-blk.sel [data-el]{position:relative;border:1.5px solid transparent;border-radius:7px;padding:4px 5px;margin:-4px -5px;cursor:pointer}
   .doc-blk.sel [data-el]:hover{border-color:var(--teal)}
@@ -120,7 +120,8 @@
   .doc-blk.sel [data-el]::before{content:attr(data-elname);position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:5px;opacity:0;pointer-events:none;z-index:2;transition:opacity .1s}
   .doc-blk.sel [data-el]:hover::before,.doc-blk.sel [data-el].esel::before{opacity:1}
   .doc-blk.sel [contenteditable]{outline:none;cursor:text;border-radius:3px} .doc-blk.sel [contenteditable]:focus{box-shadow:0 0 0 2px var(--teal-tint)}
-  .doc-body > .vb-ins:first-of-type{height:18px}   /* room for the first chip under the letterhead slot */
+  .doc-ins{height:12px;margin:-4px 0} .doc-ins::before{top:5px} .doc-ins .ms{top:-5px}   /* tighter gap between blocks; the line still has a hoverable strip */
+  .doc-body > .vb-ins:first-of-type{height:16px;margin-top:0}   /* room for the first chip under the letterhead slot */
   .vb-canvas.preview .vb-ins,.vb-canvas.preview .doc-tools,.vb-canvas.preview .vb-name,.vb-canvas.preview .pg-brk{display:none!important}
   .doc-blk.dragging{opacity:.4}
   .doc-tools{position:absolute;top:-12px;right:10px;display:flex;gap:3px;opacity:0;transition:.1s;z-index:2}
@@ -861,7 +862,7 @@ function pageInit(){
   // Styles every A4 page in the stage (one in Layout, one-per-page in Preview).
   function applyDocStyle(){
     document.querySelectorAll('#canvas .vb-page').forEach(p=>{ p.style.background=docStyle.bg; p.style.borderRadius=docStyle.rad+'px'; });
-    document.querySelectorAll('#canvas .doc-body').forEach(b=>{ b.style.padding=docStyle.pad+'px'; b.style.gap=(mode==='preview'?0:docStyle.gap)+'px'; });
+    document.querySelectorAll('#canvas .doc-body').forEach(b=>{ b.style.padding=docStyle.pad+'px'; b.style.gap='0px'; });
   }
   // Re-paginate in Preview when page metrics change; otherwise just restyle.
   function syncDoc(){ if(mode==='preview') render(); else applyDocStyle(); }
