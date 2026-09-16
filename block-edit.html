@@ -110,6 +110,10 @@
   .vb-block .vb-name{opacity:.45}   /* always readable at a glance; full on hover/select */
   .vb-el:hover .vb-name,.vb-el.selected .vb-name{opacity:1}
   #s-richRow{display:block!important} #s-richRow[hidden]{display:none!important}
+  .typo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+  .typo-grid .fig-label{margin-bottom:5px}
+  .typo-grid .fig-field input{width:100%;min-width:0;border:none;background:transparent;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;padding:0}
+  .typo-grid .fig-field{flex:1;width:100%}
   .rte{border:1px solid var(--border);border-radius:8px;background:#fff;overflow:hidden}
   .rte:focus-within{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-tint)}
   .rte-bar{display:flex;align-items:center;gap:2px;padding:4px 6px;border-bottom:1px solid var(--border);background:#fafbfb;flex-wrap:wrap}
@@ -484,16 +488,15 @@
               </div>
               <div class="rich-box" id="s-richBox" contenteditable="true" spellcheck="true" data-placeholder="Type your text…"></div>
             </div><div class="fhint" id="s-richHint" style="margin-top:4px"></div></div>
-            <div class="insp-row" data-field="font"><label>Font</label><select class="insp-sel" id="s-font"></select></div>
-            <div class="insp-row" data-field="weight"><label>Weight</label><select class="insp-sel" id="s-weight"><option value="">Inherit from brand</option><option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select></div>
-            <div class="insp-row" data-field="sizelh"><label>Size</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-size" placeholder="brand"><span class="insp-unit">px</span><input type="number" class="insp-num" id="s-lh" placeholder="brand"><span class="insp-unit">line</span></div></div>
-            <div class="insp-row" data-field="color"><label>Colour</label><div class="insp-ctl"><input type="color" class="insp-color" id="s-color"><input type="text" class="insp-hex" id="s-colorH" placeholder="Inherit from brand"></div></div>
-            <div class="insp-row" data-field="align"><label>Align</label><div class="seg" id="s-align">
-              <button data-al="left" title="Left"><span class="ms">format_align_left</span></button>
-              <button data-al="center" title="Centre"><span class="ms">format_align_center</span></button>
-              <button data-al="right" title="Right"><span class="ms">format_align_right</span></button>
-              <button data-al="justify" title="Justify"><span class="ms">format_align_justify</span></button>
-            </div></div>
+            <div class="typo-grid" data-field="font">
+              <select class="insp-sel" id="s-font" style="grid-column:1/-1"></select>
+              <select class="insp-sel" id="s-weight"><option value="">Weight · brand</option><option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select>
+              <span class="fig-field" title="Size"><span class="ms fig-ic">format_size</span><input type="number" id="s-size" placeholder="Brand"><span class="insp-unit">px</span></span>
+              <div><div class="fig-label">Line height</div><span class="fig-field" title="Line height"><span class="ms fig-ic">format_line_spacing</span><input type="number" id="s-lh" placeholder="Auto"><span class="insp-unit">px</span></span></div>
+              <div><div class="fig-label">Letter spacing</div><span class="fig-field" title="Letter spacing"><span class="ms fig-ic">text_fields</span><input type="number" id="s-ls" step="0.1" placeholder="0"><span class="insp-unit">px</span></span></div>
+              <div style="grid-column:1/-1"><div class="fig-label">Colour</div><div class="insp-ctl"><input type="color" class="insp-color" id="s-color"><input type="text" class="insp-hex" id="s-colorH" placeholder="Inherit from brand"></div></div>
+              <div style="grid-column:1/-1"><div class="fig-label">Alignment</div><div class="fig-align"><span class="seg" id="s-align"><button type="button" data-al="left" title="Left"><span class="ms">format_align_left</span></button><button type="button" data-al="center" title="Centre"><span class="ms">format_align_center</span></button><button type="button" data-al="right" title="Right"><span class="ms">format_align_right</span></button><button type="button" data-al="justify" title="Justify"><span class="ms">format_align_justify</span></button></span></div></div>
+            </div>
             <div class="fhint" style="margin:2px 0 0">Blank fields inherit the client’s brand &amp; styling.</div>
           </div>
           <div class="insp-sec" data-sec="border" data-need="rad,bcolor,bwstyle,bg">
@@ -945,7 +948,7 @@ function pageInit(){
     node.style.textAlign = st.align||'';
     const typo={};
     if(st.font) typo.fontFamily=`'${st.font}',sans-serif`; if(st.weight) typo.fontWeight=st.weight;
-    if(st.size) typo.fontSize=st.size+'px'; if(st.lh) typo.lineHeight=st.lh+'px'; if(st.color) typo.color=st.color;
+    if(st.size) typo.fontSize=st.size+'px'; if(st.lh) typo.lineHeight=st.lh+'px'; if(st.ls) typo.letterSpacing=st.ls+'px'; if(st.color) typo.color=st.color;
     [node, ...node.querySelectorAll('h1,h2,h3,h4,h5,p,li,span,a,blockquote,strong,em,td,th,ul,div')].forEach(n=>Object.assign(n.style,typo));
   }
   function elNode(r,c,k){ return page.querySelector(`.vb-el[data-r="${r}"][data-c="${c}"][data-k="${k}"] .vb-body`); }
@@ -970,7 +973,7 @@ function pageInit(){
     document.querySelectorAll('#styleCard .insp-sec[data-sec]').forEach(sec=>{
       // Gate individual labelled rows (typography, style, etc.) by their field.
       let anyRow=false;
-      sec.querySelectorAll('.insp-row[data-field]').forEach(row=>{ const show=allowed.has(row.dataset.field); row.style.display=show?'':'none'; if(show)anyRow=true; });
+      sec.querySelectorAll('.insp-row[data-field],.typo-grid[data-field]').forEach(row=>{ const show=allowed.has(row.dataset.field); row.style.display=show?'':'none'; if(show)anyRow=true; });
       // Sections built from fig-* controls declare which field(s) unlock them.
       const need=(sec.dataset.need||'').split(',').filter(Boolean);
       const needMet = need.length ? need.some(f=>allowed.has(f)) : false;
@@ -1093,7 +1096,7 @@ function pageInit(){
     const t=target();
     const setR=(rId,nId,k)=>{ document.getElementById(rId).value=t[k]||0; document.getElementById(nId).value=t[k]||0; };
     fillBoxB('pad'); fillBoxB('mar'); fillRadB(); document.getElementById('s-sp').value=blockStyle.sp||0;
-    document.getElementById('s-size').value=t.size||''; document.getElementById('s-lh').value=t.lh||''; document.getElementById('s-bw').value=t.bw||0;
+    document.getElementById('s-size').value=t.size||''; document.getElementById('s-lh').value=t.lh||''; document.getElementById('s-ls').value=t.ls||''; document.getElementById('s-bw').value=t.bw||0;
     document.getElementById('s-font').value=t.font||''; document.getElementById('s-weight').value=t.weight||''; document.getElementById('s-bstyle').value=t.bstyle||'solid';
     syncColor('bg'); syncColor('bcolor');
     document.getElementById('s-color').value=t.color||'#333333'; document.getElementById('s-colorH').value=t.color||'';
@@ -1123,7 +1126,7 @@ function pageInit(){
     document.getElementById('s-bcolorBind').innerHTML=`<option value="">Custom colour</option>${colOpts}`;
     wireBoxB('pad'); wireBoxB('mar'); wireRadB();
     document.getElementById('s-sp').addEventListener('input',e=>{ blockStyle.sp=Math.max(0,Math.min(200,Math.round(+e.target.value||0))); applyActive(); commitStyle(); });
-    bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-bw','bw');
+    bindNum('s-size','size'); bindNum('s-lh','lh'); bindNum('s-ls','ls'); bindNum('s-bw','bw');
     bindSel('s-font','font'); bindSel('s-weight','weight'); bindSel('s-bstyle','bstyle');
     bindColor('s-bg','s-bgH','bg'); bindColor('s-color','s-colorH','color'); bindColor('s-bcolor','s-bcolorH','bcolor');
     document.getElementById('s-bgBind').addEventListener('change',e=>{ target().bgBind=e.target.value; applyActive(); syncInspector(); commitStyle(); });
