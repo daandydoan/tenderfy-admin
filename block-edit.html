@@ -350,6 +350,7 @@
             <div class="ray-lbl">What is it? <span class="fld-opt">· optional</span></div>
             <textarea id="aiPrompt" class="fin" rows="2" placeholder="e.g. our safety commitment with a stats table"></textarea>
             <button type="button" class="btn btn-ray btn-sm" id="aiBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft block</button>
+            <a class="lnk" id="aiSample" style="margin-left:10px;font-size:12px">Try with a sample</a>
           </div>
           <div class="fhint" style="margin-top:10px">Ray reads the image and lays it out as elements with the words it finds — you edit from there. Paste anywhere on the page to add an image.</div>
         </div>
@@ -1290,7 +1291,20 @@ function pageInit(){
   function readAiFile(f){ if(!f||!f.type.startsWith('image/')) return; if(f.size>3e6){ showToast('Image too large — keep it under 3 MB'); return; } const rd=new FileReader(); rd.onload=()=>{ setAiImage(rd.result, f.name); showTab('ai'); }; rd.readAsDataURL(f); }
   setAiImage(null);
   document.addEventListener('paste',e=>{ if(e.target.closest && e.target.closest('[contenteditable],input,textarea') && !e.target.closest('#aiPane')) return; const f=[...(e.clipboardData||{}).files||[]].find(x=>x.type.startsWith('image/')); if(f){ e.preventDefault(); readAiFile(f); } });
+  // Demo sample: a drawn "scan" of a safety section + the real words Ray would read from it. Used by
+  // "Try with a sample" and whenever Draft is pressed with nothing attached.
+  const SAMPLE_DESC='Our safety commitment with a stats table';
+  const SAMPLE_SVG='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="640" height="360" fill="#fbfaf6"/><text x="36" y="48" font-family="Georgia,serif" font-size="20" font-weight="700" fill="#1f2a2e">4.2 Safety Management System</text><text x="36" y="80" font-family="Georgia,serif" font-size="15" font-weight="700" fill="#27535C">Our commitment</text>${['Northside Civil operates a certified Safety Management System (AS/NZS ISO 45001)','covering all civil, drainage and traffic-management works. Every project is delivered','under a site-specific WHS Management Plan reviewed by our HSEQ Manager before mobilisation.'].map((l,i)=>`<text x="36" y="${104+i*20}" font-family="Georgia,serif" font-size="13" fill="#333">${l}</text>`).join('')}<text x="36" y="188" font-family="Georgia,serif" font-size="15" font-weight="700" fill="#27535C">Safety performance (last 24 months)</text>${[['Lost-time injuries','0'],['Total recordable injury frequency rate','2.1'],['Toolbox talks delivered','412'],['Site inductions completed','1,180']].map((r,i)=>`<line x1="36" x2="604" y1="${214+i*28}" y2="${214+i*28}" stroke="#ddd"/><text x="40" y="${232+i*28}" font-family="Georgia,serif" font-size="13" fill="#333">${r[0]}</text><text x="600" y="${232+i*28}" text-anchor="end" font-family="Georgia,serif" font-size="13" font-weight="700" fill="#333">${r[1]}</text>`).join('')}</svg>`);
+  function sampleEls(){ const mk=(id,content)=>{ const e=mkEl(id); e.content=content; return e; }; return [
+    mk('subheading',{title:'Our commitment'}),
+    mk('paragraph',{body:'Northside Civil operates a certified Safety Management System (AS/NZS ISO 45001) covering all civil, drainage and traffic-management works. Every project is delivered under a site-specific WHS Management Plan reviewed by our HSEQ Manager before mobilisation.'}),
+    mk('subheading',{title:'Safety performance (last 24 months)'}),
+    mk('keyvalue',{pairs:[['Lost-time injuries','0'],['Total recordable injury frequency rate','2.1'],['Toolbox talks delivered','412'],['Site inductions completed','1,180']]}),
+  ]; }
+  function useSample(){ setAiImage(SAMPLE_SVG,'sample-safety-section.png'); document.getElementById('aiPrompt').value=SAMPLE_DESC; showTab('ai'); }
+  document.getElementById('aiSample').addEventListener('click',useSample);
   function aiDraft(desc){
+    if(aiImage===SAMPLE_SVG) return sampleEls();
     const d=(desc||'').toLowerCase(), mk=(id,content)=>{ const e=mkEl(id); if(content) e.content=content; return e; };
     const title = desc ? desc.charAt(0).toUpperCase()+desc.slice(1).replace(/\s+(with|and)\s+.*$/,'') : 'Section from image';
     const els=[mk('subheading',{title})];
@@ -1309,8 +1323,8 @@ function pageInit(){
   document.getElementById('refClose').addEventListener('click',()=>document.getElementById('refModal').classList.remove('open'));
   document.getElementById('refModal').addEventListener('click',e=>{ if(e.target.id==='refModal') e.currentTarget.classList.remove('open'); });
   document.getElementById('aiBtn').addEventListener('click',()=>{
-    const desc=document.getElementById('aiPrompt').value.trim();
-    if(!aiImage && !desc){ showToast('Add an image or say what the block is'); return; }
+    let desc=document.getElementById('aiPrompt').value.trim();
+    if(!aiImage && !desc){ useSample(); desc=document.getElementById('aiPrompt').value.trim(); }   // demo: nothing attached → draft from the built-in sample
     const go=()=>{ doc.push({cols:[aiDraft(desc)]}); source='Drafted by Ray from '+(aiImage?'an image':'a description'); if(aiImage) setRefThumb(aiImage); if(!document.getElementById('b-label').value.trim() && desc){ document.getElementById('b-label').value=desc.charAt(0).toUpperCase()+desc.slice(1).replace(/\s+(with|and)\s+.*$/,''); syncBar(); }
       sel=null; render(); commit(); showToast('Ray drafted a starting point — check the words against the image, then Save'); };
     go();
