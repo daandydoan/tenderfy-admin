@@ -375,8 +375,8 @@
         </div>
         <div class="card" id="codePane" style="display:none">
           <div class="cd-head"><h3 class="ed-h" style="margin:0">HTML</h3><button class="btn btn-outline btn-sm" id="codeCopy"><span class="ms" style="font-size:15px">content_copy</span> Copy</button></div>
-          <textarea id="codeArea" class="code-ta" spellcheck="false" readonly></textarea>
-          <div class="fhint" style="margin-top:8px">What a document renders for this block, in the brand you’re previewing. Generated from the canvas — edit there.</div>
+          <textarea id="codeArea" class="code-ta" spellcheck="false" placeholder="<div>Your block markup…</div>"></textarea>
+          <div class="fhint" style="margin-top:8px">Generated from the canvas. Edit it and the block becomes a custom-HTML block — use <code>var(--brand-primary)</code>, <code>var(--brand-secondary)</code> and <code>{{client.name}}</code> so it still renders per client.</div>
         </div>
         <div class="card" id="styleCard" style="display:none">
           <h3 class="ed-h">Style</h3>
@@ -611,7 +611,7 @@ function kindOf(id){
 }
 
 function pageInit(){
-  const ELEMS=Object.fromEntries(PRIMITIVES.map(p=>[p.id,p.name]));
+  const ELEMS=Object.fromEntries(PRIMITIVES.map(p=>[p.id,p.name])); ELEMS.html='Custom HTML';
   const clone=x=>JSON.parse(JSON.stringify(x));
   const _params=new URLSearchParams(location.search||location.hash.slice(1));
   const id=_params.get('id');
@@ -775,7 +775,11 @@ function pageInit(){
   }
   // Build / Preview: preview swaps the editable canvas for the shared renderer's output — the same HTML a document gets.
   let previewMode=false;
-  function renderCodeTab(){ const ta=document.getElementById('codeArea'); if(!ta) return; if(!doc.length){ ta.value=''; return; } P2DOC.__preview=doc; ta.value=composeBlock({p:'__preview'}, brand).replace(/></g,'>\n<'); }
+  const isHtmlBlock=()=>doc.length===1 && doc[0].cols.length===1 && doc[0].cols[0].length===1 && doc[0].cols[0][0].id==='html';
+  let codeSyncing=false;
+  function renderCodeTab(){ const ta=document.getElementById('codeArea'); if(!ta || document.activeElement===ta) return; if(!doc.length){ ta.value=''; return; } if(isHtmlBlock()){ ta.value=doc[0].cols[0][0].content.html; return; } P2DOC.__preview=doc; ta.value=composeBlock({p:'__preview'}, brand).replace(/></g,'>\n<'); }
+  // Typing in the Code tab replaces the canvas with one custom-HTML element holding that markup (debounced).
+  let codeT=null; document.getElementById('codeArea').addEventListener('input',()=>{ clearTimeout(codeT); codeT=setTimeout(()=>{ const html=document.getElementById('codeArea').value; const el=mkEl('html'); el.content={html}; doc=[{cols:[[el]]}]; sel=null; render(); commit(); },400); });
   document.getElementById('codeCopy').addEventListener('click',()=>{ navigator.clipboard.writeText(document.getElementById('codeArea').value).then(()=>showToast('HTML copied')); });
   function renderPreview(){ if(!doc.length) return; P2DOC.__preview=doc; page.innerHTML=`<div class="vb-block" id="blockWrap">${composeBlock({p:'__preview'}, brand)}</div>`; applyBlockStyle(); }
   document.querySelectorAll('#modeSeg button').forEach(b=>b.addEventListener('click',()=>{ previewMode=b.dataset.m==='preview'; document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x===b)); page.classList.toggle('preview',previewMode); sel=null; render(); }));
@@ -1271,10 +1275,8 @@ function pageInit(){
   function autosave(){ clearTimeout(autoT); autoT=setTimeout(()=>{ try{ localStorage.setItem(DKEY, JSON.stringify({doc, blockStyle, fields:fields(), slot:blockSlot, source})); }catch(e){} const t=new Date(); document.getElementById('autosave').innerHTML=`<span class="ms">cloud_done</span> Autosaved · ${t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`; },600); }
   function resumeDraft(){
     let d; try{ d=JSON.parse(localStorage.getItem(DKEY)); }catch(e){} if(!d || !(d.doc&&d.doc.length)) return;
-    confirmAction({title:'Resume unsaved draft?',body:'You have autosaved changes to this block that were never saved. Pick up where you left off, or discard them.',confirm:'Resume',cancel:'Discard'},()=>{
       doc=normDoc(d.doc); Object.assign(blockStyle, d.blockStyle||{}); Object.entries(d.fields||{}).forEach(([i,v])=>{ document.getElementById(i).value=v; }); if(d.slot) blockSlot=d.slot; source=d.source||'';
-      sel=null; applyStationeryUI(); render(); syncBar(); pushHist(); showToast('Draft restored');
-    }, ()=>{ try{ localStorage.removeItem(DKEY); }catch(e){} });
+    sel=null; applyStationeryUI(); render(); syncBar(); pushHist(); showToast('Picked up your unsaved draft');
   }
   // Dirty = anything differs from what was loaded (or last saved). Guards every way off the page.
   let base='', leaving=false;

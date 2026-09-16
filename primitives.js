@@ -24,7 +24,7 @@ const PRIMITIVES = [
 // Element categories, in palette order.
 const PRIM_TAGS = ['Text','Media','Data','Sign-off','Layout','Document'];
 // Icon per element — shared by the block editor and the document editor palettes.
-const PRIM_ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height',field:'data_object',callout:'campaign',stat:'trending_up',button:'smart_button',cover:'title',toc:'toc',pagebreak:'insert_page_break'};
+const PRIM_ICON={heading:'title',subheading:'subtitles',paragraph:'notes',list:'format_list_bulleted',quote:'format_quote',image:'image',table:'table_chart',keyvalue:'list_alt',signature:'draw',divider:'horizontal_rule',spacer:'height',field:'data_object',callout:'campaign',stat:'trending_up',button:'smart_button',cover:'title',toc:'toc',pagebreak:'insert_page_break',html:'code'};
 
 // Render a primitive with real sample content, styled by the brand tokens.
 // b = { primary, secondary, background, font, bodyFont }
@@ -89,6 +89,8 @@ function renderPrimitive(id, b, c){
       const rows = c.rows || [['1. Executive summary','2'],['2. Company profile','4'],['3. Methodology','7'],['4. Pricing','12']];
       return `<div style="${T};font-size:13px;color:${soft}">${rows.map(r=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted #cfd6d4" data-ek="row"><span data-ec>${esc(r[0])}</span><span style="color:#7A8583" data-ec>${esc(r[1])}</span></div>`).join('')}</div>`;
     }
+    case 'html':   // custom markup from the Code tab — rendered as-is (admin-authored, trusted)
+      return c.html||'';
     case 'pagebreak':
       return `<div style="${T};display:flex;align-items:center;gap:10px;color:#9aa5a3;font-size:11px;text-transform:uppercase;letter-spacing:.4px"><span style="flex:1;border-top:1.5px dashed #c2ccc9"></span>Page break<span style="flex:1;border-top:1.5px dashed #c2ccc9"></span></div>`;
     default:
