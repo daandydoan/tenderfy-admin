@@ -291,7 +291,19 @@
   .seg button .ms{font-size:16px}
   #saveModal .cfm,#verModal .cfm{text-align:left;max-width:460px;max-height:90vh;overflow-y:auto}
   #saveModal .cfm{max-width:840px}
-  #saveModal .cfm h3,#verModal .cfm h3{margin-bottom:2px}
+  /* Dialogs: icon + heading/sub + close, grey scrolling body, actions along the bottom (primary right) */
+  .cfm.dlg{text-align:left;padding:0;display:flex;flex-direction:column;max-height:88vh;overflow:hidden;border-radius:18px}
+  .dlg-h{display:flex;align-items:flex-start;gap:14px;padding:20px 22px 18px;background:#fff}
+  .dlg-ic{width:44px;height:44px;border-radius:12px;background:#FBF1E3;color:#C58A3A;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .dlg-ic .ms{font-size:22px}
+  .dlg-t{flex:1;min-width:0;padding-top:2px} .dlg-t h3{margin:0;font-size:18px} .dlg-t .sub{color:var(--gray);font-size:13px;margin-top:3px}
+  .dlg-x{border:none;background:transparent;color:var(--ink);cursor:pointer;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0;margin:-4px -6px 0 0} .dlg-x:hover{background:#f2f5f4} .dlg-x .ms{font-size:20px}
+  .dlg-b{padding:20px 22px;overflow:auto;flex:1;min-height:0;background:#ECEEED}
+  .dlg-b>.fld:last-child,.dlg-b>.ws-check:last-child{margin-bottom:0}
+  .dlg-b .fin,.dlg-b .code-ta,.dlg-b .pick-list,.dlg-b .ver-list{background:#fff}
+  .dlg-f{display:flex;gap:10px;align-items:center;padding:16px 22px;background:#fff}
+  .dlg-sp{flex:1}
+  .dlg-f .btn{min-width:0;border-radius:12px;padding:11px 22px;font-size:14px}
   #saveModal .cfm .sub,#verModal .cfm .sub{color:var(--gray);font-size:12.5px;margin-bottom:14px}
   .cfm-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
   .cfm-col{min-width:0;display:flex;flex-direction:column}
@@ -555,10 +567,9 @@
 </div>
 
 <div class="modal-overlay" id="saveModal">
-  <div class="cfm" style="text-align:left;max-width:460px">
-    <h3 id="svTitle">Save block</h3>
-    <div class="sub" id="svSub" style="color:var(--gray);font-size:12.5px;margin:-2px 0 14px">How it appears in the Blocks list and to the client.</div>
-    <div class="fld"><label for="b-label2">Name <span class="fld-opt">· what the client sees</span></label><input class="fin" id="b-label2" placeholder="e.g. Our safety commitment"></div>
+  <div class="cfm dlg" style="max-width:460px">
+    <div class="dlg-h"><span class="dlg-ic"><span class="ms">save</span></span><div class="dlg-t"><h3 id="svTitle">Save block</h3><div class="sub" id="svSub">How it appears in the Blocks list and to the client.</div></div><button type="button" class="dlg-x" data-close title="Close"><span class="ms">close</span></button></div>
+    <div class="dlg-b"><div class="fld"><label for="b-label2">Name <span class="fld-opt">· what the client sees</span></label><input class="fin" id="b-label2" placeholder="e.g. Our safety commitment"></div>
     <div class="fld"><label for="b-cat">Category</label><select class="fin" id="b-cat"></select></div>
     <div class="fld" id="slotFld" style="display:none"><label>Save as</label>
       <div class="seg full" id="b-slot"><button type="button" data-slot="header" class="on"><span class="ms" style="font-size:16px">flip_to_front</span> Letterhead</button><button type="button" data-slot="footer"><span class="ms" style="font-size:16px">flip_to_back</span> Footer</button></div>
@@ -568,28 +579,40 @@
     <label class="ws-check"><input type="checkbox" id="b-share"> <span>Share as a generic template <span class="fld-opt">· other clients can use it — check it holds nothing specific to this client</span></span></label>
     <div class="fld" id="previewFld" style="display:none"><label>Preview image <span class="fld-opt">· optional</span></label>
       <div class="thumbovr"><div class="thumbovr-box" id="thumbOvrBox"></div><div class="thumbovr-acts"><label class="btn btn-outline btn-sm"><span class="ms" style="font-size:16px">image</span> Upload image<input type="file" id="thumbFile" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label><a class="btn btn-outline btn-sm" id="thumbAuto" style="display:none"><span class="ms" style="font-size:16px">auto_awesome</span> Use auto</a></div></div>
-    </div>
-    <div class="cfm-acts"><a class="btn btn-outline" id="svCancel">Cancel</a><a class="btn btn-primary" id="svConfirm"><span class="ms" style="font-size:17px">save</span> Save block</a></div>
+    </div></div>
+    <div class="dlg-f"><a class="btn btn-outline" id="svCancel">Cancel</a><span class="dlg-sp"></span><a class="btn btn-primary" id="svConfirm"><span class="ms" style="font-size:17px">save</span> Save block</a></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="pickModal">
-  <div class="cfm" style="text-align:left;max-width:440px">
-    <h3>Who is this block for?</h3>
-    <div class="sub" style="color:var(--gray);font-size:12.5px;margin:-2px 0 14px">Blocks belong to a client and are drafted from their documents. Pick the client to open their file beside the canvas.</div>
-    <div class="pick-list" id="pickList"></div>
-    <div class="cfm-acts"><a class="btn btn-outline" href="blocks.html">Back to blocks</a><a class="btn btn-outline" id="pickGeneral"><span class="ms" style="font-size:17px">public</span> General library block</a></div>
+  <div class="cfm dlg" style="max-width:440px">
+    <div class="dlg-h"><span class="dlg-ic"><span class="ms">apartment</span></span><div class="dlg-t"><h3>Who is this block for?</h3><div class="sub">Blocks belong to a client and are drafted from their documents.</div></div><button type="button" class="dlg-x" data-close title="Close"><span class="ms">close</span></button></div>
+    <div class="dlg-b"><div class="pick-list" id="pickList"></div></div>
+    <div class="dlg-f"><a class="btn btn-outline" href="blocks.html">Back to blocks</a><span class="dlg-sp"></span><a class="btn btn-outline" id="pickGeneral"><span class="ms" style="font-size:17px">public</span> General library block</a></div>
   </div>
 </div>
 
-<div class="modal-overlay" id="refModal"><div class="cfm" style="max-width:900px"><img alt="reference"><div class="cfm-acts"><a class="btn btn-outline" id="refClose">Close</a></div></div></div>
-<div class="modal-overlay" id="codeModal"><div class="cfm" style="text-align:left;max-width:960px;width:92vw"><div class="cd-head"><h3 style="margin:0">HTML</h3><span class="fhint" style="margin:0">Edits apply to the block as you type</span></div><textarea id="codeAreaBig" class="code-ta" spellcheck="false" style="height:62vh;min-height:320px"></textarea><div class="cfm-acts"><a class="btn btn-primary" id="codeModalClose"><span class="ms" style="font-size:17px">check</span> Done</a></div></div></div>
+<div class="modal-overlay" id="refModal">
+  <div class="cfm dlg" style="max-width:900px">
+    <div class="dlg-h"><span class="dlg-ic"><span class="ms">image</span></span><div class="dlg-t"><h3>Reference image</h3><div class="sub">The screenshot this block was drafted from.</div></div><button type="button" class="dlg-x" data-close title="Close"><span class="ms">close</span></button></div>
+    <div class="dlg-b"><img alt="reference" style="max-width:100%;display:block;margin:0 auto;border-radius:8px"></div>
+    <div class="dlg-f"><span class="dlg-sp"></span><a class="btn btn-primary" id="refClose">Done</a></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="codeModal">
+  <div class="cfm dlg" style="max-width:960px;width:92vw">
+    <div class="dlg-h"><span class="dlg-ic"><span class="ms">code</span></span><div class="dlg-t"><h3>HTML</h3><div class="sub">Edits apply to the block as you type.</div></div><button type="button" class="dlg-x" data-close title="Close"><span class="ms">close</span></button></div>
+    <div class="dlg-b"><textarea id="codeAreaBig" class="code-ta" spellcheck="false" style="height:60vh;min-height:320px"></textarea></div>
+    <div class="dlg-f"><span class="dlg-sp"></span><a class="btn btn-primary" id="codeModalClose"><span class="ms" style="font-size:17px">check</span> Done</a></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="verModal">
-  <div class="cfm">
-    <h3>Version history</h3>
-    <div class="sub">Saved versions of this block. Restoring replaces the current canvas.</div>
-    <div class="ver-list" id="verList"></div>
-    <div class="cfm-acts"><a class="btn btn-outline" id="verClose">Close</a></div>
+  <div class="cfm dlg">
+    <div class="dlg-h"><span class="dlg-ic"><span class="ms">history</span></span><div class="dlg-t"><h3>Version history</h3><div class="sub">Saved versions of this block. Restoring replaces the current canvas.</div></div><button type="button" class="dlg-x" data-close title="Close"><span class="ms">close</span></button></div>
+    <div class="dlg-b"><div class="ver-list" id="verList"></div></div>
+    <div class="dlg-f"><span class="dlg-sp"></span><a class="btn btn-primary" id="verClose">Done</a></div>
   </div>
 </div>
 
@@ -1184,6 +1207,7 @@ function pageInit(){
       commit();
     });
   });
+  document.querySelectorAll('.dlg-x[data-close]').forEach(x=>x.addEventListener('click',()=>x.closest('.modal-overlay').classList.remove('open')));
   function selectEl(r,c,k){ sel={r,c,k}; applySelection(); syncInspector(); showTab('style'); }   // selecting an element opens its styling
   function applySelection(){
     page.querySelectorAll('.vb-el.selected').forEach(e=>e.classList.remove('selected'));
