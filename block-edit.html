@@ -249,12 +249,11 @@
   .fig-label{font-size:11.5px;color:var(--gray);font-weight:500}
   .fig-resize{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;align-items:center}
   .fig-resize .insp-sel{height:32px;padding:0 8px}
-  .fig-align{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:66px;height:52px;background:#f2f5f4;border-radius:7px;padding:3px}
-  .fig-align button{border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border-radius:5px}
-  .fig-align button::before{content:'';width:5px;height:5px;border-radius:50%;background:#aeb9b5;transition:all .1s}
-  .fig-align button:hover::before{background:#7d8b87}
-  .fig-align button.on{background:var(--teal-tint)}
-  .fig-align button.on::before{background:var(--teal);width:12px;height:3px;border-radius:2px}
+  .fig-align{display:flex;gap:6px}
+  .fig-align .seg{display:flex;gap:2px;background:#f2f5f4;border-radius:7px;padding:2px}
+  .fig-align button{width:26px;height:24px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border-radius:5px;color:#7d8b87}
+  .fig-align button .ms{font-size:16px} .fig-align button:hover{color:var(--ink)}
+  .fig-align button.on{background:#fff;color:var(--teal);box-shadow:0 1px 2px rgba(0,0,0,.08)}
   .insp-sel{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;color:var(--ink)}
   .insp-color{width:32px;height:30px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;flex-shrink:0}
   .insp-hex{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--ink)}
@@ -431,9 +430,8 @@
             <div id="s-blockLayout" style="display:grid;grid-template-columns:auto 1fr;gap:14px;margin-top:12px;align-items:start">
               <div><div class="fig-label" style="margin-bottom:5px">Alignment</div>
                 <div class="fig-align" id="s-align3">
-                  <button type="button" data-h="left" data-v="top" title="Top left"></button><button type="button" data-h="center" data-v="top" title="Top"></button><button type="button" data-h="right" data-v="top" title="Top right"></button>
-                  <button type="button" data-h="left" data-v="middle" title="Left"></button><button type="button" data-h="center" data-v="middle" title="Centre"></button><button type="button" data-h="right" data-v="middle" title="Right"></button>
-                  <button type="button" data-h="left" data-v="bottom" title="Bottom left"></button><button type="button" data-h="center" data-v="bottom" title="Bottom"></button><button type="button" data-h="right" data-v="bottom" title="Bottom right"></button>
+                  <span class="seg"><button type="button" data-h="left" title="Align left"><span class="ms">format_align_left</span></button><button type="button" data-h="center" title="Align centre"><span class="ms">format_align_center</span></button><button type="button" data-h="right" title="Align right"><span class="ms">format_align_right</span></button></span>
+                  <span class="seg"><button type="button" data-v="top" title="Align top"><span class="ms">vertical_align_top</span></button><button type="button" data-v="middle" title="Align middle"><span class="ms">vertical_align_center</span></button><button type="button" data-v="bottom" title="Align bottom"><span class="ms">vertical_align_bottom</span></button></span>
                 </div>
               </div>
               <div id="s-gapWrap"><div class="fig-label" style="margin-bottom:5px">Gap</div>
@@ -1083,7 +1081,7 @@ function pageInit(){
     else { wpxEl.value=t.wpx||0; wpxEl.disabled=false; }
     document.getElementById('s-hmode').value=t.hmode||'fill';
     document.getElementById('s-hpx').value=t.hpx||0; document.getElementById('s-hpx').disabled=((t.hmode||'fill')==='fill');
-    document.querySelectorAll('#s-align3 button').forEach(b=>b.classList.toggle('on', b.dataset.h===(t.alH||'left') && b.dataset.v===(sel ? ((doc[sel.r].valign||[])[sel.c]||'top') : (t.alV||'top'))));
+    { const v=sel ? ((doc[sel.r].valign||[])[sel.c]||'top') : (t.alV||'top'); document.querySelectorAll('#s-align3 button').forEach(b=>b.classList.toggle('on', b.dataset.h ? b.dataset.h===(t.alH||'left') : b.dataset.v===v)); }
     const e=selEl();
     if(e){ if(e.id==='field') document.getElementById('s-field').value=e.field;
       document.querySelectorAll('#s-imgsrc button').forEach(b=>b.classList.toggle('on',b.dataset.src===(e.src||'placeholder'))); }
@@ -1116,7 +1114,11 @@ function pageInit(){
     document.getElementById('s-wpx').addEventListener('input',e=>{ target().wpx=+e.target.value||0; applyActive(); commitStyle(); });
     document.getElementById('s-hmode').addEventListener('change',e=>{ target().hmode=e.target.value; document.getElementById('s-hpx').disabled=(e.target.value==='fill'); applyActive(); commitStyle(); });
     document.getElementById('s-hpx').addEventListener('input',e=>{ target().hpx=+e.target.value||0; applyActive(); commitStyle(); });
-    document.querySelectorAll('#s-align3 button').forEach(b=>b.addEventListener('click',()=>{ const t=target(); t.alH=b.dataset.h; if(sel){ const row=doc[sel.r]; row.valign=row.valign||[]; row.valign[sel.c]=b.dataset.v; const keep=sel; render(); sel=keep; applySelection(); } else { t.alV=b.dataset.v; applyActive(); } document.querySelectorAll('#s-align3 button').forEach(x=>x.classList.toggle('on',x===b)); commitStyle(); }));
+    document.querySelectorAll('#s-align3 button').forEach(b=>b.addEventListener('click',()=>{ const t=target();
+      if(b.dataset.h){ t.alH=b.dataset.h; applyActive(); }
+      else if(sel){ const row=doc[sel.r]; row.valign=row.valign||[]; row.valign[sel.c]=b.dataset.v; const keep=sel; render(); sel=keep; applySelection(); }
+      else { t.alV=b.dataset.v; applyActive(); }
+      b.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); commitStyle(); }));
     // Drag the icon to scrub the value (Width / Height / Gap / Weight), like the padding fields.
     document.querySelectorAll('.fig-wt').forEach(wt=>{ const ic=wt.querySelector('.ms'), inp=wt.querySelector('input'); if(!ic||!inp) return;
       figScrub(ic, ()=>+inp.value||0, v=>{ if(inp.disabled) return; const mn=+inp.min||0, mx=(inp.max!==''&&inp.max!=null)?+inp.max:1e5; inp.value=Math.max(mn,Math.min(mx,v)); inp.dispatchEvent(new Event('input',{bubbles:true})); }); });
