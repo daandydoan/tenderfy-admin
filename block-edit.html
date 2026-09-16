@@ -296,7 +296,8 @@
   .tb-btn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
   /* The left panel is a real side panel at every width: shown inline, or hidden so the canvas takes the row. */
   .ed3{transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1),column-gap .28s cubic-bezier(.4,0,.2,1)}
-  #leftCol{min-width:0;transition:opacity .22s ease,transform .28s cubic-bezier(.4,0,.2,1);transform-origin:left center}
+  #leftCol{min-width:0;transition:opacity .22s ease,transform .28s cubic-bezier(.4,0,.2,1);transform-origin:left center;display:flex;flex-direction:column;overflow:hidden}
+  #leftCol>.card{flex:1;min-height:0;overflow-y:auto;margin-bottom:0}   /* tabs stay put; the pane scrolls inside the card, so switching tabs never changes the column height */
   .ed3:not(.st-on){grid-template-columns:0px minmax(0,1fr);column-gap:0}
   .ed3:not(.st-on) #leftCol{opacity:0;transform:translateX(-24px);pointer-events:none;overflow:hidden}
   @media(max-width:1100px){ .ed3.st-on{grid-template-columns:320px minmax(0,1fr)} }
