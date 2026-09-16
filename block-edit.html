@@ -463,6 +463,7 @@
           </div>
           <div class="insp-sec" data-sec="typo">
             <div class="insp-h">Typography</div>
+            <div class="insp-row" data-field="font"><label>Text</label><span class="fig-align" id="s-rich"><span class="seg"><button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><span class="ms">format_bold</span></button><button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><span class="ms">format_italic</span></button><button type="button" data-cmd="underline" title="Underline (Ctrl+U)"><span class="ms">format_underlined</span></button><button type="button" data-cmd="strikeThrough" title="Strikethrough"><span class="ms">format_strikethrough</span></button></span><span class="seg"><button type="button" data-cmd="createLink" title="Link"><span class="ms">link</span></button><button type="button" data-cmd="removeFormat" title="Clear formatting"><span class="ms">format_clear</span></button></span></span></div>
             <div class="insp-row" data-field="font"><label>Font</label><select class="insp-sel" id="s-font"></select></div>
             <div class="insp-row" data-field="weight"><label>Weight</label><select class="insp-sel" id="s-weight"><option value="">Inherit from brand</option><option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select></div>
             <div class="insp-row" data-field="sizelh"><label>Size</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-size" placeholder="brand"><span class="insp-unit">px</span><input type="number" class="insp-num" id="s-lh" placeholder="brand"><span class="insp-unit">line</span></div></div>
@@ -1157,6 +1158,19 @@ function pageInit(){
   }
 
   // ---- Selection ----
+  // Rich text: the toolbar formats the caret/selection inside the selected element's text on the canvas.
+  document.querySelectorAll('#s-rich button').forEach(b=>{
+    b.addEventListener('mousedown',e=>e.preventDefault());   // keep the canvas selection alive
+    b.addEventListener('click',()=>{
+      if(!sel) return; const body=elNode(sel.r,sel.c,sel.k); if(!body) return;
+      let leaf=document.activeElement && document.activeElement.closest && document.activeElement.closest('.vb-body')===body ? document.activeElement : null;
+      if(!leaf){ leaf=body.querySelector('[contenteditable]'); if(!leaf) return; leaf.focus(); document.execCommand('selectAll'); }
+      const cmd=b.dataset.cmd; let arg=null;
+      if(cmd==='createLink'){ arg=prompt('Link URL','https://'); if(!arg) return; }
+      document.execCommand(cmd,false,arg);
+      body.dispatchEvent(new Event('input',{bubbles:true})); commit();
+    });
+  });
   function selectEl(r,c,k){ sel={r,c,k}; applySelection(); syncInspector(); }
   function applySelection(){
     page.querySelectorAll('.vb-el.selected').forEach(e=>e.classList.remove('selected'));
@@ -1209,20 +1223,23 @@ function pageInit(){
 
   // ---- Inline text editing: leaves marked data-ek / data-ec by renderPrimitive become contenteditable;
   // on input the element's `content` is rebuilt from the DOM (same keys renderPrimitive reads back).
+  // Text is kept as inline HTML limited to b/i/u/s/br/a — anything else the browser emits is unwrapped to its text.
+  const RICH=new Set(['B','I','U','S','BR','A']);
+  function richText(n){ return [...n.childNodes].map(x=>{ if(x.nodeType===3) return x.textContent; if(x.nodeType!==1) return ''; const inner=richText(x); const tag=x.tagName==='STRONG'?'b':x.tagName==='EM'?'i':x.tagName.toLowerCase(); if(x.tagName==='BR') return '<br>'; if(x.tagName==='A' && x.getAttribute('href')) return '<a href="'+x.getAttribute('href').replace(/"/g,'')+'">'+inner+'</a>'; return RICH.has(tag.toUpperCase()) ? '<'+tag+'>'+inner+'</'+tag+'>' : inner; }).join(''); }
   function captureContent(body){
     const c={};
     body.querySelectorAll('[data-ek]').forEach(n=>{ const k=n.dataset.ek;
-      if(k==='items') c.items=[...n.querySelectorAll('li')].map(t=>t.textContent);
-      else if(k==='headers') (c.headers=c.headers||[]).push(n.textContent);
-      else if(k==='row'||k==='pair') (c[k+'s']=c[k+'s']||[]).push([...n.querySelectorAll('[data-ec]')].map(t=>t.textContent));
-      else c[k]=n.textContent;
+      if(k==='items') c.items=[...n.querySelectorAll('li')].map(richText);
+      else if(k==='headers') (c.headers=c.headers||[]).push(richText(n));
+      else if(k==='row'||k==='pair') (c[k+'s']=c[k+'s']||[]).push([...n.querySelectorAll('[data-ec]')].map(richText));
+      else c[k]=richText(n);
     });
     return c;
   }
   function wireText(){
     page.querySelectorAll('.vb-el').forEach(el=>{
       const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k, body=el.querySelector('.vb-body');
-      body.querySelectorAll('[data-ek]:not([data-ek=row]):not([data-ek=pair]),[data-ec]').forEach(n=>n.setAttribute('contenteditable','plaintext-only'));
+      body.querySelectorAll('[data-ek]:not([data-ek=row]):not([data-ek=pair]),[data-ec]').forEach(n=>n.setAttribute('contenteditable','true'));
       body.addEventListener('input',()=>{ doc[r].cols[c][k].content=captureContent(body); autosave(); });
       body.addEventListener('focusout',()=>pushHist());
       body.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.target.closest('[data-ek=items]')) e.preventDefault(); });

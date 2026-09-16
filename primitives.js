@@ -36,7 +36,8 @@ function renderPrimitive(id, b, c){
   const H = `font-family:'${b.font}',sans-serif`;
   const T = `font-family:'${b.bodyFont}',sans-serif`;
   const soft = '#3A4442';
-  const esc = v => (v==null?'':String(v)).replace(/[&<>]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
+  // Escape, then re-enable the inline formatting the block builder writes (b/i/u/s/br/a). Content is sanitised to those on capture.
+  const esc = v => (v==null?'':String(v)).replace(/[&<>]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])).replace(/&lt;(\/?)(b|i|u|s|br|a)( href="[^"<>]*")?&gt;/g,'<$1$2$3>');
   switch(id){
     case 'heading':
       return `<h3 style="${H};margin:0;color:${b.primary};font-size:20px;font-weight:700;border-bottom:2px solid ${b.secondary};padding-bottom:6px" data-ek="title">${esc(c.title||'Project Overview')}</h3>`;
