@@ -15,9 +15,16 @@
 <link rel="stylesheet" href="components.css">
 <style>
   /* Aligned to the block builder: scrollable palette | fixed canvas | scrollable properties */
-  .ed3{display:grid;grid-template-columns:250px minmax(0,1fr) 300px;gap:16px;align-items:stretch;height:calc(100vh - 152px);min-height:500px}
-  .ed3-col{height:100%;overflow-y:auto;overflow-x:hidden}
-  .ed3-col .card{margin-bottom:14px}
+  .ed3{display:grid;grid-template-columns:380px minmax(0,1fr);gap:16px;grid-template-rows:minmax(0,1fr);align-items:stretch;flex:1;min-height:0;height:calc(100vh - 152px);transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1),column-gap .28s cubic-bezier(.4,0,.2,1)}
+  .ed3>*{min-height:0}
+  #leftCol{min-width:0;display:flex;flex-direction:column;overflow:hidden;transition:opacity .22s ease,transform .28s cubic-bezier(.4,0,.2,1);transform-origin:left center}
+  #leftCol>div>.card,#leftCol>.card{flex:1;min-height:0;overflow-y:auto;margin-bottom:0}
+  #leftCol>div:not(.ws-tabs){flex:1;min-height:0;display:flex;flex-direction:column}
+  .ed3:not(.st-on){grid-template-columns:0px minmax(0,1fr);column-gap:0}
+  .ed3:not(.st-on) #leftCol{opacity:0;transform:translateX(-24px);pointer-events:none}
+  .ws-tabs{display:flex;background:#eef2f1;border:1px solid var(--border);border-radius:9px;padding:3px;gap:2px;margin-bottom:12px;flex-shrink:0}
+  .ws-tabs button{flex:1;border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);padding:7px 10px;border-radius:7px;cursor:pointer}
+  .ws-tabs button.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.09)}
   .ed3-mid{height:100%;min-width:0;display:flex;flex-direction:column}
   .vb-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
   .tb-btn{width:auto;padding:0 11px;height:30px;gap:6px;border:1px solid var(--border);background:#fff;border-radius:7px;color:var(--gray);font-family:inherit;font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -32,24 +39,7 @@
   .pg-kebab{width:34px;height:34px;flex-shrink:0;border:1px solid var(--border);background:#fff;border-radius:9px;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
   .pg-kebab:hover{border-color:var(--teal);color:var(--teal)}
   .pg-kebab .ms{font-size:19px}
-  /* Responsive panels — Properties collapsible on desktop, drawers on small screens */
-  #elBtn{display:none}
   .ed3-scrim{display:none}
-  @media(min-width:1101px){
-    .ed3:not(.st-on) #rightCol{display:none}
-    .ed3:not(.st-on){grid-template-columns:250px minmax(0,1fr)}
-  }
-  @media(max-width:1100px){
-    #elBtn{display:flex}
-    .ed3{grid-template-columns:minmax(0,1fr)!important}
-    #leftCol,#rightCol{position:fixed;top:58px;bottom:0;width:290px;max-width:86vw;z-index:70;background:var(--page,#eef2f1);box-shadow:0 14px 44px rgba(0,0,0,.24);transition:transform .22s ease;overflow-y:auto;padding:16px}
-    #leftCol{left:0;transform:translateX(-106%)}
-    #rightCol{right:0;transform:translateX(106%);display:block}
-    .ed3.el-on #leftCol{transform:translateX(0)}
-    .ed3.st-on #rightCol{transform:translateX(0)}
-    .ed3-scrim{display:block;position:fixed;inset:0;background:rgba(16,26,23,.4);opacity:0;visibility:hidden;transition:opacity .2s;z-index:65}
-    .ed3.el-on ~ .ed3-scrim,.ed3.st-on ~ .ed3-scrim{opacity:1;visibility:visible}
-  }
   .ed3-col,.vb-canvas{scrollbar-width:none;-ms-overflow-style:none}
   .ed3-col::-webkit-scrollbar,.vb-canvas::-webkit-scrollbar{width:0;height:0;display:none}
   .d-search{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:12px}
@@ -161,9 +151,6 @@
   .ds-in{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:8px 9px;font-family:inherit;font-size:12.5px;color:var(--ink);background:#fff}
   textarea.ds-in{resize:vertical;line-height:1.5}
   /* Side-panel tabs (Blocks / Layers) */
-  .rt-tabs,.lt-tabs{display:flex;gap:4px;background:#e6ece9;border-radius:9px;padding:3px;margin-bottom:14px}
-  .rt-tab,.lt-tab{flex:1;border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:var(--gray);padding:7px 6px;border-radius:7px;cursor:pointer}
-  .rt-tab.on,.lt-tab.on{background:#fff;color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.1)}
   /* Layer cards */
   .lyr-card{position:relative}
   .lyr-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -288,10 +275,7 @@
     <div class="ed3 st-on">
       <!-- LEFT: Blocks palette + Layers -->
       <div class="ed3-col" id="leftCol">
-        <div class="lt-tabs">
-          <button class="lt-tab on" data-lt="blocks">Blocks</button>
-          <button class="lt-tab" data-lt="layers">Layers</button>
-        </div>
+        <div class="ws-tabs"><button class="on" data-wtab="blocks">Blocks</button><button data-wtab="style">Style</button><button data-wtab="layers">Layers</button></div>
         <div id="paneBlocks">
           <div class="card">
             <h3 class="ed-h" style="display:flex;align-items:center;gap:8px">Blocks <span class="muted" style="font-weight:400;font-size:12px" id="pal-count"></span><a href="block-edit.html" title="Create a new block" style="margin-left:auto;font-size:12px;color:var(--teal);text-decoration:none;font-weight:600"><span class="ms" style="font-size:14px;vertical-align:-2px">add</span> New block</a></h3>
@@ -301,6 +285,79 @@
             <div class="vb-pal" id="palette"></div>
           </div>
         </div>
+        <div id="paneStyle" style="display:none"><div class="card">
+      <!-- Block inspector: shown when a block is selected in Layout mode -->
+      <div id="blockInspector" style="display:none">
+        <div>
+          <div class="bi-head"><h3 class="ed-h" style="margin:0">Block</h3><button class="bi-x" id="bi-close" title="Deselect"><span class="ms">close</span></button></div>
+          <strong id="bi-name" style="font-size:13.5px;color:var(--ink)"></strong>
+          <div class="fhint" id="bi-desc" style="margin-top:3px"></div>
+
+          <div class="ds-lbl" id="bi-content-lbl" style="display:none">Example content</div>
+          <div id="bi-content"></div>
+
+          <div class="insp-sec" data-sec="layout">
+          <div class="insp-h">Layout</div>
+          <div class="typo-grid" style="margin-top:0">
+            <div><div class="fig-label">Width</div><select class="insp-sel" id="bs-wmode"><option value="fill">Fill container</option><option value="fixed">Fixed</option></select></div>
+            <div><div class="fig-label">Height</div><select class="insp-sel" id="bs-hmode"><option value="auto">Auto</option><option value="hug">Hug</option><option value="fixed">Fixed</option><option value="min">Min</option><option value="max">Max</option></select></div>
+            <span class="fig-field" title="Width"><span class="ms fig-ic">swap_horiz</span><input type="number" id="bs-wpx" min="0"><span class="insp-unit">px</span></span>
+            <span class="fig-field" title="Height"><span class="ms fig-ic">swap_vert</span><input type="number" id="bs-hval" min="0"><span class="insp-unit">px</span></span>
+          </div>
+          <div class="insp-sec" data-sec="dim">
+          <div class="insp-h">Dimension</div>
+          <div class="fig-box" data-box="pad">
+            <div class="fig-box-head"><span class="fig-label">Padding</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
+            <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="bs-padH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="bs-padV" min="0" max="200"></span></div>
+            <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="bs-padT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="bs-padR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="bs-padB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="bs-padL" placeholder="0"></span></div>
+          </div>
+          <div class="fig-box" data-box="mar">
+            <div class="fig-box-head"><span class="fig-label">Margin</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
+            <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="bs-marH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="bs-marV" min="0" max="200"></span></div>
+            <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="bs-marT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="bs-marR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="bs-marB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="bs-marL" placeholder="0"></span></div>
+          </div>
+          </div></div>
+          <div class="insp-sec" data-sec="border">
+          <div class="insp-h">Appearance</div>
+          <div class="insp-sec fig-sec" data-sec="fill" data-paint="bg">
+            <div class="fig-sec-h"><span class="fig-sec-t">Fill</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add fill"><span class="ms">add</span></button></span></div>
+            <div class="fig-paint" id="bs-bgPaint"><span class="fig-sw"><input type="color" id="bs-bg"></span><input class="fig-hexin" id="bs-bgH" placeholder="FFFFFF"><span class="fig-op"><input type="number" id="bs-bgA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
+          </div>
+          <div class="fig-box" data-box="rad">
+            <div class="fig-box-head"><span class="fig-label">Corner radius</span><button type="button" class="fig-toggle" data-toggle title="Edit corners individually"><span class="ms">rounded_corner</span></button></div>
+            <div class="fig-solo"><span class="fig-field"><span class="ms fig-ic" data-scrub>rounded_corner</span><input type="number" id="bs-rad" min="0" max="400"></span></div>
+            <div class="fig-corners" hidden><span class="fig-field"><span class="ms fig-ic cn cn-tl">rounded_corner</span><input type="number" id="bs-radTL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-tr">rounded_corner</span><input type="number" id="bs-radTR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-bl">rounded_corner</span><input type="number" id="bs-radBL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-br">rounded_corner</span><input type="number" id="bs-radBR" placeholder="0"></span></div>
+          </div>
+          <div class="insp-sec fig-sec" data-sec="stroke" data-paint="bc">
+            <div class="fig-sec-h"><span class="fig-sec-t">Stroke</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add stroke"><span class="ms">add</span></button></span></div>
+            <div class="fig-paint" id="bs-bcPaint"><span class="fig-sw"><input type="color" id="bs-bc"></span><input class="fig-hexin" id="bs-bcH" placeholder="EAEDEC"><span class="fig-op"><input type="number" id="bs-bcA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
+            <div class="typo-grid" id="bs-strokeMeta" style="margin:10px 0 0"><div><div class="fig-label">Position</div><select class="insp-sel" id="bs-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><div class="fig-label">Weight</div><span class="fig-field" title="Stroke weight"><span class="ms fig-ic">line_weight</span><input type="number" id="bs-bw" min="0" max="40"><span class="insp-unit">px</span></span></div></div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="docSettings">
+      <h3 class="ed-h">Document</h3>
+      <div class="acc closed" data-acc>
+        <button class="acc-h"><span class="acc-title"><span class="ms" style="color:var(--teal)">description</span> Document</span><span class="ms acc-caret">expand_more</span></button>
+        <div class="acc-body">
+          <div class="doc-summary" id="doc-summary"></div>
+          <button class="btn btn-outline btn-sm btn-block" id="editDetailsBtn"><span class="ms" style="font-size:16px">tune</span> Edit details</button>
+        </div>
+      </div>
+      <div class="acc" data-acc>
+        <button class="acc-h"><span class="acc-title"><span class="ms" style="color:var(--teal)">palette</span> Style</span><span class="ms acc-caret">expand_more</span></button>
+        <div class="acc-body">
+          <div class="ds-row"><label>Fill</label><div class="ds-ctl"><input type="color" id="ds-bg"><input class="ds-hex" id="ds-bgH"></div></div>
+          <div class="ds-row"><label>Padding</label><div class="ds-ctl"><input type="range" id="ds-pad" min="0" max="80"><input type="number" class="ds-num" id="ds-padN"><span class="ds-u">px</span></div></div>
+          <div class="ds-row"><label>Spacing</label><div class="ds-ctl"><input type="range" id="ds-gap" min="0" max="48"><input type="number" class="ds-num" id="ds-gapN"><span class="ds-u">px</span></div></div>
+          <div class="ds-row"><label>Radius</label><div class="ds-ctl"><input type="range" id="ds-rad" min="0" max="24"><input type="number" class="ds-num" id="ds-radN"><span class="ds-u">px</span></div></div>
+          <div class="fhint" style="margin-top:6px">Document-level styling. The assigned client's brand is layered on top.</div>
+        </div>
+      </div>
+      </div>
+        </div></div>
         <div id="paneLayers" style="display:none">
           <div class="side-title">Layers</div>
           <!-- Background layer -->
@@ -349,8 +406,7 @@
       <!-- MIDDLE: document canvas -->
       <div class="ed3-mid">
         <div class="vb-toolbar">
-          <button class="tb-btn" id="elBtn" title="Toggle Blocks panel"><span class="ms">grid_view</span> Blocks</button>
-          <button class="tb-btn on" id="styleBtn" title="Toggle Properties panel" style="margin-left:auto"><span class="ms">tune</span> Properties</button>
+          <button class="tb-btn tb-lbl on" id="elBtn" title="Show / hide the side panel"><span class="ms">left_panel_open</span> Panel</button>
         </div>
         <div class="vb-canvas" id="cvWrap">
           <div class="vb-bar"><span class="ms" style="font-size:16px;color:var(--teal)">description</span> <span id="doc-bar">Untitled Document</span> <span class="muted" id="doc-count" style="font-weight:400"></span>
@@ -364,79 +420,6 @@
       </div>
 
       <!-- RIGHT: document properties -->
-      <div class="ed3-col" id="rightCol">
-        <!-- Block inspector: shown when a block is selected in Layout mode -->
-        <div id="blockInspector" style="display:none">
-          <div class="card">
-            <div class="bi-head"><h3 class="ed-h" style="margin:0">Block</h3><button class="bi-x" id="bi-close" title="Deselect"><span class="ms">close</span></button></div>
-            <strong id="bi-name" style="font-size:13.5px;color:var(--ink)"></strong>
-            <div class="fhint" id="bi-desc" style="margin-top:3px"></div>
-
-            <div class="ds-lbl" id="bi-content-lbl" style="display:none">Example content</div>
-            <div id="bi-content"></div>
-
-            <div class="insp-sec" data-sec="layout">
-            <div class="insp-h">Layout</div>
-            <div class="typo-grid" style="margin-top:0">
-              <div><div class="fig-label">Width</div><select class="insp-sel" id="bs-wmode"><option value="fill">Fill container</option><option value="fixed">Fixed</option></select></div>
-              <div><div class="fig-label">Height</div><select class="insp-sel" id="bs-hmode"><option value="auto">Auto</option><option value="hug">Hug</option><option value="fixed">Fixed</option><option value="min">Min</option><option value="max">Max</option></select></div>
-              <span class="fig-field" title="Width"><span class="ms fig-ic">swap_horiz</span><input type="number" id="bs-wpx" min="0"><span class="insp-unit">px</span></span>
-              <span class="fig-field" title="Height"><span class="ms fig-ic">swap_vert</span><input type="number" id="bs-hval" min="0"><span class="insp-unit">px</span></span>
-            </div>
-            <div class="insp-sec" data-sec="dim">
-            <div class="insp-h">Dimension</div>
-            <div class="fig-box" data-box="pad">
-              <div class="fig-box-head"><span class="fig-label">Padding</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
-              <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="bs-padH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="bs-padV" min="0" max="200"></span></div>
-              <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="bs-padT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="bs-padR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="bs-padB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="bs-padL" placeholder="0"></span></div>
-            </div>
-            <div class="fig-box" data-box="mar">
-              <div class="fig-box-head"><span class="fig-label">Margin</span><button type="button" class="fig-toggle" data-toggle title="Edit sides individually"><span class="ms">border_outer</span></button></div>
-              <div class="fig-hv"><span class="fig-field"><span class="ms fig-ic" data-scrub title="Horizontal">width</span><input type="number" id="bs-marH" min="0" max="200"></span><span class="fig-field"><span class="ms fig-ic" data-scrub title="Vertical">height</span><input type="number" id="bs-marV" min="0" max="200"></span></div>
-              <div class="fig-cross" hidden><span class="fig-field"><span class="ms fig-ic" data-scrub="T">border_top</span><input type="number" id="bs-marT" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="R">border_right</span><input type="number" id="bs-marR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="B">border_bottom</span><input type="number" id="bs-marB" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic" data-scrub="L">border_left</span><input type="number" id="bs-marL" placeholder="0"></span></div>
-            </div>
-            </div></div>
-            <div class="insp-sec" data-sec="border">
-            <div class="insp-h">Appearance</div>
-            <div class="insp-sec fig-sec" data-sec="fill" data-paint="bg">
-              <div class="fig-sec-h"><span class="fig-sec-t">Fill</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add fill"><span class="ms">add</span></button></span></div>
-              <div class="fig-paint" id="bs-bgPaint"><span class="fig-sw"><input type="color" id="bs-bg"></span><input class="fig-hexin" id="bs-bgH" placeholder="FFFFFF"><span class="fig-op"><input type="number" id="bs-bgA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
-            </div>
-            <div class="fig-box" data-box="rad">
-              <div class="fig-box-head"><span class="fig-label">Corner radius</span><button type="button" class="fig-toggle" data-toggle title="Edit corners individually"><span class="ms">rounded_corner</span></button></div>
-              <div class="fig-solo"><span class="fig-field"><span class="ms fig-ic" data-scrub>rounded_corner</span><input type="number" id="bs-rad" min="0" max="400"></span></div>
-              <div class="fig-corners" hidden><span class="fig-field"><span class="ms fig-ic cn cn-tl">rounded_corner</span><input type="number" id="bs-radTL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-tr">rounded_corner</span><input type="number" id="bs-radTR" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-bl">rounded_corner</span><input type="number" id="bs-radBL" placeholder="0"></span><span class="fig-field"><span class="ms fig-ic cn cn-br">rounded_corner</span><input type="number" id="bs-radBR" placeholder="0"></span></div>
-            </div>
-            <div class="insp-sec fig-sec" data-sec="stroke" data-paint="bc">
-              <div class="fig-sec-h"><span class="fig-sec-t">Stroke</span><span class="fig-acts"><button type="button" class="fig-a" data-add title="Add stroke"><span class="ms">add</span></button></span></div>
-              <div class="fig-paint" id="bs-bcPaint"><span class="fig-sw"><input type="color" id="bs-bc"></span><input class="fig-hexin" id="bs-bcH" placeholder="EAEDEC"><span class="fig-op"><input type="number" id="bs-bcA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
-              <div class="typo-grid" id="bs-strokeMeta" style="margin:10px 0 0"><div><div class="fig-label">Position</div><select class="insp-sel" id="bs-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><div class="fig-label">Weight</div><span class="fig-field" title="Stroke weight"><span class="ms fig-ic">line_weight</span><input type="number" id="bs-bw" min="0" max="40"><span class="insp-unit">px</span></span></div></div>
-            </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="docSettings">
-        <div class="side-title">Properties</div>
-        <div class="acc closed" data-acc>
-          <button class="acc-h"><span class="acc-title"><span class="ms" style="color:var(--teal)">description</span> Document</span><span class="ms acc-caret">expand_more</span></button>
-          <div class="acc-body">
-            <div class="doc-summary" id="doc-summary"></div>
-            <button class="btn btn-outline btn-sm btn-block" id="editDetailsBtn"><span class="ms" style="font-size:16px">tune</span> Edit details</button>
-          </div>
-        </div>
-        <div class="acc" data-acc>
-          <button class="acc-h"><span class="acc-title"><span class="ms" style="color:var(--teal)">palette</span> Style</span><span class="ms acc-caret">expand_more</span></button>
-          <div class="acc-body">
-            <div class="ds-row"><label>Fill</label><div class="ds-ctl"><input type="color" id="ds-bg"><input class="ds-hex" id="ds-bgH"></div></div>
-            <div class="ds-row"><label>Padding</label><div class="ds-ctl"><input type="range" id="ds-pad" min="0" max="80"><input type="number" class="ds-num" id="ds-padN"><span class="ds-u">px</span></div></div>
-            <div class="ds-row"><label>Spacing</label><div class="ds-ctl"><input type="range" id="ds-gap" min="0" max="48"><input type="number" class="ds-num" id="ds-gapN"><span class="ds-u">px</span></div></div>
-            <div class="ds-row"><label>Radius</label><div class="ds-ctl"><input type="range" id="ds-rad" min="0" max="24"><input type="number" class="ds-num" id="ds-radN"><span class="ds-u">px</span></div></div>
-            <div class="fhint" style="margin-top:6px">Document-level styling. The assigned client's brand is layered on top.</div>
-          </div>
-        </div>
-        </div>
-      </div>
     </div>
     <div class="ed3-scrim" id="ed3Scrim"></div>
     <div class="el-pick" id="docPick" style="display:none"><label class="pk-search"><span class="ms">search</span><input id="dpQ" placeholder="Search blocks"></label><div class="pk-grid" id="dpGrid"></div></div>
@@ -845,12 +828,13 @@ function pageInit(){
     showToast('Ray drafted '+n+' blocks'+(rayDocHasImg?' to match your reference':'')+' — refine, then Save');
   });
 
-  // ---- Left-panel tabs (Blocks / Layers) ----
+  // ---- Left-panel tabs (Blocks / Style / Layers) ----
+  const PANES={blocks:'paneBlocks',style:'paneStyle',layers:'paneLayers'};
   function showLeftTab(which){
-    document.querySelectorAll('.lt-tab').forEach(x=>x.classList.toggle('on',x.dataset.lt===which));
-    [['paneBlocks','blocks'],['paneLayers','layers']].forEach(([id,k])=>{ const el=document.getElementById(id); const show=which===k; if(show && el.style.display==='none'){ el.classList.remove('tab-in'); void el.offsetWidth; el.classList.add('tab-in'); } el.style.display=show?'':'none'; });
+    document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.wtab===which));
+    Object.entries(PANES).forEach(([k,id])=>{ const el=document.getElementById(id); const show=k===which; if(show && el.style.display==='none'){ el.classList.remove('tab-in'); void el.offsetWidth; el.classList.add('tab-in'); } el.style.display=show?'':'none'; });
   }
-  document.querySelectorAll('.lt-tab').forEach(t=>t.addEventListener('click',()=>showLeftTab(t.dataset.lt)));
+  document.querySelectorAll('.ws-tabs button').forEach(t=>t.addEventListener('click',()=>showLeftTab(t.dataset.wtab)));
 
   // ---- Top layer (letterhead / footer, from Headers & Footers blocks) ----
   const heads=BLOCKS.filter(b=>b.cat==='Headers & Footers'&&b.slot==='header');
@@ -959,11 +943,15 @@ function pageInit(){
     'We hold current accreditations across WHS, quality and environmental management, and have a five-year record with zero lost-time injuries.'
   ];
   // ---- Block inspector (per-block content + style) ----
+  let lastSel=null;
   function renderInspector(){
     const it=items.find(x=>x.k===selK), show=!!it;   // selectable in Layout AND Preview
     document.getElementById('blockInspector').style.display=show?'':'none';
     document.getElementById('docSettings').style.display=show?'none':'';
     if(show) fillInspector(it);
+    // selecting a block opens its style; deselecting goes back to the palette
+    if(show && selK!==lastSel) showLeftTab('style'); else if(!show && lastSel!==null) showLeftTab('blocks');
+    lastSel=show?selK:null;
   }
   function fillInspector(it){
     curItem=it; const b=instObj(it);
@@ -1097,19 +1085,10 @@ function pageInit(){
   document.getElementById('bi-close').addEventListener('click',()=>{ selK=null; renderInspector(); render(); });
   canvas.addEventListener('click',e=>{ if(!e.target.closest('.doc-blk') && !e.target.closest('.pv-blk[data-k]')){ selK=null; renderInspector(); render(); } });
 
-  // ---- Responsive panels (Properties collapsible / drawers on small screens) ----
-  const ed3=document.querySelector('.ed3');
-  let styleOpen=window.innerWidth>1100, elOpen=false, lastWide=window.innerWidth>1100;
-  function applyPanels(){
-    ed3.classList.toggle('st-on', styleOpen);
-    ed3.classList.toggle('el-on', elOpen);
-    document.getElementById('styleBtn').classList.toggle('on', styleOpen);
-    document.getElementById('elBtn').classList.toggle('on', elOpen);
-  }
-  document.getElementById('styleBtn').addEventListener('click',()=>{ styleOpen=!styleOpen; if(styleOpen && window.innerWidth<=1100) elOpen=false; applyPanels(); });
-  document.getElementById('elBtn').addEventListener('click',()=>{ elOpen=!elOpen; if(elOpen && window.innerWidth<=1100) styleOpen=false; applyPanels(); });
-  document.getElementById('ed3Scrim').addEventListener('click',()=>{ elOpen=false; styleOpen=false; applyPanels(); });
-  window.addEventListener('resize',()=>{ const wide=window.innerWidth>1100; if(wide!==lastWide){ lastWide=wide; styleOpen=wide; elOpen=false; applyPanels(); } });
+  // ---- Side panel toggle (one panel, like the block builder) ----
+  const ed3=document.querySelector('.ed3'); let panelOpen=true;
+  function applyPanels(){ ed3.classList.toggle('st-on', panelOpen); document.getElementById('elBtn').classList.toggle('on', panelOpen); }
+  document.getElementById('elBtn').addEventListener('click',()=>{ panelOpen=!panelOpen; applyPanels(); });
 
   renderPalette(); render(); applyDocStyle(); applyPanels(); renderInspector();
   updateDocSummary();
