@@ -432,7 +432,7 @@
                   <button type="button" data-h="left" data-v="bottom" title="Bottom left"></button><button type="button" data-h="center" data-v="bottom" title="Bottom"></button><button type="button" data-h="right" data-v="bottom" title="Bottom right"></button>
                 </div>
               </div>
-              <div><div class="fig-label" style="margin-bottom:5px">Gap</div>
+              <div id="s-gapWrap"><div class="fig-label" style="margin-bottom:5px">Gap</div>
                 <span class="fig-wt"><span class="ms">width_normal</span><input type="number" id="s-sp" min="0" max="200"></span>
               </div>
             </div>
@@ -903,7 +903,11 @@ function pageInit(){
     box.style.width = ewm==='fixed' ? (st.wpx||0)+'px' : '';
     box.style.minWidth = ewm==='min' ? (st.wpx||0)+'px' : '';
     box.style.maxWidth = ewm==='max' ? (st.wpx||0)+'px' : '';
-    box.style.alignSelf = (ewm==='fixed'||ewm==='max') ? 'flex-start' : '';
+    // Element alignment inside its column: H via align-self (matters when the element isn't Fill width), V via auto margins.
+    // ponytail: margin:auto V-alignment shares the column's free space with siblings; fine for 1–2 elements per column.
+    const HM2={left:'flex-start',center:'center',right:'flex-end'};
+    box.style.alignSelf = st.alH ? HM2[st.alH] : ((ewm==='fixed'||ewm==='max') ? 'flex-start' : '');
+    box.style.marginTop = (st.alV==='bottom'||st.alV==='middle') ? 'auto' : ''; box.style.marginBottom = st.alV==='middle' ? 'auto' : '';
     box.style.flex = '0 0 auto';   // elements stack at their natural height, like the document renderer
     // A column holding a Fixed/Min/Max-width element sizes to it; the other columns fill the rest.
     const col=box.parentElement; if(col && col.classList.contains('vb-col')){ const sized=[...col.querySelectorAll(':scope > .vb-el')].some(el=>el.style.width||el.style.minWidth||el.style.maxWidth); col.style.flex = sized ? '0 1 auto' : (col.dataset.ratio||'1'); }
@@ -950,7 +954,7 @@ function pageInit(){
       sec.style.display=(anyRow||needMet)?'':'none';
     });
     const id = sel?selEl().id:null;
-    document.getElementById('s-blockLayout').style.display = sel?'none':'';   // Alignment + Gap are block-only; Resizing stays for elements
+    document.getElementById('s-gapWrap').style.display = sel?'none':'';   // Gap is block-only; Alignment works on the block or the selected element
     document.getElementById('imgUploadBtn').style.display = (id==='image' && selEl().src==='upload')?'':'none';
     if(id==='image'){ const fit=(selEl().content&&selEl().content.fit)||'cover'; document.querySelectorAll('#s-imgfit button').forEach(b=>b.classList.toggle('on',b.dataset.fit===fit)); }
     document.getElementById('sec-imgsrc').style.display = id==='image'?'':'none';
@@ -1077,7 +1081,7 @@ function pageInit(){
     else { wpxEl.value=t.wpx||0; wpxEl.disabled=false; }
     document.getElementById('s-hmode').value=t.hmode||'fill';
     document.getElementById('s-hpx').value=t.hpx||0; document.getElementById('s-hpx').disabled=((t.hmode||'fill')==='fill');
-    document.querySelectorAll('#s-align3 button').forEach(b=>b.classList.toggle('on', b.dataset.h===(blockStyle.alH||'left') && b.dataset.v===(blockStyle.alV||'top')));
+    document.querySelectorAll('#s-align3 button').forEach(b=>b.classList.toggle('on', b.dataset.h===(t.alH||'left') && b.dataset.v===(t.alV||'top')));
     const e=selEl();
     if(e){ if(e.id==='field') document.getElementById('s-field').value=e.field;
       document.querySelectorAll('#s-imgsrc button').forEach(b=>b.classList.toggle('on',b.dataset.src===(e.src||'placeholder'))); }
@@ -1110,7 +1114,7 @@ function pageInit(){
     document.getElementById('s-wpx').addEventListener('input',e=>{ target().wpx=+e.target.value||0; applyActive(); commitStyle(); });
     document.getElementById('s-hmode').addEventListener('change',e=>{ target().hmode=e.target.value; document.getElementById('s-hpx').disabled=(e.target.value==='fill'); applyActive(); commitStyle(); });
     document.getElementById('s-hpx').addEventListener('input',e=>{ target().hpx=+e.target.value||0; applyActive(); commitStyle(); });
-    document.querySelectorAll('#s-align3 button').forEach(b=>b.addEventListener('click',()=>{ blockStyle.alH=b.dataset.h; blockStyle.alV=b.dataset.v; document.querySelectorAll('#s-align3 button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
+    document.querySelectorAll('#s-align3 button').forEach(b=>b.addEventListener('click',()=>{ const t=target(); t.alH=b.dataset.h; t.alV=b.dataset.v; document.querySelectorAll('#s-align3 button').forEach(x=>x.classList.toggle('on',x===b)); applyActive(); commitStyle(); }));
     // Drag the icon to scrub the value (Width / Height / Gap / Weight), like the padding fields.
     document.querySelectorAll('.fig-wt').forEach(wt=>{ const ic=wt.querySelector('.ms'), inp=wt.querySelector('input'); if(!ic||!inp) return;
       figScrub(ic, ()=>+inp.value||0, v=>{ if(inp.disabled) return; const mn=+inp.min||0, mx=(inp.max!==''&&inp.max!=null)?+inp.max:1e5; inp.value=Math.max(mn,Math.min(mx,v)); inp.dispatchEvent(new Event('input',{bubbles:true})); }); });
