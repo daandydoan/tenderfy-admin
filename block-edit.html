@@ -110,7 +110,8 @@
   .vb-el.dragging{opacity:.4}
   /* Insert line between elements: hover the gap → a line with a + that opens the element picker */
   .vb-page.dnd .vb-ins,.vb-page.dnd .vb-tools,.vb-page.dnd .vb-name,.vb-page.dnd .vb-rowtools{pointer-events:none}   /* while dragging, only columns/elements receive the pointer */
-  .vb-ins{position:relative;height:16px;margin:0;cursor:pointer;z-index:2}   /* real gap between elements so the insert line is hoverable */
+  .vb-ins{position:relative;height:16px;margin:0;cursor:pointer;z-index:2}
+  .vb-rins{width:100%;height:14px;margin:-2px 0 0}   /* real gap between elements so the insert line is hoverable */
   .vb-col>.vb-ins:first-child{height:18px;margin:0}   /* room above the first element so its name chip clears the row tools */
   .vb-col>.vb-ins:first-child::before{top:12px} .vb-col>.vb-ins:first-child .ms{top:2px}
   .vb-ins::before{content:'';position:absolute;left:8px;right:8px;top:7px;height:2px;background:var(--teal);border-radius:2px;opacity:0;transition:opacity .12s}
@@ -754,13 +755,14 @@ function pageInit(){
   function renderPick(q){
     const all=PRIMITIVES.filter(p=>BLOCK_PARTS.has(p.id));
     const list = q ? all.filter(p=>(p.name+' '+p.desc).toLowerCase().includes(q)) : PICK_FIRST.map(id=>all.find(p=>p.id===id)).filter(Boolean);
-    const layouts = (!pickTarget && (!q || 'columns layout row repeat'.includes(q))) /* structure only when adding to the block itself, not inside a column */ ? [2,3].map(n=>`<div class="pk-it" data-row="${n}" title="A new row with ${n} columns"><span class="ms">view_column</span>${n} Columns</div>`).join('')+`<div class="pk-it" data-row="1" data-repeat="v" title="One item per row, repeated"><span class="ms">table_rows</span>Repeat down</div><div class="pk-it" data-row="1" data-repeat="h" title="Items side by side, repeated"><span class="ms">view_carousel</span>Repeat across</div>` : '';
+    const layouts = ((!pickTarget || pickTarget.row!=null) && (!q || 'columns layout row repeat'.includes(q))) /* structure only when adding to the block itself, not inside a column */ ? [2,3].map(n=>`<div class="pk-it" data-row="${n}" title="A new row with ${n} columns"><span class="ms">view_column</span>${n} Columns</div>`).join('')+`<div class="pk-it" data-row="1" data-repeat="v" title="One item per row, repeated"><span class="ms">table_rows</span>Repeat down</div><div class="pk-it" data-row="1" data-repeat="h" title="Items side by side, repeated"><span class="ms">view_carousel</span>Repeat across</div>` : '';
     const items=list.map(p=>`<div class="pk-it" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('');
     pkGrid.innerHTML = (items||layouts) ? (layouts?'<div class="pal-tag">Structure</div>'+layouts:'')+(items?'<div class="pal-tag">Elements</div>'+items:'') : '<div class="pk-empty">No element matches.</div>';
-    pkGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ if(it.dataset.row){ const row=newRow(+it.dataset.row, it.dataset.repeat); const at = pickTarget ? pickTarget.r + (pickTarget.k>0 ? 1 : 0) : doc.length; doc.splice(at,0,row); sel=null; render(); commit(); } else insertAt(mkEl(it.dataset.id)); closePicker(); }));
+    pkGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ if(it.dataset.row){ const row=newRow(+it.dataset.row, it.dataset.repeat); const at = pickTarget ? (pickTarget.row!=null ? pickTarget.row : pickTarget.r + (pickTarget.k>0 ? 1 : 0)) : doc.length; doc.splice(at,0,row); sel=null; render(); commit(); } else insertAt(mkEl(it.dataset.id)); closePicker(); }));
   }
   function insertAt(el){
-    if(pickTarget){ doc[pickTarget.r].cols[pickTarget.c].splice(pickTarget.k,0,el); sel={r:pickTarget.r,c:pickTarget.c,k:pickTarget.k}; }
+    if(pickTarget && pickTarget.row!=null){ doc.splice(pickTarget.row,0,{cols:[[el]]}); sel={r:pickTarget.row,c:0,k:0}; }
+    else if(pickTarget){ doc[pickTarget.r].cols[pickTarget.c].splice(pickTarget.k,0,el); sel={r:pickTarget.r,c:pickTarget.c,k:pickTarget.k}; }
     else { addEl(el); const r=doc.length-1, c=doc[r].cols.length-1; sel={r,c,k:doc[r].cols[c].length-1}; }
     render(); commit();
   }
@@ -862,7 +864,7 @@ function pageInit(){
               ${col.length?col.map((el,k)=>`<div class="vb-ins" data-r="${r}" data-c="${c}" data-k="${k}" title="Insert an element here"><span class="ms">add</span></div>`+elHtml(el,r,c,k)).join('')+`<div class="vb-ins" data-r="${r}" data-c="${c}" data-k="${col.length}" title="Insert an element here"><span class="ms">add</span></div>`:'<div class="vb-colph"><span class="ms">add</span>Drop element</div>'}
             </div>`).join('')}
           ${row.repeat?`<div class="vb-ghost" title="Next item — added by the estimator" style="flex:${row.repeat==='h'?row.cols.reduce((a,_,i)=>a+((row.ratio&&row.ratio[i])||1),0):'0 0 100%'}">${row.cols.some(c=>c.length)?'<div class="vb-ghost-cols">'+row.cols.map((col,i)=>`<div class="vb-ghost-col" style="flex:${(row.ratio&&row.ratio[i])||1}">${col.map(el=>renderPrimitive(el.id, brand, el.content)).join('')}</div>`).join('')+'</div>':'<div class="vb-ghost-ph">Next item</div>'}</div>`:''}
-        </div>`).join('')+`</div>`;
+        </div><div class="vb-ins vb-rins" data-row="${r+1}" title="Insert a full-width element below"><span class="ms">add</span></div>`).join('')+`</div>`;
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
@@ -1222,7 +1224,7 @@ function pageInit(){
   page.addEventListener('click',e=>{ if(!e.target.closest('.vb-el')) deselect(); });
 
   function wire(){
-    page.querySelectorAll('.vb-ins').forEach(ins=>ins.addEventListener('click',e=>{ e.stopPropagation(); openPicker(ins,{r:+ins.dataset.r,c:+ins.dataset.c,k:+ins.dataset.k}); }));
+    page.querySelectorAll('.vb-ins').forEach(ins=>ins.addEventListener('click',e=>{ e.stopPropagation(); openPicker(ins, ins.dataset.row!=null ? {row:+ins.dataset.row} : {r:+ins.dataset.r,c:+ins.dataset.c,k:+ins.dataset.k}); }));
     page.querySelectorAll('.vb-el').forEach(el=>{
       const r=+el.dataset.r,c=+el.dataset.c,k=+el.dataset.k;
       el.addEventListener('click',e=>{ if(e.target.closest('[data-handle],[data-dup],[data-del]'))return; e.stopPropagation(); selectEl(r,c,k); });
