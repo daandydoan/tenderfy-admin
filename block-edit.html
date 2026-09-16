@@ -1195,7 +1195,7 @@ function pageInit(){
       commit();
     });
   });
-  function selectEl(r,c,k){ sel={r,c,k}; applySelection(); syncInspector(); }
+  function selectEl(r,c,k){ sel={r,c,k}; applySelection(); syncInspector(); showTab('style'); }   // selecting an element opens its styling
   function applySelection(){
     page.querySelectorAll('.vb-el.selected').forEach(e=>e.classList.remove('selected'));
     if(sel){ const node=page.querySelector(`.vb-el[data-r="${sel.r}"][data-c="${sel.c}"][data-k="${sel.k}"]`); if(node) node.classList.add('selected'); else sel=null; }
