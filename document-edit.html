@@ -346,6 +346,21 @@
           <div id="bi-edited" style="display:none;margin-top:10px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:#f7faf9;align-items:center;gap:8px;font-size:12px;color:var(--gray)"><span class="ms" style="font-size:16px;color:var(--teal)">edit_note</span><span style="flex:1">Words edited in this document only — the saved block is unchanged.</span><a class="btn btn-outline btn-sm" id="bi-revert" title="Discard this document's edits and use the block as saved">Revert to block</a></div>
           <div class="fhint" id="bi-editHint" style="margin-top:8px">Click any text on the canvas to edit it for this document.</div>
 
+          <div class="insp-sec" data-sec="source">
+          <div class="insp-h">Styling</div>
+          <div class="fhint" id="bi-sourceHint">Layout, fill and type come from the saved block and the client’s brand — the renderer applies them. Change the block to change every document that uses it.</div>
+          <a class="btn btn-outline btn-sm btn-block" id="bi-editBlock" style="margin-top:10px"><span class="ms" style="font-size:16px">edit</span> Edit the block</a>
+          </div>
+          <div class="insp-sec" data-sec="arrange">
+          <div class="insp-h">Arrange</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button type="button" class="btn btn-outline btn-xs" id="bi-up" title="Move up"><span class="ms" style="font-size:15px">arrow_upward</span> Up</button>
+            <button type="button" class="btn btn-outline btn-xs" id="bi-down" title="Move down"><span class="ms" style="font-size:15px">arrow_downward</span> Down</button>
+            <button type="button" class="btn btn-outline btn-xs" id="bi-dup" title="Duplicate"><span class="ms" style="font-size:15px">content_copy</span> Duplicate</button>
+            <button type="button" class="btn btn-danger-outline btn-xs" id="bi-rm" title="Remove from this document"><span class="ms" style="font-size:15px">delete</span> Remove</button>
+          </div>
+          </div>
+
           <div class="insp-sec" data-sec="layout">
           <div class="insp-h">Layout</div>
           <div class="typo-grid" style="margin-top:0">
@@ -1099,7 +1114,15 @@ function pageInit(){
     const hm=s.hMode||'auto'; document.getElementById('bs-hmode').value=hm; document.getElementById('bs-hval').value=s.hVal||120; document.getElementById('bs-hval').disabled=(hm==='auto'||hm==='hug');
     fillPaint('bg'); fillPaint('bc');
     syncEditedRow(it); document.getElementById('bi-editHint').style.display=it.el?'none':'';
+    const eb=document.getElementById('bi-editBlock'); eb.style.display=it.el?'none':''; if(!it.el){ const ct=TENANTS[+clientSel.value-1]; eb.href='block-edit.html#id='+it.bid+(ct?'&client='+ct.id:''); }   // select index 0 = no client
+    document.getElementById('bi-sourceHint').textContent = it.el ? 'Type and colour come from the client’s brand — the renderer applies them. Add this element inside a block to style it.' : 'Layout, fill and type come from the saved block and the client’s brand — the renderer applies them. Change the block to change every document that uses it.';
   }
+  // Arrange the selected block within this document (same ops as the canvas tools / drag)
+  const selIdx=()=>items.findIndex(x=>x.k===selK);
+  document.getElementById('bi-up').addEventListener('click',()=>{ const i=selIdx(); if(i>0){ const [m]=items.splice(i,1); items.splice(i-1,0,m); render(); } });
+  document.getElementById('bi-down').addEventListener('click',()=>{ const i=selIdx(); if(i>=0&&i<items.length-1){ const [m]=items.splice(i,1); items.splice(i+1,0,m); render(); } });
+  document.getElementById('bi-dup').addEventListener('click',()=>{ const i=selIdx(); if(i<0) return; const src=items[i]; const c=JSON.parse(JSON.stringify(src)); c.k=++uid; items.splice(i+1,0,c); selK=c.k; render(); renderInspector(); showToast('Duplicated: '+instLabel(c)); });
+  document.getElementById('bi-rm').addEventListener('click',()=>{ const i=selIdx(); if(i<0) return; items.splice(i,1); selK=null; selEl=null; render(); renderInspector(); });
   document.getElementById('bi-revert').addEventListener('click',()=>{ if(!curItem||!curItem.doc) return; delete curItem.doc; render(); renderInspector(); showToast('Reverted to the saved block'); });
   function biNum(rId,nId,key){
     const R=document.getElementById(rId),N=document.getElementById(nId);
