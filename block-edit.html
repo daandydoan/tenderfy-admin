@@ -110,8 +110,14 @@
   .vb-block .vb-name{opacity:.45}   /* always readable at a glance; full on hover/select */
   .vb-el:hover .vb-name,.vb-el.selected .vb-name{opacity:1}
   #s-richRow{display:block!important} #s-richRow[hidden]{display:none!important}
-  .rich-box{min-height:72px;max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5;background:#fff;outline:none}
-  .rich-box:focus{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-tint)}
+  .rte{border:1px solid var(--border);border-radius:8px;background:#fff;overflow:hidden}
+  .rte:focus-within{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-tint)}
+  .rte-bar{display:flex;align-items:center;gap:2px;padding:4px 6px;border-bottom:1px solid var(--border);background:#fafbfb;flex-wrap:wrap}
+  .rte-bar button{width:26px;height:26px;border:none;background:transparent;border-radius:5px;color:var(--gray);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  .rte-bar button .ms{font-size:17px} .rte-bar button:hover{background:#eef2f1;color:var(--ink)}
+  .rte-div{width:1px;height:16px;background:var(--border);margin:0 4px}
+  .rich-box{min-height:110px;max-height:260px;overflow-y:auto;padding:10px 12px;font-size:13px;line-height:1.5;outline:none}
+  .rich-box:empty::before{content:attr(data-placeholder);color:var(--light)}
   .vb-body [contenteditable]{outline:none;cursor:text;min-width:1ch;border-radius:3px}
   .vb-body [contenteditable]:focus{box-shadow:0 0 0 2px var(--teal-tint)}
   /* Inline name in the header (replaces the title) + back / kebab, matching the document editor */
@@ -466,8 +472,18 @@
           </div>
           <div class="insp-sec" data-sec="typo">
             <div class="insp-h">Typography</div>
-            <div class="insp-row" data-field="font"><label>Text</label><span class="fig-align" id="s-rich"><span class="seg"><button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><span class="ms">format_bold</span></button><button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><span class="ms">format_italic</span></button><button type="button" data-cmd="underline" title="Underline (Ctrl+U)"><span class="ms">format_underlined</span></button><button type="button" data-cmd="strikeThrough" title="Strikethrough"><span class="ms">format_strikethrough</span></button></span><span class="seg"><button type="button" data-cmd="createLink" title="Link"><span class="ms">link</span></button><button type="button" data-cmd="removeFormat" title="Clear formatting"><span class="ms">format_clear</span></button></span></span></div>
-            <div class="insp-row" data-field="font" style="display:block" id="s-richRow"><div class="rich-box" id="s-richBox" contenteditable="true" spellcheck="true"></div><div class="fhint" id="s-richHint" style="margin-top:4px"></div></div>
+            <div class="insp-row" data-field="font" style="display:block" id="s-richRow"><div class="rte">
+              <div class="rte-bar" id="s-rich">
+                <button type="button" data-cmd="undo" title="Undo"><span class="ms">undo</span></button><button type="button" data-cmd="redo" title="Redo"><span class="ms">redo</span></button>
+                <span class="rte-div"></span>
+                <button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><span class="ms">format_bold</span></button><button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><span class="ms">format_italic</span></button><button type="button" data-cmd="strikeThrough" title="Strikethrough"><span class="ms">format_strikethrough</span></button><button type="button" data-cmd="underline" title="Underline (Ctrl+U)"><span class="ms">format_underlined</span></button>
+                <span class="rte-div"></span>
+                <button type="button" data-cmd="createLink" title="Link"><span class="ms">link</span></button><button type="button" data-cmd="unlink" title="Remove link"><span class="ms">link_off</span></button>
+                <span class="rte-div"></span>
+                <button type="button" data-cmd="removeFormat" title="Clear formatting"><span class="ms">format_clear</span></button>
+              </div>
+              <div class="rich-box" id="s-richBox" contenteditable="true" spellcheck="true" data-placeholder="Type your text…"></div>
+            </div><div class="fhint" id="s-richHint" style="margin-top:4px"></div></div>
             <div class="insp-row" data-field="font"><label>Font</label><select class="insp-sel" id="s-font"></select></div>
             <div class="insp-row" data-field="weight"><label>Weight</label><select class="insp-sel" id="s-weight"><option value="">Inherit from brand</option><option value="400">400 · Regular</option><option value="500">500 · Medium</option><option value="600">600 · Semibold</option><option value="700">700 · Bold</option></select></div>
             <div class="insp-row" data-field="sizelh"><label>Size</label><div class="insp-ctl"><input type="number" class="insp-num" id="s-size" placeholder="brand"><span class="insp-unit">px</span><input type="number" class="insp-num" id="s-lh" placeholder="brand"><span class="insp-unit">line</span></div></div>
@@ -1165,7 +1181,7 @@ function pageInit(){
   // Rich text editor in the panel mirrors the selected element's main text leaf; the toolbar formats whichever is focused (panel box or canvas).
   const richBox=document.getElementById('s-richBox');
   const richLeaf=()=>{ if(!sel) return null; const body=elNode(sel.r,sel.c,sel.k); return body && body.querySelector('[data-ek]:not([data-ek=items]):not([data-ek=headers]):not([data-ek=row]):not([data-ek=pair])'); };
-  function syncRichBox(){ const richBox=document.getElementById('s-richBox'); const leaf=richLeaf(); /* looked up here: syncInspector runs before the const above is initialised */ const row=richBox.parentElement; row.hidden=!leaf; if(!leaf || document.activeElement===richBox) return; richBox.innerHTML=leaf.innerHTML; document.getElementById('s-richHint').textContent='Editing “'+leaf.dataset.ek+'” — the canvas updates as you type.'; }
+  function syncRichBox(){ const richBox=document.getElementById('s-richBox'); const leaf=richLeaf(); /* looked up here: syncInspector runs before the const above is initialised */ const row=richBox.parentElement; row.hidden=!leaf; if(!leaf || document.activeElement===richBox) return; richBox.innerHTML=leaf.innerHTML; document.getElementById('s-richHint').textContent=''; }
   richBox.addEventListener('input',()=>{ const leaf=richLeaf(); if(!leaf) return; leaf.innerHTML=richBox.innerHTML; leaf.closest('.vb-body').dispatchEvent(new Event('input',{bubbles:true})); });
   richBox.addEventListener('blur',commit);
   richBox.addEventListener('paste',e=>{ e.preventDefault(); document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text')); });
