@@ -78,7 +78,16 @@
   .vb-page.band{min-height:96px;padding:22px 30px}
   .vb-block{display:flex;flex-direction:column;min-width:0}
   .vb-row{position:relative;display:flex;width:100%;gap:24px;padding:10px 4px;border-radius:10px}   /* 24px column gap matches the renderer */
-  .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.3)}   /* padding above keeps the outline clear of the elements' chips and tools */
+  .vb-row:hover{box-shadow:inset 0 0 0 1px rgba(38,152,138,.3)}
+  /* Repeating rows: dashed frame, badge, and a ghost of the next item so it reads as "one of many" */
+  .vb-rep{outline:1.5px dashed #9fc9c1;outline-offset:-1px;padding-top:26px}
+  .vb-rep-badge{position:absolute;top:6px;left:8px;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--teal);background:var(--teal-tint);border-radius:5px;padding:2px 7px;z-index:1}
+  .vb-rep-badge .ms{font-size:13px}
+  .vb-ghost{display:flex;align-items:center;justify-content:center;gap:4px;border:1.5px dashed #c2ccc9;border-radius:8px;color:var(--light);font-size:11.5px;pointer-events:none}
+  .vb-ghost .ms{font-size:16px}
+  .vb-rep-v{flex-wrap:wrap} .vb-rep-v .vb-ghost{flex:0 0 100%;min-height:44px;margin-top:8px}
+  .vb-rep-h .vb-ghost{flex:1;min-width:0;align-self:stretch;min-height:60px}
+  .vb-page.preview .vb-rep-badge,.vb-page.preview .vb-ghost{display:none} .vb-page.preview .vb-rep{outline:none;padding-top:0}   /* padding above keeps the outline clear of the elements' chips and tools */
   .vb-row.row-ins-before::before{content:'';position:absolute;top:-3px;left:0;right:0;height:3px;background:var(--teal);border-radius:2px}
   .vb-rowtools{position:absolute;top:-12px;left:50%;transform:translateX(-50%);display:flex;gap:3px;opacity:0;transition:.1s;z-index:4}
   .vb-row:hover>.vb-rowtools{opacity:1}
@@ -646,7 +655,8 @@ function pageInit(){
 
   const elDef=()=>({wmode:'fill',wpx:200,hmode:'fill',hpx:120,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',bgA:100,bgVis:true,font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'});
   const mkEl=pid=>{ const e={id:pid, st:elDef()}; if(pid==='field') e.field='client.name'; if(pid==='image') e.src='placeholder'; return e; };
-  const normDoc=d=>d.map(row=>({cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
+  const newRow=(n,repeat)=>{ const r={cols:Array.from({length:n},()=>[])}; if(repeat) r.repeat=repeat; return r; };
+  const normDoc=d=>d.map(row=>({...row, cols:row.cols.map(col=>col.map(x=>typeof x==='string'?mkEl(x):x))}));
 
   let doc = existing ? normDoc(clone(P2DOC[existing.p]||[{cols:[['paragraph']]}])) : [];
   let drag = null;
@@ -703,16 +713,16 @@ function pageInit(){
   // ---- Elements tab: the palette (drag onto the block, or click to add). A block normally starts from the document.
   const byTag={};
   // Block-level parts only — cover, contents, page break, button, signature, stat, divider, spacer are document/template concerns.
-  const BLOCK_PARTS=new Set(['heading','subheading','paragraph','list','quote','callout','image','table','keyvalue','field']);
+  const BLOCK_PARTS=new Set(['heading','subheading','paragraph','list','quote','callout','image','table','keyvalue','field','stat','divider','signature']);
   PRIMITIVES.filter(p=>BLOCK_PARTS.has(p.id)).forEach(p=>{ (byTag[p.tag]=byTag[p.tag]||[]).push(p); });
   document.getElementById('palette').innerHTML =
-    `<div class="pal-tag">Structure</div><div class="vb-widget struct" draggable="true" data-row="2" title="A row with two columns"><span class="ms">view_column</span>2 Columns</div><div class="vb-widget struct" draggable="true" data-row="3" title="A row with three columns"><span class="ms">view_week</span>3 Columns</div>`
+    `<div class="pal-tag">Structure</div><div class="vb-widget struct" draggable="true" data-row="2" title="A row with two columns"><span class="ms">view_column</span>2 Columns</div><div class="vb-widget struct" draggable="true" data-row="3" title="A row with three columns"><span class="ms">view_week</span>3 Columns</div><div class="vb-widget struct" draggable="true" data-row="1" data-repeat="v" title="One item per row — the estimator adds as many as the tender needs (people, projects, references)"><span class="ms">repeat</span>Repeat down</div><div class="vb-widget struct" draggable="true" data-row="1" data-repeat="h" title="Items side by side — the estimator adds as many as the tender needs (stats, logos, cards)"><span class="ms">repeat</span>Repeat across</div>`
     + Object.entries(byTag).map(([tag,ps])=>`<div class="pal-tag">${tag}</div>`+ps.map(p=>`<div class="vb-widget" draggable="true" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('')).join('');
   document.querySelectorAll('.vb-widget').forEach(w=>{
     w.addEventListener('dragend',()=>{ page.classList.remove('dnd'); drag=null; clearInd(); });
-    w.addEventListener('dragstart',e=>{ setTimeout(()=>page.classList.add('dnd')); drag = w.dataset.row ? {kind:'new-row',cols:+w.dataset.row} : {kind:'new-prim',id:w.dataset.id}; if(e.dataTransfer){ e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text','n'); } });
+    w.addEventListener('dragstart',e=>{ setTimeout(()=>page.classList.add('dnd')); drag = w.dataset.row ? {kind:'new-row',cols:+w.dataset.row,repeat:w.dataset.repeat} : {kind:'new-prim',id:w.dataset.id}; if(e.dataTransfer){ e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text','n'); } });
     w.addEventListener('dragend',()=>{drag=null;clearInd();});
-    w.addEventListener('click',()=>{ if(w.dataset.row) doc.push({cols:Array.from({length:+w.dataset.row},()=>[])}); else addEl(mkEl(w.dataset.id)); sel=null; render(); commit(); });
+    w.addEventListener('click',()=>{ if(w.dataset.row) doc.push(newRow(+w.dataset.row, w.dataset.repeat)); else addEl(mkEl(w.dataset.id)); sel=null; render(); commit(); });
   });
   document.getElementById('palQ').addEventListener('input',e=>{
     const q=e.target.value.trim().toLowerCase();
@@ -729,10 +739,10 @@ function pageInit(){
   function renderPick(q){
     const all=PRIMITIVES.filter(p=>BLOCK_PARTS.has(p.id));
     const list = q ? all.filter(p=>(p.name+' '+p.desc).toLowerCase().includes(q)) : PICK_FIRST.map(id=>all.find(p=>p.id===id)).filter(Boolean);
-    const layouts = (!q || 'columns layout row'.includes(q)) ? [2,3].map(n=>`<div class="pk-it" data-row="${n}" title="A new row with ${n} columns"><span class="ms">view_column</span>${n} Columns</div>`).join('') : '';
+    const layouts = (!q || 'columns layout row repeat'.includes(q)) ? [2,3].map(n=>`<div class="pk-it" data-row="${n}" title="A new row with ${n} columns"><span class="ms">view_column</span>${n} Columns</div>`).join('')+`<div class="pk-it" data-row="1" data-repeat="v" title="One item per row, repeated"><span class="ms">repeat</span>Repeat down</div><div class="pk-it" data-row="1" data-repeat="h" title="Items side by side, repeated"><span class="ms">repeat</span>Repeat across</div>` : '';
     const items=list.map(p=>`<div class="pk-it" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('');
     pkGrid.innerHTML = (items||layouts) ? (layouts?'<div class="pal-tag">Structure</div>'+layouts:'')+(items?'<div class="pal-tag">Elements</div>'+items:'') : '<div class="pk-empty">No element matches.</div>';
-    pkGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ if(it.dataset.row){ const row={cols:Array.from({length:+it.dataset.row},()=>[])}; const at = pickTarget ? pickTarget.r + (pickTarget.k>0 ? 1 : 0) : doc.length; doc.splice(at,0,row); sel=null; render(); commit(); } else insertAt(mkEl(it.dataset.id)); closePicker(); }));
+    pkGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ if(it.dataset.row){ const row=newRow(+it.dataset.row, it.dataset.repeat); const at = pickTarget ? pickTarget.r + (pickTarget.k>0 ? 1 : 0) : doc.length; doc.splice(at,0,row); sel=null; render(); commit(); } else insertAt(mkEl(it.dataset.id)); closePicker(); }));
   }
   function insertAt(el){
     if(pickTarget){ doc[pickTarget.r].cols[pickTarget.c].splice(pickTarget.k,0,el); sel={r:pickTarget.r,c:pickTarget.c,k:pickTarget.k}; }
@@ -824,7 +834,8 @@ function pageInit(){
       document.getElementById('emptyAdd').addEventListener('click',e=>openPicker(e.currentTarget, null));
     } else {
       page.innerHTML=`<div class="vb-block" id="blockWrap">`+doc.map((row,r)=>`
-        <div class="vb-row" data-r="${r}">
+        <div class="vb-row${row.repeat?' vb-rep vb-rep-'+row.repeat:''}" data-r="${r}">
+          ${row.repeat?`<span class="vb-rep-badge" title="The estimator adds as many items as the tender needs"><span class="ms">repeat</span>Repeats per item</span>`:''}
           <div class="vb-rowtools">
             <span class="rb grab" data-rhandle title="Move row"><span class="ms">drag_indicator</span></span>
             <span class="rb" data-addcol title="Add column"><span class="ms">add</span></span>
@@ -835,6 +846,7 @@ function pageInit(){
           ${row.cols.map((col,c)=>`<div class="vb-col" data-r="${r}" data-c="${c}" data-ratio="${(row.ratio&&row.ratio[c])||1}" style="flex:${(row.ratio&&row.ratio[c])||1};justify-content:${({top:'flex-start',middle:'center',bottom:'flex-end'})[(row.valign||[])[c]]||'flex-start'}">
               ${col.length?col.map((el,k)=>`<div class="vb-ins" data-r="${r}" data-c="${c}" data-k="${k}" title="Insert an element here"><span class="ms">add</span></div>`+elHtml(el,r,c,k)).join('')+`<div class="vb-ins" data-r="${r}" data-c="${c}" data-k="${col.length}" title="Insert an element here"><span class="ms">add</span></div>`:'<div class="vb-colph"><span class="ms">add</span>Drop element</div>'}
             </div>`).join('')}
+          ${row.repeat?`<div class="vb-ghost"><span class="ms">add</span>Next item</div>`:''}
         </div>`).join('')+`</div>`;
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
@@ -1300,7 +1312,7 @@ function pageInit(){
     const rowMode = drag.kind==='new-row' || drag.kind==='move-row' || !overCol;
     if(rowMode){
       const ri=rowIndexFromY(e.clientY);
-      if(drag.kind==='new-row'){ doc.splice(ri,0,{cols:Array.from({length:drag.cols},()=>[])}); }
+      if(drag.kind==='new-row'){ doc.splice(ri,0,newRow(drag.cols, drag.repeat)); }
       else if(drag.kind==='move-row'){ let to=ri; const [m]=doc.splice(drag.r,1); if(drag.r<to)to--; doc.splice(to,0,m); }
       else { const item = drag.kind==='new-prim'?mkEl(drag.id):pluck(drag); doc.splice(ri,0,{cols:[[item]]}); }
     } else {
