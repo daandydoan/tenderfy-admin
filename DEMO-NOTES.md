@@ -138,5 +138,4 @@ Same shell as the Block Builder (one tabbed panel · canvas · Build/Preview), s
 **What the mockup fakes here** (look for the `concept` badge)
 - AI Draft "from a client file" and "Suggest blocks": keyword match on the description / name; the file is ignored.
 - Pagination never splits a block taller than a page; long tables overflow the A4 page in Preview.
-- "Download PDF" is `window.print()` over the preview pages with a print stylesheet.
 - No audit trail, no lock-by-head-office, no versioning of documents — open items the client editor must answer.
