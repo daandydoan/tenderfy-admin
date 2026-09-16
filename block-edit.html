@@ -728,8 +728,9 @@ function pageInit(){
   function renderPick(q){
     const all=PRIMITIVES.filter(p=>BLOCK_PARTS.has(p.id));
     const list = q ? all.filter(p=>(p.name+' '+p.desc).toLowerCase().includes(q)) : PICK_FIRST.map(id=>all.find(p=>p.id===id)).filter(Boolean);
-    pkGrid.innerHTML = list.length ? list.map(p=>`<div class="pk-it" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('') : '<div class="pk-empty">No element matches.</div>';
-    pkGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ insertAt(mkEl(it.dataset.id)); closePicker(); }));
+    const layouts = (!q || 'columns layout row'.includes(q)) ? [2,3].map(n=>`<div class="pk-it" data-row="${n}" title="A new row with ${n} columns"><span class="ms">view_column</span>${n} Columns</div>`).join('') : '';
+    pkGrid.innerHTML = (list.length||layouts) ? list.map(p=>`<div class="pk-it" data-id="${p.id}" title="${p.desc}"><span class="ms">${PRIM_ICON[p.id]||'widgets'}</span>${p.name}</div>`).join('')+layouts : '<div class="pk-empty">No element matches.</div>';
+    pkGrid.querySelectorAll('.pk-it').forEach(it=>it.addEventListener('click',()=>{ if(it.dataset.row){ const row={cols:Array.from({length:+it.dataset.row},()=>[])}; const at = pickTarget ? pickTarget.r + (pickTarget.k>0 ? 1 : 0) : doc.length; doc.splice(at,0,row); sel=null; render(); commit(); } else insertAt(mkEl(it.dataset.id)); closePicker(); }));
   }
   function insertAt(el){
     if(pickTarget){ doc[pickTarget.r].cols[pickTarget.c].splice(pickTarget.k,0,el); sel={r:pickTarget.r,c:pickTarget.c,k:pickTarget.k}; }
