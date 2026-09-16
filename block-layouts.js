@@ -50,7 +50,8 @@ function composeBlock(block, brand){
   const doc = P2DOC[block.p] || [{cols:[[block.p]]}];
   return doc.map(row=>{
     if(row.cols.length>1){
-      const cols = row.cols.map((col,i)=>`<div style="flex:${(row.ratio&&row.ratio[i])||1};min-width:0;display:flex;flex-direction:column;gap:11px">${col.map(el=>renderPrimitive(el.id||el, brand, el.content)).join('')}</div>`).join('');
+      const VJ={top:'flex-start',middle:'center',bottom:'flex-end'};
+      const cols = row.cols.map((col,i)=>`<div style="flex:${(row.ratio&&row.ratio[i])||1};min-width:0;display:flex;flex-direction:column;gap:11px;justify-content:${VJ[(row.valign||[])[i]]||'flex-start'}">${col.map(el=>renderPrimitive(el.id||el, brand, el.content)).join('')}</div>`).join('');
       return `<div style="display:flex;gap:24px;margin-bottom:18px">${cols}</div>`;
     }
     return `<div style="display:flex;flex-direction:column;gap:11px;margin-bottom:18px">${row.cols[0].map(el=>renderPrimitive(el.id||el, brand, el.content)).join('')}</div>`;
