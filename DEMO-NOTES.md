@@ -56,11 +56,10 @@ Optional: Preview style → another client (same block, their brand).
 The brand is **evidence + sign-off**, not a document we store or a kit we version.
 
 Workflow: **Request** (client sends logo · brand document · past tenders) → **Derive** (admin, Ray suggesting,
-fills the Brand; every value carries *from file · page* or *assumed*; page setup is part of it) → **Approve**
-(client sees their real tender page beside ours; one click) → **Build** (blocks bind roles) → **Assign**
+fills the Brand; every value carries *from file · page* or *assumed*; page setup is part of it) → **Approve** (client signs off the brand) → **Build** (blocks bind roles) → **Assign**
 (no ceremony — render applies the brand) → **Issue** (a sent document freezes its brand; later changes affect drafts only).
 
-Where it lives in the mockup: Client detail → *Original files*, *Approve brand*, *Brand* (with evidence tags,
+Where it lives in the mockup: Client detail → *Original files*, *Brand* (with evidence tags, approval status,
 page setup, change log); Documents tab → *Brand frozen at issue* on a sent tender; Block builder →
 Preview style reads "Bramble & Kite Builders · approved 1 Sep".
 

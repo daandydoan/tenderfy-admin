@@ -40,20 +40,11 @@
   .of-slot .empty{font-size:11.5px;color:var(--light);display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:3px;text-align:center} .of-slot .empty .ms{font-size:22px}
   .of-req{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#8a5a00;background:#fff4e0;border:1px solid #f3d9a4;border-radius:100px;padding:2px 9px}
   /* Approve brand — side-by-side */
-  .ap-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .ap-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--light);font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:8px} .ap-lbl .ms{font-size:15px;color:var(--teal)}
-  .ap-page{aspect-ratio:1/1.1;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 16px rgba(20,45,38,.1);padding:22px 24px;overflow:hidden;font-size:9px;line-height:1.45}
-  .ap-theirs{font-family:Georgia,'Times New Roman',serif;color:#222;filter:contrast(.96) sepia(.08)}
-  .ap-theirs .lh{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid;padding-bottom:6px;margin-bottom:10px;font-weight:700;font-size:11px}
-  .ap-theirs h4{margin:8px 0 3px;font-size:10.5px} .ap-theirs p{margin:0 0 6px} .ap-theirs table{width:100%;border-collapse:collapse;margin-top:4px} .ap-theirs td,.ap-theirs th{padding:3px 5px;border-bottom:1px solid #ddd;text-align:left} .ap-theirs th{color:#fff}
-  .ap-foot{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
-  .ap-stamp{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#1f5a50;background:var(--teal-tint);border:1.5px solid #38988a;border-radius:8px;padding:6px 12px;transform:rotate(-1.5deg)} .ap-stamp .ms{font-size:17px}
-  .ap-pending{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;color:#8a5a00;background:#fff4e0;border:1px solid #f3d9a4;border-radius:8px;padding:6px 12px} .ap-pending .ms{font-size:16px}
   /* Issued documents — brand frozen */
   .issued-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:14px;background:#fff}
   .issued-card .ms.big{font-size:22px;color:var(--teal)} .issued-card .nm{font-weight:600;font-size:13px} .issued-card .meta{font-size:11.5px;color:var(--gray)}
   .frozen{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:#1f5a50;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:100px;padding:2px 8px;margin-left:auto;white-space:nowrap} .frozen .ms{font-size:13px}
-  @media(max-width:900px){ .ap-cols,.of-grid{grid-template-columns:1fr} }
+  @media(max-width:900px){ .of-grid{grid-template-columns:1fr} }
   .bt-sec-h{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--light);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
   .bt-sec-h .shared{font-size:9.5px;background:#eef2f1;color:var(--gray);border:1px solid var(--border);border-radius:100px;padding:2px 9px;letter-spacing:.3px;font-weight:700}
   .bt-note{font-size:12px;color:var(--gray);margin-top:10px;display:flex;align-items:center;gap:6px}
@@ -216,15 +207,6 @@
           <div class="cd2-cardhead"><h3>Original files</h3><span class="sub" id="of-status">What the client sent us — the brand below is read from these</span><a class="btn btn-primary btn-sm" id="buildBlocksBtn" style="margin-left:auto;white-space:nowrap"><span class="ms" style="font-size:16px">grid_view</span> Build blocks</a></div>
           <div class="of-grid" id="ofGrid"></div>
           <input type="file" id="ofFile" hidden>
-        </div>
-
-        <div class="card" id="approveCard">
-          <div class="cd2-cardhead"><h3>Approve brand</h3><span class="sub">Their real tender page beside ours — nothing gets built until the client says it looks like theirs</span></div>
-          <div class="ap-cols">
-            <div><div class="ap-lbl"><span class="ms">picture_as_pdf</span> Their page · <span id="ap-src"></span></div><div class="ap-page ap-theirs" id="apTheirs"></div></div>
-            <div><div class="ap-lbl"><span class="ms">auto_awesome</span> Rendered in Tenderfy</div><div class="ap-page" id="apOurs"></div></div>
-          </div>
-          <div class="ap-foot" id="apFoot"></div>
         </div>
 
         <div class="card">
@@ -404,36 +386,10 @@ function pageInit(){
     document.querySelectorAll('.of-slot:not(.has)').forEach(s=>s.addEventListener('click',()=>{ pendingSlot=s.dataset.slot; const inp=document.getElementById('ofFile'); inp.accept=pendingSlot==='logo'?'image/*':'.pdf,.doc,.docx'; inp.click(); }));
   }
   document.getElementById('ofFile').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; if(!f||!pendingSlot) return;
-    const add=data=>{ M.files.push({type:pendingSlot,name:f.name,by:'Kaila (on client’s behalf)',date:new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}),data}); if(M.files.length>=3) M.requested=null; brandLog(t,'Kaila','Added '+f.name); saveBrandMeta(t); renderFiles(); renderBoard(); renderApprove(); showToast('Added '+f.name); };
+    const add=data=>{ M.files.push({type:pendingSlot,name:f.name,by:'Kaila (on client’s behalf)',date:new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}),data}); if(M.files.length>=3) M.requested=null; brandLog(t,'Kaila','Added '+f.name); saveBrandMeta(t); renderFiles(); renderBoard(); showToast('Added '+f.name); };
     if(pendingSlot==='logo' && f.size<1600000){ const rd=new FileReader(); rd.onload=()=>add(rd.result); rd.readAsDataURL(f); } else add(null);
     e.target.value='';
   });
-
-  // ---- Approve brand: their page vs ours. The gate before templates get built.
-  function renderApprove(){
-    const tender=M.files.find(f=>f.type==='past-tender');
-    document.getElementById('ap-src').textContent = tender ? tender.name+' · p.2' : 'no tender received yet';
-    // "Their" page: a plausible scan of the client's old tender in their colours, set in Word-ish serif.
-    document.getElementById('apTheirs').innerHTML = `
-      <div class="lh" style="border-color:${b.primary};color:${b.primary}"><span>${t.name.toUpperCase()}</span><span style="font-size:8px;font-weight:400;color:#666">Tender Response · 2025</span></div>
-      <h4 style="color:${b.primary}">2. Company Overview</h4>
-      <p>${t.name} is a ${t.industry.toLowerCase()} contractor delivering projects across South-East Queensland. We self-perform the majority of our scope with a directly employed workforce.</p>
-      <h4 style="color:${b.primary}">2.1 Key personnel</h4>
-      <table><tr><th style="background:${b.primary}">Role</th><th style="background:${b.primary}">Name</th></tr><tr><td>Project Director</td><td>Kenzie May</td></tr><tr><td>HSEQ Manager</td><td>Sam Ortiz</td></tr><tr><td>Site Supervisor</td><td>Dana Reilly</td></tr></table>`;
-    // "Ours": the same content through the shared renderer in the client's brand.
-    const items=[{el:true,pid:'heading',content:{title:'Company Overview'}},{el:true,pid:'paragraph',content:{body:`${t.name} is a ${t.industry.toLowerCase()} contractor delivering projects across South-East Queensland. We self-perform the majority of our scope with a directly employed workforce.`}},{el:true,pid:'subheading',content:{title:'Key personnel'}},{el:true,pid:'table',content:{headers:['Role','Name'],rows:[['Project Director','Kenzie May'],['HSEQ Manager','Sam Ortiz'],['Site Supervisor','Dana Reilly']]}}];
-    document.getElementById('apOurs').innerHTML = `<div style="border-bottom:3px solid ${b.secondary};padding-bottom:6px;margin-bottom:10px;display:flex;align-items:center;gap:6px;font-family:'${b.font}',sans-serif;font-weight:700;font-size:10px;color:${b.primary}"><span style="width:14px;height:14px;border-radius:4px;background:${b.primary};display:inline-block"></span>${t.name}</div>`
-      + `<div style="zoom:.62">${(typeof renderComposedDoc==='function')?renderComposedDoc(items, b).replace('padding:46px 50px','padding:0'):''}</div>`;
-    const a=M.approval, foot=document.getElementById('apFoot');
-    if(a.status==='approved') foot.innerHTML=`<span class="ap-stamp"><span class="ms">verified</span> Client approved · ${a.date}</span><span class="muted" style="font-size:12px">${a.by}</span><a class="lnk" id="apReset" style="margin-left:auto;font-size:12px">Re-request</a>`;
-    else if(a.status==='pending') foot.innerHTML=`<span class="ap-pending"><span class="ms">schedule</span> Sent to client · ${a.date}</span><a class="btn btn-primary btn-sm" id="apMark"><span class="ms" style="font-size:16px">check</span> Mark approved</a><a class="lnk" id="apReset" style="margin-left:auto;font-size:12px">Cancel</a>`;
-    else foot.innerHTML=`<span class="muted" style="font-size:12.5px">Not sent yet.</span><a class="btn btn-primary btn-sm" id="apSend"><span class="ms" style="font-size:16px">send</span> Send to client for approval</a><a class="btn btn-outline btn-sm" id="apMark"><span class="ms" style="font-size:16px">check</span> Approved in person</a>`;
-    const today=()=>new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
-    const set=(status,extra,msg)=>{ M.approval=Object.assign({status},extra); brandLog(t,'Kaila',msg); saveBrandMeta(t); renderApprove(); renderLog(); showToast(msg); };
-    document.getElementById('apSend')?.addEventListener('click',()=>set('pending',{date:today()},'Brand sample sent to '+t.name+' for approval'));
-    document.getElementById('apMark')?.addEventListener('click',()=>set('approved',{date:today(),by:'Client · '+t.name},'Client approved brand sample'));
-    document.getElementById('apReset')?.addEventListener('click',()=>set('not-sent',{},'Brand approval reset'));
-  }
 
   // ---- Issued documents: a sent tender keeps the brand it went out with.
   function renderIssued(){
@@ -452,7 +408,7 @@ function pageInit(){
   meterFill(document.getElementById('cd-tu-m'),t.topup);
 
   document.getElementById("buildBlocksBtn").href="block-edit.html#client="+t.id;
-  renderIdentity(); renderDetails(); renderFiles(); renderApprove(); renderBoard();
+  renderIdentity(); renderDetails(); renderFiles(); renderBoard();
 
   // ---- Documents tab: per-document breakdown across assigned packs + direct docs ----
   const assignedTemplates = (typeof TEMPLATES!=='undefined') ? TEMPLATES.filter(x=>x.tenants && x.tenants.includes(t.id)) : [];
@@ -589,7 +545,7 @@ function pageInit(){
 
   // ---- Brand Kit editor (shared component) ----
   function openBrand(){
-    openBrandEditor(b, {title:'Brand — '+t.name, onSave:()=>{ brandLog(t,'Kaila','Edited brand values'); if(M.approval.status==='approved'){ M.approval={status:'not-sent'}; saveBrandMeta(t); showToast('Brand changed — client approval needs renewing'); } renderIdentity(); renderBoard(); renderApprove(); }});
+    openBrandEditor(b, {title:'Brand — '+t.name, onSave:()=>{ brandLog(t,'Kaila','Edited brand values'); if(M.approval.status==='approved'){ M.approval={status:'not-sent'}; saveBrandMeta(t); showToast('Brand changed — client approval needs renewing'); } renderIdentity(); renderBoard(); }});
   }
 }
 </script>
