@@ -63,6 +63,8 @@
   .autosave .ms{font-size:13px}
   .fin-sm{padding:7px 10px;font-size:12.5px;width:auto;min-width:190px}
   .vb-canvas{position:relative;flex:1;min-height:0;background:#E7ECEA;background-image:radial-gradient(#d4dcd9 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto}
+  .cd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .code-ta{width:100%;box-sizing:border-box;height:calc(100% - 70px);min-height:260px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.6;border:1px solid var(--border);border-radius:10px;padding:12px;resize:none;background:#0f1720;color:#d7e2df;tab-size:2;outline:none;white-space:pre;overflow:auto}
   .vb-page.preview{cursor:default} .vb-page.preview .vb-block>div{width:100%}   /* renderer rows fill the block like editor rows do */
   .vb-bar{display:flex;align-items:center;gap:9px;width:100%;max-width:620px;margin:0 auto 16px;color:var(--gray);font-size:12.5px;font-weight:500}
   /* Always A4 width (content-driven height); canvas scrolls if it can't fit */
@@ -353,7 +355,7 @@
     <div class="ed3 st-on" id="ws">
       <!-- Source document — the client's file, any page, any order. Click a section or select text to make a block. -->
       <div class="ed3-col" id="leftCol">
-        <div class="ws-tabs"><button class="on" data-wtab="els">Elements</button><button data-wtab="ai">Draft with AI</button><button data-wtab="style">Style</button></div>
+        <div class="ws-tabs"><button class="on" data-wtab="els">Elements</button><button data-wtab="style">Style</button><button data-wtab="ai">AI Draft</button><button data-wtab="code">Code</button></div>
         <div class="card" id="aiPane" style="display:none">
           <div class="ray-draft">
             <div class="ray-h"><span class="ms">auto_awesome</span> Draft a block from an image <span class="fld-opt" style="margin-left:auto;font-weight:500">with Tenderfy AI (Ray)</span></div>
@@ -370,6 +372,11 @@
           <label class="pal-search"><span class="ms">search</span><input id="palQ" placeholder="Search elements…"></label>
           <div class="vb-pal" id="palette"></div>
           <div class="fhint" style="margin-top:10px">Drag onto the block, or click to add. Text comes from the document — select it there.</div>
+        </div>
+        <div class="card" id="codePane" style="display:none">
+          <div class="cd-head"><h3 class="ed-h" style="margin:0">HTML</h3><button class="btn btn-outline btn-sm" id="codeCopy"><span class="ms" style="font-size:15px">content_copy</span> Copy</button></div>
+          <textarea id="codeArea" class="code-ta" spellcheck="false" readonly></textarea>
+          <div class="fhint" style="margin-top:8px">What a document renders for this block, in the brand you’re previewing. Generated from the canvas — edit there.</div>
         </div>
         <div class="card" id="styleCard" style="display:none">
           <h3 class="ed-h">Style</h3>
@@ -727,7 +734,7 @@ function pageInit(){
   // Duplicate works before the first save too: keep the canvas, drop the identity, name it "(copy)".
   document.getElementById('dupBtn').addEventListener('click',()=>{ if(cur){ leaving=true; duplicateBlock(cur.label, cur.id); return; } const l=document.getElementById('b-label'); l.value=(l.value.trim()||'Untitled block')+' (copy)'; syncBar(); commit(); showToast('Duplicated on the canvas — save it as a new block'); });
   // Left panel tabs: Document · Elements · Block · Style
-  const PANES={ai:'aiPane',els:'elPane',style:'styleCard'};
+  const PANES={els:'elPane',style:'styleCard',ai:'aiPane',code:'codePane'};
   function showTab(k){
     document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.wtab===k));
     Object.entries(PANES).forEach(([key,id])=>{ document.getElementById(id).style.display = key===k?'':'none'; });
@@ -768,6 +775,8 @@ function pageInit(){
   }
   // Build / Preview: preview swaps the editable canvas for the shared renderer's output — the same HTML a document gets.
   let previewMode=false;
+  function renderCodeTab(){ const ta=document.getElementById('codeArea'); if(!ta) return; if(!doc.length){ ta.value=''; return; } P2DOC.__preview=doc; ta.value=composeBlock({p:'__preview'}, brand).replace(/></g,'>\n<'); }
+  document.getElementById('codeCopy').addEventListener('click',()=>{ navigator.clipboard.writeText(document.getElementById('codeArea').value).then(()=>showToast('HTML copied')); });
   function renderPreview(){ if(!doc.length) return; P2DOC.__preview=doc; page.innerHTML=`<div class="vb-block" id="blockWrap">${composeBlock({p:'__preview'}, brand)}</div>`; applyBlockStyle(); }
   document.querySelectorAll('#modeSeg button').forEach(b=>b.addEventListener('click',()=>{ previewMode=b.dataset.m==='preview'; document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',x===b)); page.classList.toggle('preview',previewMode); sel=null; render(); }));
   function render(){
@@ -796,6 +805,7 @@ function pageInit(){
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
     if(previewMode) renderPreview();
+    renderCodeTab();
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
   function loadTemplate(key){ doc = key ? normDoc(clone(P2DOC[key]||[])) : []; sel=null; render(); commit(); }
