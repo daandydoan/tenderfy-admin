@@ -344,22 +344,11 @@
   .ver-empty{color:var(--light);font-size:12.5px;text-align:center;padding:26px 0}
   /* ---- Responsive: collapsible Style panel + overlay drawers ---- */
   .tb-btn.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint)}
-  #elBtn{display:none}
+  /* The left panel is a real side panel at every width: shown inline, or hidden so the canvas takes the row. */
+  .ed3:not(.st-on) #leftCol{display:none}
+  .ed3:not(.st-on){grid-template-columns:minmax(0,1fr)}
+  @media(max-width:1100px){ .ed3{grid-template-columns:320px minmax(0,1fr)} }
   .ed3-scrim{display:none}
-  @media(min-width:1101px){
-    .ed3:not(.st-on) #leftCol{display:none}
-    .ed3:not(.st-on){grid-template-columns:minmax(0,1fr)}
-  }
-  @media(max-width:1100px){
-    #elBtn{display:flex}
-    .ed3{grid-template-columns:minmax(0,1fr)!important}
-    #leftCol{position:fixed;top:58px;bottom:0;width:290px;max-width:86vw;z-index:70;background:var(--page,#eef2f1);box-shadow:0 14px 44px rgba(0,0,0,.24);transition:transform .22s ease;overflow-y:auto;padding:16px}
-    #leftCol{left:0;transform:translateX(-106%)}
-    .ed3.el-on #leftCol{transform:translateX(0)}
-    .ed3.st-on #leftCol{transform:translateX(0)}
-    .ed3-scrim{display:block;position:fixed;inset:0;background:rgba(16,26,23,.4);opacity:0;visibility:hidden;transition:opacity .2s;z-index:65}
-    .ed3.el-on ~ .ed3-scrim,.ed3.st-on ~ .ed3-scrim{opacity:1;visibility:visible}
-  }
 </style>
 </head>
 <body data-page="blocks" data-title="Blocks">
@@ -524,7 +513,7 @@
       <div class="ed3-mid">
         <div id="visualPanel">
           <div class="vb-toolbar">
-            <button class="tb-btn tb-lbl" id="elBtn" title="Show the panel"><span class="ms">left_panel_open</span> Panel</button>
+            <button class="tb-btn tb-lbl" id="elBtn" title="Show / hide the side panel"><span class="ms">left_panel_open</span> Panel</button>
             <span class="sel-pill" id="selPill"></span>
             <span class="tb-group">
               <button class="tb-btn" id="undoBtn" title="Undo (Ctrl+Z)"><span class="ms">undo</span></button>
@@ -549,7 +538,6 @@
       </div>
 
     </div>
-    <div class="ed3-scrim" id="ed3Scrim"></div>
   </div>
 </div>
 
@@ -1503,15 +1491,13 @@ function pageInit(){
 
   // ---- Responsive panels (Style collapsible / drawers on small screens) ----
   const ed3=document.querySelector('.ed3');
-  let styleOpen = window.innerWidth>1100, elOpen=false, lastWide=window.innerWidth>1100;
+  // Left panel: an inline side panel. Open by default on wide screens, closed on narrow; the button toggles it.
+  let panelOpen = window.innerWidth>900;
   function applyPanels(){
-    ed3.classList.toggle('st-on', styleOpen);
-    ed3.classList.toggle('el-on', elOpen);
-    document.getElementById('elBtn').classList.toggle('on', elOpen);
+    ed3.classList.toggle('st-on', panelOpen);
+    const b=document.getElementById('elBtn'); b.classList.toggle('on', panelOpen); b.querySelector('.ms').textContent = panelOpen?'left_panel_close':'left_panel_open';
   }
-  document.getElementById('elBtn').addEventListener('click',()=>{ elOpen=!elOpen; if(elOpen && window.innerWidth<=1100) styleOpen=false; applyPanels(); });
-  document.getElementById('ed3Scrim').addEventListener('click',()=>{ elOpen=false; styleOpen=false; applyPanels(); });
-  window.addEventListener('resize',()=>{ const wide=window.innerWidth>1100; if(wide!==lastWide){ lastWide=wide; styleOpen=wide; elOpen=false; applyPanels(); } });
+  document.getElementById('elBtn').addEventListener('click',()=>{ panelOpen=!panelOpen; applyPanels(); });
 
   if(!existing && (wantSlot==='header'||wantSlot==='footer')){
     document.getElementById('b-cat').value='Headers & Footers';
