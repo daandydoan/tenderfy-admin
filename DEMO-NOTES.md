@@ -6,37 +6,28 @@ the "For developers" notes are what the mockup deliberately fakes.
 
 ## The block workspace (how it's meant to be used)
 
-One screen, no steps: a tabbed panel on the left (Document · Elements · Style), the block on the right.
-Entry: Client detail → *Original files* → **Build blocks from these**
-(`block-edit.html#client=taylor&doc=whs`). From the Blocks list:
-New Block asks *Who is this block for?* first.
+One screen, no steps: a tabbed panel on the left (Draft with AI · Elements · Style), the block on the right.
+Entry: Client detail → **Build blocks** (`block-edit.html#client=taylor`); from the Blocks list, New Block asks
+*Who is this block for?* first.
 
-You can, in any order:
-- click any section of any page → **New block** (or **Add to this block** if one is open)
-- drag across any text → **New block from selection** / **Add to this block**
-- **Elements** tab for anything not in the document (drag or click); every element’s words are editable inline
-- **Save** — the first save asks for name · category · helper in a dialog; later saves are one click. Stays here; the section gets a ✓. **Save & new** clears the canvas
-- click a ✓ section to reopen that block
+- **Draft with AI**: upload, drop or paste (Ctrl+V anywhere) a screenshot or photo of a section from the client's
+  document, optionally say what it is → Ray lays it out as elements. In the mockup the layout follows the description
+  (table / list / quote / photo words) and the text is a placeholder; the real build reads the image.
+- **Elements** for anything else (drag or click); every element's words are editable inline
+- **Save** — the first save asks for name · category · helper in a dialog; later saves are one click.
+  **Save & start another** in the kebab.
 
-The document is a map, not a to-do list: "2 of 14 sections are blocks" in its header, a dot on pages that
-have blocks, one section deliberately flagged *Ray merged two sections — check the split*, one page that
-*Ray couldn't read* (a drawing). Blocks save against the client (*Built for Taylor Builders*) with the
-regions they came from; *Also available to all clients* is a checkbox.
+Blocks save against the client (*Built for Taylor Builders*); *Share as a generic template* is a save-time checkbox.
 
 ## The 2-minute demo
 
-1. Client detail (Taylor) → **Build blocks from these**. Their WHS plan opens beside an empty block.
-   > "We start from your documents, not a blank page."
-2. Page 4 → click **Our commitment**. Their words land in the block, named after the section,
-   *From WHS Management Plan · p.4*.
-3. Click **Safety performance** → *Add to this block*. A key/value table joins it.
-4. **Save & new** → both sections show ✓ on the document. Drag across a sentence on page 2 → *New block
-   from selection*.
-   > "Any text, any page, any order."
+1. Client detail (Taylor) → **Build blocks**. An empty block, Taylor's brand already selected.
+2. Paste a screenshot of their safety section into **Draft with AI**, type "our safety commitment with a stats table", **Draft block**.
+   > "Screenshot any section of what you already have — Ray lays it out."
+3. Fix the words inline, adjust the table rows, **Save**. It appears in the Blocks list and the Document builder.
+4. **Save & start another** → paste the next screenshot.
 
-Optional: Preview style → another client (same block, their brand); page 7 (the drawing Ray can't read);
-page 5 (the flagged merge).
-
+Optional: Preview style → another client (same block, their brand).
 ## Glossary — say this, not that
 
 | On screen | Say to a prospect | Means |
@@ -53,11 +44,7 @@ page 5 (the flagged merge).
 
 ## For developers — what the mockup fakes
 
-- **Source document** is a static page with three draftable regions. Real: upload PDF/Word, render pages,
-  select a region, extract text/tables. Provenance (`source`) is stored on the block and should become
-  `{docId, page, region}`.
-- **Ray** is a keyword matcher on the description and a fixed lift from the source regions. Real: LLM over
-  the extracted region, returning elements.
+- **Draft with AI** stores the pasted image as a data URL and drafts a layout from the description keywords. Real: a vision model over the image returning elements + the exact text.
 - **Client attachment.** Blocks are stored brand-neutral with `availability: All clients`. Prior reviews
   agree the real model is *block → client* (admin-built blocks belong to one client; Tenderfy base blocks
   are the exception). The mockup does not model this yet; "Preview style" stands in for it.
@@ -105,14 +92,9 @@ store (ABN/licences/insurance) that blocks reference · block analytics / win-ra
 
 ## Block workspace — rules the mockup now models
 
-- **Sections are handled, not blocks**: a section is handled when it's a block *or* skipped. "8 of 15 sections
-  handled · 6 blocks" — the denominator can reach the end; one block can cover several sections.
-- **Blocks from this document** strip at the top of the Document tab is the memory of the file; deleting a block
-  clears its ✓ and drops it from the strip.
-- **Auto-split may be wrong** → *Split here* makes two sections; **Not readable (drawing)** → *Skip this page*.
 - **A block belongs to a client**: New Block asks *Who is this block for?* before anything else; *General library
   block* is the only client-less path (Tenderfy's seeded blocks).
-- **Provenance is by region**, shown as a page range: *From WHS Management Plan · p.4–5*.
+- **Provenance**: *Drafted by Ray from an image* — the real build stores the image and what it read from it.
 - **No permissions in the admin workspace.** Who may edit what is decided in the client editor — *owner decides,
   estimator obeys*. The admin’s protection is provenance and merge fields — facts with a shelf life
   (licence, insurance, ABN) become merge fields, never prose.
@@ -123,6 +105,4 @@ store (ABN/licences/insurance) that blocks reference · block analytics / win-ra
   key/value, merge field, 2/3 columns). Style shows image source and table shape; layout, fill,
   spacing, type and borders live under *Advanced styling*.
 
-Parked for the real build: **source updated** — when a client uploads v2 of a document, blocks whose regions
-changed are flagged *review*; **block-in-use check** — drop a block into a real tender with merge fields resolved
-before calling it done; multiple documents per client; real upload.
+Parked for the real build: a **block-in-use check** — drop a block into a real tender with merge fields resolved before calling it done; multiple images per block.

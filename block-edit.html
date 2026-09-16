@@ -15,32 +15,6 @@
 <link rel="stylesheet" href="components.css">
 <style>
   .ed3{display:grid;grid-template-columns:380px minmax(0,1fr);gap:16px;align-items:stretch;height:calc(100vh - 152px);min-height:500px}
-  .ed3.no-doc #tabDoc{display:none}
-  /* Source document pane — the client's file, big enough to read */
-  .ws-doc{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;position:relative;height:calc(100% - 52px)}
-  .ws-dochead{display:flex;align-items:center;gap:9px;margin-bottom:10px}
-  .ws-doctitle{flex:1;min-width:0} .ws-doctitle .nm{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .ws-doctitle .meta{font-size:11px;color:var(--gray)}
-  .ws-pagenav{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--gray);white-space:nowrap} .ws-pagenav .tb-btn{width:26px;height:26px}
-  .ws-pages{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
-  .ws-pages button{width:26px;height:26px;border:1px solid var(--border);background:#fff;border-radius:6px;font-family:inherit;font-size:10.5px;color:var(--gray);cursor:pointer;position:relative}
-  .ws-pages button.on{border-color:var(--teal);color:var(--teal);background:var(--teal-tint);font-weight:700}
-  .ws-pages button.done::after{content:'';position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
-  .ws-docpage{flex:1;min-height:0;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:6px;padding:22px 24px;box-shadow:inset 0 0 0 1px #f2f5f4;font-family:Georgia,'Times New Roman',serif;color:#2a2f2e;font-size:12px;line-height:1.5;user-select:text}
-  .ws-docpage .src-hd{font-size:13px;margin-bottom:10px}
-  .ws-docpage .src-region{padding:8px 10px;margin:0 -10px 6px;font-size:12px}
-  .ws-docpage .src-h2{font-size:12.5px}
-  .ws-docpage .src-region table{font-size:11.5px} .ws-docpage .src-region td{padding:3px 6px}
-  .ws-docpage .src-draft{display:inline-flex;opacity:0;transition:.12s;font-size:11px;padding:5px 9px}
-  .ws-docpage .src-region:hover .src-draft{opacity:1}
-  .ws-docpage .src-region.drafted .src-draft{display:none}
-  .ws-docpage .src-region.drafted{cursor:pointer}
-  .ws-docpage .src-region.drafted::after{content:'✓ block';font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--teal);position:absolute;top:6px;right:8px}
-  .ws-docpage .src-region.warn{border-color:#f3d9a4;background:#fffaf0}
-  .ws-docpage .src-warn{display:flex;align-items:center;gap:5px;font-family:'Outfit',sans-serif;font-size:10.5px;color:#8a5a00;margin-bottom:5px} .ws-docpage .src-warn .ms{font-size:14px}
-  .ws-scan{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:260px;text-align:center;color:var(--gray);font-family:'Outfit',sans-serif;font-size:12.5px}
-  .ws-scan .ms{font-size:34px;color:var(--light)} .ws-scan .fake{width:80%;height:120px;background:repeating-linear-gradient(0deg,#f0f3f2 0 6px,#fff 6px 14px);border:1px solid var(--border);border-radius:4px;filter:blur(.6px)}
-  .sel-pop{position:absolute;z-index:20;display:flex;gap:6px;background:#1f2a2e;border-radius:9px;padding:5px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-  .sel-pop button{display:inline-flex;align-items:center;gap:5px;border:none;background:transparent;color:#fff;font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;padding:6px 9px;border-radius:6px;cursor:pointer;white-space:nowrap} .sel-pop button:hover{background:rgba(255,255,255,.12)} .sel-pop .ms{font-size:15px}
   /* Block panel tabs */
   .ws-tabs{display:flex;background:#eef2f1;border:1px solid var(--border);border-radius:9px;padding:3px;gap:2px;margin-bottom:12px}
   .ws-tabs button{flex:1;border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--gray);padding:7px 10px;border-radius:7px;cursor:pointer}
@@ -49,20 +23,6 @@
   .ws-owner{font-size:11.5px;color:var(--gray);display:flex;align-items:center;gap:5px} .ws-owner .ms{font-size:14px;color:var(--teal)}
   .add-menu{min-width:200px;max-height:380px;overflow:auto} .add-menu .pal-tag{padding:6px 12px 2px} .add-menu a{padding:7px 12px}
   .kebab-menu.add-menu{left:0;right:auto}
-  /* Blocks from this document + skipped sections */
-  .ws-blocks{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;min-height:0}
-  .ws-blocks .bk{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#1f5a50;background:var(--teal-tint);border:1px solid #bfe0d9;border-radius:100px;padding:2px 9px;cursor:pointer;max-width:100%} .ws-blocks .bk:hover{border-color:var(--teal)} .ws-blocks .bk .ms{font-size:13px} .ws-blocks .bk.cur{background:var(--teal);color:#fff;border-color:var(--teal)}
-  .ws-blocks .bk .pg{font-weight:400;color:inherit;opacity:.7}
-  .ws-blocks .none{font-size:11px;color:var(--light)}
-  .ws-docpage .src-region.skipped{opacity:.55;border-style:dotted;border-color:#d4dcd9}
-  .ws-docpage .src-region.skipped::after{content:'– skipped';font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--light);position:absolute;top:6px;right:8px}
-  .ws-docpage .src-region.skipped .src-draft{display:none}
-  .ws-docpage .src-skip{position:absolute;right:6px;top:6px;display:none;align-items:center;gap:3px;border:1px solid var(--border);background:#fff;color:var(--gray);border-radius:6px;padding:3px 7px;font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;cursor:pointer} .ws-docpage .src-skip .ms{font-size:13px}
-  .ws-docpage .src-region:hover .src-skip{display:inline-flex} .ws-docpage .src-region.drafted .src-skip,.ws-docpage .src-region.skipped .src-skip{display:none}
-  .ws-docpage .src-region.skipped:hover .src-unskip{display:inline-flex}
-  .ws-docpage .src-unskip{position:absolute;right:6px;bottom:6px;display:none;font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;color:var(--teal);background:#fff;border:1px solid #bfe0d9;border-radius:6px;padding:3px 7px;cursor:pointer}
-  .ws-docpage .src-warn button,.ws-scan button{margin-left:auto;border:1px solid #f3d9a4;background:#fff;color:#8a5a00;border-radius:6px;padding:2px 8px;font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;cursor:pointer}
-  .ws-scan button{border-color:var(--border);color:var(--gray);margin:0}
   /* Permission control on the selected element (canvas) */
   /* Client picker */
   .pick-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
@@ -159,17 +119,6 @@
   .tbl-ops button{display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid var(--border);background:#fff;border-radius:7px;padding:6px 4px;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--gray);cursor:pointer}
   .tbl-ops button:hover{border-color:var(--teal);color:var(--teal)} .tbl-ops button .ms{font-size:15px}
   /* Source document (the client's PDF) — a static page with draftable regions */
-  .src-meta{font-size:11px;color:var(--light);margin:-4px 0 8px}
-  .src-page{background:#fff;border:1px solid var(--border);border-radius:6px;padding:12px 12px 6px;box-shadow:0 2px 8px rgba(20,45,38,.08);font-family:Georgia,'Times New Roman',serif;color:#333;font-size:9.5px;line-height:1.45}
-  .src-hd{font-weight:700;font-size:10.5px;color:#1f2a2e;border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:6px}
-  .src-h2{font-weight:700;font-size:10px;margin-bottom:3px;color:#27535C}
-  .src-region{position:relative;padding:6px 6px 8px;margin:0 -6px 4px;border-radius:6px;border:1.5px dashed transparent;cursor:pointer;transition:.12s}
-  .src-region:hover{border-color:#a893e0;background:#faf9ff}
-  .src-region p,.src-region ul{margin:0} .src-region ul{padding-left:14px}
-  .src-region table{width:100%;border-collapse:collapse} .src-region td{padding:2px 4px;border-bottom:1px solid #eee} .src-region td:last-child{text-align:right;font-weight:700}
-  .src-draft{position:absolute;right:6px;bottom:6px;display:none;align-items:center;gap:4px;border:none;background:#5b46b8;color:#fff;border-radius:6px;padding:4px 8px;font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;cursor:pointer}
-  .src-draft .ms{font-size:13px} .src-region:hover .src-draft{display:inline-flex}
-  .src-region.drafted{border-color:#bfe0d9;background:var(--teal-tint)} .src-region.drafted::after{content:'check_circle';font-family:'Material Symbols Outlined';position:absolute;top:4px;right:6px;color:var(--teal);font-size:14px}
   .src-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#5b46b8;background:#f3f0fb;border:1px solid #d9d0f2;border-radius:100px;padding:2px 9px}
   .src-chip .ms{font-size:13px}
   /* Page break — reads as a page split, not a divider */
@@ -323,7 +272,7 @@
   .ray-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;color:#6a5fb0;margin:2px 0 5px}
   .ray-ref{margin-bottom:10px}
   .ray-drop{display:flex;align-items:center;justify-content:center;gap:7px;border:1.5px dashed #c3b8ea;border-radius:9px;background:#faf9ff;color:#5b46b8;font-size:12px;font-weight:600;padding:15px;cursor:pointer}
-  .ray-drop:hover{background:#f3f0fb;border-color:#a893e0}
+  .ray-drop:hover,.ray-drop.over{background:#f3f0fb;border-color:#a893e0}
   .ray-drop .ms{font-size:19px}
   .ray-thumb{position:relative;border-radius:9px;overflow:hidden;border:1px solid #d9d0f2;background:#faf9ff}
   .ray-thumb img{display:block;width:100%;max-height:120px;object-fit:cover}
@@ -384,18 +333,17 @@
     <div class="ed3 st-on" id="ws">
       <!-- Source document — the client's file, any page, any order. Click a section or select text to make a block. -->
       <div class="ed3-col" id="leftCol">
-        <div class="ws-tabs"><button class="on" data-wtab="doc" id="tabDoc">Document</button><button data-wtab="els">Elements</button><button data-wtab="style">Style</button></div>
-        <div class="ws-doc" id="docPane">
-        <div class="ws-dochead">
-          <span class="ms" style="color:var(--teal);font-size:18px">picture_as_pdf</span>
-          <div class="ws-doctitle"><div class="nm" id="docName">—</div><div class="meta" id="docMeta"></div></div>
-          <span class="ws-pagenav"><button class="tb-btn" id="pgPrev" title="Previous page"><span class="ms">chevron_left</span></button><span id="pgLbl">p.1 / 9</span><button class="tb-btn" id="pgNext" title="Next page"><span class="ms">chevron_right</span></button></span>
-        </div>
-        <div class="ws-blocks" id="docBlocks"></div>
-        <div class="ws-pages" id="docPages"></div>
-        <div class="ws-docpage" id="docPage"></div>
-        <div class="fhint" style="margin-top:8px">Click a section → <strong>New block</strong>. Drag across any text → <strong>Make block</strong>. Hover a section to <strong>skip</strong> it. ✓ = block · – = skipped.</div>
-        <div class="sel-pop" id="selPop" style="display:none"><button id="selNew"><span class="ms">add_box</span> New block from selection</button><button id="selAdd"><span class="ms">playlist_add</span> Add to this block</button></div>
+        <div class="ws-tabs"><button class="on" data-wtab="ai">Draft with AI</button><button data-wtab="els">Elements</button><button data-wtab="style">Style</button></div>
+        <div class="card" id="aiPane">
+          <div class="ray-draft">
+            <div class="ray-h"><span class="ms">auto_awesome</span> Draft a block from an image</div>
+            <div class="ray-lbl">Screenshot or photo of the section</div>
+            <div class="ray-ref" id="aiRef"><input type="file" accept="image/*" id="aiImg" hidden><label for="aiImg" class="ray-drop" id="aiDrop"><span class="ms">add_photo_alternate</span> Upload, drop, or paste (Ctrl+V)</label></div>
+            <div class="ray-lbl">What is it? <span class="fld-opt">· optional</span></div>
+            <textarea id="aiPrompt" class="fin" rows="2" placeholder="e.g. our safety commitment with a stats table"></textarea>
+            <button type="button" class="btn btn-ray btn-sm" id="aiBtn"><span class="ms" style="font-size:16px">auto_awesome</span> Draft block</button>
+          </div>
+          <div class="fhint" style="margin-top:10px">Ray reads the image and lays it out as elements with the words it finds — you edit from there. Paste anywhere on the page to add an image.</div>
         </div>
         <div class="card" id="elPane" style="display:none">
           <label class="pal-search"><span class="ms">search</span><input id="palQ" placeholder="Search elements…"></label>
@@ -640,7 +588,7 @@ function pageInit(){
   const wantSlot=_params.get('slot'); // 'header' | 'footer' — deep-link to create page furniture
   const existing=id?BLOCKS.find(b=>b.id===id):null;
   let cur=existing;   // the block currently saved from this canvas (null until first save)
-  const clientId=_params.get('client')||(existing&&existing.client)||null, docId=_params.get('doc')||'whs';
+  const clientId=_params.get('client')||(existing&&existing.client)||null;
   const tenant=clientId?TENANTS.find(t=>t.id===clientId):null;
 
   const elDef=()=>({wmode:'fill',wpx:200,hmode:'fill',hpx:120,padH:0,padV:0,padSides:false,padT:0,padR:0,padB:0,padL:0,marH:0,marV:0,marSides:false,marT:0,marR:0,marB:0,marL:0,bg:'',bgBind:'',bgA:100,bgVis:true,font:'',weight:'',size:0,lh:0,color:'',align:'',rad:0,radSides:false,radTL:0,radTR:0,radBR:0,radBL:0,bw:0,bstyle:'solid',bcolor:'#38988a',bcolorBind:'',bcolorA:100,bcolorVis:true,bpos:'inside'});
@@ -729,7 +677,7 @@ function pageInit(){
   }
   document.getElementById('dupBtn').addEventListener('click',()=>{ if(cur){ leaving=true; duplicateBlock(cur.label, cur.id); } });
   // Left panel tabs: Document · Elements · Block · Style
-  const PANES={doc:'docPane',els:'elPane',style:'styleCard'};
+  const PANES={ai:'aiPane',els:'elPane',style:'styleCard'};
   function showTab(k){
     document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.wtab===k));
     Object.entries(PANES).forEach(([key,id])=>{ document.getElementById(id).style.display = key===k?'':'none'; });
@@ -795,7 +743,7 @@ function pageInit(){
     }
     const n=doc.reduce((sum,row)=>sum+row.cols.reduce((a,col)=>a+col.length,0),0);
     document.getElementById('bar-count').textContent=n?`· ${n} element${n>1?'s':''}`:'';
-    const sc=document.getElementById('srcChip'); sc.style.display=source?'':'none'; sc.innerHTML=source?`<span class="ms">picture_as_pdf</span> From ${source}`:'';
+    const sc=document.getElementById('srcChip'); sc.style.display=source?'':'none'; sc.innerHTML=source?`<span class="ms">${/Ray/.test(source)?'auto_awesome':'picture_as_pdf'}</span> ${source}`:'';
     wire(); wireText(); applyAllElStyles(); applyBlockStyle(); applySelection(); syncInspector();
   }
   function loadTemplate(key){ doc = key ? normDoc(clone(P2DOC[key]||[])) : []; sel=null; render(); commit(); }
@@ -1314,130 +1262,52 @@ function pageInit(){
     if(auto) auto.addEventListener('click',()=>{ _thumbMem=''; setBlockThumbOverride(id,''); renderThumbOverride(); showToast('Using the auto-generated preview'); });
   })();
 
-  // ---- Source document workspace. A mock 9-page WHS plan for the client; any page, any order.
-  // Click a section → new block (or add to the open one). Drag-select any text → make a block from it.
-  // Region ids persist in tf_docs_<client> so ✓ marks survive reload; blocks record which regions they came from.
-  const SRC_DOCS={ whs:{ name:'WHS Management Plan.pdf', pages:[
-    {t:'1. Introduction', r:[{id:'p1-purpose',h:'Purpose of this plan',p:'This WHS Management Plan sets out how Northside Civil manages health and safety on every project it delivers. It applies to all employees, subcontractors and visitors.'},{id:'p1-scope',h:'Scope',items:['Civil and drainage works','Traffic management','Bulk earthworks and reinstatement']}]},
-    {t:'2. Company Overview', r:[{id:'p2-overview',h:'Who we are',p:'Northside Civil is a Brisbane-based civil contractor delivering road, drainage and traffic-management packages for state and local government since 2011. We self-perform the majority of our scope with a directly employed workforce of 48.'},{id:'p2-people',h:'Key personnel',rows:[['Project Director','Kenzie May'],['HSEQ Manager','Sam Ortiz'],['Site Supervisor','Dana Reilly']]}]},
-    {t:'3. Roles & Responsibilities', r:[{id:'p3-roles',h:'Responsibilities',items:['Directors — provide resources and set safety expectations','HSEQ Manager — maintains the system and audits sites','Supervisors — daily pre-starts, SWMS sign-on, incident reporting','All workers — follow SWMS, report hazards']}]},
-    {t:'4. Safety Management System', r:[{id:'p4-sms',h:'Our commitment',p:'Northside Civil operates a certified Safety Management System (AS/NZS ISO 45001) covering all civil, drainage and traffic-management works. Every project is delivered under a site-specific WHS Management Plan reviewed by our HSEQ Manager before mobilisation.'},{id:'p4-stats',h:'Safety performance (last 24 months)',rows:[['Lost-time injuries','0'],['Total recordable injury frequency rate','2.1'],['Toolbox talks delivered','412'],['Site inductions completed','1,180']]},{id:'p4-controls',h:'Key controls on every site',items:['Daily pre-start and SWMS sign-on','Exclusion zones for plant and live traffic','Certified traffic controllers on all road interfaces','Weekly HSEQ site audit with corrective-action register']}]},
-    {t:'5. Risk Management', r:[{id:'p5-risk',h:'Hazard identification and control',warn:'Auto-split may be wrong — this looks like two sections',splitAt:'Incidents are reported',splitTitle:'Incident reporting',p:'Hazards are identified at tender, at mobilisation and daily at pre-start. Controls follow the hierarchy of control and are recorded in the project risk register. High-risk construction work requires a signed SWMS before it starts. Incidents are reported within 24 hours and investigated by the HSEQ Manager, with corrective actions tracked to closure.'}]},
-    {t:'6. Training & Competency', r:[{id:'p6-training',h:'Training',items:['White Card and site induction for every worker','Traffic controller and plant tickets verified before start','Annual first-aid and fire-warden refreshers']},{id:'p6-matrix',h:'Competency matrix',rows:[['Excavator','12 ticketed operators'],['Roller','8 ticketed operators'],['Traffic control','19 accredited']]}]},
-    {t:'7. Site Layout Plan', scan:true},
-    {t:'8. Emergency Response', r:[{id:'p8-emerg',h:'Emergency procedures',p:'Each site maintains an Emergency Response Plan with assembly points, first-aid kits and trained wardens. Emergency contacts are displayed at the site office and reviewed at every induction.'}]},
-    {t:'9. Environmental Controls', r:[{id:'p9-env',h:'Environmental management',items:['Erosion and sediment controls installed before earthworks','Dust suppression with water carts','Spill kits on all plant']},{id:'p9-quote',h:'Client feedback',quote:'Northside delivered ahead of schedule with zero safety incidents.'}]},
-  ]}};
-  const srcDoc = clientId && SRC_DOCS[docId] ? SRC_DOCS[docId] : null;
-  const DSKEY='tf_docs_'+(clientId||'none');
-  let docState={}; try{ docState=JSON.parse(localStorage.getItem(DSKEY))||{}; }catch(e){}
-  if(srcDoc && !docState[docId]) docState[docId]={done:{},skip:{}};
-  const saveDocState=()=>{ try{ localStorage.setItem(DSKEY, JSON.stringify(docState)); }catch(e){} };
-  let regionsUsed = (existing && existing.regions) ? existing.regions.slice() : [];
-  let curPage = 0;
-  const regionOf=(id)=>{ for(const [i,pg] of (srcDoc?srcDoc.pages:[]).entries()){ const r=(pg.r||[]).find(x=>x.id===id); if(r) return {r,n:i+1}; } return null; };
-  const provenance=n=>srcDoc.name.replace(/\.(pdf|docx)$/i,'')+' · p.'+n;
-  // Provenance from the regions actually used: "WHS Management Plan · p.4–5" (a block can span pages).
-  const provenanceOf=()=>{ const ps=[...new Set(regionsUsed.map(r=>{ const f=regionOf(r); return f?f.n:null; }).filter(Boolean))].sort((a,b)=>a-b); if(!ps.length) return source; const runs=[]; ps.forEach(n=>{ const l=runs[runs.length-1]; if(l&&l[1]===n-1) l[1]=n; else runs.push([n,n]); }); return srcDoc.name.replace(/.(pdf|docx)$/i,'')+' · p.'+runs.map(r=>r[0]===r[1]?r[0]:r[0]+'–'+r[1]).join(', '); };
-  function regionEls(r){
-    const mk=(id,content)=>{ const e=mkEl(id); e.content=content; return e; };
-    const els=[mk('subheading',{title:r.h})];
-    if(r.p) els.push(mk('paragraph',{body:r.p}));
-    if(r.items) els.push(mk('list',{items:r.items.slice()}));
-    if(r.rows) els.push(mk('keyvalue',{pairs:r.rows.map(x=>x.slice())}));
-    if(r.quote) els.push(mk('quote',{body:r.quote}));
+  // ---- Draft with AI: upload / drop / paste an image of a section, optionally say what it is, Ray lays it out.
+  // Mock: no OCR here — the layout comes from the description keywords (or a heading + paragraph), the words are
+  // placeholders you replace. ponytail: real build = vision model over the image returning elements + text.
+  let aiImage=null;
+  const aiRef=document.getElementById('aiRef');
+  function setAiImage(dataUrl, name){
+    aiImage=dataUrl;
+    aiRef.innerHTML = dataUrl
+      ? `<div class="ray-thumb"><img src="${dataUrl}" alt="reference"><button type="button" class="ray-x" title="Remove"><span class="ms">close</span></button><div class="ray-cap">${name||'Pasted image'}</div></div>`
+      : `<input type="file" accept="image/*" id="aiImg" hidden><label for="aiImg" class="ray-drop" id="aiDrop"><span class="ms">add_photo_alternate</span> Upload, drop, or paste (Ctrl+V)</label>`;
+    aiRef.querySelector('.ray-x')?.addEventListener('click',()=>setAiImage(null));
+    aiRef.querySelector('#aiImg')?.addEventListener('change',e=>readAiFile(e.target.files&&e.target.files[0]));
+    const drop=aiRef.querySelector('#aiDrop'); if(drop){ drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.classList.add('over'); }); drop.addEventListener('dragleave',()=>drop.classList.remove('over')); drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); readAiFile(e.dataTransfer.files&&e.dataTransfer.files[0]); }); }
+  }
+  function readAiFile(f){ if(!f||!f.type.startsWith('image/')) return; if(f.size>3e6){ showToast('Image too large — keep it under 3 MB'); return; } const rd=new FileReader(); rd.onload=()=>{ setAiImage(rd.result, f.name); showTab('ai'); }; rd.readAsDataURL(f); }
+  setAiImage(null);
+  document.addEventListener('paste',e=>{ if(e.target.closest && e.target.closest('[contenteditable],input,textarea') && !e.target.closest('#aiPane')) return; const f=[...(e.clipboardData||{}).files||[]].find(x=>x.type.startsWith('image/')); if(f){ e.preventDefault(); readAiFile(f); } });
+  function aiDraft(desc){
+    const d=(desc||'').toLowerCase(), mk=(id,content)=>{ const e=mkEl(id); if(content) e.content=content; return e; };
+    const title = desc ? desc.charAt(0).toUpperCase()+desc.slice(1).replace(/\s+(with|and)\s+.*$/,'') : 'Section from image';
+    const els=[mk('subheading',{title})];
+    if(/table|rate|price|pricing|schedule|stat|figure|number/.test(d)) els.push(mk('keyvalue',{pairs:[['Item','Value from image'],['Item','Value from image'],['Item','Value from image']]}));
+    if(/list|bullet|point|checklist|control|step/.test(d)) els.push(mk('list',{items:['Point read from the image','Point read from the image','Point read from the image']}));
+    if(/quote|testimonial|feedback/.test(d)) els.push(mk('quote',{body:'Quote read from the image.'}));
+    if(/photo|image|logo|diagram|picture/.test(d)) els.push(mk('image'));
+    if(els.length===1 || /para|text|commitment|overview|statement|about/.test(d)) els.splice(1,0,mk('paragraph',{body:'Paragraph read from the image — replace with the exact wording once you’ve checked it.'}));
     return els;
   }
-  // Sections are "handled" when they're a block or skipped — that's the number that can reach the end.
-  const secStats=()=>{ const st=docState[docId]; const total=srcDoc.pages.reduce((s,p)=>s+(p.r||[]).length,0); const handledDone=Object.keys(st.done).length, blocks=new Set(Object.values(st.done)).size, skipped=Object.keys(st.skip||{}).filter(k=>!k.startsWith('page-')).length; return {total, done:blocks, skipped, handled:handledDone+skipped}; };
-  function renderDocHead(){
-    if(!srcDoc) return;
-    const st=docState[docId], s=secStats();
-    document.getElementById('docName').textContent=srcDoc.name;
-    document.getElementById('docMeta').textContent = s.handled>=s.total ? `${srcDoc.pages.length} pages · all ${s.total} sections handled — ${s.done} blocks, ${s.skipped} skipped` : `${srcDoc.pages.length} pages · ${s.handled} of ${s.total} sections handled · ${s.done} blocks`;
-    document.getElementById('pgLbl').textContent=`p.${curPage+1} / ${srcDoc.pages.length}`;
-    document.getElementById('docPages').innerHTML=srcDoc.pages.map((pg,i)=>`<button class="${i===curPage?'on':''}${(pg.r||[]).some(r=>st.done[r.id])?' done':''}" data-pg="${i}" title="${pg.t}">${i+1}</button>`).join('');
-    document.querySelectorAll('#docPages button').forEach(b=>b.addEventListener('click',()=>gotoPage(+b.dataset.pg)));
-    // Blocks from this document — the memory of the file, click to open.
-    const ids=[...new Set(Object.values(st.done))], host=document.getElementById('docBlocks');
-    host.innerHTML = ids.length ? ids.map(bid=>{ const b=BLOCKS.find(x=>x.id===bid); if(!b) return ''; const pages=[...new Set((b.regions||[]).map(r=>{ const f=regionOf(r); return f?f.n:null; }).filter(Boolean))]; return `<span class="bk${cur&&cur.id===bid?' cur':''}" data-open="${bid}" title="Open this block"><span class="ms">grid_view</span>${b.label}${pages.length?` <span class="pg">p.${pages.join(',')}</span>`:''}</span>`; }).join('') : `<span class="none">No blocks from this document yet.</span>`;
-    host.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>{ const bid=el.dataset.open; if(cur&&cur.id===bid) return; leaveGuard(()=>{ leaving=true; location.href=location.pathname+'#id='+bid+'&client='+clientId+'&doc='+docId; }); }));
-    document.getElementById('pgSub').innerHTML=`<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">apartment</span> Built for ${tenant.name} · ${srcDoc.name} <span class="muted" title="A block is a reusable section of a tender — the client's words, marked for what they may change">· a block is a reusable section of a tender</span>`;
-  }
-  function renderDocPage(){
-    if(!srcDoc) return;
-    const pg=srcDoc.pages[curPage], host=document.getElementById('docPage'), st=docState[docId], done=st.done, skip=st.skip=st.skip||{};
-    if(pg.scan){ host.innerHTML=`<div class="src-hd">${pg.t}</div><div class="ws-scan"><div class="fake"></div><span class="ms">image_not_supported</span>Not readable — this page is a drawing.<span style="font-size:11.5px;color:var(--light)">Select text on another page, or add an Image element to the block.</span>${skip['page-'+curPage]?`<span class="src-chip" style="color:var(--gray)">– page skipped</span>`:`<button data-skippage><span class="ms" style="font-size:13px;vertical-align:-2px">block</span> Skip this page</button>`}</div>`;
-      host.querySelector('[data-skippage]')?.addEventListener('click',()=>{ skip['page-'+curPage]=true; saveDocState(); renderDocPage(); showToast('Page skipped — it won’t count against the document'); });
-      return; }
-    host.innerHTML=`<div class="src-hd">${pg.t}</div>`+pg.r.map(r=>`<div class="src-region${done[r.id]?' drafted':''}${skip[r.id]?' skipped':''}${r.warn?' warn':''}" data-region="${r.id}" title="${done[r.id]?'Open this block':skip[r.id]?'Skipped — not reusable':'Make a block from this section'}">
-        ${r.warn?`<div class="src-warn"><span class="ms">warning</span>${r.warn}${r.splitAt?`<button data-split title="Split at the sentence Auto-split missed">Split here</button>`:''}</div>`:''}<div class="src-h2">${r.h}</div>
-        ${r.p?`<p>${r.p}</p>`:''}${r.items?`<ul>${r.items.map(i=>`<li>${i}</li>`).join('')}</ul>`:''}${r.rows?`<table>${r.rows.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join('')}</table>`:''}${r.quote?`<p style="font-style:italic">“${r.quote}”</p>`:''}
-        <button class="src-skip" data-skip title="Not reusable — boilerplate, contents, project-specific"><span class="ms">block</span> Skip</button><button class="src-unskip" data-unskip>Un-skip</button>
-        <button class="src-draft"><span class="ms">auto_awesome</span> ${hasContent()?'New block / add':'New block'}</button></div>`).join('');
-    host.querySelectorAll('.src-region').forEach(reg=>{
-      const id=reg.dataset.region, r=pg.r.find(x=>x.id===id);
-      reg.querySelector('[data-skip]').addEventListener('click',e=>{ e.stopPropagation(); skip[id]=true; saveDocState(); renderDocPage(); renderDocHead(); });
-      reg.querySelector('[data-unskip]').addEventListener('click',e=>{ e.stopPropagation(); delete skip[id]; saveDocState(); renderDocPage(); renderDocHead(); });
-      reg.querySelector('[data-split]')?.addEventListener('click',e=>{ e.stopPropagation(); splitRegion(pg, r); });
-      reg.addEventListener('click',()=>{
-        if(window.getSelection && String(window.getSelection()).trim().length>10) return;   // a drag-select — handled by the mouseup popover
-        if(skip[id]) return;
-        if(done[id]){ if(cur&&cur.id===done[id]) return; leaveGuard(()=>{ leaving=true; location.href=location.pathname+'#id='+done[id]+'&client='+clientId+'&doc='+docId; }); return; }
-        if(hasContent()) showPop(reg.getBoundingClientRect(), ()=>newBlockFrom(r,[id]), ()=>addToBlock(regionEls(r),[id],curPage+1));
-        else newBlockFrom(r,[id]);
-      });
-    });
-  }
-  // "Split here": the flagged section becomes two — text before/after the sentence Auto-split missed.
-  function splitRegion(pg, r){
-    const i=pg.r.indexOf(r), at=r.p.indexOf(r.splitAt); if(i<0||at<0) return;
-    const a={id:r.id, h:r.h, p:r.p.slice(0,at).trim()}, b={id:r.id+'-b', h:r.splitTitle||'Incident reporting', p:r.p.slice(at).trim()};
-    pg.r.splice(i,1,a,b); renderDocPage(); renderDocHead(); showToast('Split into two sections');
-  }
-  function gotoPage(i){ curPage=Math.max(0,Math.min(srcDoc.pages.length-1,i)); renderDocHead(); renderDocPage(); hidePop(); }
-  function newBlockFrom(r, ids){
-    const go=()=>{ resetBlock(); addToBlock(regionEls(r), ids, curPage+1); document.getElementById('b-label').value=r.h; syncBar(); document.getElementById('b-cat').value = r.rows?'Table & Data':'Text Blocks'; };
-    if(hasContent() && isDirty()) confirmAction({title:'Start a new block?',body:'The block on the canvas has unsaved changes. Save it first, or discard it and start from this section.',confirm:'Discard & start new',danger:true},go); else go();
-  }
-  function addToBlock(els, ids, pageNo){
-    doc.push({cols:[els]}); ids.forEach(i=>{ if(!regionsUsed.includes(i)) regionsUsed.push(i); });
-    source = provenanceOf();
-    sel=null; render(); commit(); renderDocPage(); hidePop();
-    showToast('Added from '+provenance(pageNo)+' — mark what the client may edit');
-  }
-  // Drag-select any text on the page → floating "make block" popover.
-  const pop=document.getElementById('selPop');
-  function showPop(rect, onNew, onAdd){
-    const host=document.getElementById('leftCol').getBoundingClientRect();
-    pop.style.display=''; pop.style.left=Math.max(8,rect.left-host.left)+'px'; pop.style.top=Math.max(8,rect.top-host.top-44)+'px';
-    document.getElementById('selNew').onclick=e=>{ e.stopPropagation(); onNew(); };
-    document.getElementById('selAdd').onclick=e=>{ e.stopPropagation(); onAdd(); };
-    document.getElementById('selAdd').style.display = hasContent()?'':'none';
-  }
-  function hidePop(){ pop.style.display='none'; }
-  document.getElementById('docPage').addEventListener('mouseup',()=>{ setTimeout(()=>{
-    const s=window.getSelection(); const text=String(s).trim(); if(!s.rangeCount || text.length<=10) return;
-    const rect=s.getRangeAt(0).getBoundingClientRect(); const reg=s.anchorNode&&s.anchorNode.parentElement&&s.anchorNode.parentElement.closest('.src-region');
-    const h = reg ? srcDoc.pages[curPage].r.find(x=>x.id===reg.dataset.region).h : srcDoc.pages[curPage].t;
-    const mkP=()=>{ const e=mkEl('paragraph'); e.content={body:text}; return e; };
-    showPop(rect, ()=>newBlockFrom({h, p:text}, reg?[reg.dataset.region]:[]), ()=>addToBlock([mkP()], reg?[reg.dataset.region]:[], curPage+1));
-  },10); });
-  document.addEventListener('mousedown',e=>{ if(!e.target.closest('#selPop')) hidePop(); });
-  document.getElementById('pgPrev').addEventListener('click',()=>gotoPage(curPage-1));
-  document.getElementById('pgNext').addEventListener('click',()=>gotoPage(curPage+1));
-  if(srcDoc){ if(existing && existing.regions && existing.regions.length){ const f=regionOf(existing.regions[0]); if(f) curPage=f.n-1; } renderDocHead(); renderDocPage(); }
-  else {
-    document.getElementById('ws').classList.add('no-doc'); showTab('els');
-    document.getElementById('pgSub').innerHTML = existing ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">public</span> General library block · not tied to a client` : 'A block is a reusable section of a tender.';
-    if(!existing){   // a new block belongs to a client — pick one before anything else
-      document.getElementById('pickList').innerHTML=TENANTS.map(t=>`<a data-pick="${t.id}"><span class="av" style="background:${t.brand.primary}">${t.initials}</span><span>${t.name}<div class="sub">${brandMeta(t).files.length?'Documents received':'Waiting on documents'}</div></span></a>`).join('');
-      document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{ leaving=true; location.href=location.pathname+'#client='+a.dataset.pick+'&doc=whs'; location.reload(); }));
-      document.getElementById('pickGeneral').addEventListener('click',()=>document.getElementById('pickModal').classList.remove('open'));
-      document.getElementById('pickModal').classList.add('open');
-    }
-  }
+  document.getElementById('aiBtn').addEventListener('click',()=>{
+    const desc=document.getElementById('aiPrompt').value.trim();
+    if(!aiImage && !desc){ showToast('Add an image or say what the block is'); return; }
+    const go=()=>{ doc.push({cols:[aiDraft(desc)]}); source='Drafted by Ray from '+(aiImage?'an image':'a description'); if(!document.getElementById('b-label').value.trim() && desc){ document.getElementById('b-label').value=desc.charAt(0).toUpperCase()+desc.slice(1).replace(/\s+(with|and)\s+.*$/,''); syncBar(); }
+      sel=null; render(); commit(); showToast('Ray drafted a starting point — check the words against the image, then Save'); };
+    go();
+  });
 
+  // Who the block is for. A new block belongs to a client — pick one before anything else.
+  document.getElementById('pgSub').innerHTML = clientId
+    ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">apartment</span> Built for ${tenant.name} <span class="muted">· a block is a reusable section of a tender</span>`
+    : existing ? `<span class="ms" style="font-size:14px;vertical-align:-3px;color:var(--teal)">public</span> General library block · not tied to a client` : 'A block is a reusable section of a tender.';
+  if(!clientId && !existing){
+    document.getElementById('pickList').innerHTML=TENANTS.map(t=>`<a data-pick="${t.id}"><span class="av" style="background:${t.brand.primary}">${t.initials}</span><span>${t.name}<div class="sub">${brandMeta(t).files.length?'Documents received':'Waiting on documents'}</div></span></a>`).join('');
+    document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{ leaving=true; location.href=location.pathname+'#client='+a.dataset.pick; location.reload(); }));
+    document.getElementById('pickGeneral').addEventListener('click',()=>document.getElementById('pickModal').classList.remove('open'));
+    document.getElementById('pickModal').classList.add('open');
+  }
 
   // ---- Save. First save of a block opens the details dialog (name · category · internal name · helper);
   // later saves go straight through. "Details" in the panel/kebab reopens the dialog any time.
@@ -1472,23 +1342,22 @@ function pageInit(){
     const nm=document.getElementById('b-name').value.trim()||l;
     const bid = cur ? cur.id : 'cb-'+Date.now();
     saveCustomBlock({id:bid, name:nm, label:l, desc:document.getElementById('b-desc').value.trim(), cat:document.getElementById('b-cat').value,
-      slot:isStationery()?blockSlot:undefined, source, regions:regionsUsed.slice(), client:clientId||null, share:document.getElementById('b-share').checked,
+      slot:isStationery()?blockSlot:undefined, source, client:clientId||null, share:document.getElementById('b-share').checked,
       status:published?'active':'draft', doc:clone(doc), blockStyle:clone(blockStyle)});
     saveVersion(nm, bid); try{ localStorage.removeItem(DKEY); }catch(e){}
     cur = BLOCKS.find(b=>b.id===bid) || {id:bid,label:l};
     ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='');
-    if(srcDoc){ regionsUsed.forEach(r=>{ docState[docId].done[r]=bid; }); saveDocState(); renderDocPage(); renderDocHead(); }
     base=snap();
     showToast((published?'Saved':'Saved as draft')+' “'+l+'”'+(clientId?' for '+tenant.name:'')+(usage>0?` · updates ${usage} documents`:''));
     return true;
   }
-  function resetBlock(){ doc=[]; regionsUsed=[]; source=''; cur=null; sel=null;
+  function resetBlock(){ doc=[]; source=''; cur=null; sel=null;
     ['b-label','b-name','b-desc'].forEach(i=>document.getElementById(i).value=''); document.getElementById('b-share').checked=false;
     ['dupBtn','delBtn','del-sep','previewFld'].forEach(x=>document.getElementById(x).style.display='none');
     render(); syncBar(); history=[]; hidx=-1; pushHist(); base=snap(); }
   document.getElementById('saveBtn').addEventListener('click',()=>save(true,false));
   document.getElementById('saveNewBtn').addEventListener('click',()=>save(true,true));
-  document.getElementById('delBtn').addEventListener('click',()=>{ if(!cur) return; if(srcDoc){ const d=docState[docId].done; Object.keys(d).forEach(k=>{ if(d[k]===cur.id) delete d[k]; }); saveDocState(); } leaving=true; deleteBlock(cur.label, cur.id); });
+  document.getElementById('delBtn').addEventListener('click',()=>{ if(!cur) return; leaving=true; deleteBlock(cur.label, cur.id); });
 
   (function(){ // Kebab menus: header overflow + Add element
     document.querySelectorAll('[data-kebab]').forEach(kb=>{ const menu=kb.parentElement.querySelector('.kebab-menu'); if(!menu) return;

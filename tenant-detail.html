@@ -213,7 +213,7 @@
 
       <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
         <div class="card">
-          <div class="cd2-cardhead"><h3>Original files</h3><span class="sub" id="of-status">What the client sent us — the brand below is read from these</span><a class="btn btn-primary btn-sm" id="buildBlocksBtn" style="margin-left:auto;white-space:nowrap"><span class="ms" style="font-size:16px">auto_awesome</span> Build blocks from these</a></div>
+          <div class="cd2-cardhead"><h3>Original files</h3><span class="sub" id="of-status">What the client sent us — the brand below is read from these</span><a class="btn btn-primary btn-sm" id="buildBlocksBtn" style="margin-left:auto;white-space:nowrap"><span class="ms" style="font-size:16px">grid_view</span> Build blocks</a></div>
           <div class="of-grid" id="ofGrid"></div>
           <input type="file" id="ofFile" hidden>
         </div>
@@ -451,7 +451,7 @@ function pageInit(){
   document.getElementById('cd-tu-v').textContent=t.topup?t.topup+'% left':'None';
   meterFill(document.getElementById('cd-tu-m'),t.topup);
 
-  document.getElementById('buildBlocksBtn').href='block-edit.html#client='+t.id+'&doc=whs';
+  document.getElementById("buildBlocksBtn").href="block-edit.html#client="+t.id;
   renderIdentity(); renderDetails(); renderFiles(); renderApprove(); renderBoard();
 
   // ---- Documents tab: per-document breakdown across assigned packs + direct docs ----
