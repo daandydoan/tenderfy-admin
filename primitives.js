@@ -11,7 +11,7 @@ const PRIMITIVES = [
   {id:'table',      name:'Table',         tag:'Data',    desc:'Rows and columns of data.'},
   {id:'keyvalue',   name:'Key / Value',   tag:'Data',    desc:'A label and its value.'},
   {id:'signature',  name:'Signature',     tag:'Sign-off',desc:'A sign-off area.'},
-  {id:'divider',    name:'Divider',       tag:'Layout',  desc:'A horizontal rule.'},
+  {id:'divider',    name:'Divider',       tag:'Structure',  desc:'A horizontal rule.'},
   {id:'spacer',     name:'Spacer',        tag:'Layout',  desc:'Vertical spacing.'},
   {id:'field',      name:'Merge field',   tag:'Data',    desc:'A dynamic value from the client or project.'},
   {id:'callout',    name:'Callout',       tag:'Text',    desc:'A highlighted box for key text.'},
