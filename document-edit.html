@@ -109,7 +109,7 @@
   /* Blocks in the document render exactly like the block listing cards */
   .doc-blk{position:relative;margin-bottom:0;cursor:pointer;padding:26px 12px 14px;border-radius:10px;border:1.5px solid transparent}   /* same frame on every block, hovered or selected — nothing jumps; top room for the chips */
   .doc-blk:hover{border-color:var(--teal)}
-  .doc-blk .vb-name{position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:4px;opacity:.45;pointer-events:none;z-index:2}
+  .doc-blk .vb-name{position:absolute;top:-11px;left:8px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:4px;opacity:0;transition:opacity .1s;pointer-events:none;z-index:2}
   .doc-blk .vb-name .ms{font-size:12px}
   .doc-blk:hover .vb-name,.doc-blk.sel .vb-name{opacity:1}
   .doc-blk .pv-blk{outline:none!important;cursor:inherit}
