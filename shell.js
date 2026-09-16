@@ -143,7 +143,7 @@ function buildDrawer(){
     <div class="ditem" data-toast="Open event"><div class="t">Template QA review — 3 in queue</div><div class="m">2:00 PM</div></div>
     <div class="ditem" data-toast="Open event"><div class="t">Brand kit handoff — Ashish</div><div class="m">4:30 PM</div></div>
     <div class="dsec">To-do list</div>
-    <div class="ditem" data-toast="Open task"><div class="t">Approve Taylor Builders template v3</div><div class="m">Added: 6 hours ago</div></div>
+    <div class="ditem" data-toast="Open task"><div class="t">Approve Bramble & Kite Builders template v3</div><div class="m">Added: 6 hours ago</div></div>
     <div class="ditem" data-toast="Open task"><div class="t">Deprecate legacy CV (v1) component</div><div class="m">Added: 2 days ago</div></div>
     <div class="dsec">Server statistics</div>
     <div class="dstat"><div class="l"><span>CPU Load</span><span>71% / 100%</span></div><div class="dbar warn"><i style="width:71%"></i></div></div>

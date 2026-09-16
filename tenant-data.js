@@ -4,14 +4,14 @@
 // (brand-neutral) template is assigned — so templates stay reusable across clients.
 // Filenames/ids keep the legacy "tenant" wording; the user-facing name is "Clients".
 const TENANTS = [
-  {id:'taylor',   name:'Taylor Builders',        industry:'Construction',   initials:'TB', templates:4, plan:'Pro',     planCredits:62,  topup:0,   renews:'10 Aug 2026', brand:{primary:'#1F5C3D', secondary:'#C9A227', background:'#F4F7F5', font:'Poppins', bodyFont:'Outfit'}},
-  {id:'cpm-civil',name:'CPM Civil',              industry:'Civil',          initials:'CC', templates:3, plan:'Growth',  planCredits:45,  topup:0,   renews:'2 Sep 2026',  brand:{primary:'#123B66', secondary:'#E8622C', background:'#F2F5F9', font:'Inter',   bodyFont:'Inter'}},
-  {id:'cpm-infra',name:'CPM Infrastructure',     industry:'Infrastructure', initials:'CI', templates:3, plan:'Growth',  planCredits:80,  topup:26,  renews:'2 Sep 2026',  brand:{primary:'#0B4F4A', secondary:'#7BC043', background:'#F1F6F5', font:'Inter',   bodyFont:'Inter'}},
-  {id:'velocity', name:'Velocity Engineering',   industry:'Engineering',    initials:'VE', templates:2, plan:'Lite',    planCredits:100, topup:0,   renews:'18 Aug 2026', brand:{primary:'#2B2D42', secondary:'#EF233C', background:'#F5F5F7', font:'Outfit',  bodyFont:'Outfit'}},
-  {id:'hansen',   name:'Hansen Projects',        industry:'Construction',   initials:'HP', templates:2, plan:'Starter', planCredits:34,  topup:0,   renews:'5 Jul 2026',  brand:{primary:'#3A2E39', secondary:'#D4A15A', background:'#F7F4F2', font:'Lora',    bodyFont:'Outfit'}},
-  {id:'acme',     name:'Acme Constructions',     industry:'Construction',   initials:'AC', templates:1, plan:'Starter', planCredits:12,  topup:0,   renews:'21 Jul 2026', brand:{primary:'#8A1C1C', secondary:'#F2C14E', background:'#FAF4F2', font:'Roboto',  bodyFont:'Roboto'}},
-  {id:'northolt', name:'Northolt Construction',  industry:'Trades',         initials:'NC', templates:0, plan:'Lite',    planCredits:100, topup:0,   renews:'1 Sep 2026',  brand:{primary:'#38988A', secondary:'#FFBC4A', background:'#F2F8F6', font:'Outfit',  bodyFont:'Outfit'}},
-  {id:'civic',    name:'Civic HVAC',             industry:'HVAC',           initials:'CH', templates:1, plan:'Growth',  planCredits:96,  topup:99,  renews:'14 Aug 2026', brand:{primary:'#155E75', secondary:'#F59E0B', background:'#F1F6F8', font:'Inter',   bodyFont:'Outfit'}},
+  {id:'taylor',   name:'Bramble & Kite Builders',        industry:'Construction',   initials:'BK', templates:4, plan:'Pro',     planCredits:62,  topup:0,   renews:'10 Aug 2026', brand:{primary:'#1F5C3D', secondary:'#C9A227', background:'#F4F7F5', font:'Poppins', bodyFont:'Outfit'}},
+  {id:'cpm-civil',name:'Ironbark Civil',              industry:'Civil',          initials:'IC', templates:3, plan:'Growth',  planCredits:45,  topup:0,   renews:'2 Sep 2026',  brand:{primary:'#123B66', secondary:'#E8622C', background:'#F2F5F9', font:'Inter',   bodyFont:'Inter'}},
+  {id:'cpm-infra',name:'Ironbark Infrastructure',     industry:'Infrastructure', initials:'II', templates:3, plan:'Growth',  planCredits:80,  topup:26,  renews:'2 Sep 2026',  brand:{primary:'#0B4F4A', secondary:'#7BC043', background:'#F1F6F5', font:'Inter',   bodyFont:'Inter'}},
+  {id:'velocity', name:'Halcyon Engineering',   industry:'Engineering',    initials:'HE', templates:2, plan:'Lite',    planCredits:100, topup:0,   renews:'18 Aug 2026', brand:{primary:'#2B2D42', secondary:'#EF233C', background:'#F5F5F7', font:'Outfit',  bodyFont:'Outfit'}},
+  {id:'hansen',   name:'Wattlecreek Projects',        industry:'Construction',   initials:'WP', templates:2, plan:'Starter', planCredits:34,  topup:0,   renews:'5 Jul 2026',  brand:{primary:'#3A2E39', secondary:'#D4A15A', background:'#F7F4F2', font:'Lora',    bodyFont:'Outfit'}},
+  {id:'acme',     name:'Stonefield Constructions',     industry:'Construction',   initials:'SC', templates:1, plan:'Starter', planCredits:12,  topup:0,   renews:'21 Jul 2026', brand:{primary:'#8A1C1C', secondary:'#F2C14E', background:'#FAF4F2', font:'Roboto',  bodyFont:'Roboto'}},
+  {id:'northolt', name:'Redgum Construction',  industry:'Trades',         initials:'RC', templates:0, plan:'Lite',    planCredits:100, topup:0,   renews:'1 Sep 2026',  brand:{primary:'#38988A', secondary:'#FFBC4A', background:'#F2F8F6', font:'Outfit',  bodyFont:'Outfit'}},
+  {id:'civic',    name:'Southwind HVAC',             industry:'HVAC',           initials:'SH', templates:1, plan:'Growth',  planCredits:96,  topup:99,  renews:'14 Aug 2026', brand:{primary:'#155E75', secondary:'#F59E0B', background:'#F1F6F8', font:'Inter',   bodyFont:'Outfit'}},
 ];
 
 // Which brand token drives what inside an assigned tender template.
@@ -105,7 +105,7 @@ function brandMeta(t){
 }
 function saveBrandMeta(t){ try{ localStorage.setItem(BRAND_META_KEY(t.id), JSON.stringify(t._meta)); }catch(e){} }
 function brandLog(t, by, what){ const m=brandMeta(t); m.log.unshift({date:new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}), by, what}); saveBrandMeta(t); }
-// One-line status for pickers: "Taylor Builders · approved 1 Sep" / "· awaiting approval" / "· brand not approved".
+// One-line status for pickers: "Bramble & Kite Builders · approved 1 Sep" / "· awaiting approval" / "· brand not approved".
 function brandStatusLabel(t){ const a=brandMeta(t).approval; return a.status==='approved' ? 'approved '+a.date : a.status==='pending' ? 'awaiting client approval' : 'brand not approved'; }
 
 // Resolve a colour-role key to a concrete value for a given brand or the neutral default.

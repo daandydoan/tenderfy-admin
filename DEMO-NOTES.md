@@ -17,11 +17,11 @@ Entry: Client detail → **Build blocks** (`block-edit.html#client=taylor`); fro
 - **Save** — the first save asks for name · category · helper in a dialog; later saves are one click.
   **Save & start another** in the kebab.
 
-Blocks save against the client (*Built for Taylor Builders*); *Share as a generic template* is a save-time checkbox.
+Blocks save against the client (*Built for Bramble & Kite Builders*); *Share as a generic template* is a save-time checkbox.
 
 ## The 2-minute demo
 
-1. Client detail (Taylor) → **Build blocks**. An empty block, Taylor's brand already selected.
+1. Client detail (Bramble & Kite) → **Build blocks**. An empty block, Bramble & Kite's brand already selected.
 2. Paste a screenshot of their safety section into **Draft with AI**, type "our safety commitment with a stats table", **Draft block**.
    > "Screenshot any section of what you already have — Ray lays it out."
 3. Fix the words inline, adjust the table rows, **Save**. It appears in the Blocks list and the Document builder.
@@ -64,7 +64,7 @@ fills the Brand; every value carries *from file · page* or *assumed*; page setu
 
 Where it lives in the mockup: Client detail → *Original files*, *Approve brand*, *Brand* (with evidence tags,
 page setup, change log); Documents tab → *Brand frozen at issue* on a sent tender; Block builder →
-Preview style reads "Taylor Builders · approved 1 Sep".
+Preview style reads "Bramble & Kite Builders · approved 1 Sep".
 
 Data model (per client, `tenant-data.js` → `brandMeta(client)`; mockup persists in `tf_brandmeta_<id>`):
 
