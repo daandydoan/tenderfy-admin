@@ -126,9 +126,9 @@ Same shell as the Block Builder (one tabbed panel · canvas · Build/Preview), s
 - Drafts autosave to `tf_ddraft_<id|new>` 600ms after the last change and resume silently.
 
 **Decisions encoded in the UI**
-- Brand is applied by the renderer. Per-instance Layout / Fill / Stroke overrides are hidden
-  (`#blockInspector [data-sec=layout|border]`); the code is still there pending the styling-ownership call
-  (block owns layout/emphasis, brand owns type/colour — *proposed, not decided*).
+- Brand is applied by the renderer. Per-instance Layout / Fill / Stroke overrides on a placed block are
+  shown and live in `blocks[i].style` (this document only); whether they survive the styling-ownership call
+  (block owns layout/emphasis, brand owns type/colour — *proposed, not decided*) is open.
 - Element-level Typography overrides inside a document are allowed and live in `blocks[i].doc`.
 - Repeat rows render twice in documents as a stand-in for "one per item"; the estimator's "add another"
   belongs to the client editor.

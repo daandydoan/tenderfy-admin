@@ -163,7 +163,6 @@
   #styleTarget .ms{font-size:15px}
   #docSettings .insp-sec:first-child .insp-h{margin-top:0}
   /* Per-instance layout/paint overrides are hidden: the brand is applied by the renderer (styling ownership is a block/brand decision, not a document one) */
-  #blockInspector .insp-sec[data-sec="layout"],#blockInspector .insp-sec[data-sec="border"]{display:none}
   .bi-x{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--gray);display:flex;align-items:center;justify-content:center;cursor:pointer}
   .bi-x:hover{border-color:var(--teal);color:var(--teal)}
   .bi-x .ms{font-size:16px}
@@ -1115,7 +1114,7 @@ function pageInit(){
     fillPaint('bg'); fillPaint('bc');
     syncEditedRow(it); document.getElementById('bi-editHint').style.display=it.el?'none':'';
     const eb=document.getElementById('bi-editBlock'); eb.style.display=it.el?'none':''; if(!it.el){ const ct=TENANTS[+clientSel.value-1]; eb.href='block-edit.html#id='+it.bid+(ct?'&client='+ct.id:''); }   // select index 0 = no client
-    document.getElementById('bi-sourceHint').textContent = it.el ? 'Type and colour come from the client’s brand — the renderer applies them. Add this element inside a block to style it.' : 'Layout, fill and type come from the saved block and the client’s brand — the renderer applies them. Change the block to change every document that uses it.';
+    document.getElementById('bi-sourceHint').textContent = it.el ? 'Type and colour come from the client’s brand — the renderer applies them. Add this element inside a block to style it.' : 'Layout and appearance below apply to this document only. Type and colour come from the client’s brand. Edit the block to change every document that uses it.';
   }
   // Arrange the selected block within this document (same ops as the canvas tools / drag)
   const selIdx=()=>items.findIndex(x=>x.k===selK);
