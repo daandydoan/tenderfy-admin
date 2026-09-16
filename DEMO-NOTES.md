@@ -6,16 +6,15 @@ the "For developers" notes are what the mockup deliberately fakes.
 
 ## The block workspace (how it's meant to be used)
 
-One screen, no steps: a tabbed panel on the left (Document · Elements · Block · Style), the block on the right.
+One screen, no steps: a tabbed panel on the left (Document · Elements · Style), the block on the right.
 Entry: Client detail → *Original files* → **Build blocks from these**
-(`block-edit.html#client=taylor&doc=whs`). From the Blocks list you get the same screen with no document;
-*Attach a source document* in the kebab opens one.
+(`block-edit.html#client=taylor&doc=whs`). From the Blocks list:
+New Block asks *Who is this block for?* first.
 
 You can, in any order:
 - click any section of any page → **New block** (or **Add to this block** if one is open)
 - drag across any text → **New block from selection** / **Add to this block**
 - **Elements** tab for anything not in the document (drag or click); every element’s words are editable inline
-- set **Fixed / Editable / Locked** per element in the **Block** tab (or on the canvas)
 - **Save** — the first save asks for name · category · helper in a dialog; later saves are one click. Stays here; the section gets a ✓. **Save & new** clears the canvas
 - click a ✓ section to reopen that block
 
@@ -31,11 +30,7 @@ regions they came from; *Also available to all clients* is a checkbox.
 2. Page 4 → click **Our commitment**. Their words land in the block, named after the section,
    *From WHS Management Plan · p.4*.
 3. Click **Safety performance** → *Add to this block*. A key/value table joins it.
-4. In the panel, set the paragraph **Editable**, the heading **Locked**.
-   > "You decide what your estimators can change — and what they can't."
-5. **Client view**. Only the dashed paragraph takes a cursor.
-   > "This is exactly what your team sees."
-6. **Save & new** → both sections show ✓ on the document. Drag across a sentence on page 2 → *New block
+4. **Save & new** → both sections show ✓ on the document. Drag across a sentence on page 2 → *New block
    from selection*.
    > "Any text, any page, any order."
 
@@ -51,9 +46,6 @@ page 5 (the flagged merge).
 | Merge field | auto-filled detail | Client name, ABN, project ref — filled in per document |
 | Key / Value | details list | Label + value rows |
 | Stat | headline number | A big figure with a caption |
-| Fixed | can't be changed | Client sees it, can't edit the words |
-| Editable | your team can edit | Client can rewrite the words |
-| Locked | stays put | Client can't move or remove it |
 | Ray | the assistant | Drafts from a source document or description |
 | Preview style | see it in a brand | Renders the block in a client's brand kit |
 | Publish / Save as draft | make it available / keep working | Draft = only staff see it |
@@ -65,7 +57,7 @@ page 5 (the flagged merge).
   select a region, extract text/tables. Provenance (`source`) is stored on the block and should become
   `{docId, page, region}`.
 - **Ray** is a keyword matcher on the description and a fixed lift from the source regions. Real: LLM over
-  the extracted region, returning elements + suggested permissions.
+  the extracted region, returning elements.
 - **Client attachment.** Blocks are stored brand-neutral with `availability: All clients`. Prior reviews
   agree the real model is *block → client* (admin-built blocks belong to one client; Tenderfy base blocks
   are the exception). The mockup does not model this yet; "Preview style" stands in for it.
@@ -73,8 +65,6 @@ page 5 (the flagged merge).
   drafts, server-side versions.
 - **Image upload** stores a data URL. Real: asset store, per-client library.
 - **"Used in N"** comes from a seeded table; new blocks are 0. Real: count from documents, list them on click.
-- **Client view** is a CSS/contenteditable mode inside the admin editor. Real: the client-side editor
-  enforces Fixed/Editable/Locked server-side.
 
 ## Brand / styleguide — how it's modelled
 
@@ -123,13 +113,14 @@ store (ABN/licences/insurance) that blocks reference · block analytics / win-ra
 - **A block belongs to a client**: New Block asks *Who is this block for?* before anything else; *General library
   block* is the only client-less path (Tenderfy's seeded blocks).
 - **Provenance is by region**, shown as a page range: *From WHS Management Plan · p.4–5*.
-- **Permissions live on the element**: select it → Fixed / Editable / Locked in its toolbar; Fixed also shows a
-  badge while selected. No Block tab.
+- **No permissions in the admin workspace.** Who may edit what is decided in the client editor — *owner decides,
+  estimator obeys*. The admin’s protection is provenance and merge fields — facts with a shelf life
+  (licence, insurance, ABN) become merge fields, never prose.
 - **Sharing is a save decision**: *Share as a generic template* sits in the Save dialog with category/name/helper,
   with a warning that it must hold nothing client-specific.
 - **One save**: *Save Block*; *Save & start another* in the kebab. Autosave is the draft.
 - Elements are block-level parts only (heading, sub-heading, paragraph, list, quote, callout, image, table,
-  key/value, merge field, 2/3 columns). Style shows permission, image source and table shape; layout, fill,
+  key/value, merge field, 2/3 columns). Style shows image source and table shape; layout, fill,
   spacing, type and borders live under *Advanced styling*.
 
 Parked for the real build: **source updated** — when a client uploads v2 of a document, blocks whose regions
