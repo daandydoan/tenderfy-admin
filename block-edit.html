@@ -249,8 +249,6 @@
   .fig-op input::-webkit-outer-spin-button,.fig-op input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .fig-op-u{font-size:11px;color:var(--light)}
   .fig-paint .fig-a{width:22px;height:22px}
-  .fig-strokerow{display:grid;grid-template-columns:1fr 92px;gap:8px;margin-top:8px}
-  .fig-strokerow label{display:block;font-size:10.5px;color:var(--gray);margin-bottom:4px}
   .fig-wt{display:flex;align-items:center;gap:5px;background:#f2f5f4;border:1px solid transparent;border-radius:7px;height:32px;padding:0 8px}
   .fig-wt:focus-within{background:#fff;border-color:var(--teal)}
   .fig-wt:has(input:disabled){opacity:.45}
@@ -512,8 +510,11 @@
             <div class="fig-paint" id="s-bcolorLit" data-paint="bcolor"><span class="fig-sw"><input type="color" class="insp-color" id="s-bcolor"></span><input class="fig-hexin insp-hex" id="s-bcolorH" placeholder="EAEDEC"><span class="fig-op"><input type="number" id="s-bcolorA" min="0" max="100"><span class="fig-op-u">%</span></span><button type="button" class="fig-a" data-eye title="Show / hide"><span class="ms">visibility</span></button><button type="button" class="fig-a" data-rm title="Remove"><span class="ms">remove</span></button></div>
             <div class="bind-note" id="s-bcolorNote" style="display:none"></div>
             <select class="insp-sel fig-bind" id="s-bcolorBind"></select>
-            <div class="fig-strokerow"><div><label>Position</label><select class="insp-sel" id="s-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div><div><label>Weight</label><span class="fig-wt"><span class="ms">line_weight</span><input type="number" id="s-bw" min="0" max="40"></span></div></div>
-            <div class="insp-row" data-field="bwstyle" style="margin-top:8px"><label>Style</label><select class="insp-sel" id="s-bstyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
+            <div class="typo-grid" style="grid-template-columns:1fr 1fr 1fr;margin:10px 0 0">
+              <div><div class="fig-label">Position</div><select class="insp-sel" id="s-bpos"><option value="inside">Inside</option><option value="center">Center</option><option value="outside">Outside</option></select></div>
+              <div><div class="fig-label">Weight</div><span class="fig-field" title="Stroke weight"><span class="ms fig-ic">line_weight</span><input type="number" id="s-bw" min="0" max="40"><span class="insp-unit">px</span></span></div>
+              <div class="fig-cell" data-field="bwstyle"><div class="fig-label">Style</div><select class="insp-sel" id="s-bstyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
+            </div>
           </div>
           </details>
         </div>
@@ -973,7 +974,7 @@ function pageInit(){
     document.querySelectorAll('#styleCard .insp-sec[data-sec]').forEach(sec=>{
       // Gate individual labelled rows (typography, style, etc.) by their field.
       let anyRow=false;
-      sec.querySelectorAll('.insp-row[data-field],.typo-grid[data-field]').forEach(row=>{ const show=allowed.has(row.dataset.field); row.style.display=show?'':'none'; if(show)anyRow=true; });
+      sec.querySelectorAll('.insp-row[data-field],.typo-grid[data-field],.fig-cell[data-field]').forEach(row=>{ const show=allowed.has(row.dataset.field); row.style.display=show?'':'none'; if(show)anyRow=true; });
       // Sections built from fig-* controls declare which field(s) unlock them.
       const need=(sec.dataset.need||'').split(',').filter(Boolean);
       const needMet = need.length ? need.some(f=>allowed.has(f)) : false;
