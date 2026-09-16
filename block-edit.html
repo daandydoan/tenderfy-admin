@@ -791,7 +791,7 @@ function pageInit(){
   const PANES={els:'elPane',style:'styleCard',ai:'aiPane',code:'codePane'};
   function showTab(k){
     document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.wtab===k));
-    Object.entries(PANES).forEach(([key,id])=>{ document.getElementById(id).style.display = key===k?'':'none'; });
+    Object.entries(PANES).forEach(([key,id])=>{ const el=document.getElementById(id); const show=key===k; if(show && el.style.display==='none'){ el.classList.remove('tab-in'); void el.offsetWidth; el.classList.add('tab-in'); } el.style.display = show?'':'none'; });
   }
   document.querySelectorAll('.ws-tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.wtab)));
   showTab('els');

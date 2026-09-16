@@ -66,7 +66,8 @@ function pageInit(){
   }
   function renderGrid(){
     const list=COMPOSED_BLOCKS.filter(b=>(active==='All Blocks'||b.cat===active)&&(activeStatus==='all'||blockStatus(b.id)===activeStatus)&&(!query||(b.label+' '+b.desc+' '+b.cat).toLowerCase().includes(query)));
-    document.getElementById('grid').innerHTML=list.map(b=>{
+    const g=document.getElementById('grid'); g.classList.remove('tab-in'); void g.offsetWidth; g.classList.add('tab-in');   // restart the fade
+    g.innerHTML=list.map(b=>{
       const on=blockStatus(b.id)!=='inactive';
       return `
       <div class="lst-card" data-id="${b.id}">
