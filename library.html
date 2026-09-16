@@ -47,12 +47,6 @@
       </div>
     </div>
 
-    <div class="stat-row stat-compact">
-      <div class="stat-tile"><div class="st-ic"><span class="ms">description</span></div><div class="st-txt"><div class="st-big" id="s-total">0</div><div class="st-lbl">Documents</div></div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">check_circle</span></div><div class="st-txt"><div class="st-big" id="s-pub">0</div><div class="st-lbl">Published</div></div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-grey-bg);color:var(--st-grey-tx)"><span class="ms">edit_note</span></div><div class="st-txt"><div class="st-big" id="s-draft">0</div><div class="st-lbl">Draft</div></div></div>
-      <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">lock</span></div><div class="st-txt"><div class="st-big" id="s-restrict">0</div><div class="st-lbl">Client-restricted</div></div></div>
-    </div>
 
     <div class="lst-bar">
       <div class="lst-tabs" id="tabs"></div>
@@ -155,10 +149,6 @@ function pageInit(){
   nb.addEventListener('click',()=>{ if(typeof closePopovers==='function') closePopovers(nm); nm.classList.toggle('open'); });
 
   renderTabs(); renderStatusRow(); renderGrid(); updateFcount();
-  document.getElementById('s-total').textContent = COMPONENTS.length;
-  document.getElementById('s-pub').textContent = COMPONENTS.filter(c=>c.status==='published').length;
-  document.getElementById('s-draft').textContent = COMPONENTS.filter(c=>c.status==='draft').length;
-  document.getElementById('s-restrict').textContent = COMPONENTS.filter(c=>c.restricted).length;
 }
 </script>
 </body>
