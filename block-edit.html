@@ -75,9 +75,10 @@
   #visualPanel{display:flex;flex-direction:column;height:100%;min-height:0}
   .ed3-col,.vb-canvas,.ver-list{scrollbar-width:none;-ms-overflow-style:none}
   .ed3-col::-webkit-scrollbar,.vb-canvas::-webkit-scrollbar,.ver-list::-webkit-scrollbar{width:0;height:0;display:none}
-  .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12.5px;margin-right:6px}
+  .hdr-brand{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:12px;margin-left:6px}
   .hdr-brand .ms{font-size:17px;color:var(--teal)}
-  .hdr-brand .fin-sm{min-width:172px}
+  .hdr-brand .fin-sm{min-width:150px;padding:6px 8px;font-size:12px}
+  .hdr-brand .tb-btn{width:30px;height:30px}
   .use-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--gray);background:#eef2f1;border:1px solid var(--border);border-radius:100px;padding:4px 10px;margin-right:8px}
   .use-chip .ms{font-size:14px;color:var(--teal)}
   .vb-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -374,7 +375,6 @@
       </div>
       <div class="pg-acts">
         <span class="use-chip" id="useChip" style="display:none"></span>
-        <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select><button class="tb-btn" id="editBrandBtn" title="Edit this brand style" style="margin-left:4px"><span class="ms">edit</span></button></span>
         <a class="btn btn-primary btn-sm" id="saveBtn"><span class="ms" style="font-size:17px">save</span> Save Block</a>
         <span class="lst-kebwrap">
           <button class="pg-kebab" data-kebab aria-label="More actions"><span class="ms">more_vert</span></button>
@@ -533,6 +533,7 @@
             </span>
             <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
               <span class="autosave" id="autosave"></span>
+        <span class="hdr-brand"><span class="ms">palette</span> Preview style <select id="brandSel" class="fin fin-sm"></select><button class="tb-btn" id="editBrandBtn" title="Edit this brand style" style="margin-left:4px"><span class="ms">edit</span></button></span>
             </span>
           </div>
           <div class="vb-canvas" id="cvWrap">
