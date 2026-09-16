@@ -117,7 +117,8 @@
   .vb-col.ins-end::after{content:'';position:absolute;left:6px;right:6px;bottom:0;height:3px;background:var(--teal);border-radius:2px}
   .vb-colph{border:1.5px dashed #c2ccc9;border-radius:8px;padding:16px 10px;text-align:center;color:var(--light);font-size:11.5px;margin:auto;width:100%;display:flex;flex-direction:column;align-items:center;gap:3px}
   .vb-colph .ms{font-size:18px}
-  .vb-el{position:relative;padding:4px 8px;border-radius:7px;border:1.5px solid transparent;cursor:pointer}
+  .vb-el{position:relative;display:flex;flex-direction:column;padding:4px 8px;border-radius:7px;border:1.5px solid transparent;cursor:pointer}
+  .vb-el>.vb-body{flex:1 1 auto;min-height:0}
   .vb-el:hover{border-color:var(--teal)}
   .vb-el.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
   .vb-el.dragging{opacity:.4}
@@ -787,7 +788,7 @@ function pageInit(){
             ${row.cols.length>1?'<span class="rb" data-ratio title="Column widths"><span class="ms">view_column_2</span></span>':''}
             <span class="rb del" data-delrow title="Delete row"><span class="ms">delete</span></span>
           </div>
-          ${row.cols.map((col,c)=>`<div class="vb-col" data-r="${r}" data-c="${c}" style="flex:${(row.ratio&&row.ratio[c])||1}">
+          ${row.cols.map((col,c)=>`<div class="vb-col" data-r="${r}" data-c="${c}" data-ratio="${(row.ratio&&row.ratio[c])||1}" style="flex:${(row.ratio&&row.ratio[c])||1}">
               ${col.length?col.map((el,k)=>elHtml(el,r,c,k)).join(''):'<div class="vb-colph"><span class="ms">add</span>Drop element</div>'}
             </div>`).join('')}
         </div>`).join('')+`</div>`;
@@ -881,6 +882,9 @@ function pageInit(){
     box.style.minWidth = ewm==='min' ? (st.wpx||0)+'px' : '';
     box.style.maxWidth = ewm==='max' ? (st.wpx||0)+'px' : '';
     box.style.alignSelf = (ewm==='fixed'||ewm==='max') ? 'flex-start' : '';
+    box.style.flex = ehm==='fill' ? '1 1 auto' : '0 0 auto';   // Fill height grows to the column's height; siblings share what's left
+    // A column holding a Fixed/Min/Max-width element sizes to it; the other columns fill the rest.
+    const col=box.parentElement; if(col && col.classList.contains('vb-col')){ const sized=[...col.querySelectorAll(':scope > .vb-el')].some(el=>el.style.width||el.style.minWidth||el.style.maxWidth); col.style.flex = sized ? '0 1 auto' : (col.dataset.ratio||'1'); }
     node.style.height = ehm==='fixed' ? (st.hpx||0)+'px' : '';   // height stays on the body so hover tools aren't clipped
     node.style.maxHeight = ehm==='max' ? (st.hpx||0)+'px' : '';
     node.style.padding = boxCss(st,'pad'); node.style.margin = boxCss(st,'mar');
@@ -896,7 +900,9 @@ function pageInit(){
     [node, ...node.querySelectorAll('h1,h2,h3,h4,h5,p,li,span,a,blockquote,strong,em,td,th,ul,div')].forEach(n=>Object.assign(n.style,typo));
   }
   function elNode(r,c,k){ return page.querySelector(`.vb-el[data-r="${r}"][data-c="${c}"][data-k="${k}"] .vb-body`); }
-  function applyAllElStyles(){ doc.forEach((row,r)=>row.cols.forEach((col,c)=>col.forEach((el,k)=>applyElStyle(elNode(r,c,k), el.st)))); }
+  function applyAllElStyles(){
+    doc.forEach((row,r)=>row.cols.forEach((col,c)=>col.forEach((el,k)=>applyElStyle(elNode(r,c,k), el.st))));
+  }
   function applyActive(){ if(sel){ applyElStyle(elNode(sel.r,sel.c,sel.k), target()); } else { applyBlockStyle(); } }
 
   function fieldsFor(){
