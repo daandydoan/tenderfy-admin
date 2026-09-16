@@ -56,11 +56,11 @@ Optional: Preview style → another client (same block, their brand).
 The brand is **evidence + sign-off**, not a document we store or a kit we version.
 
 Workflow: **Request** (client sends logo · brand document · past tenders) → **Derive** (admin, Ray suggesting,
-fills the Brand; every value carries *from file · page* or *assumed*; page setup is part of it) → **Approve** (client signs off the brand) → **Build** (blocks bind roles) → **Assign**
+fills the Brand; every value carries *from file · page* or *assumed*) → **Approve** (client signs off the brand) → **Build** (blocks bind roles) → **Assign**
 (no ceremony — render applies the brand) → **Issue** (a sent document freezes its brand; later changes affect drafts only).
 
 Where it lives in the mockup: Client detail → *Original files*, *Brand* (with evidence tags, approval status,
-page setup, change log); Documents tab → *Brand frozen at issue* on a sent tender; Block builder →
+change log); Documents tab → *Brand frozen at issue* on a sent tender; Block builder →
 Preview style reads "Bramble & Kite Builders · approved 1 Sep".
 
 Data model (per client, `tenant-data.js` → `brandMeta(client)`; mockup persists in `tf_brandmeta_<id>`):
@@ -69,7 +69,6 @@ Data model (per client, `tenant-data.js` → `brandMeta(client)`; mockup persist
 client.files[]        {type: logo | brand-guide | past-tender, name, by, date, pages?, data?}
 client.requested      date the three-slot request went out (null once files are in)
 brand.evidence[key]   {from, page} | {assumed:true} | {derived:true}   — key = colour role or font
-brand.page            {marginTop, marginSide, logoPos, footer}        — geometry IS brand
 brand.approval        {status: not-sent | pending | approved, by, date}
 brand.log[]           {date, by, what}                                — a log, not versions
 document.issued       {date, brandSnapshot}                           — frozen at issue

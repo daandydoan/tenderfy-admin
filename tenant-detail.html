@@ -22,10 +22,6 @@
   .ev.derived{background:#eef2f1;color:var(--gray);border:1px solid var(--border)}
   .bt-log{margin-top:18px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--gray)}
   .bt-log .row{display:flex;gap:10px;padding:3px 0} .bt-log .d{color:var(--light);width:82px;flex-shrink:0} .bt-log .w{flex:1} .bt-log .b{color:var(--light)}
-  /* Page setup */
-  .pg-setup{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-  .pg-setup label{display:block;font-size:10.5px;color:var(--light);margin-bottom:4px}
-  .pg-setup .fin{padding:6px 9px;font-size:12px}
   /* Original files */
   .of-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .of-slot{border:1.5px dashed #c2ccc9;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:104px;cursor:pointer}
@@ -347,7 +343,6 @@ function pageInit(){
     const logoHtml = b.logo
       ? `<div style="display:flex;align-items:center;gap:12px"><img src="${b.logo}" style="width:48px;height:48px;border-radius:10px;object-fit:cover"><div><div style="font-weight:600;font-size:12.5px">Logo</div><div class="ap" style="font-size:10.5px;color:var(--light)">Cover lockup &amp; running header</div></div></div>`
       : `<div style="display:flex;align-items:center;gap:12px"><span style="width:48px;height:48px;border-radius:10px;background:${b.primary};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'${b.font}',sans-serif;font-size:17px">${t.initials}</span><div><div style="font-weight:600;font-size:12.5px">Logo</div><div class="ap" style="font-size:10.5px;color:var(--light)">Cover lockup &amp; running header</div></div></div>`;
-    const P=M.page;
     document.getElementById('btBoard').innerHTML = `
       <div><div class="bt-sec-h">Logo</div>${logoHtml}<div>${ev('logo')}</div></div>
       <div><div class="bt-sec-h">Colours</div><div class="bt-cols">${b.colours.map(colCard).join('')}</div></div>
@@ -356,15 +351,7 @@ function pageInit(){
         <div class="bt-fonts">${fontCard('Heading font', b.font, 'font')}${fontCard('Body font', b.bodyFont, 'bodyFont')}</div>
         <div class="bt-scale">${typeRows}</div>
       </div>
-      <div><div class="bt-sec-h">Page setup <span class="shared" title="Part of the brand — a brand guide dictates margins and logo placement">A4</span></div>
-        <div class="pg-setup">
-          <div><label>Top / bottom margin</label><input class="fin" type="number" data-pg="marginTop" value="${P.marginTop}" min="8" max="40"> <span class="muted" style="font-size:11px">mm</span></div>
-          <div><label>Side margin</label><input class="fin" type="number" data-pg="marginSide" value="${P.marginSide}" min="8" max="40"> <span class="muted" style="font-size:11px">mm</span></div>
-          <div><label>Logo position</label><select class="fin" data-pg="logoPos"><option value="top-left"${P.logoPos==='top-left'?' selected':''}>Top left</option><option value="top-right"${P.logoPos==='top-right'?' selected':''}>Top right</option><option value="top-centre"${P.logoPos==='top-centre'?' selected':''}>Top centre</option></select></div>
-          <div style="grid-column:1/-1"><label>Footer text</label><input class="fin" data-pg="footer" value="${P.footer.replace(/"/g,'&quot;')}"></div>
-        </div>
-      </div>`;
-    document.querySelectorAll('[data-pg]').forEach(i=>i.addEventListener('change',()=>{ M.page[i.dataset.pg]=i.type==='number'?+i.value:i.value; brandLog(t,'Kaila','Page setup: '+i.previousElementSibling.textContent); renderLog(); showToast('Page setup saved'); }));
+`;
     renderLog();
   }
   function renderLog(){
