@@ -32,19 +32,21 @@
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-amber-bg);color:var(--st-amber-tx)"><span class="ms">mark_email_unread</span></div><div class="st-big">52</div><div class="st-lbl">Pending invite</div></div>
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-green-bg);color:var(--st-green-tx)"><span class="ms">bolt</span></div><div class="st-big">134</div><div class="st-lbl">Active</div><div class="st-trend">quoted in 30 days</div></div>
       <div class="stat-tile"><div class="st-ic" style="background:var(--st-pink-bg);color:var(--st-pink-tx)"><span class="ms">block</span></div><div class="st-big">20</div><div class="st-lbl">Declined / bounced</div></div>
+      <div class="stat-tile"><div class="st-ic" style="background:var(--teal-tint);color:var(--teal)"><span class="ms">payments</span></div><div class="st-big">$12.4M</div><div class="st-lbl">Awarded value</div><div class="st-trend" style="color:var(--gray)">from all subbies&rsquo; won quotes</div></div>
     </div>
 
     <div class="pg-toolbar">
       <span class="psearch"><span class="ms">search</span><input id="scSearch" placeholder="Search by subbie, contractor or trade…"></span>
       <div style="display:flex;gap:8px;align-items:center;margin-left:auto">
-        <a class="btn btn-outline btn-sm" data-toast="Filter by status">Status <span class="ms" style="font-size:16px">arrow_drop_down</span></a>
-        <a class="btn btn-outline btn-sm" data-toast="Filter by contractor">Contractor <span class="ms" style="font-size:16px">arrow_drop_down</span></a>
+        <select class="sa-select" id="scContractor" title="Filter by contractor"></select>
+        <label class="muted" style="font-size:12.5px;display:flex;align-items:center;gap:6px">Sort<select class="sa-select" id="scSort" onchange="setSort(this.value)"><option value="name">Name (A–Z)</option><option value="quotes">Most quotes</option><option value="value">Highest value</option></select></label>
         <span class="muted" id="scCount">248 subcontractors</span>
       </div>
     </div>
+    <div class="tabs" style="margin:0 0 -1px"><div class="set" id="scTabs"></div></div>
 
     <div class="tbl-scroll">
-      <table class="ctable"><thead><tr><th>Subcontractor</th><th>Invited by</th><th>Trade</th><th>Status</th><th class="c">Quotes</th><th>Invited</th><th>Last active</th><th style="text-align:right">Action</th></tr></thead>
+      <table class="ctable"><thead><tr><th data-sort="name" onclick="setSort('name')" style="cursor:pointer">Subcontractor <span class="ms car" style="font-size:14px;vertical-align:-3px"></span></th><th>Invited by</th><th>Trade</th><th>Status</th><th class="c" data-sort="quotes" onclick="setSort('quotes')" style="cursor:pointer;text-align:center">Quotes <span class="ms car" style="font-size:14px;vertical-align:-3px"></span></th><th class="c" data-sort="value" onclick="setSort('value')" style="cursor:pointer;text-align:right">Total value <span class="ms car" style="font-size:14px;vertical-align:-3px"></span></th><th>Invited</th><th>Last active</th><th style="text-align:right">Action</th></tr></thead>
         <tbody id="scBody"></tbody>
       </table>
       <div class="ct-foot"><span>Showing 1–8 of 248</span><span class="pgbtn" data-toast="Previous page"><span class="ms" style="font-size:16px">chevron_left</span></span><span class="pgbtn" data-toast="Next page"><span class="ms" style="font-size:16px">chevron_right</span></span></div>
@@ -65,32 +67,53 @@ const SUBS = [
 ];
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const PENDING=['Invited','Viewed','Declined'];
+// Total awarded value per subbie (won quotes). Sample rows; aggregate stat is 248-scale.
+SUBS.forEach((s,i)=>s.value=[428000,262000,0,0,96500,0,0,0][i]||0);
+const money = n => !n ? '&mdash;' : n>=1e6 ? '$'+(n/1e6).toFixed(1).replace(/\.0$/,'')+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'k' : '$'+n;
+const FILTERS=['all','Active','Registered','Viewed','Invited','Declined'];
+const SORT_DIR={name:1,quotes:-1,value:-1};   // default sort direction per column
+let curFilter='all', curSort='name', sortDir=1, curContractor='';
 
+function visible(){
+  const v=(document.getElementById('scSearch').value||'').toLowerCase().trim();
+  const list=SUBS.map((s,i)=>({s,i})).filter(({s})=>
+    (curFilter==='all'||s.status===curFilter) &&
+    (!curContractor||s.by===curContractor) &&
+    (!v||(s.name+' '+s.by+' '+s.trade).toLowerCase().includes(v)));
+  const key={name:x=>x.s.name.toLowerCase(),quotes:x=>x.s.quotes,value:x=>x.s.value}[curSort];
+  return list.sort((a,b)=>{const x=key(a),y=key(b);return x<y?-sortDir:x>y?sortDir:0;});
+}
 function renderRows(){
-  document.getElementById('scBody').innerHTML = SUBS.map((s,i)=>`
+  const list=visible();
+  document.getElementById('scBody').innerHTML = list.map(({s,i})=>`
     <tr class="${s.suspended?'suspended':''}">
       <td><div class="ccell"><span class="ava" style="background:${s.color}">${s.av}</span><span style="font-weight:600">${esc(s.name)}</span>${s.verified?'<span class="ms" title="Verified" style="font-size:15px;color:var(--teal)">verified</span>':''}</div></td>
       <td class="trade">${esc(s.by)}</td>
       <td class="trade">${esc(s.trade)}</td>
       <td><span class="badge ${s.suspended?'b-suspended':s.badge}">${s.suspended?'Suspended':s.status}</span></td>
       <td class="c" style="text-align:center;font-weight:600">${s.quotes||'&mdash;'}</td>
+      <td class="c" style="text-align:right;font-weight:600">${money(s.value)}</td>
       <td class="trade">${s.inv}</td>
       <td class="trade">${s.last}</td>
       <td style="text-align:right;white-space:nowrap">${(PENDING.includes(s.status)&&!s.suspended)?`<a class="sc-resend" onclick="saResend(event,${i})">Resend</a>`:''}<a class="rq-view" href="view-subbie.html#i=${i}">View &rarr;</a></td>
     </tr>`).join('');
+  document.getElementById('scCount').textContent = list.length+' of '+SUBS.length;
+  document.querySelectorAll('#scTabs .tab').forEach(t=>t.classList.toggle('active',t.dataset.f===curFilter));
+  document.querySelectorAll('.ctable th[data-sort] .car').forEach(c=>c.textContent='');
+  const car=document.querySelector('.ctable th[data-sort="'+curSort+'"] .car'); if(car) car.textContent=sortDir>0?'arrow_upward':'arrow_downward';
 }
+const tabCount = f => f==='all'?SUBS.length:SUBS.filter(s=>s.status===f).length;
+function setFilter(f){ curFilter=f; renderRows(); }
+function setSort(col){ if(curSort===col) sortDir=-sortDir; else { curSort=col; sortDir=SORT_DIR[col]||1; } document.getElementById('scSort').value=col; renderRows(); }
 function saResend(e,i){ if(e)e.stopPropagation(); showToast('Invite resent to '+SUBS[i].name); }
 
 function pageInit(){
+  document.getElementById('scTabs').innerHTML = FILTERS.map(f=>`<div class="tab ${f===curFilter?'active':''}" data-f="${f}" onclick="setFilter('${f}')">${f==='all'?'All':f}<span class="ct">${tabCount(f)}</span></div>`).join('');
+  const bys=[...new Set(SUBS.map(s=>s.by))].sort();
+  document.getElementById('scContractor').innerHTML='<option value="">All contractors</option>'+bys.map(b=>`<option>${esc(b)}</option>`).join('');
+  document.getElementById('scContractor').onchange=e=>{ curContractor=e.target.value; renderRows(); };
+  document.getElementById('scSearch').addEventListener('input', renderRows);
   renderRows();
-  const q = document.getElementById('scSearch');
-  q.addEventListener('input', ()=>{
-    const v = q.value.toLowerCase().trim();
-    document.querySelectorAll('#scBody tr').forEach((tr,i)=>{
-      const s = SUBS[i];
-      tr.style.display = (!v || (s.name+' '+s.by+' '+s.trade).toLowerCase().includes(v)) ? '' : 'none';
-    });
-  });
 }
 </script>
 </body>

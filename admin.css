@@ -137,3 +137,5 @@
   .c-side .c-logout,.c-side:not(:hover) .c-logout{width:auto;margin:14px 16px 0;border-radius:100px}
   .c-side .c-logout .clbl{display:inline}
 }
+
+.sa-select{font:inherit;font-size:13px;color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:7px 10px;background:#fff;cursor:pointer}

@@ -23,7 +23,7 @@
     </div>
     <p class="sub" id="vSub" style="margin:-6px 0 18px"></p>
 
-    <div class="vs-stats" style="grid-template-columns:repeat(5,1fr)" id="vStats"></div>
+    <div class="vs-stats" style="grid-template-columns:repeat(6,1fr)" id="vStats"></div>
 
     <div class="row">
       <div class="grow">
@@ -73,6 +73,9 @@ const SUBS = [
   {name:'Meridian Earthworks',av:'ME',color:'#827717',by:'Wattlecreek Projects',trade:'Earthworks',status:'Registered',badge:'b-registered',quotes:1,inv:'9 Mar 2026',last:'3 days ago',contact:'Lena Ford',email:'lena@meridianearth.com.au',abn:'88 640 112 305',region:'Torrington, QLD',verified:false,acc:0,resp:70,turn:'3.1 days',comp:['current','current','missing','current']},
 ];
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Total awarded value per subbie (won quotes) — same figures as the list page.
+SUBS.forEach((s,i)=>s.value=[428000,262000,0,0,96500,0,0,0][i]||0);
+const money = n => !n ? '—' : n>=1e6 ? '$'+(n/1e6).toFixed(1).replace(/\.0$/,'')+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'k' : '$'+n;
 const COMP_NAMES=['Public Liability','Workers Comp','Trade Licence','White Card'];
 const COMP=Object.assign(Object.create(null),{current:{c:'#34C759',t:'Current',x:'var(--teal)'},expiring:{c:'var(--secondary)',t:'Expiring soon',x:'#B7791F'},expired:{c:'var(--accent)',t:'Expired',x:'var(--accent)'},missing:{c:'var(--lighter)',t:'Not on file',x:'var(--light)'}});
 const PENDING=['Invited','Viewed','Declined'];
@@ -81,15 +84,24 @@ let cur=+((new URLSearchParams(location.search || location.hash.slice(1))).get('
 if(!(cur>=0&&cur<SUBS.length)) cur=0;
 
 function timeline(s){
-  const viewed=s.status!=='Invited', reg=['Registered','Active'].includes(s.status), quoted=s.quotes>0;
+  const viewed=s.status!=='Invited', reg=['Registered','Active'].includes(s.status);
   const ev=[
     {t:'Invited by '+s.by, d:s.inv, done:true},
     {t:'Viewed the request', d:viewed?s.inv:'Not yet', done:viewed},
-    {t:'Created Tenderfy account', d:reg?'Registered':'No account yet', done:reg},
-    {t:quoted?('Submitted '+s.quotes+' quote'+(s.quotes>1?'s':'')):'First quote submitted', d:quoted?(s.acc+' accepted'):'Not yet', done:quoted},
   ];
-  if(s.status==='Declined') ev.push({t:'Declined the invite', d:s.last, done:true});
-  else ev.push({t:'Last active', d:s.last, done:s.status==='Active'});
+  if(s.status==='Declined'){ ev.push({t:'Declined the invitation', d:s.last, done:true}); return ev; }
+  ev.push({t:'Created Tenderfy account', d:reg?'Registered':'No account yet', done:reg});
+  if(reg){
+    // Once active, the timeline reflects work status — quotes, awarded, not awarded.
+    if(s.quotes>0){
+      ev.push({t:'Submitted '+s.quotes+' quote'+(s.quotes>1?'s':''), d:s.inv, done:true});
+      if(s.acc>0) ev.push({t:'Won '+s.acc+' contract'+(s.acc>1?'s':'')+' · '+money(s.value), d:(s.quotes-s.acc)+' not awarded', done:true});
+      else ev.push({t:'Awaiting outcome', d:s.quotes+' under review', done:false});
+    } else {
+      ev.push({t:'No quotes submitted yet', d:'—', done:false});
+    }
+    ev.push({t:'Last active', d:s.last, done:s.status==='Active'});
+  }
   return ev;
 }
 
@@ -111,6 +123,7 @@ function render(){
   document.getElementById('vStats').innerHTML=[
     {v:s.quotes||'—',l:'Quotes submitted'},
     {v:s.acc||'—',l:'Accepted',s2:s.quotes?wr+' win rate':''},
+    {v:money(s.value),l:'Total value'},
     {v:s.resp?s.resp+'%':'—',l:'Response rate',live:s.status==='Active'},
     {v:s.turn,l:'Avg turnaround'},
     {v:'1',l:'Contractors'}
