@@ -1,4 +1,4 @@
-# Tenderfy Super Admin — Business Analysis (initial)
+# Tenderfy Super Admin Business Analysis (initial)
 
 **Version** 0.1 · draft for review · 28 Sep 2026
 **Author** Daniel (dev + UI/UX)
@@ -6,7 +6,7 @@
 **Source of truth** this file. The 2-page summary for non-BA readers is `brief.html`; screen-by-screen wording is `handoff/copy.md`; prototype behaviour and fakes are `DEMO-NOTES.md`.
 **Status of evidence** Everything below is derived from the working prototype at
 `https://daandydoan.github.io/tenderfy-admin/` and the decisions logged in this repo. It has **not**
-been validated with an onboarding operator — see §12 OQ-1.
+been validated with an onboarding operator. See §12 OQ-1.
 
 ---
 
@@ -58,7 +58,7 @@ shelf life (licence numbers, insurance currency) go stale inside prose.
 **Problem statement.** A contractor has no reusable, on-brand, structured tender kit; every bid is
 rebuilt from scratch by whoever is free, and quality depends on which old document they started from.
 
-**The Tenderfy answer, and the thing this document specifies.** Tenderfy staff — not the client —
+**The Tenderfy answer, and the thing this document specifies.** Tenderfy staff, not the client,
 build that kit once, from evidence the client already has. The client's estimators then only ever
 supply words into a structure that is already correct and already on-brand.
 
@@ -76,7 +76,7 @@ brand through one renderer).
 |---|---|---|---|---|
 | BO-1 | Cut the time a contractor spends producing a tender | Hours per tender, estimator-reported | TBD | Needs a before-number from two real clients |
 | BO-2 | Every issued tender is on-brand and structurally consistent | % of issued tenders rendered from an approved brand | n/a | Enforced by BR-3 |
-| BO-3 | Onboarding a client is repeatable and cheap enough to scale | Admin hours per client onboarding; lead time to first fillable template | **unknown — OQ-1** | The number that decides whether admin-built scales |
+| BO-3 | Onboarding a client is repeatable and cheap enough to scale | Admin hours per client onboarding; lead time to first fillable template | **unknown, see OQ-1** | The number that decides whether admin-built scales |
 | BO-4 | Content is written once and reused | Average number of documents a block is used in | prototype: seeded | Requires the real "used in N" count |
 | BO-5 | Stale facts cannot rot inside prose | % of shelf-life facts held as merge fields, not text | n/a | BR-10 |
 
@@ -86,20 +86,20 @@ brand through one renderer).
 
 | Stakeholder | Interest | Influence | Needs from this work |
 |---|---|---|---|
-| Tom — founder | Does admin-built onboarding scale; commercial model | High | BO-3 answered; the model defensible to prospects |
-| Shivam — tech lead | Feasibility, shared component library, effort | High | Unambiguous data model and invariants (§10, §11) |
-| Daniel — BA / dev / UI-UX | Owns prototype and spec | High | Decisions closed so the client side can be scoped |
+| Tom (founder) | Does admin-built onboarding scale; commercial model | High | BO-3 answered; the model defensible to prospects |
+| Shivam (tech lead) | Feasibility, shared component library, effort | High | Unambiguous data model and invariants (§10, §11) |
+| Daniel (BA / dev / UI-UX) | Owns prototype and spec | High | Decisions closed so the client side can be scoped |
 | Onboarding operator (Tenderfy staff) | Day-to-day user of every module here | Medium | Fast, forgiving builders; no dead ends |
 | Sales | Something sayable to a prospect | Medium | Lead time, what the client must hand over, rebrand answer |
-| Client owner (contractor) | Brand correctness; control over estimators | High (external) | Brand sign-off; permissions — client-side |
-| Client estimator | Producing a bid on deadline | Medium (external) | A template that is already right — client-side |
+| Client owner (contractor) | Brand correctness; control over estimators | High (external) | Brand sign-off; permissions (client-side) |
+| Client estimator | Producing a bid on deadline | Medium (external) | A template that is already right (client-side) |
 
 ### 4.1 Actors in the admin system
-- **Super Admin** — full access including settings and roles.
-- **Library Manager** — builds and edits blocks, documents, templates.
-- **Template Builder** — builds, cannot approve.
-- **QA Approver** — moves items from In review to Approved.
-- **Member** — read-only.
+- **Super Admin**: full access including settings and roles.
+- **Library Manager**: builds and edits blocks, documents, templates.
+- **Template Builder**: builds, cannot approve.
+- **QA Approver**: moves items from In review to Approved.
+- **Member**: read-only.
 (Roles as modelled in `settings.html`; see OQ-4 on whether the matrix is final.)
 
 ---
@@ -109,18 +109,17 @@ brand through one renderer).
 | Term | Definition | In the reader's own words |
 |---|---|---|
 | **Client (tenant)** | A contractor business that subscribes to Tenderfy | The customer |
-| **Brand** | A versioned record of the client's visual tokens — logo, colours by role, heading/body fonts, type scale — each value tagged with its evidence | The client's styleguide, proven |
+| **Brand** | A versioned record of the client's visual tokens (logo, colours by role, heading/body fonts, type scale), each value tagged with its evidence | The client's styleguide, proven |
 | **Element** | The smallest part: heading, paragraph, list, quote, callout, image, table, key/value, merge field, stat, divider, signature | A part |
 | **Block** | A reusable section of a tender: rows of 1–3 columns of elements, owned by a client | One section |
 | **Document** | One or more A4 pages assembled from blocks, plus letterhead/footer and background regions | A page or handful of pages |
 | **Tender template** | Documents arranged in the fixed section order and assigned to a client | The whole bid |
 | **Merge field** | A placeholder resolved per document (client name, ABN, project ref) | An auto-filled detail |
-| **Repeat row** | A block row marked "one per item" — rendered once per instance at fill time | One per item |
+| **Repeat row** | A block row marked "one per item", rendered once per instance at fill time | One per item |
 | **Issue** | Sending a tender; freezes the brand it rendered with | The moment it goes out |
 | **Ray** | The AI assistant that drafts a block or brand values from a client file | The assistant |
 
-**Containment:** Tender template ⊃ Documents ⊃ Blocks ⊃ Elements. Brand is not in that chain — it is
-applied across all of it by the renderer at output.
+**Containment:** Tender template ⊃ Documents ⊃ Blocks ⊃ Elements. Brand is not in that chain; the renderer applies it across all of it at output.
 
 ---
 
@@ -165,7 +164,7 @@ traceable as `FR-<module>-<n>`.
 - FR-M3-1 Record client files by type (logo · brand-guide · past-tender) with who and when.
 - FR-M3-2 Derive brand values, each carrying evidence: `{from, page}` | `{assumed}` | `{derived}`.
 - FR-M3-3 Track approval status (`not-sent` → `pending` → `approved`) with approver and date.
-- FR-M3-4 Keep a change log of brand edits (a log, not versions, in the prototype — see OQ-3).
+- FR-M3-4 Keep a change log of brand edits (a log, not versions, in the prototype; see OQ-3).
 - FR-M3-5 Render any block or document in a chosen client's brand for comparison ("Preview style").
 - FR-M3-6 Freeze the brand onto a document at issue (`document.issued.brandSnapshot`).
 
@@ -174,8 +173,8 @@ traceable as `FR-<module>-<n>`.
 - FR-M4-2 Compose rows of 1–3 columns; add elements by drag, click, or the insert line between elements.
 - FR-M4-3 Edit any element's words inline with rich text (bold / italic / underline / strike / link).
 - FR-M4-4 Style a selected element: Typography, and Layout / Dimension / Appearance under advanced styling.
-- FR-M4-5 Mark a row as a repeat row (down or across) — "one per item".
-- FR-M4-6 Draft a block from a screenshot or photo of the client's existing section, plus an optional description. *(prototype: keyword match — see §9)*
+- FR-M4-5 Mark a row as a repeat row (down or across), "one per item".
+- FR-M4-6 Draft a block from a screenshot or photo of the client's existing section, plus an optional description. *(prototype: keyword match, see §9)*
 - FR-M4-7 Save: first save captures name · category · helper text; later saves are one click; "Save & start another".
 - FR-M4-8 Mark a block "Share as a generic template" at save time, with a warning that it must hold nothing client-specific.
 - FR-M4-9 Show where a block is used ("Used in N documents") and open that list.
@@ -187,7 +186,7 @@ traceable as `FR-<module>-<n>`.
 - FR-M5-3 Paginate to A4 and preview as pages.
 - FR-M5-4 Edit words inside a placed block **for this document only**, creating a local copy; offer "Revert to block".
 - FR-M5-5 Override element typography inside a placed block, stored on the same local copy.
-- FR-M5-6 Override a placed block's layout and appearance for this document (`blocks[i].style`). *(see OQ-2 — this is the live styling-ownership question)*
+- FR-M5-6 Override a placed block's layout and appearance for this document (`blocks[i].style`). *(see OQ-2: this is the live styling-ownership question)*
 - FR-M5-7 Reorder, duplicate and remove placed blocks; reorder from a Layers list.
 - FR-M5-8 Classify the document (Resume, Case study, Policy, Insurance, Certification, Org chart, Cover page, TOC, Other) and set status.
 - FR-M5-9 Save to the library and assign to clients.
@@ -234,7 +233,7 @@ traceable as `FR-<module>-<n>`.
 | BR-9 | Tender templates follow the fixed section order. | Buyer-side expectation in construction tendering |
 | BR-10 | Facts with a shelf life (licence, insurance, ABN) are merge fields, never prose. | Stops stale facts being sent |
 | BR-11 | Nothing reaches a client's estimators without passing QA review. | Last check before it represents the client |
-| BR-12 | The admin workspace carries no per-field permissions. Who may edit what is decided in the client editor — *owner decides, estimator obeys*. | Keeps the admin builders simple; one place owns permissions |
+| BR-12 | The admin workspace carries no per-field permissions. Who may edit what is decided in the client editor: *owner decides, estimator obeys*. | Keeps the admin builders simple; one place owns permissions |
 | BR-13 | Brand is applied by the renderer. Blocks are brand-neutral in styling except deliberate emphasis. | One renderer, one truth |
 
 ---
@@ -310,9 +309,9 @@ blocks[i].doc     this document's copy of the block; created on first edit; "Rev
 
 | # | Question | Owner | Impact if unanswered | Proposal |
 |---|---|---|---|---|
-| **OQ-1** | What does onboarding one client actually cost — admin hours, and lead time to a fillable template? Who performs it? | Tom | BO-3 unmeasurable; sales cannot answer "how fast to first tender"; scale of the model unproven | Time-box two real onboardings and record it |
+| **OQ-1** | What does onboarding one client actually cost: admin hours, and lead time to a fillable template? Who performs it? | Tom | BO-3 unmeasurable; sales cannot answer "how fast to first tender"; scale of the model unproven | Time-box two real onboardings and record it |
 | **OQ-2** | **Styling ownership.** Which layer owns type, colour, layout and emphasis? The prototype currently allows per-document overrides of block layout and appearance, and of element typography. | Shivam + Tom | **Blocking.** Devs will scope override plumbing that may be deleted; "brand by renderer" and per-instance overrides contradict each other on the page | Brand owns type and colour; block owns layout and emphasis; document-level overrides limited to words |
-| **OQ-3** | Brand is a *log*, not versions — but an issued tender pins a snapshot. Is a real version record required for v1? | Shivam | Rebrand story is unspecified; sales already asked | Version the brand; snapshot references a version id |
+| **OQ-3** | Brand is a *log*, not versions, but an issued tender pins a snapshot. Is a real version record required for v1? | Shivam | Rebrand story is unspecified; sales already asked | Version the brand; snapshot references a version id |
 | **OQ-4** | Is the role matrix in Settings final, and does QA approval require a different role from the builder? | Tom | QA control (BR-11) may be unenforceable | Builder ≠ approver |
 | **OQ-5** | What ships in v1 vs later: server IDs, per-user drafts, document versioning, asset store? | Shivam | Estimate cannot be produced | Scope against §9 |
 | **OQ-6** | Where does the PDF renderer run and how does it share the renderer with the front end (NFR-2)? | Shivam | Risk of a second renderer and visual drift | One shared library, server-invoked |
@@ -346,8 +345,8 @@ blocks[i].doc     this document's copy of the block; created on first edit; "Rev
 
 | # | Risk | Likelihood | Impact | Response |
 |---|---|---|---|---|
-| R-1 | Onboarding cost makes admin-built uneconomic at scale | Medium | High | OQ-1 — measure before committing to the model |
-| R-2 | Styling ownership left open; override plumbing built then deleted | High | Medium | OQ-2 — decide before the client-side sprint |
+| R-1 | Onboarding cost makes admin-built uneconomic at scale | Medium | High | OQ-1: measure before committing to the model |
+| R-2 | Styling ownership left open; override plumbing built then deleted | High | Medium | OQ-2: decide before the client-side sprint |
 | R-3 | Prototype stand-ins (AI Draft) read as shipped and estimated as done | Medium | High | §9 table; `concept` badges kept on screen |
 | R-4 | A second renderer appears server-side; PDFs drift from preview | Medium | High | NFR-2, I-2 |
 | R-5 | "No sync" (BR-8) surprises a client whose block was updated | Medium | Medium | State it in the client editor UI; consider an opt-in refresh later |
@@ -357,7 +356,7 @@ blocks[i].doc     this document's copy of the block; created on first edit; "Rev
 
 ## 15. Next steps
 
-1. Close **OQ-2** (styling ownership) — blocking the client-side spec.
+1. Close **OQ-2** (styling ownership), blocking the client-side spec.
 2. Produce the **OQ-1** onboarding measurement from two real clients.
 3. Shivam to size §7 against §9 and §10 and return a v1 / later split (OQ-5).
 4. On OQ-2's answer, write the client-editor BA document against §10's contract.
