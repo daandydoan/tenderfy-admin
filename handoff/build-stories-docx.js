@@ -6,7 +6,7 @@ const {
 
 const SRC = 'G:/Claude/Subbies/tenderfy-admin/handoff/USER-STORIES-BLOCK-BUILDER.md';
 const OUT = 'G:/Claude/Subbies/tenderfy-admin/handoff/Block Builder User Stories.docx';
-const TEAL = '1D9E75', DARK = '17402F', GREY = '6B7772', LINE = 'D7DEDB', BAND = 'F2F7F5';
+const INK = '1A1A1A', GREY = '666666', LINE = 'C8C8C8', BAND = 'EFEFEF';
 const BODY = 'Calibri';
 
 /* ---------- inline markdown ---------- */
@@ -20,7 +20,7 @@ function runs(text, base = {}) {
     if (m.index > last) out.push(new TextRun({ text: text.slice(last, m.index), font: BODY, ...base }));
     const t = m[0];
     if (t.startsWith('**')) out.push(new TextRun({ text: t.slice(2, -2), bold: true, font: BODY, ...base }));
-    else if (t.startsWith('`')) out.push(new TextRun({ text: t.slice(1, -1), font: 'Consolas', size: (base.size || 22) - 2, color: DARK }));
+    else if (t.startsWith('`')) out.push(new TextRun({ text: t.slice(1, -1), font: 'Consolas', size: (base.size || 22) - 2, color: INK }));
     else out.push(new TextRun({ text: t.slice(1, -1), italics: true, font: BODY, ...base }));
     last = re.lastIndex;
   }
@@ -42,7 +42,7 @@ const cell = (text, o = {}) => new TableCell({
   shading: o.fill ? { type: ShadingType.CLEAR, color: 'auto', fill: o.fill } : undefined,
   margins: { top: 60, bottom: 60, left: 100, right: 100 },
   children: [new Paragraph({
-    children: runs(text, { size: o.head ? 19 : 20, bold: o.head || undefined, color: o.head ? 'FFFFFF' : undefined }),
+    children: runs(text, { size: o.head ? 19 : 20, bold: o.head || undefined }),
     spacing: { after: 0, line: 252 },
   })],
 });
@@ -56,7 +56,7 @@ function table(rows, widths) {
     }, {}),
     rows: rows.map((r, i) => new TableRow({
       tableHeader: i === 0,
-      children: r.map((c, j) => cell(c, { w: widths[j], head: i === 0, fill: i === 0 ? TEAL : (i % 2 === 0 ? BAND : undefined) })),
+      children: r.map((c, j) => cell(c, { w: widths[j], head: i === 0, fill: i === 0 ? BAND : undefined })),
     })),
   });
 }
@@ -90,13 +90,12 @@ while (i < lines.length) {
 
   if (l.startsWith('# ')) {                                   // document title + doc control table
     doc.push(new Paragraph({
-      children: [new TextRun({ text: 'Block Builder', bold: true, size: 48, color: DARK, font: BODY })],
+      children: [new TextRun({ text: 'Block Builder', bold: true, size: 36, color: INK, font: BODY })],
       spacing: { after: 0 },
     }));
     doc.push(new Paragraph({
-      children: [new TextRun({ text: 'User stories', size: 40, color: TEAL, font: BODY })],
+      children: [new TextRun({ text: 'User stories', size: 28, color: GREY, font: BODY })],
       spacing: { after: 100 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: TEAL, space: 10 } },
     }));
     doc.push(P('', { after: 200 }));
     const ctl = [];
@@ -116,7 +115,7 @@ while (i < lines.length) {
   }
   if (false) {
     doc.push(new Paragraph({
-      children: [new TextRun({ text: plain(l.slice(2)), bold: true, size: 44, color: DARK, font: BODY })],
+      children: [new TextRun({ text: plain(l.slice(2)), bold: true, size: 44, color: INK, font: BODY })],
       spacing: { after: 60 },
     }));
     i++; continue;
@@ -125,16 +124,15 @@ while (i < lines.length) {
     const txt = plain(l.slice(3));
     doc.push(new Paragraph({
       heading: HeadingLevel.HEADING_1, keepNext: true,
-      children: [new TextRun({ text: txt, bold: true, size: 30, color: TEAL, font: BODY })],
-      spacing: { before: 380, after: 140 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: LINE, space: 6 } },
+      children: [new TextRun({ text: txt, bold: true, size: 26, color: INK, font: BODY })],
+      spacing: { before: 320, after: 120 },
     }));
     inFront = false; i++; continue;
   }
   if (l.startsWith('### ')) {                                 // story / sub-section
     doc.push(new Paragraph({
       heading: HeadingLevel.HEADING_2, keepNext: true,
-      children: [new TextRun({ text: plain(l.slice(4)), bold: true, size: 24, color: DARK, font: BODY })],
+      children: [new TextRun({ text: plain(l.slice(4)), bold: true, size: 24, color: INK, font: BODY })],
       spacing: { before: 260, after: 100 },
     }));
     i++; continue;
@@ -146,7 +144,7 @@ while (i < lines.length) {
       numbering: { reference: 'bullets', level: 0 },
       spacing: { after: 40, line: 264 },
       children: gwt
-        ? [new TextRun({ text: gwt[1], bold: true, font: BODY, size: 21, color: TEAL }), ...runs(gwt[2], { size: 21 })]
+        ? [new TextRun({ text: gwt[1], bold: true, font: BODY, size: 21, color: INK }), ...runs(gwt[2], { size: 21 })]
         : runs(t, { size: 21 }),
     }));
     i++; continue;
@@ -162,10 +160,8 @@ while (i < lines.length) {
   if (l.startsWith('**As a**') || l.startsWith('**As an**')) { // the story statement, as a callout
     doc.push(new Paragraph({
       children: runs(l, { size: 22 }),
-      spacing: { before: 80, after: 140, line: 276 },
-      indent: { left: 200, right: 200 },
-      shading: { type: ShadingType.CLEAR, color: 'auto', fill: BAND },
-      border: { left: { style: BorderStyle.SINGLE, size: 18, color: TEAL, space: 10 } },
+      spacing: { before: 60, after: 120, line: 276 },
+      indent: { left: 340 },
     }));
     i++; continue;
   }
